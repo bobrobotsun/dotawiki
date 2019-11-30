@@ -679,9 +679,19 @@ class Main(QMainWindow):
 
     def edit_target_selected_changed(self):
         selected=[self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
-        if len(edit_json.edit[selected[0]])>0:
+        if len(edit_json.edit_source[selected[0]])>0:
             self.editlayout['修改核心']['竖布局']['代码库'][0].setCurrentText(self.json_base[selected[0]][selected[1]]['代码名'])
             self.edit_text_base_selected_changed()
+        self.editlayout['修改核心']['竖布局']['树'][0].clear()
+        self.editlayout['修改核心']['竖布局']['树']={0:self.editlayout['修改核心']['竖布局']['树'][0]}
+        self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值','填入类型'])
+        self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 200)
+        self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'],edit_json.edit[selected[0]])
+
+    def complex_dict_to_tree(self, tdict, jdict):
+        for j in jdict:
+            i
+
 
     def edit_text_base_selected_changed(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['代码库'][0].currentText()]
