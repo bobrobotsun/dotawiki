@@ -73,8 +73,11 @@ def get_hero_data_from_txt(base_txt,address):
             break
 
 
-def fulfill_unit_json(base_txt, all_json):
+def fulfill_unit_json(base_txt, all_json,version):
     for i in all_json:
+        all_json[i]["分类"] = "非英雄单位"
+        all_json[i]["版本"] = version
+        all_json[i]["应用"] = 1
         for j in unitpro_txt + unitpro_num:
             popit = []
             for k in all_json[i][j[0]]:

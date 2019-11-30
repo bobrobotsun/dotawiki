@@ -106,11 +106,11 @@ def get_hero_data_from_txt(base_txt,address):
             break
 
 
-def get_source_to_data(all_json, upgrade_json):
+def get_source_to_data(all_json, upgrade_json,version):
     for ijk in all_json['技能']:
         unit_dic=copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"
-        unit_dic["版本"] = "7.22h"
+        unit_dic["版本"] = version
         unit_dic["应用"] = 1
         if unit_dic["技能排序"] == "":
             if unit_dic["默认按键"] == "Q":

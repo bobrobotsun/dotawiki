@@ -88,11 +88,11 @@ def get_hero_data_from_txt(base_txt,source_address):
             break
 
 
-def fulfill_hero_json(base_txt, all_json):
+def fulfill_hero_json(base_txt, all_json,version):
     for i in all_json:
         if all_json[i]["代码名"] in base_txt["英雄"]:
             all_json[i]["分类"] = "英雄"
-            all_json[i]["版本"] = "7.22h"
+            all_json[i]["版本"] = version
             all_json[i]["应用"] = 1
             for j in heropro_txt:
                 if j[1] in base_txt["英雄"][all_json[i]["代码名"]]:

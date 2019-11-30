@@ -137,10 +137,10 @@ def get_hero_data_from_txt(base_txt,address):
             break
 
 
-def fulfill_item_json(base_txt, all_json):
+def fulfill_item_json(base_txt, all_json,version):
     for ii in all_json:
         all_json[ii]["分类"] = "物品"
-        all_json[ii]["版本"] = "7.22h"
+        all_json[ii]["版本"] = version
         all_json[ii]["应用"] = 1
         if '升级' in all_json[ii]:
             all_json[ii].pop('升级')
