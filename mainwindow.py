@@ -552,11 +552,11 @@ class Main(QMainWindow):
             self.editlayout[0].addWidget(self.editlayout['修改核心'][0])
             self.editlayout['修改核心']['竖布局'] = {0: QVBoxLayout()}
             self.editlayout['修改核心'][0].setLayout(self.editlayout['修改核心']['竖布局'][0])
-            self.editlayout['修改核心']['竖布局']['大分类']={0:QComboBox(self)}
+            self.editlayout['修改核心']['竖布局']['大分类'] = {0: QComboBox(self)}
             self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['大分类'][0])
-            self.editlayout['修改核心']['竖布局']['具体库']={0:QComboBox(self)}
+            self.editlayout['修改核心']['竖布局']['具体库'] = {0: QComboBox(self)}
             self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['具体库'][0])
-            self.editlayout['修改核心']['竖布局']['代码库']={0:QComboBox(self)}
+            self.editlayout['修改核心']['竖布局']['代码库'] = {0: QComboBox(self)}
             self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['代码库'][0])
             for i in edit_json.edit:
                 self.editlayout['修改核心']['竖布局']['大分类'][0].addItem(i)
@@ -592,11 +592,11 @@ class Main(QMainWindow):
 
     def resort(self):
         for i in self.text_base:
-            self.text_base[i]=edit_json.sortedDictValues(self.text_base[i],False)
+            self.text_base[i] = edit_json.sortedDictValues(self.text_base[i], False)
         for i in self.json_base:
-            self.json_base[i]=edit_json.sortedDictValues(self.json_base[i],True)
+            self.json_base[i] = edit_json.sortedDictValues(self.json_base[i], True)
         for i in self.json_name:
-            self.json_name[i]=edit_json.sortedList(self.json_name[i])
+            self.json_name[i] = edit_json.sortedList(self.json_name[i])
         self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
         self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
@@ -667,38 +667,38 @@ class Main(QMainWindow):
                 tdict[i].setText(1, str(jdict[i]))
 
     def edit_category_selected_changed(self):
-        selected=self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         self.editlayout['修改核心']['竖布局']['具体库'][0].clear()
         self.editlayout['修改核心']['竖布局']['代码库'][0].clear()
         for i in self.json_base[selected]:
             self.editlayout['修改核心']['竖布局']['具体库'][0].addItem(i)
-        if len(edit_json.edit[selected])>0:
+        if len(edit_json.edit[selected]) > 0:
             for i in self.text_base[selected]:
                 self.editlayout['修改核心']['竖布局']['代码库'][0].addItem(i)
         self.edit_target_selected_changed()
 
     def edit_target_selected_changed(self):
-        selected=[self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
-        if len(edit_json.edit_source[selected[0]])>0:
+        selected = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        if len(edit_json.edit_source[selected[0]]) > 0:
             self.editlayout['修改核心']['竖布局']['代码库'][0].setCurrentText(self.json_base[selected[0]][selected[1]]['代码名'])
             self.edit_text_base_selected_changed()
         self.editlayout['修改核心']['竖布局']['树'][0].clear()
-        self.editlayout['修改核心']['竖布局']['树']={0:self.editlayout['修改核心']['竖布局']['树'][0]}
-        self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值','填入类型'])
+        self.editlayout['修改核心']['竖布局']['树'] = {0: self.editlayout['修改核心']['竖布局']['树'][0]}
+        self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值', '填入类型'])
         self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 200)
-        self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'],edit_json.edit[selected[0]])
+        self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]])
 
     def complex_dict_to_tree(self, tdict, jdict):
         for j in jdict:
-            i
-
+            pass
 
     def edit_text_base_selected_changed(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['代码库'][0].currentText()]
         self.editlayout['基础数据']['竖布局']['树'][0].clear()
-        self.editlayout['基础数据']['竖布局']['树']={0:self.editlayout['基础数据']['竖布局']['树'][0]}
+        self.editlayout['基础数据']['竖布局']['树'] = {0: self.editlayout['基础数据']['竖布局']['树'][0]}
         self.dict_to_tree(self.editlayout['基础数据']['竖布局']['树'], self.text_base[ss[0]][ss[1]])
         self.editlayout['基础数据']['竖布局']['树'][0].expandAll()
+
 
 class upload_text(QWidget):
     def __init__(self, first_txt):
@@ -723,3 +723,29 @@ class upload_text(QWidget):
         self.b.append(content)
         self.cursor = self.b.textCursor()
         self.b.moveCursor(self.b.textCursor().End)
+
+
+class TreeItemEdit(QTreeWidgetItem):
+    def __init__(self, father):
+        super().__init__(father)
+        self.itemvalue = ''
+        self.itemtype = ''
+        self.hasvalue = False
+        self.haslist = False
+        self.listtype = {}
+
+    def set_type(self, t):
+        self.itemtype = t
+
+    def set_value(self, v):
+        self.itemvalue = v
+        self.setText(1, str(v))
+        self.hasvalue = True
+
+    def delete_value(self):
+        self.itemvalue = ''
+        self.hasvalue = False
+
+    def set_kid_list(self, l):
+        self.haslist = True
+        self.listtype = l
