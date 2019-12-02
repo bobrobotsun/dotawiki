@@ -11,7 +11,8 @@
 from mainwindow import Main
 import sys
 from PyQt5.QtWidgets import QApplication
-
+"""
+"""
 app = QApplication(sys.argv)
 ex = Main()
 sys.exit(app.exec_())
