@@ -501,7 +501,6 @@ class Main(QMainWindow):
             self.lock.acquire()
             try:
                 self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]] = self.local.download_info.json()['jsondata']
-                print(self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]])
                 self.progress.addtext(
                     '【' + QTime.currentTime().toString() + '】【' + threading.current_thread().name + '】下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功')
                 self.current_num[0] += 1
@@ -577,14 +576,25 @@ class Main(QMainWindow):
             self.editlayout['竖布局'][0].addStretch(1)
             self.editlayout['竖布局']['修改数据'] = QPushButton('修改数据', self)
             self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['修改数据'])
+            self.editlayout['竖布局']['修改数据'].clicked.connect(self.json_edit_change_value)
             self.editlayout['竖布局']['增加列表'] = QPushButton('增加列表', self)
             self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['增加列表'])
+            self.editlayout['竖布局']['增加列表'].clicked.connect(self.json_edit_add_list)
             self.editlayout['竖布局']['删除列表'] = QPushButton('删除列表', self)
             self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除列表'])
+            self.editlayout['竖布局']['删除列表'].clicked.connect(self.json_edit_delete_list)
+            self.editlayout['竖布局']['增加新次级条目'] = QPushButton('增加新次级条目', self)
+            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['增加新次级条目'])
+            self.editlayout['竖布局']['增加新次级条目'].clicked.connect(self.json_edit_add_new_item)
+            self.editlayout['竖布局']['删除该次级条目'] = QPushButton('删除该次级条目', self)
+            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除该次级条目'])
+            self.editlayout['竖布局']['删除该次级条目'].clicked.connect(self.json_edit_delete_item)
             self.editlayout['竖布局']['转换为混合文字'] = QPushButton('转换为混合文字', self)
             self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['转换为混合文字'])
+            self.editlayout['竖布局']['转换为混合文字'].clicked.connect(self.json_edit_text_to_combine)
             self.editlayout['竖布局']['转换为普通文字'] = QPushButton('转换为普通文字', self)
             self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['转换为普通文字'])
+            self.editlayout['竖布局']['转换为普通文字'].clicked.connect(self.json_edit_combine_to_text)
             self.editlayout['竖布局'][0].addStretch(5)
 
             self.editlayout['额外机制'] = {0: QGroupBox('额外机制', self)}
@@ -604,6 +614,7 @@ class Main(QMainWindow):
             self.edit_category_selected_changed()
             self.editlayout['修改核心']['竖布局']['具体库'][0].activated.connect(self.edit_target_selected_changed)
             self.editlayout['修改核心']['竖布局']['代码库'][0].activated.connect(self.edit_text_base_selected_changed)
+            self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
 
     def resort(self):
         for i in self.text_base:
@@ -619,7 +630,7 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
 
-    def update_json_base(self,info="更新数据成功！\n您可以选择上传这些数据。"):
+    def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
         hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
         item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
 
@@ -697,7 +708,7 @@ class Main(QMainWindow):
         self.edit_target_selected_changed()
 
     def edit_target_selected_changed(self):
-        selected = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        selected = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         if len(edit_json.edit_source[selected[0]]) > 0:
             if selected[0] == '非英雄单位':
                 target = self.json_base[selected[0]][selected[1]]['代码名']["1"]
@@ -714,10 +725,11 @@ class Main(QMainWindow):
         self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 200)
         self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]], self.json_base[selected[0]][selected[1]])
         self.editlayout['修改核心']['竖布局']['树'][0].expandAll()
+        self.self_edit_button_default()
 
     def complex_dict_to_tree(self, tdict, edict, sdict):
         for i in edict:
-            if i!='list':
+            if i != 'list':
                 if i in sdict:
                     if edict[i][0] == 'tree':
                         tdict[i] = {0: TreeItemEdit(tdict[0], i)}
@@ -760,7 +772,7 @@ class Main(QMainWindow):
                         self.add_another_to_json(str(index), edict['list'], sdict)
                     else:
                         break
-                i=str(index)
+                i = str(index)
                 tdict[0].listtype[2] += 1
                 tdict[0].listtype[3] += 1
                 if edict['list'][0] == 'tree':
@@ -778,7 +790,7 @@ class Main(QMainWindow):
     def combine_text_to_tree(self, tdict, sdict):
         tdict['混合文字'] = {0: TreeItemEdit(tdict[0], '混合文字')}
         tdict['混合文字'][0].set_type('combine_tree')
-        tdict['混合文字'][0].set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 3, False]}, 1, 1, False]}])
+        tdict['混合文字'][0].set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 3, False]}, 1, 1, False]},1,0,False])
         for i in sdict['混合文字']:
             if isinstance(sdict['混合文字'][i], dict):
                 tdict['混合文字'][i] = {0: TreeItemEdit(tdict['混合文字'][0], i)}
@@ -798,7 +810,6 @@ class Main(QMainWindow):
                 tdict[i] = {0: TreeItemEdit(tdict[0], i)}
                 tdict[i][0].settype('tree')
                 tdict[i][0].israndom = True
-                tdict[i][0].clicked.connect(self.tree_item_clicked)
             else:
                 tdict[i] = TreeItemEdit(tdict[0], i)
                 tdict[i][0].israndom = True
@@ -825,8 +836,8 @@ class Main(QMainWindow):
                 sdict[name] = {}
                 for j in edict[1]:
                     self.add_another_to_json(j, edict[1][j], sdict[name])
-            elif edict[0]=='random_tree':
-                sdict[name]={}
+            elif edict[0] == 'random_tree':
+                sdict[name] = {}
             else:
                 sdict[name] = edict[1]
 
@@ -838,13 +849,13 @@ class Main(QMainWindow):
         self.editlayout['基础数据']['竖布局']['树'][0].expandAll()
 
     def json_edit_new(self):
-        selected=self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
-        text, ok = QInputDialog.getText(self, '新增一个'+selected,'请输入你想要的'+selected+'的名称:')
+        selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        text, ok = QInputDialog.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:')
         if ok:
             self.json_name[selected].append(text)
-            self.json_base[selected][text]={}
+            self.json_base[selected][text] = {}
             for i in edit_json.edit[selected]:
-                self.add_another_to_json(i,edit_json.edit[selected][i],self.json_base[selected][text])
+                self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
             self.resort()
             self.editlayout['基础数据']['竖布局']['代码库'][0].setCurrentText(selected)
             self.edit_category_selected_changed()
@@ -852,16 +863,16 @@ class Main(QMainWindow):
             self.edit_target_selected_changed()
 
     def json_edit_save(self):
-        ss=[self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
-        self.json_base[ss[0]][ss[1]]={}
-        self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'],self.json_base[ss[0]][ss[1]])
+        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        self.json_base[ss[0]][ss[1]] = {}
+        self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
         self.update_json_base('已经保存更改并更新完毕\n您可以选择统一上传或继续编辑。')
 
     def json_edit_save_and_upload(self):
-        ss=[self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
-        self.json_base[ss[0]][ss[1]]={}
-        self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'],self.json_base[ss[0]][ss[1]])
+        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        self.json_base[ss[0]][ss[1]] = {}
+        self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
         self.update_json_base('已经保存并更新完毕\n确认后会上传本次修改内容\n如果您的修改影响了其他库内容，请之后进行一次统一更新。')
         if ss[0] == '技能源':
@@ -869,24 +880,126 @@ class Main(QMainWindow):
         else:
             self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
 
+    def tree_item_clicked(self):
+        sender = self.sender().currentItem()
+        parent = sender.parent()
+        self.editlayout['竖布局']['修改数据'].setEnabled(sender.hasvalue)
+        self.editlayout['竖布局']['增加列表'].setEnabled(sender.haslist and not sender.israndom)
+        self.editlayout['竖布局']['删除列表'].setEnabled(sender.islist and not sender.israndom)
+        self.editlayout['竖布局']['增加新次级条目'].setEnabled(sender.israndom and sender.itemtype=='tree')
+        self.editlayout['竖布局']['删除该次级条目'].setEnabled(sender.israndom and parent.israndom)
+        self.editlayout['竖布局']['转换为混合文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() == 0 and not sender.israndom)
+        self.editlayout['竖布局']['转换为普通文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() > 0 and not sender.israndom)
+
+    def self_edit_button_default(self,bool=False):
+        self.editlayout['竖布局']['修改数据'].setEnabled(bool)
+        self.editlayout['竖布局']['增加列表'].setEnabled(bool)
+        self.editlayout['竖布局']['删除列表'].setEnabled(bool)
+        self.editlayout['竖布局']['增加新次级条目'].setEnabled(bool)
+        self.editlayout['竖布局']['删除该次级条目'].setEnabled(bool)
+        self.editlayout['竖布局']['转换为混合文字'].setEnabled(bool)
+        self.editlayout['竖布局']['转换为普通文字'].setEnabled(bool)
+
     def json_edit_change_value(self):
-        sender=self.sender()
-        if sender.hasvalue:
-            self.editlayout['竖布局']['修改数据'].enabled=False
-        if sender.haslist:
-            self.editlayout['竖布局']['增加列表'].enabled = False
-        if sender.islist or sender.israndom:
-            self.editlayout['竖布局']['删除列表'].enabled = False
+        text, ok = QInputDialog.getText(self, '修改值', '您想将其修改为:')
+        if ok:
+            item=self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+            if item.itemtype=='number':
+                try:
+                    ii=float(text)
+                    item.set_value(ii)
+                except ValueError:
+                    QMessageBox.critical(self,'输入格式错误','您应当输入一串数字，而不是文字！',QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes)
+            else:
+                item.set_value(text)
 
+    def json_edit_add_list(self):
+        item=self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        i=str(item.listtype[2])
+        item.listtype[2] += 1
+        item.listtype[3] += 1
+        if item.itemtype=='combine_tree':
+            item.tree_or_text=not item.tree_or_text
+        if item.itemtype=='combine_tree' and item.tree_or_text:
+            temp=TreeItemEdit(item, i)
+            temp.set_type('text')
+            temp.set_value('')
+            temp.islist = True
+        else:
+            sdict = {}
+            self.add_another_to_json(i, item.listtype, sdict)
+            if item.listtype[0] == 'tree':
+                temp = {0: TreeItemEdit(item, i)}
+                temp[0].set_type(item.listtype[0])
+                temp[0].islist = True
+                self.complex_dict_to_tree(temp, item.listtype[1], sdict[i])
+            else:
+                temp = TreeItemEdit(item, i)
+                temp.set_type(item.listtype[0])
+                temp.set_value(sdict[i])
+                temp.islist = True
+        self.editlayout['修改核心']['竖布局']['树'][0].expandAll()
 
-    def read_tree_to_json(self,tdict,sdict):
-        for i in tdict:
-            if i!=0:
-                if isinstance(tdict[i],dict):
-                    sdict[i]={}
-                    self.read_tree_to_json(tdict[i],sdict[i])
-                else:
-                    sdict[i]=tdict[i].itemvalue
+    def json_edit_delete_list(self):
+        item=self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        ii=int(item.text(0))
+        parent=item.parent()
+        parent.removeChild(item)
+        for i in range(ii-parent.listtype[2]+parent.listtype[3],parent.childCount()):
+            parent.child(i).setText(0,str(i+parent.listtype[2]-parent.listtype[3]))
+        parent.listtype[2]-=1
+        parent.listtype[3]-=1
+        if parent.itemtype=='combine_tree':
+            parent.tree_or_text=not parent.tree_or_text
+
+    def json_edit_text_to_combine(self):
+        item=self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        item.delete_value()
+        temp = TreeItemEdit(item, '混合文字')
+        temp.set_type('combine_tree')
+        temp.set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 3, False]}, 1, 1, False]},1,0,False])
+        self.tree_item_clicked()
+
+    def json_edit_combine_to_text(self):
+        item=self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        item.removeChild(item.child(0))
+        item.set_value('')
+        self.tree_item_clicked()
+
+    def json_edit_add_new_item(self):
+        item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        choose=('文字（可以填入任意信息）','数字（只能填入有效数字）','树（可以拥有下属信息，但自身没有值）')
+        text1,ok1=QInputDialog.getItem(self,"增加新条目",'条目的类型',choose,0,False)
+        text2,ok2=QInputDialog.getText(self,'增加新条目','新条目的名称为：')
+        if ok1 and ok2:
+            temp=TreeItemEdit(item, text2)
+            temp.israndom=True
+            if choose[0]==text1:
+                temp.set_type('text')
+                temp.set_value('')
+            elif choose[1]==text1:
+                temp.set_type('number')
+                temp.set_value(0)
+            elif choose[2]==text1:
+                temp.set_type('tree')
+
+    def json_edit_delete_item(self):
+        item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        parent = item.parent()
+        parent.removeChild(item)
+
+    def read_tree_to_json(self, tree, sdict):
+        for i in range(tree.topLevelItemCount()):
+            self.read_tree_item_to_json(tree.topLevelItem(i), sdict)
+
+    def read_tree_item_to_json(self, item, sdict):
+        if item.childCount() > 0:
+            sdict[item.text(0)] = {}
+            for i in range(item.childCount()):
+                self.read_tree_item_to_json(item.child(i), sdict[item.text(0)])
+        else:
+            sdict[item.text(0)] = item.itemvalue
+
 
 class upload_text(QWidget):
     def __init__(self, first_txt):
@@ -936,6 +1049,7 @@ class TreeItemEdit(QTreeWidgetItem):
 
     def delete_value(self):
         self.itemvalue = ''
+        self.setText(1, '')
         self.hasvalue = False
 
     def set_kid_list(self, l):
