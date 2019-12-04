@@ -859,37 +859,50 @@ class Main(QMainWindow):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         text, ok = QInputDialog.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:')
         if ok:
-            print(selected, self.json_name)
             self.json_name[selected].append(text)
             self.json_base[selected][text] = {}
-            print(self.json_name[selected])
             for i in edit_json.edit[selected]:
                 self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
             self.resort()
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
             self.edit_category_selected_changed()
-            self.editlayout['修改核心']['竖布局']['代码库'][0].setCurrentText(text)
+            self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
             self.edit_target_selected_changed()
 
     def json_edit_delete(self):
-        warning=QMessageBox.warning(self, '删除', '您正试图删除一个库，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if warning==QMessageBox.Yes:
-            ss=[self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['代码库'][0].currentText()]
-            self.json_name[ss[0]][ss[1]]['应用']=0
-            self.upload_json()
+        warning = QMessageBox.warning(self, '删除', '您正试图删除一个库，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if warning == QMessageBox.Yes:
+            ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+            self.json_base[ss[0]][ss[1]]['应用'] = 0
             if ss[0] == '技能源':
                 self.upload_json('Data:' + ss[1] + '/源.json', json.dumps(self.json_base[ss[0]][ss[1]]))
             else:
                 self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
-            self.json_name[ss[0]].pop(ss[1])
+            self.json_base[ss[0]].pop(ss[1])
             self.resort()
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
             self.edit_category_selected_changed()
-            QMessageBox.information(self,'删除完毕','删除成功！您将不会再看到这个库。')
-
+            QMessageBox.information(self, '删除完毕', '删除成功！您将不会再看到这个库。')
 
     def json_edit_change_name(self):
-        pass
+        warning = QMessageBox.warning(self, '改名', '您正改变库的名字，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if warning == QMessageBox.Yes:
+            ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+            text, ok = QInputDialog.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:')
+            if ok:
+                self.json_base[ss[0]][text]=copy.deepcopy(self.json_base[ss[0]][ss[1]])
+                self.json_base[ss[0]][ss[1]]['应用'] = '改名'
+                if ss[0] == '技能源':
+                    self.upload_json('Data:' + ss[1] + '/源.json', json.dumps(self.json_base[ss[0]][ss[1]]))
+                else:
+                    self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
+                self.json_base[ss[0]].pop(ss[1])
+                self.resort()
+                self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
+                self.edit_category_selected_changed()
+                self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
+                self.edit_target_selected_changed()
+                QMessageBox.information(self, '改名完毕', '库【'+ss[1]+'】已经被改名为【'+text+'】\n请记得保存后上传')
 
     def json_edit_save(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
