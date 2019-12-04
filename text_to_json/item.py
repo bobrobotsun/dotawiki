@@ -142,6 +142,10 @@ def fulfill_item_json(base_txt, all_json,version):
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
         all_json[ii]["应用"] = 1
+        if all_json[i]['图片'] == '':
+            all_json[i]['图片'] = 'items_' + all_json[i]["代码名"] + '.png'
+        if all_json[i]['迷你图片'] == '':
+            all_json[i]['迷你图片'] = 'items_' + all_json[i]["代码名"] + '.png'
         if '升级' in all_json[ii]:
             all_json[ii].pop('升级')
         for i in item_for_item:

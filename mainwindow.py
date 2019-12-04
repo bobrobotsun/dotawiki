@@ -726,6 +726,7 @@ class Main(QMainWindow):
             if target in self.text_base[edit_json.edit_source[selected[0]][0]]:
                 self.editlayout['修改核心']['竖布局']['代码库'][0].setCurrentText(target)
                 self.edit_text_base_selected_changed()
+        QApplication.processEvents()
         self.editlayout['修改核心']['竖布局']['树'][0].clear()
         self.editlayout['修改核心']['竖布局']['树'] = {0: self.editlayout['修改核心']['竖布局']['树'][0]}
         self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
@@ -769,7 +770,7 @@ class Main(QMainWindow):
                     else:
                         tdict[i] = TreeItemEdit(tdict[0], i)
                         tdict[i].set_type(edict[i][0])
-                        tdict[i].set_value(sdict[i])
+                        tdict[i].set_value(edict[i][1])
         if 'list' in edict:
             tdict[0].set_kid_list(edict['list'])
             index = tdict[0].listtype[2]
