@@ -910,6 +910,7 @@ class Main(QMainWindow):
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
         self.update_json_base('已经保存更改并更新完毕\n您可以选择统一上传或继续编辑。')
+        self.edit_target_selected_changed()
 
     def json_edit_save_and_upload(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
@@ -921,6 +922,7 @@ class Main(QMainWindow):
             self.upload_json('Data:' + ss[1] + '/源.json', json.dumps(self.json_base[ss[0]][ss[1]]))
         else:
             self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
+        self.edit_target_selected_changed()
 
     def tree_item_clicked(self):
         sender = self.sender().currentItem()
