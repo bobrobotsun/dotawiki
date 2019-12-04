@@ -463,9 +463,9 @@ class Main(QMainWindow):
                 self.json_base[i] = {}
                 for j in self.json_name[i]:
                     if i == '技能源':
-                        self.download_json_list.append([i, j[:-7], j])
+                        self.download_json_list.append([i, j, j+'/源.json'])
                     else:
-                        self.download_json_list.append([i, j[:-5], j])
+                        self.download_json_list.append([i, j, j+'.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
             for i in range(10):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1))
