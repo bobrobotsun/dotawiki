@@ -54,8 +54,8 @@ class Main(QMainWindow):
         self.json_name = {"英雄": [], "非英雄单位": [], "物品": [], "技能": [], '技能源': []}
         self.upgrade_base = {}
         self.mech = {}
-        self.red=QBrush(Qt.red)
-        self.green=QBrush(Qt.green)
+        self.red = QBrush(Qt.red)
+        self.green = QBrush(Qt.green)
 
     def initUI(self):
         # 设定软件的图标
@@ -465,9 +465,9 @@ class Main(QMainWindow):
                 self.json_base[i] = {}
                 for j in self.json_name[i]:
                     if i == '技能源':
-                        self.download_json_list.append([i, j, j+'/源.json'])
+                        self.download_json_list.append([i, j, j + '/源.json'])
                     else:
-                        self.download_json_list.append([i, j, j+'.json'])
+                        self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
             for i in range(10):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1))
@@ -751,8 +751,8 @@ class Main(QMainWindow):
                         tdict[i] = {0: TreeItemEdit(tdict[0], i)}
                         tdict[i][0].set_type(edict[i][0])
                         self.complex_dict_to_tree(tdict[i], edict[i][1], sdict[i])
-                        if len(edict[i])>2 and edict[i][2]:
-                            tdict[i][0].setBackground(1,self.green)
+                        if len(edict[i]) > 2 and edict[i][2]:
+                            tdict[i][0].setBackground(1, self.green)
                     elif edict[i][0] == 'number':
                         tdict[i] = TreeItemEdit(tdict[0], i)
                         tdict[i].set_type(edict[i][0])
@@ -777,8 +777,8 @@ class Main(QMainWindow):
                         tdict[i][0].set_type(edict[i][0])
                         self.add_another_to_json(i, edict[i], sdict)
                         self.complex_dict_to_tree(tdict[i], edict[i][1], sdict[i])
-                        if len(edict[i])>2 and edict[i][2]:
-                            tdict[i][0].setBackground(1,self.red)
+                        if len(edict[i]) > 2 and edict[i][2]:
+                            tdict[i][0].setBackground(1, self.red)
                     else:
                         tdict[i] = TreeItemEdit(tdict[0], i)
                         tdict[i].set_type(edict[i][0])
@@ -903,7 +903,7 @@ class Main(QMainWindow):
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             text, ok = QInputDialog.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:')
             if ok:
-                self.json_base[ss[0]][text]=copy.deepcopy(self.json_base[ss[0]][ss[1]])
+                self.json_base[ss[0]][text] = copy.deepcopy(self.json_base[ss[0]][ss[1]])
                 self.json_base[ss[0]][ss[1]]['应用'] = '改名'
                 if ss[0] == '技能源':
                     self.upload_json('Data:' + ss[1] + '/源.json', json.dumps(self.json_base[ss[0]][ss[1]]))
@@ -915,7 +915,7 @@ class Main(QMainWindow):
                 self.edit_category_selected_changed()
                 self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
                 self.edit_target_selected_changed()
-                QMessageBox.information(self, '改名完毕', '库【'+ss[1]+'】已经被改名为【'+text+'】\n请记得保存后上传')
+                QMessageBox.information(self, '改名完毕', '库【' + ss[1] + '】已经被改名为【' + text + '】\n请记得保存后上传')
 
     def json_edit_save(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
@@ -938,13 +938,15 @@ class Main(QMainWindow):
         self.edit_target_selected_changed()
 
     def tree_item_clicked(self):
-        sender = self.sender().currentItem()
+        sender = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
         parent = sender.parent()
         self.editlayout['竖布局']['修改数据'].setEnabled(sender.hasvalue)
         self.editlayout['竖布局']['增加列表'].setEnabled(sender.haslist and not sender.israndom)
         self.editlayout['竖布局']['删除列表'].setEnabled(sender.islist and not sender.israndom)
-        self.editlayout['竖布局']['启用条目'].setEnabled(sender.background(1)==self.red)
-        self.editlayout['竖布局']['禁用条目'].setEnabled(sender.background(1)==self.green)
+        print(1)
+        self.editlayout['竖布局']['启用条目'].setEnabled(sender.background(1) == self.red)
+        self.editlayout['竖布局']['禁用条目'].setEnabled(sender.background(1) == self.green)
+        print(2)
         self.editlayout['竖布局']['增加新次级条目'].setEnabled(sender.israndom and sender.itemtype == 'tree')
         self.editlayout['竖布局']['删除该次级条目'].setEnabled(sender.israndom and parent.israndom)
         self.editlayout['竖布局']['转换为混合文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() == 0 and not sender.israndom)
@@ -1015,13 +1017,15 @@ class Main(QMainWindow):
 
     def json_edit_tree_use_true(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-        item.setBackground(1,self.green)
+        item.setBackground(1, self.green)
         self.tree_item_clicked()
+        item.setExpanded(True)
 
     def json_edit_tree_use_false(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-        item.setBackground(1,self.red)
+        item.setBackground(1, self.red)
         self.tree_item_clicked()
+        item.setExpanded(False)
 
     def json_edit_text_to_combine(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -1061,11 +1065,10 @@ class Main(QMainWindow):
 
     def edit_json_expand_all(self):
         self.editlayout['修改核心']['竖布局']['树'][0].expandAll()
-        tree=self.editlayout['修改核心']['竖布局']['树'][0]
+        tree = self.editlayout['修改核心']['竖布局']['树'][0]
         for i in range(tree.topLevelItemCount()):
-            if tree.topLevelItem(i).background(1)==self.red:
+            if tree.topLevelItem(i).background(1) == self.red:
                 tree.topLevelItem(i).setExpanded(False)
-
 
     def read_tree_to_json(self, tree, sdict):
         for i in range(tree.topLevelItemCount()):
@@ -1073,7 +1076,7 @@ class Main(QMainWindow):
 
     def read_tree_item_to_json(self, item, sdict):
         if item.childCount() > 0:
-            if item.background(1)==self.red:
+            if item.background(1) == self.red:
                 pass
             else:
                 sdict[item.text(0)] = {}
