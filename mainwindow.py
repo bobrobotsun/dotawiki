@@ -753,7 +753,7 @@ class Main(QMainWindow):
                         self.complex_dict_to_tree(tdict[i], edict[i][1], sdict[i])
                         if len(edict[i]) > 2 and edict[i][2]:
                             tdict[i][0].setBackground(1, self.green)
-                    elif edict[i][0] == 'number':
+                    elif edict[i][0] == 'number' or edict[i][0] == 'int':
                         tdict[i] = TreeItemEdit(tdict[0], i)
                         tdict[i].set_type(edict[i][0])
                         tdict[i].set_value(sdict[i])
@@ -852,6 +852,8 @@ class Main(QMainWindow):
                             self.add_another_to_json(j, edict[1][j], sdict[str(i)])
                     else:
                         sdict[str(i)] = edict[1]
+        elif len(edict)>2 and edict[2]:
+            pass
         else:
             if edict[0] == 'tree':
                 sdict[name] = {}
@@ -965,15 +967,21 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['转换为普通文字'].setEnabled(bool)
 
     def json_edit_change_value(self):
-        text, ok = QInputDialog.getText(self, '修改值', '您想将其修改为:')
+        item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        text, ok = QInputDialog.getText(self, '修改值', '您想将其修改为:',QLineEdit.Normal,item.text(1))
         if ok:
-            item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
             if item.itemtype == 'number':
                 try:
                     ii = float(text)
                     item.set_value(ii)
                 except ValueError:
                     QMessageBox.critical(self, '输入格式错误', '您应当输入一串数字，而不是文字！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            elif item.itemtype == 'int':
+                try:
+                    ii = int(text)
+                    item.set_value(ii)
+                except ValueError:
+                    QMessageBox.critical(self, '输入格式错误', '您应当输入一串整数，而不是文字或小数！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             else:
                 item.set_value(text)
 
@@ -1044,7 +1052,7 @@ class Main(QMainWindow):
 
     def json_edit_add_new_item(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-        choose = ('文字（可以填入任意信息）', '数字（只能填入有效数字）', '树（可以拥有下属信息，但自身没有值）')
+        choose = ('文字（可以填入任意信息）', '数字（只能填入有效数字）','整数（只能填入不含小数点的整数）', '树（可以拥有下属信息，但自身没有值）')
         text1, ok1 = QInputDialog.getItem(self, "增加新条目", '条目的类型', choose, 0, False)
         text2, ok2 = QInputDialog.getText(self, '增加新条目', '新条目的名称为：')
         if ok1 and ok2:
@@ -1057,6 +1065,9 @@ class Main(QMainWindow):
                 temp.set_type('number')
                 temp.set_value(0)
             elif choose[2] == text1:
+                temp.set_type('int')
+                temp.set_value(0)
+            elif choose[3] == text1:
                 temp.set_type('tree')
 
     def json_edit_delete_item(self):
