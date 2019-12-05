@@ -94,9 +94,9 @@ def fulfill_hero_json(base_txt, all_json,version):
             all_json[i]["分类"] = "英雄"
             all_json[i]["版本"] = version
             all_json[i]["应用"] = 1
-            if all_json[i]['图片']=='':
+            if '图片' not in all_json[i] or all_json[i]['图片']=='':
                 all_json[i]['图片']='heroes_'+all_json[i]["代码名"]+'.png'
-            if all_json[i]['迷你图片']=='':
+            if '迷你图片' not in all_json[i] or all_json[i]['迷你图片']=='':
                 all_json[i]['迷你图片']='miniheroes_'+all_json[i]["代码名"]+'.png'
             for j in heropro_txt:
                 if j[1] in base_txt["英雄"][all_json[i]["代码名"]]:

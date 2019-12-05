@@ -142,10 +142,10 @@ def fulfill_item_json(base_txt, all_json,version):
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
         all_json[ii]["应用"] = 1
-        if all_json[i]['图片'] == '':
-            all_json[i]['图片'] = 'items_' + all_json[i]["代码名"] + '.png'
-        if all_json[i]['迷你图片'] == '':
-            all_json[i]['迷你图片'] = 'items_' + all_json[i]["代码名"] + '.png'
+        if '图片' not in all_json[ii] or all_json[ii]['图片'] == '':
+            all_json[ii]['图片'] = 'items_' + all_json[ii]["代码名"] + '.png'
+        if '迷你图片' not in all_json[ii] or all_json[ii]['迷你图片'] == '':
+            all_json[ii]['迷你图片'] = 'items_' + all_json[ii]["代码名"] + '.png'
         if '升级' in all_json[ii]:
             all_json[ii].pop('升级')
         for i in item_for_item:
@@ -158,34 +158,36 @@ def fulfill_item_json(base_txt, all_json,version):
                 else:
                     all_json[ii][i]["1"] = base_txt["物品"][all_json[ii]["代码名"]][all_json[ii][i]["代码"]]["1"]
         # 以下是确认物品的组件、卷轴情况
-        if ('recipe_' + all_json[ii]["代码名"]) in base_txt["物品"]:
-            all_json[ii]["组件"] = {}
-            if base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"] != 0:
-                all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"]}
+        if all_json[ii]["商店"]["1"][:2]!='中立':
+            if ('recipe_' + all_json[ii]["代码名"]) in base_txt["物品"]:
                 all_json[ii]["组件"] = {}
-                for jj in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]:
-                    all_json[ii]["组件"][jj] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][jj]
-            else:
-                if base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][str(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]))][
-                   0:6] == 'recipe':
-                    all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1':
-                        base_txt["物品"][
-                            base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][str(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]))]][
-                            "ItemCost"]["1"]}
+                if base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"] != 0:
+                    all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"]}
                     all_json[ii]["组件"] = {}
-                    for j in range(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]) - 1):
-                        all_json[ii]["组件"][str(j + 1)] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][str(j + 1)]
+                    for jj in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]:
+                        all_json[ii]["组件"][jj] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][jj]
                 else:
-                    all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': 0}
-                    if all_json[ii]["合成"] == 0:
+                    if base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][str(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]))][
+                       0:6] == 'recipe':
+                        all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1':
+                            base_txt["物品"][
+                                base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][
+                                    str(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]))]][
+                                "ItemCost"]["1"]}
                         all_json[ii]["组件"] = {}
-                        for jj in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]:
-                            all_json[ii]["组件"][jj] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][jj]
+                        for j in range(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]) - 1):
+                            all_json[ii]["组件"][str(j + 1)] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][str(j + 1)]
                     else:
-                        all_json[ii]["组件"] = {}
-                        for jj in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]:
-                            all_json[ii]["组件"][jj] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][str(all_json[ii]["合成"])][jj]
-        all_json[all_json[ii]["页面名"]] = all_json[ii]
+                        all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': 0}
+                        if all_json[ii]["合成"] == 0:
+                            all_json[ii]["组件"] = {}
+                            for jj in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]:
+                                all_json[ii]["组件"][jj] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"][jj]
+                        else:
+                            all_json[ii]["组件"] = {}
+                            for jj in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]["1"]:
+                                all_json[ii]["组件"][jj] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][str(all_json[ii]["合成"])][jj]
+
     # 接下来把所有的组件变成中文名+图片的形式
     for i in all_json:
         if "组件" in all_json[i]:
@@ -214,9 +216,15 @@ def fulfill_item_json(base_txt, all_json,version):
                                                                                                                                   "图片": all_json[i]["图片"]}
         # 这里开始同商店物品填入
         all_json[i]["同商店物品"] = {}
-        for j in all_json:
-            if all_json[i]["商店"] == all_json[j]["商店"]:
-                all_json[i]["同商店物品"][str(len(all_json[i]["同商店物品"]) + 1)] = {"物品名": all_json[j]["页面名"], "图片": all_json[j]["图片"]}
+        if isinstance(all_json[i]["商店"],str):
+            all_json[i]["商店"]={"1":all_json[i]["商店"]}
+    for i in all_json:
+        for j in all_json[i]["商店"]:
+            all_json[i]["同商店物品"][j] = {}
+            for k in all_json:
+                for l in all_json[k]["商店"]:
+                    if all_json[i]["商店"][j] == all_json[k]["商店"][l]:
+                        all_json[i]["同商店物品"][j][str(len(all_json[i]["同商店物品"][j]) + 1)] = {"物品名": all_json[k]["页面名"], "图片": all_json[k]["图片"]}
 
 
 def create_file(all_json):

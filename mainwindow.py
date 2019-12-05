@@ -640,17 +640,17 @@ class Main(QMainWindow):
     def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
         hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
         item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
-
+        print(1)
         ability.get_source_to_data(self.json_base, self.upgrade_base, self.version)
         unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version)
-
+        print(2)
         ability.input_upgrade(self.json_base, self.upgrade_base)
-
+        print(3)
         unit.complete_upgrade(self.json_base["非英雄单位"], self.text_base)
         ability.complete_upgrade(self.json_base["技能"], self.text_base)
-
+        print(4)
         ability.complete_mech(self.json_base["技能"], self.mech)
-
+        print(5)
         for i in self.json_base["技能"]:
             ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i)
 
@@ -910,7 +910,7 @@ class Main(QMainWindow):
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
-        self.update_json_base('已经保存更改并更新完毕\n您可以选择统一上传或继续编辑。')
+        self.update_json_base(info='已经保存更改并更新完毕\n您可以选择统一上传或继续编辑。')
         self.edit_target_selected_changed()
 
     def json_edit_save_and_upload(self):
@@ -918,7 +918,7 @@ class Main(QMainWindow):
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
-        self.update_json_base('已经保存并更新完毕\n确认后会上传本次修改内容\n如果您的修改影响了其他库内容，请之后进行一次统一更新。')
+        self.update_json_base(info='已经保存并更新完毕\n确认后会上传本次修改内容\n如果您的修改影响了其他库内容，请之后进行一次统一更新。')
         if ss[0] == '技能源':
             self.upload_json('Data:' + ss[1] + '/源.json', json.dumps(self.json_base[ss[0]][ss[1]]))
         else:
