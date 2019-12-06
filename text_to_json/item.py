@@ -80,7 +80,8 @@ def finditemrequire(source, data, tb):
                 splitit = source[r[0]:r[1]].split(';')
                 data["ItemRequirements"][str(len(data["ItemRequirements"]) + 1)] = {}
                 for l in range(len(splitit)):
-                    data["ItemRequirements"][str(len(data["ItemRequirements"]))][str(l + 1)] = splitit[l][5:]
+                    if len(splitit[l])>5:
+                        data["ItemRequirements"][str(len(data["ItemRequirements"]))][str(l + 1)] = splitit[l][5:]
             else:
                 return
 

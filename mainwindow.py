@@ -475,9 +475,9 @@ class Main(QMainWindow):
             while (threading.activeCount() > 1):
                 QApplication.processEvents()
                 time.sleep(0.5)
-
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
+            QMessageBox.information(self.w, '下载完毕', "已为您下载完所有的合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
         except FileNotFoundError:
             mb = QMessageBox(QMessageBox.Critical, "获取名称集失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton, self)
             button1 = mb.addButton('从网络下载', QMessageBox.YesRole)
