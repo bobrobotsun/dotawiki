@@ -29,7 +29,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.23b'
+        self.version = '7.23c'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -477,7 +477,7 @@ class Main(QMainWindow):
                 time.sleep(0.5)
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            QMessageBox.information(self.w, '下载完毕', "已为您下载完所有的合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
+            QMessageBox.information(self.progress, '下载完毕', "已为您下载完所有的合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
         except FileNotFoundError:
             mb = QMessageBox(QMessageBox.Critical, "获取名称集失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton, self)
             button1 = mb.addButton('从网络下载', QMessageBox.YesRole)
@@ -629,6 +629,16 @@ class Main(QMainWindow):
             self.editlayout['修改核心']['竖布局']['具体库'][0].activated.connect(self.edit_target_selected_changed)
             self.editlayout['修改核心']['竖布局']['代码库'][0].activated.connect(self.edit_text_base_selected_changed)
             self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
+            self.editlayout['修改核心']['竖布局']['树'][0].doubleClicked.connect(self.tree_item_double_clicked)
+            """
+            以下是版本更新的内容
+            """
+            self.versionWidget = QWidget(self)
+            self.centralWidget().addTab(self.versionWidget, '版本更新')
+            self.versionlayout={0:QHBoxLayout()}
+            self.versionWidget.setLayout(self.versionlayout[0])
+            self.versionlayout['基础数据'] = {0: QGroupBox('基础数据', self)}
+            self.versionlayout[0].addWidget(self.versionlayout['基础数据'][0])
 
     def resort(self):
         for i in self.text_base:
@@ -954,6 +964,11 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['删除该次级条目'].setEnabled(sender.israndom and parent.israndom)
         self.editlayout['竖布局']['转换为混合文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() == 0 and not sender.israndom)
         self.editlayout['竖布局']['转换为普通文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() > 0 and not sender.israndom)
+
+    def tree_item_double_clicked(self):
+        sender = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        if sender.hasvalue:
+            self.json_edit_change_value()
 
     def self_edit_button_default(self, bool=False):
         self.editlayout['竖布局']['修改数据'].setEnabled(bool)
