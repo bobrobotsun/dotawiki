@@ -255,3 +255,38 @@ edit = {
         }]
     }
 }
+version = {
+    "更新日期": ['text', '2020/2/20'],
+    "地图作者": ['text', "Icefrog"],
+    "游戏本体": ['text', "DOTA2"],
+    "英雄": ['tree','英雄'],
+    "物品": ['tree','物品'],
+    "中立生物": ['tree','非英雄单位'],
+    "建筑": ['tree',''],
+    "兵线": ['tree',''],
+    "通用": ['tree',''],
+    "其他内容": ['tree','']
+}
+version_default={
+}
+def set_version_default(base):
+    version_default={
+        '全英雄':[],
+        '力量英雄':[],
+        '敏捷英雄':[],
+        '智力英雄':[],
+        '近战英雄':[],
+        '远程英雄':[],
+    }
+    for i in base['英雄']:
+        version_default['全英雄'].append()
+        if base['英雄'][i]['主属性']['1']=='力量':
+            version_default['力量英雄'].append(i)
+        elif base['英雄'][i]['主属性']['1']=='敏捷':
+            version_default['敏捷英雄'].append(i)
+        elif base['英雄'][i]['主属性']['1']=='智力':
+            version_default['智力英雄'].append(i)
+        if base['英雄'][i]['近战远程']['1']=='远程':
+            version_default['近战英雄'].append(i)
+        elif base['英雄'][i]['近战远程']['1']=='远程':
+            version_default['远程英雄'].append(i)

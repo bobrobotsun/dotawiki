@@ -655,10 +655,12 @@ class Main(QMainWindow):
             self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['上传'])
             self.versionlayout['版本列表']['横排版']['竖排版']['上传'].clicked.connect(self.upload_version_list)
             self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'] = QPushButton('向上插入新版本', self)
+            self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'].clicked.connect(lambda:self.add_version_list(0))
             self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'])
             self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'] = QPushButton('向下插入新版本', self)
+            self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'].clicked.connect(lambda:self.add_version_list(1))
             self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'])
-            self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(5)
+            self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(1)
 
             self.versionlayout['版本内容'] = {0: QGroupBox('版本内容', self)}
             self.versionlayout[0].addWidget(self.versionlayout['版本内容'][0], 1)
@@ -666,6 +668,7 @@ class Main(QMainWindow):
             self.versionlayout['版本内容'][0].setLayout(self.versionlayout['版本内容']['横排版'][0])
             self.versionlayout['版本内容']['横排版']['树'] = QTreeWidget(self)
             self.versionlayout['版本内容']['横排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['树'])
+            self.editlayout['版本内容']['横排版']['树'][0].setHeaderLabels(['名称', '值'])
             self.versionlayout['版本内容']['横排版']['竖排版'] = {0: QVBoxLayout()}
             self.versionlayout['版本内容']['横排版'][0].addLayout(self.versionlayout['版本内容']['横排版']['竖排版'][0])
             self.versionlayout['版本内容']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
@@ -1153,6 +1156,8 @@ class Main(QMainWindow):
             version_file = open(os.path.join('database', 'version_list.json'), mode="r", encoding="utf-8")
             self.version_list = json.loads(version_file.read())
             version_file.close()
+            for i in self.version_list['版本']:
+                self.versionlayout['版本列表']['横排版']['列表'].addItem(i)
         except FileNotFoundError:
             messageBox = QMessageBox(QMessageBox.Critical, "获取版本数据失败", "请问您是否想要从网络上重新下载？", QMessageBox.NoButton, self)
             buttonWeb = messageBox.addButton('从网络下载', QMessageBox.YesRole)
@@ -1163,11 +1168,32 @@ class Main(QMainWindow):
     def download_version_list(self):
         self.version_list = self.download_json('版本更新.json')
         self.file_save(os.path.join('database', 'version_list.json'), json.dumps(self.version_list))
+        QMessageBox.information(self, '下载成功', '版本信息已经下载保存完毕。')
+        self.versionlayout['版本列表']['横排版']['列表'].clear()
+        for i in self.version_list['版本']:
+            self.versionlayout['版本列表']['横排版']['列表'].addItem(i)
 
     def upload_version_list(self):
         self.upload_json('Data:版本更新.json',json.dumps(self.version_list))
-        QMessageBox.information(self, '上传成功', '版本信息已经更新完毕。')
+        self.file_save(os.path.join('database', 'version_list.json'), json.dumps(self.version_list))
+        QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
+    def add_version_list(self,next=0):
+        index = self.versionlayout['版本列表']['横排版']['列表'].currentRow()
+        if index==-1:
+            if next==0:
+                index=0
+            elif next==1:
+                index=self.versionlayout['版本列表']['横排版']['列表'].count()
+        else:
+            index+=next
+        text, ok= QInputDialog.getText(self, "增加新版本", '版本号')
+        if ok:
+            self.versionlayout['版本列表']['横排版']['列表'].insertItem(index,text)
+            self.versionlayout['版本列表']['横排版']['列表'].setCurrentRow(index)
+            self.version_list={'版本':[]}
+            for i in range(self.versionlayout['版本列表']['横排版']['列表'].count()):
+                self.version_list['版本'].append(self.versionlayout['版本列表']['横排版']['列表'].item(i).text())
 
 class upload_text(QWidget):
     def __init__(self, first_txt):
