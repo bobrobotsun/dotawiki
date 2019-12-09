@@ -56,6 +56,9 @@ class Main(QMainWindow):
         self.mech = {}
         self.red = QBrush(Qt.red)
         self.green = QBrush(Qt.green)
+        # 版本更新的内容
+        self.version_list = {}
+        self.version_base = {}
 
     def initUI(self):
         # 设定软件的图标
@@ -635,10 +638,43 @@ class Main(QMainWindow):
             """
             self.versionWidget = QWidget(self)
             self.centralWidget().addTab(self.versionWidget, '版本更新')
-            self.versionlayout={0:QHBoxLayout()}
+            self.versionlayout = {0: QHBoxLayout()}
             self.versionWidget.setLayout(self.versionlayout[0])
-            self.versionlayout['基础数据'] = {0: QGroupBox('基础数据', self)}
-            self.versionlayout[0].addWidget(self.versionlayout['基础数据'][0])
+            self.versionlayout['版本列表'] = {0: QGroupBox('版本列表', self)}
+            self.versionlayout[0].addWidget(self.versionlayout['版本列表'][0])
+            self.versionlayout['版本列表']['横排版'] = {0: QHBoxLayout()}
+            self.versionlayout['版本列表'][0].setLayout(self.versionlayout['版本列表']['横排版'][0])
+            self.versionlayout['版本列表']['横排版']['列表'] = QListWidget(self)
+            self.versionlayout['版本列表']['横排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['列表'])
+            self.versionlayout['版本列表']['横排版']['竖排版'] = {0: QVBoxLayout()}
+            self.versionlayout['版本列表']['横排版'][0].addLayout(self.versionlayout['版本列表']['横排版']['竖排版'][0])
+            self.versionlayout['版本列表']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
+            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['下载'])
+            self.versionlayout['版本列表']['横排版']['竖排版']['下载'].clicked.connect(self.download_version_list)
+            self.versionlayout['版本列表']['横排版']['竖排版']['上传'] = QPushButton('上传', self)
+            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['上传'])
+            self.versionlayout['版本列表']['横排版']['竖排版']['上传'].clicked.connect(self.upload_version_list)
+            self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'] = QPushButton('向上插入新版本', self)
+            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'])
+            self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'] = QPushButton('向下插入新版本', self)
+            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'])
+            self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(5)
+
+            self.versionlayout['版本内容'] = {0: QGroupBox('版本内容', self)}
+            self.versionlayout[0].addWidget(self.versionlayout['版本内容'][0], 1)
+            self.versionlayout['版本内容']['横排版'] = {0: QHBoxLayout()}
+            self.versionlayout['版本内容'][0].setLayout(self.versionlayout['版本内容']['横排版'][0])
+            self.versionlayout['版本内容']['横排版']['树'] = QTreeWidget(self)
+            self.versionlayout['版本内容']['横排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['树'])
+            self.versionlayout['版本内容']['横排版']['竖排版'] = {0: QVBoxLayout()}
+            self.versionlayout['版本内容']['横排版'][0].addLayout(self.versionlayout['版本内容']['横排版']['竖排版'][0])
+            self.versionlayout['版本内容']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['下载'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['上传'] = QPushButton('上传', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['上传'])
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(1)
+
+            self.check_version()
 
     def resort(self):
         for i in self.text_base:
@@ -862,7 +898,7 @@ class Main(QMainWindow):
                             self.add_another_to_json(j, edict[1][j], sdict[str(i)])
                     else:
                         sdict[str(i)] = edict[1]
-        elif len(edict)>2 and edict[2]:
+        elif len(edict) > 2 and edict[2]:
             pass
         else:
             if edict[0] == 'tree':
@@ -983,7 +1019,7 @@ class Main(QMainWindow):
 
     def json_edit_change_value(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-        text, ok = QInputDialog.getText(self, '修改值', '您想将其修改为:',QLineEdit.Normal,item.text(1))
+        text, ok = QInputDialog.getText(self, '修改值', '您想将其修改为:', QLineEdit.Normal, item.text(1))
         if ok:
             if item.itemtype == 'number':
                 try:
@@ -1067,7 +1103,7 @@ class Main(QMainWindow):
 
     def json_edit_add_new_item(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-        choose = ('文字（可以填入任意信息）', '数字（只能填入有效数字）','整数（只能填入不含小数点的整数）', '树（可以拥有下属信息，但自身没有值）')
+        choose = ('文字（可以填入任意信息）', '数字（只能填入有效数字）', '整数（只能填入不含小数点的整数）', '树（可以拥有下属信息，但自身没有值）')
         text1, ok1 = QInputDialog.getItem(self, "增加新条目", '条目的类型', choose, 0, False)
         text2, ok2 = QInputDialog.getText(self, '增加新条目', '新条目的名称为：')
         if ok1 and ok2:
@@ -1111,6 +1147,22 @@ class Main(QMainWindow):
                     self.read_tree_item_to_json(item.child(i), sdict[item.text(0)])
         else:
             sdict[item.text(0)] = item.itemvalue
+
+    def check_version(self):
+        try:
+            version_file = open(os.path.join('database', 'version_list.json'), mode="r", encoding="utf-8")
+            self.version_list = json.loads(version_file.read())
+            version_file.close()
+        except FileNotFoundError:
+            messageBox = QMessageBox(QMessageBox.Critical, "获取版本数据失败", "请问您是否想要从网络上重新下载？", QMessageBox.NoButton, self)
+            buttonWeb = messageBox.addButton('从网络下载', QMessageBox.YesRole)
+            messageBox.exec_()
+            if messageBox.clickedButton() == buttonWeb:
+                self.download_version_list()
+
+    def download_version_list(self):
+        self.version_list = self.download_json('版本更新.json')
+        self.file_save(os.path.join('database', 'version_list.json'), json.dumps(self.json_name))
 
 
 class upload_text(QWidget):
