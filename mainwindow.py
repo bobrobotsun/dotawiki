@@ -1162,7 +1162,11 @@ class Main(QMainWindow):
 
     def download_version_list(self):
         self.version_list = self.download_json('版本更新.json')
-        self.file_save(os.path.join('database', 'version_list.json'), json.dumps(self.json_name))
+        self.file_save(os.path.join('database', 'version_list.json'), json.dumps(self.version_list))
+
+    def upload_version_list(self):
+        self.upload_json('Data:版本更新.json',json.dumps(self.version_list))
+        QMessageBox.information(self, '上传成功', '版本信息已经更新完毕。')
 
 
 class upload_text(QWidget):
