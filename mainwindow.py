@@ -534,6 +534,10 @@ class Main(QMainWindow):
             self.ml['高级功能']['上传'] = self.ml['高级功能'][0].addAction('上传')
             self.ml['高级功能']['上传'].triggered.connect(self.upload_all)
             """
+            制作一个默认的单位统称列表，具体效果见edit_json.py
+            """
+            self.version_default = edit_json.set_version_default(self.json_base)
+            """
             下面是重新排序的情况
             """
             self.resort()
@@ -655,29 +659,47 @@ class Main(QMainWindow):
             self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['上传'])
             self.versionlayout['版本列表']['横排版']['竖排版']['上传'].clicked.connect(self.upload_version_list)
             self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'] = QPushButton('向上插入新版本', self)
-            self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'].clicked.connect(lambda:self.add_version_list(0))
+            self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'].clicked.connect(lambda: self.add_version_list(0))
             self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'])
             self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'] = QPushButton('向下插入新版本', self)
-            self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'].clicked.connect(lambda:self.add_version_list(1))
+            self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'].clicked.connect(lambda: self.add_version_list(1))
             self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'])
             self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(1)
+            self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'] = QPushButton('下载全部更新内容', self)
+            self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'].clicked.connect(self.download_all_versions)
+            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'])
+            self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(5)
 
             self.versionlayout['版本内容'] = {0: QGroupBox('版本内容', self)}
             self.versionlayout[0].addWidget(self.versionlayout['版本内容'][0], 1)
             self.versionlayout['版本内容']['横排版'] = {0: QHBoxLayout()}
             self.versionlayout['版本内容'][0].setLayout(self.versionlayout['版本内容']['横排版'][0])
-            self.versionlayout['版本内容']['横排版']['树'] = QTreeWidget(self)
-            self.versionlayout['版本内容']['横排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['树'])
-            self.editlayout['版本内容']['横排版']['树'][0].setHeaderLabels(['名称', '值'])
+            self.versionlayout['版本内容']['横排版']['树'] = {0: QTreeWidget(self)}
+            self.versionlayout['版本内容']['横排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['树'][0])
+            self.versionlayout['版本内容']['横排版']['树'][0].setHeaderLabels(['名称', '值'])
             self.versionlayout['版本内容']['横排版']['竖排版'] = {0: QVBoxLayout()}
             self.versionlayout['版本内容']['横排版'][0].addLayout(self.versionlayout['版本内容']['横排版']['竖排版'][0])
+            self.versionlayout['版本内容']['横排版']['竖排版']['新建'] = QPushButton('新建', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['新建'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['新建'].clicked.connect(self.create_one_version)
             self.versionlayout['版本内容']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
             self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['下载'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['下载'].clicked.connect(self.download_one_version)
             self.versionlayout['版本内容']['横排版']['竖排版']['上传'] = QPushButton('上传', self)
             self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['上传'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['上传'].clicked.connect(self.upload_one_version)
             self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(1)
+            self.versionlayout['版本内容']['横排版']['竖排版']['大分类'] = QPushButton('大分类', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['大分类'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].clicked.connect(self.version_button_tree1)
+            self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'] = QPushButton('加小分类', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].clicked.connect(self.version_button_tree1_add_tree2)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(5)
 
             self.check_version()
+            self.versionlayout['版本列表']['横排版']['列表'].clicked.connect(self.check_version_content)
+            self.versionlayout['版本内容']['横排版']['树'][0].clicked.connect(self.version_edit_all_button_clicked)
 
     def resort(self):
         for i in self.text_base:
@@ -1153,11 +1175,24 @@ class Main(QMainWindow):
 
     def check_version(self):
         try:
+            version_file = open(os.path.join('database', 'version_base.json'), mode="r", encoding="utf-8")
+            self.version_base = json.loads(version_file.read())
+            version_file.close()
+        except FileNotFoundError:
+            self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+        try:
             version_file = open(os.path.join('database', 'version_list.json'), mode="r", encoding="utf-8")
             self.version_list = json.loads(version_file.read())
             version_file.close()
+            self.versionlayout['版本列表']['横排版']['列表'].clear()
             for i in self.version_list['版本']:
-                self.versionlayout['版本列表']['横排版']['列表'].addItem(i)
+                new = QListWidgetItem()
+                new.setText(i)
+                if i in self.version_base:
+                    new.setBackground(self.green)
+                else:
+                    new.setBackground(self.red)
+                self.versionlayout['版本列表']['横排版']['列表'].addItem(new)
         except FileNotFoundError:
             messageBox = QMessageBox(QMessageBox.Critical, "获取版本数据失败", "请问您是否想要从网络上重新下载？", QMessageBox.NoButton, self)
             buttonWeb = messageBox.addButton('从网络下载', QMessageBox.YesRole)
@@ -1171,29 +1206,215 @@ class Main(QMainWindow):
         QMessageBox.information(self, '下载成功', '版本信息已经下载保存完毕。')
         self.versionlayout['版本列表']['横排版']['列表'].clear()
         for i in self.version_list['版本']:
-            self.versionlayout['版本列表']['横排版']['列表'].addItem(i)
+            new = QListWidgetItem()
+            new.setText(i)
+            if i in self.version_base:
+                new.setBackground(self.green)
+            else:
+                new.setBackground(self.red)
+            self.versionlayout['版本列表']['横排版']['列表'].addItem(new)
 
     def upload_version_list(self):
-        self.upload_json('Data:版本更新.json',json.dumps(self.version_list))
+        self.upload_json('Data:版本更新.json', json.dumps(self.version_list))
         self.file_save(os.path.join('database', 'version_list.json'), json.dumps(self.version_list))
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
-    def add_version_list(self,next=0):
+    def add_version_list(self, next=0):
         index = self.versionlayout['版本列表']['横排版']['列表'].currentRow()
-        if index==-1:
-            if next==0:
-                index=0
-            elif next==1:
-                index=self.versionlayout['版本列表']['横排版']['列表'].count()
+        if index == -1:
+            if next == 0:
+                index = 0
+            elif next == 1:
+                index = self.versionlayout['版本列表']['横排版']['列表'].count()
         else:
-            index+=next
-        text, ok= QInputDialog.getText(self, "增加新版本", '版本号')
+            index += next
+        text, ok = QInputDialog.getText(self, "增加新版本", '版本号')
         if ok:
-            self.versionlayout['版本列表']['横排版']['列表'].insertItem(index,text)
+            new = QListWidgetItem()
+            new.setText(text)
+            new.setBackground(self.red)
+            self.versionlayout['版本列表']['横排版']['列表'].insertItem(index, new)
             self.versionlayout['版本列表']['横排版']['列表'].setCurrentRow(index)
-            self.version_list={'版本':[]}
+            self.version_list = {'版本': []}
             for i in range(self.versionlayout['版本列表']['横排版']['列表'].count()):
                 self.version_list['版本'].append(self.versionlayout['版本列表']['横排版']['列表'].item(i).text())
+
+    def check_version_content(self):
+        item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
+        text = item.text()
+        if text in self.version_base:
+            self.complex_json_to_version_tree()
+        else:
+            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "您没有这个版本更新的库，请问您准备从哪里获取？", QMessageBox.NoButton, self)
+            button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
+            button2 = messageBox.addButton('造个新的', QMessageBox.AcceptRole)
+            button3 = messageBox.addButton('不创建', QMessageBox.NoRole)
+            messageBox.exec_()
+            if messageBox.clickedButton() == button1:
+                self.download_one_version(text)
+            elif messageBox.clickedButton() == button2:
+                self.create_one_version(text)
+
+    def download_one_version(self):
+        text=self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
+        download_data = {'action': 'jsondata', 'title': text + '.json', 'format': 'json'}
+        download_info = self.seesion.post(self.target_url, data=download_data)
+        if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
+            messageBox = QMessageBox(QMessageBox.Critical, "下载失败", "网络上没有这个版本更新的库，请问是否自行创建？", QMessageBox.NoButton, self)
+            button1 = messageBox.addButton('自行新建', QMessageBox.YesRole)
+            button2 = messageBox.addButton('不创建', QMessageBox.NoRole)
+            messageBox.exec_()
+            if messageBox.clickedButton() == button1:
+                self.create_one_version(text)
+        else:
+            self.version_base[text] = download_info.json()['jsondata']
+            self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+            QMessageBox.information(self, '下载成功', text+'版本已更新至本地。')
+
+    def download_all_versions(self):
+        for i in range(len(self.version_list['版本'])):
+            download_data = {'action': 'jsondata', 'title': self.version_list['版本'][i] + '.json', 'format': 'json'}
+            download_info = self.seesion.post(self.target_url, data=download_data)
+            print(download_info.json())
+            if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
+                continue
+            else:
+                self.version_base[self.version_list['版本'][i]] = download_info.json()['jsondata']
+                self.versionlayout['版本列表']['横排版']['列表'].item(i).setBackground(self.green)
+        self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+        QMessageBox.information(self, '下载成功', '所有版本号已经下载并保存完毕。')
+
+    def upload_one_version(self):
+        text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
+        self.upload_json('Data:'+text+'.json', json.dumps(self.version_base[text]))
+        self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+        QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
+
+    def create_one_version(self):
+        text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
+        self.version_base[text] = {}
+        for i in edit_json.version:
+            if edit_json.version[i][0] == 'text':
+                self.version_base[text][i] = edit_json.version[i][1]
+        self.versionlayout['版本列表']['横排版']['列表'].item(self.version_list['版本'].index(text)).setBackground(self.green)
+        self.complex_json_to_version_tree()
+
+    def complex_json_to_version_tree(self):
+        self.versionlayout['版本内容']['横排版']['树'][0].clear()
+        text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
+        for i in edit_json.version:
+            if edit_json.version[i][0] == 'text':
+                if i not in self.version_base[text]:
+                    self.version_base[text][i] = edit_json.version[i][1]
+                    self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+                new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
+                new1.itemtype = 'text'
+                new1.itemvalue = self.version_base[text][i]
+                new1.setText(0, i)
+                new1.setText(1, self.version_base[text][i])
+            elif edit_json.version[i][0] == 'tree':
+                if i in self.version_base[text] and '0' in self.version_base[text][i]:
+                    new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
+                    new1.itemtype = 'tree1'
+                    new1.setText(0, i)
+                    new1.setBackground(1, self.green)
+                    for j in self.version_base[text][i]:
+                        new2 = VersionItemEdit(new1)
+                        new2.itemtype = 'tree2'
+                        new2.setText(0, j)
+                        for k in range(len(self.version_base[text][i][j])):
+                            if k>0:
+                                new3 = VersionItemEdit(new2)
+                                new3.itemtype = 'tree_list'
+                                new3.setText(0, str(k))
+                                new4 = VersionItemEdit(new3)
+                                new4.itemtype = 'complex_tree'
+                                new4.setText(0, '文字')
+                                for l in self.version_base[text][i][j][k]['文字']:
+                                    if isinstance(l, text):
+                                        new6 = VersionItemEdit(new4)
+                                        new6.itemtype = 'text_text'
+                                        new6.setText(1, l)
+                                        new6.setBackground(0, self.red)
+                                    elif len(l) == 1:
+                                        new6 = VersionItemEdit(new4)
+                                        new6.itemtype = 'text_link'
+                                        new6.setText(1, l[0])
+                                        new6.setBackground(0, self.green)
+                                    else:
+                                        new6 = VersionItemEdit(new4)
+                                        new6.itemtype = 'text_image'
+                                        new6.setText(0, '图片')
+                                        new7 = VersionItemEdit(new6)
+                                        new7.itemtype = 'text_image_1'
+                                        new7.setText(0, '文')
+                                        new7.setText(1, l[0])
+                                        new7 = VersionItemEdit(new6)
+                                        new7.itemtype = 'text_image_2'
+                                        new7.setText(0, '库')
+                                        new7.setText(1, l[1])
+                                        new7 = VersionItemEdit(new6)
+                                        new7.itemtype = 'text_image_3'
+                                        new7.setText(0, '名')
+                                        new7.setText(1, l[2])
+                                        new7 = VersionItemEdit(new6)
+                                        new7.itemtype = 'text_image_4'
+                                        new7.setText(0, '图')
+                                        new7.setText(1, l[3])
+                                new5 = VersionItemEdit(new3)
+                                new5.itemtype = 'list'
+                                new5.setText(0, '目标')
+                                for l in self.version_base[text][i][j][k]['目标']:
+                                    new6 = VersionItemEdit(new5)
+                                    new6.itemtype = 'list_text'
+                                    new6.setText(1, l)
+                else:
+                    new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
+                    new1.itemtype = 'tree1'
+                    new1.setText(0, i)
+                    new1.setBackground(1, self.red)
+
+    def version_edit_all_button_clicked(self):
+        item=self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        if item.itemtype=='tree1':
+            if item.background(1)==self.red:
+                self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('启用大分类')
+            elif item.background(1)==self.green:
+                self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('禁用大分类')
+            self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(True)
+            self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(True)
+        else:
+            self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('大分类')
+            self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(False)
+            self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
+
+    def version_edit_all_button_default(self):
+        self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('大分类')
+        self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
+
+    def version_button_tree1(self):
+        item=self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        if item.background(1)==self.red:
+            new=VersionItemEdit(item)
+            new.setText(0,'0')
+            new.itemtype='tree2'
+            item.setBackground(1, self.green)
+            item.setExpanded(True)
+        elif item.background(1)==self.green:
+            while item.childCount()>0:
+                item.removeChild(item.child(0))
+            item.setBackground(1, self.red)
+        self.version_edit_all_button_clicked()
+
+    def version_button_tree1_add_tree2(self):
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        text, ok = QInputDialog.getText(self, '新增一个小分类', '请输入你想要增加的分类名称:')
+        if ok:
+            new=VersionItemEdit(item)
+            new.setText(0,text)
+            new.itemtype='tree2'
+            item.setExpanded(True)
 
 class upload_text(QWidget):
     def __init__(self, first_txt):
@@ -1250,3 +1471,16 @@ class TreeItemEdit(QTreeWidgetItem):
         self.haslist = True
         self.listtype = copy.deepcopy(l)
         self.listtype[3] = 0
+
+
+class VersionItemEdit(QTreeWidgetItem):
+    def __init__(self, *args):
+        super().__init__(args[0])
+        self.itemvalue = ''
+        self.itemtype = ''
+        self.used = False  # 下属有没有list
+        self.list = []
+
+    def set_list(self, ll):
+        self.list = copy.deepcopy(ll)
+        self.setText(1, str(self.list))
