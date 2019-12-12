@@ -29,7 +29,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.23c'
+        self.version = '7.23d'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -677,6 +677,7 @@ class Main(QMainWindow):
             self.versionlayout['版本内容']['横排版']['树'] = {0: QTreeWidget(self)}
             self.versionlayout['版本内容']['横排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['树'][0])
             self.versionlayout['版本内容']['横排版']['树'][0].setHeaderLabels(['名称', '值'])
+            self.versionlayout['版本内容']['横排版']['树'][0].setColumnWidth(0, 350)
             self.versionlayout['版本内容']['横排版']['竖排版'] = {0: QVBoxLayout()}
             self.versionlayout['版本内容']['横排版'][0].addLayout(self.versionlayout['版本内容']['横排版']['竖排版'][0])
             self.versionlayout['版本内容']['横排版']['竖排版']['新建'] = QPushButton('新建', self)
@@ -685,21 +686,47 @@ class Main(QMainWindow):
             self.versionlayout['版本内容']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
             self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['下载'])
             self.versionlayout['版本内容']['横排版']['竖排版']['下载'].clicked.connect(self.download_one_version)
-            self.versionlayout['版本内容']['横排版']['竖排版']['上传'] = QPushButton('上传', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['上传'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['上传'].clicked.connect(self.upload_one_version)
+            self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'] = QPushButton('保存并上传', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'].clicked.connect(self.upload_one_version)
             self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(1)
+            self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'] = QPushButton('修改内容', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'].clicked.connect(self.version_edit_change_value)
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'] = QPushButton('大分类', self)
             self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['大分类'])
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].clicked.connect(self.version_button_tree1)
             self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'] = QPushButton('加小分类', self)
             self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'])
             self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].clicked.connect(self.version_button_tree1_add_tree2)
+            self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'] = QPushButton('删除小分类', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].clicked.connect(self.version_button_delete_tree_item)
+            self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'] = QPushButton('加一条新条目', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].clicked.connect(self.version_button_tree2_add_tree_list)
+            self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'] = QPushButton('删除该条目', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].clicked.connect(self.version_button_delete_tree_item)
+            self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'] = QPushButton('增加一段文字内容', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].clicked.connect(self.version_button_complex_tree_add_text)
+            self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'] = QPushButton('删除该文字内容', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].clicked.connect(self.version_button_delete_tree_item)
+            self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'] = QPushButton('增加新目标', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].clicked.connect(self.version_button_list_add_list_text)
+            self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'] = QPushButton('删除该目标', self)
+            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'])
+            self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].clicked.connect(self.version_button_delete_tree_item)
             self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(5)
 
             self.check_version()
             self.versionlayout['版本列表']['横排版']['列表'].clicked.connect(self.check_version_content)
             self.versionlayout['版本内容']['横排版']['树'][0].clicked.connect(self.version_edit_all_button_clicked)
+            self.version_edit_all_button_default()
+
 
     def resort(self):
         for i in self.text_base:
@@ -1244,6 +1271,7 @@ class Main(QMainWindow):
         text = item.text()
         if text in self.version_base:
             self.complex_json_to_version_tree()
+            self.versionlayout['版本内容']['横排版']['树'][0].expandAll()
         else:
             messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "您没有这个版本更新的库，请问您准备从哪里获取？", QMessageBox.NoButton, self)
             button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
@@ -1251,12 +1279,12 @@ class Main(QMainWindow):
             button3 = messageBox.addButton('不创建', QMessageBox.NoRole)
             messageBox.exec_()
             if messageBox.clickedButton() == button1:
-                self.download_one_version(text)
+                self.download_one_version()
             elif messageBox.clickedButton() == button2:
-                self.create_one_version(text)
+                self.create_one_version()
 
     def download_one_version(self):
-        text=self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
+        text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
         download_data = {'action': 'jsondata', 'title': text + '.json', 'format': 'json'}
         download_info = self.seesion.post(self.target_url, data=download_data)
         if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
@@ -1265,11 +1293,11 @@ class Main(QMainWindow):
             button2 = messageBox.addButton('不创建', QMessageBox.NoRole)
             messageBox.exec_()
             if messageBox.clickedButton() == button1:
-                self.create_one_version(text)
+                self.create_one_version()
         else:
             self.version_base[text] = download_info.json()['jsondata']
             self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
-            QMessageBox.information(self, '下载成功', text+'版本已更新至本地。')
+            QMessageBox.information(self, '下载成功', text + '版本已更新至本地。')
 
     def download_all_versions(self):
         for i in range(len(self.version_list['版本'])):
@@ -1286,9 +1314,48 @@ class Main(QMainWindow):
 
     def upload_one_version(self):
         text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
-        self.upload_json('Data:'+text+'.json', json.dumps(self.version_base[text]))
+        self.version_base[text]={}
+        for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):
+            item=self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
+            if item.itemtype=='text':
+                self.version_base[text][item.text(0)]=item.text(1)
+            elif item.background(1)==self.green:
+                self.version_base[text][item.text(0)]=self.version_tree_to_json(item)
+        self.upload_json('Data:' + text + '.json', json.dumps(self.version_base[text]))
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
+
+    def version_tree_to_json(self,item):
+        re={}
+        for i in range(item.childCount()):
+            item1=item.child(i)
+            re[item1.text(0)]=[item1.text(1)]
+            if edit_json.version[item.text(0)][1] in self.json_base and item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]]:
+                re[item1.text(0)][0]=self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
+            for j in range(item1.childCount()):
+                item2=item1.child(j).child(0)
+                item3=item1.child(j).child(1)
+                index=len(re[item1.text(0)])
+                re[item1.text(0)].append({'文字':[],'目标':[]})
+                for k in range(item2.childCount()):
+                    item4=item2.child(k)
+                    if item4.childCount()==0:
+                        re[item1.text(0)][index]['文字'].append([item4.text(1)])
+                    elif item4.childCount()==2:
+                        re[item1.text(0)][index]['文字'].append([item4.child(0).text(1),item4.child(1).text(1)])
+                    else:
+                        index2=len(re[item1.text(0)][index]['文字'])
+                        re[item1.text(0)][index]['文字'].append([item4.child(0).text(1),item4.child(1).text(1),item4.child(2).text(1),item4.child(3).text(1)])
+                        if re[item1.text(0)][index]['文字'][index2][1]=='':
+                            re[item1.text(0)][index]['文字'][index2][1]=edit_json.version[item.text(0)][1]
+                        if re[item1.text(0)][index]['文字'][index2][2]=='':
+                            re[item1.text(0)][index]['文字'][index2][2]=re[item1.text(0)][index]['文字'][index2][0]
+                        if re[item1.text(0)][index]['文字'][index2][3]=='' and re[item1.text(0)][index]['文字'][index2][1] in self.json_base and re[item1.text(0)][index]['文字'][index2][2] in self.json_base[re[item1.text(0)][index]['文字'][index2][1]]:
+                            re[item1.text(0)][index]['文字'][index2][3]=self.json_base[re[item1.text(0)][index]['文字'][index2][1]][re[item1.text(0)][index]['文字'][index2][2]]['迷你图片']
+                for k in range(item3.childCount()):
+                    item4 = item3.child(k)
+                    re[item1.text(0)][index]['目标'].append(item4.text(1))
+        return re
 
     def create_one_version(self):
         text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
@@ -1311,7 +1378,7 @@ class Main(QMainWindow):
                 new1.itemtype = 'text'
                 new1.itemvalue = self.version_base[text][i]
                 new1.setText(0, i)
-                new1.setText(1, self.version_base[text][i])
+                new1.set_value(self.version_base[text][i])
             elif edit_json.version[i][0] == 'tree':
                 if i in self.version_base[text] and '0' in self.version_base[text][i]:
                     new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
@@ -1322,8 +1389,9 @@ class Main(QMainWindow):
                         new2 = VersionItemEdit(new1)
                         new2.itemtype = 'tree2'
                         new2.setText(0, j)
+                        new2.set_value(self.version_base[text][i][j][0])
                         for k in range(len(self.version_base[text][i][j])):
-                            if k>0:
+                            if k > 0:
                                 new3 = VersionItemEdit(new2)
                                 new3.itemtype = 'tree_list'
                                 new3.setText(0, str(k))
@@ -1331,43 +1399,50 @@ class Main(QMainWindow):
                                 new4.itemtype = 'complex_tree'
                                 new4.setText(0, '文字')
                                 for l in self.version_base[text][i][j][k]['文字']:
-                                    if isinstance(l, text):
+                                    if len(l) == 1:
                                         new6 = VersionItemEdit(new4)
                                         new6.itemtype = 'text_text'
-                                        new6.setText(1, l)
-                                        new6.setBackground(0, self.red)
-                                    elif len(l) == 1:
+                                        new6.setText(0, '文字')
+                                        new6.set_value(l[0])
+                                    elif len(l) == 2:
                                         new6 = VersionItemEdit(new4)
                                         new6.itemtype = 'text_link'
-                                        new6.setText(1, l[0])
-                                        new6.setBackground(0, self.green)
+                                        new6.setText(0, '链接')
+                                        new7 = VersionItemEdit(new6)
+                                        new7.itemtype = 'text_link_1'
+                                        new7.setText(0, '链接')
+                                        new7.set_value(l[0])
+                                        new7 = VersionItemEdit(new6)
+                                        new7.itemtype = 'text_link_2'
+                                        new7.setText(0, '文字')
+                                        new7.set_value(l[1])
                                     else:
                                         new6 = VersionItemEdit(new4)
                                         new6.itemtype = 'text_image'
-                                        new6.setText(0, '图片')
+                                        new6.setText(0, '带图链接')
                                         new7 = VersionItemEdit(new6)
                                         new7.itemtype = 'text_image_1'
-                                        new7.setText(0, '文')
-                                        new7.setText(1, l[0])
+                                        new7.setText(0, '文字')
+                                        new7.set_value(l[0])
                                         new7 = VersionItemEdit(new6)
                                         new7.itemtype = 'text_image_2'
-                                        new7.setText(0, '库')
-                                        new7.setText(1, l[1])
+                                        new7.setText(0, '大类名')
+                                        new7.set_value(l[1])
                                         new7 = VersionItemEdit(new6)
                                         new7.itemtype = 'text_image_3'
-                                        new7.setText(0, '名')
-                                        new7.setText(1, l[2])
+                                        new7.setText(0, '具体名称')
+                                        new7.set_value(l[2])
                                         new7 = VersionItemEdit(new6)
                                         new7.itemtype = 'text_image_4'
-                                        new7.setText(0, '图')
-                                        new7.setText(1, l[3])
+                                        new7.setText(0, '图片名')
+                                        new7.set_value(l[3])
                                 new5 = VersionItemEdit(new3)
                                 new5.itemtype = 'list'
                                 new5.setText(0, '目标')
                                 for l in self.version_base[text][i][j][k]['目标']:
                                     new6 = VersionItemEdit(new5)
                                     new6.itemtype = 'list_text'
-                                    new6.setText(1, l)
+                                    new6.set_value(l)
                 else:
                     new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
                     new1.itemtype = 'tree1'
@@ -1375,11 +1450,12 @@ class Main(QMainWindow):
                     new1.setBackground(1, self.red)
 
     def version_edit_all_button_clicked(self):
-        item=self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
-        if item.itemtype=='tree1':
-            if item.background(1)==self.red:
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'].setEnabled(item.hasvalue)
+        if item.itemtype == 'tree1':
+            if item.background(1) == self.red:
                 self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('启用大分类')
-            elif item.background(1)==self.green:
+            elif item.background(1) == self.green:
                 self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('禁用大分类')
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(True)
             self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(True)
@@ -1387,22 +1463,43 @@ class Main(QMainWindow):
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('大分类')
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(False)
             self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(item.itemtype == 'tree2')
+        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(item.itemtype == 'tree2')
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(item.itemtype == 'tree_list')
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].setEnabled(item.itemtype == 'complex_tree')
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].setEnabled(item.itemtype == 'text_text' or item.itemtype == 'text_image' or item.itemtype == 'text_link')
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(item.itemtype == 'list')
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].setEnabled(item.itemtype == 'list_text')
 
     def version_edit_all_button_default(self):
+        self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('大分类')
         self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].setEnabled(False)
+
+    def version_edit_change_value(self):
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        text, ok = QInputDialog.getText(self, '修改值', '您想将其修改为:', QLineEdit.Normal, item.text(1))
+        if ok:
+            item.set_value(text)
 
     def version_button_tree1(self):
-        item=self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
-        if item.background(1)==self.red:
-            new=VersionItemEdit(item)
-            new.setText(0,'0')
-            new.itemtype='tree2'
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        if item.background(1) == self.red:
+            new = VersionItemEdit(item)
+            new.setText(0, '0')
+            new.itemtype = 'tree2'
             item.setBackground(1, self.green)
             item.setExpanded(True)
-        elif item.background(1)==self.green:
-            while item.childCount()>0:
+        elif item.background(1) == self.green:
+            while item.childCount() > 0:
                 item.removeChild(item.child(0))
             item.setBackground(1, self.red)
         self.version_edit_all_button_clicked()
@@ -1411,10 +1508,97 @@ class Main(QMainWindow):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         text, ok = QInputDialog.getText(self, '新增一个小分类', '请输入你想要增加的分类名称:')
         if ok:
-            new=VersionItemEdit(item)
-            new.setText(0,text)
-            new.itemtype='tree2'
+            new = VersionItemEdit(item)
+            new.setText(0, text)
+            new.itemtype = 'tree2'
             item.setExpanded(True)
+
+    def version_button_delete_tree_item(self):
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        parent = item.parent()
+        parent.removeChild(item)
+        self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(parent)
+        self.version_edit_all_button_clicked()
+
+    def version_button_tree2_add_tree_list(self):
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        new3 = VersionItemEdit(item)
+        new3.itemtype = 'tree_list'
+        new3.setText(0, str(item.childCount()))
+        new4 = VersionItemEdit(new3)
+        new4.itemtype = 'complex_tree'
+        new4.setText(0, '文字')
+        new5 = VersionItemEdit(new3)
+        new5.itemtype = 'list'
+        new5.setText(0, '目标')
+        new3.setExpanded(True)
+        item.setExpanded(True)
+
+    def version_button_complex_tree_add_text(self):
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        choose = ('纯文字', '带有链接的文字', '带有图片的链接')
+        text1, ok1 = QInputDialog.getItem(self, "增加新文字", '文字的类型', choose, 0, False)
+        if ok1:
+            if text1 == choose[0]:
+                new6 = VersionItemEdit(item)
+                new6.itemtype = 'text_text'
+                new6.setText(0, '文字')
+                new6.set_value()
+            elif text1 == choose[1]:
+                new6 = VersionItemEdit(item)
+                new6.itemtype = 'text_link'
+                new6.setText(0, '链接')
+                new7 = VersionItemEdit(new6)
+                new7.itemtype = 'text_link_1'
+                new7.setText(0, '链接')
+                new7.set_value()
+                new7 = VersionItemEdit(new6)
+                new7.itemtype = 'text_link_2'
+                new7.setText(0, '文字')
+                new7.set_value()
+                new6.setExpanded(True)
+            else:
+                new6 = VersionItemEdit(item)
+                new6.itemtype = 'text_image'
+                new6.set_value()
+                new7 = VersionItemEdit(new6)
+                new7.itemtype = 'text_image_1'
+                new7.setText(0, '文字')
+                new7.set_value()
+                new7.hasvalue = True
+                new7 = VersionItemEdit(new6)
+                new7.itemtype = 'text_image_2'
+                new7.setText(0, '大类名')
+                new7.set_value()
+                new7 = VersionItemEdit(new6)
+                new7.itemtype = 'text_image_3'
+                new7.setText(0, '具体名称')
+                new7.set_value()
+                new7 = VersionItemEdit(new6)
+                new7.itemtype = 'text_image_4'
+                new7.setText(0, '图片名')
+                new7.set_value()
+                new6.setExpanded(True)
+        item.setExpanded(True)
+
+    def version_button_list_add_list_text(self):
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        choose = ['自行填入']
+        for i in self.version_default:
+            choose.append(i)
+        text1, ok1 = QInputDialog.getItem(self, "增加新目标", '目标类型', choose, 0, False)
+        if ok1:
+            if text1 in self.version_default:
+                for i in self.version_default[text1]:
+                    new = VersionItemEdit(item)
+                    new.itemtype = 'list_text'
+                    new.set_value(i)
+            else:
+                text2, ok2 = QInputDialog.getText(self, "增加新目标", '目标名称')
+                if ok2:
+                    new = VersionItemEdit(item)
+                    new.itemtype = 'list_text'
+                    new.set_value(text2)
 
 class upload_text(QWidget):
     def __init__(self, first_txt):
@@ -1478,8 +1662,13 @@ class VersionItemEdit(QTreeWidgetItem):
         super().__init__(args[0])
         self.itemvalue = ''
         self.itemtype = ''
-        self.used = False  # 下属有没有list
+        self.hasvalue = False  # 可不可以修改
         self.list = []
+
+    def set_value(self, text=''):
+        self.hasvalue = True
+        self.itemvalue = text
+        self.setText(1, text)
 
     def set_list(self, ll):
         self.list = copy.deepcopy(ll)
