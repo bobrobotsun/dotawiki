@@ -1314,7 +1314,7 @@ class Main(QMainWindow):
 
     def upload_one_version(self):
         text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
-        self.version_base[text]={}
+        self.version_base[text]={'分类':'版本更新','版本':text}
         for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):
             item=self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
             if item.itemtype=='text':
@@ -1455,10 +1455,11 @@ class Main(QMainWindow):
         if item.itemtype == 'tree1':
             if item.background(1) == self.red:
                 self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('启用大分类')
+                self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
             elif item.background(1) == self.green:
                 self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('禁用大分类')
+                self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(True)
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(True)
-            self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(True)
         else:
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('大分类')
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(False)
@@ -1512,6 +1513,8 @@ class Main(QMainWindow):
             new.setText(0, text)
             new.itemtype = 'tree2'
             item.setExpanded(True)
+            self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new)
+            self.version_button_tree2_add_tree_list()
 
     def version_button_delete_tree_item(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
