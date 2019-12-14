@@ -29,7 +29,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.23d'
+        self.version = '7.23e'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -549,7 +549,7 @@ class Main(QMainWindow):
             self.editlayout = {0: QHBoxLayout()}
             self.editWidget.setLayout(self.editlayout[0])
             self.editlayout['基础数据'] = {0: QGroupBox('基础数据', self)}
-            self.editlayout[0].addWidget(self.editlayout['基础数据'][0])
+            self.editlayout[0].addWidget(self.editlayout['基础数据'][0], 1)
             self.editlayout['基础数据']['竖布局'] = {0: QVBoxLayout()}
             self.editlayout['基础数据'][0].setLayout(self.editlayout['基础数据']['竖布局'][0])
             self.editlayout['基础数据']['竖布局']['树'] = {0: QTreeWidget(self)}
@@ -558,7 +558,7 @@ class Main(QMainWindow):
             self.editlayout['基础数据']['竖布局']['树'][0].setColumnWidth(0, 300)
 
             self.editlayout['修改核心'] = {0: QGroupBox('修改核心', self)}
-            self.editlayout[0].addWidget(self.editlayout['修改核心'][0])
+            self.editlayout[0].addWidget(self.editlayout['修改核心'][0], 2)
             self.editlayout['修改核心']['竖布局'] = {0: QVBoxLayout()}
             self.editlayout['修改核心'][0].setLayout(self.editlayout['修改核心']['竖布局'][0])
             self.editlayout['修改核心']['竖布局']['大分类'] = {0: QComboBox(self)}
@@ -576,6 +576,9 @@ class Main(QMainWindow):
             self.editlayout['竖布局']['新增'] = QPushButton('新增', self)
             self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['新增'])
             self.editlayout['竖布局']['新增'].clicked.connect(self.json_edit_new)
+            self.editlayout['竖布局']['下载更新'] = QPushButton('下载更新', self)
+            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['下载更新'])
+            self.editlayout['竖布局']['下载更新'].clicked.connect(self.json_edit_download)
             self.editlayout['竖布局']['删除'] = QPushButton('删除', self)
             self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除'])
             self.editlayout['竖布局']['删除'].clicked.connect(self.json_edit_delete)
@@ -619,7 +622,7 @@ class Main(QMainWindow):
             self.editlayout['竖布局'][0].addStretch(5)
 
             self.editlayout['额外机制'] = {0: QGroupBox('额外机制', self)}
-            self.editlayout[0].addWidget(self.editlayout['额外机制'][0])
+            self.editlayout[0].addWidget(self.editlayout['额外机制'][0], 1)
             self.editlayout['额外机制']['竖布局'] = {0: QVBoxLayout()}
             self.editlayout['额外机制'][0].setLayout(self.editlayout['额外机制']['竖布局'][0])
             self.editlayout['额外机制']['竖布局']['树'] = {0: QTreeWidget(self)}
@@ -726,7 +729,6 @@ class Main(QMainWindow):
             self.versionlayout['版本列表']['横排版']['列表'].clicked.connect(self.check_version_content)
             self.versionlayout['版本内容']['横排版']['树'][0].clicked.connect(self.version_edit_all_button_clicked)
             self.version_edit_all_button_default()
-
 
     def resort(self):
         for i in self.text_base:
@@ -836,7 +838,7 @@ class Main(QMainWindow):
         self.editlayout['修改核心']['竖布局']['树'][0].clear()
         self.editlayout['修改核心']['竖布局']['树'] = {0: self.editlayout['修改核心']['竖布局']['树'][0]}
         self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
-        self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 200)
+        self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 300)
         self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]], self.json_base[selected[0]][selected[1]])
         self.edit_json_expand_all()
         self.self_edit_button_default()
@@ -876,7 +878,7 @@ class Main(QMainWindow):
                         if len(edict[i]) > 2 and edict[i][2]:
                             tdict[i][0].setBackground(1, self.red)
                         else:
-                            self.add_another_to_json(i, edict[i], sdict)
+                            sdict = self.add_another_to_json(i, edict[i])
                         self.complex_dict_to_tree(tdict[i], edict[i][1], {})
                     else:
                         tdict[i] = TreeItemEdit(tdict[0], i)
@@ -888,7 +890,7 @@ class Main(QMainWindow):
             while True:
                 if str(index) not in sdict:
                     if str(index + 1) in sdict:
-                        self.add_another_to_json(str(index), edict['list'], sdict)
+                        sdict = self.add_another_to_json(str(index), edict['list'])
                     else:
                         break
                 i = str(index)
@@ -938,7 +940,8 @@ class Main(QMainWindow):
                     tdict[i].settype('number')
                 tdict[i].set_value(sdict[i])
 
-    def add_another_to_json(self, name, edict, sdict):
+    def add_another_to_json(self, name, edict):
+        sdict = {}
         if name == 'list':
             if edict[4] and edict[3] < edict[2]:
                 pass
@@ -947,20 +950,21 @@ class Main(QMainWindow):
                     if edict[0] == 'tree':
                         sdict[str(i)] = {}
                         for j in edict[1]:
-                            self.add_another_to_json(j, edict[1][j], sdict[str(i)])
+                            sdict[str(i)] = self.add_another_to_json(j, edict[1][j])
                     else:
                         sdict[str(i)] = edict[1]
-        elif len(edict) > 2 and edict[2]:
+        elif len(edict) ==3 and edict[2]:
             pass
         else:
             if edict[0] == 'tree':
                 sdict[name] = {}
                 for j in edict[1]:
-                    self.add_another_to_json(j, edict[1][j], sdict[name])
+                    sdict[name]=self.add_another_to_json(j, edict[1][j])
             elif edict[0] == 'random_tree':
                 sdict[name] = {}
             else:
                 sdict[name] = edict[1]
+        return sdict
 
     def edit_text_base_selected_changed(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['代码库'][0].currentText()]
@@ -976,12 +980,23 @@ class Main(QMainWindow):
             self.json_name[selected].append(text)
             self.json_base[selected][text] = {}
             for i in edit_json.edit[selected]:
-                self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
+                self.json_base[selected][text]
+                self.add_another_to_json(i, edit_json.edit[selected][i])
             self.resort()
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
             self.edit_category_selected_changed()
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
             self.edit_target_selected_changed()
+
+    def json_edit_download(self):
+        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        if ss[0] == '技能源':
+            self.json_base[ss[0]][ss[1]]=self.download_json(ss[1] + '/源.json')
+        else:
+            self.json_base[ss[0]][ss[1]]=self.download_json(ss[1] + '.json')
+        self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
+        self.edit_target_selected_changed()
+        QMessageBox.information(self, '更新完毕', '更新成功！您成功从wiki下载到'+ss[1]+'的信息。')
 
     def json_edit_delete(self):
         warning = QMessageBox.warning(self, '删除', '您正试图删除一个库，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
@@ -1102,7 +1117,7 @@ class Main(QMainWindow):
             temp.islist = True
         else:
             sdict = {}
-            self.add_another_to_json(i, item.listtype, sdict)
+            sdict = self.add_another_to_json(i, item.listtype)
             if item.listtype[0] == 'tree':
                 temp = {0: TreeItemEdit(item, i)}
                 temp[0].set_type(item.listtype[0])
@@ -1314,44 +1329,45 @@ class Main(QMainWindow):
 
     def upload_one_version(self):
         text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
-        self.version_base[text]={'分类':'版本更新','版本':text}
+        self.version_base[text] = {'分类': '版本更新', '版本': text}
         for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):
-            item=self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
-            if item.itemtype=='text':
-                self.version_base[text][item.text(0)]=item.text(1)
-            elif item.background(1)==self.green:
-                self.version_base[text][item.text(0)]=self.version_tree_to_json(item)
+            item = self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
+            if item.itemtype == 'text':
+                self.version_base[text][item.text(0)] = item.text(1)
+            elif item.background(1) == self.green:
+                self.version_base[text][item.text(0)] = self.version_tree_to_json(item)
         self.upload_json('Data:' + text + '.json', json.dumps(self.version_base[text]))
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
-    def version_tree_to_json(self,item):
-        re={}
+    def version_tree_to_json(self, item):
+        re = {}
         for i in range(item.childCount()):
-            item1=item.child(i)
-            re[item1.text(0)]=[item1.text(1)]
+            item1 = item.child(i)
+            re[item1.text(0)] = [item1.text(1)]
             if edit_json.version[item.text(0)][1] in self.json_base and item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]]:
-                re[item1.text(0)][0]=self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
+                re[item1.text(0)][0] = self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
             for j in range(item1.childCount()):
-                item2=item1.child(j).child(0)
-                item3=item1.child(j).child(1)
-                index=len(re[item1.text(0)])
-                re[item1.text(0)].append({'文字':[],'目标':[]})
+                item2 = item1.child(j).child(0)
+                item3 = item1.child(j).child(1)
+                index = len(re[item1.text(0)])
+                re[item1.text(0)].append({'文字': [], '目标': []})
                 for k in range(item2.childCount()):
-                    item4=item2.child(k)
-                    if item4.childCount()==0:
+                    item4 = item2.child(k)
+                    if item4.childCount() == 0:
                         re[item1.text(0)][index]['文字'].append([item4.text(1)])
-                    elif item4.childCount()==2:
-                        re[item1.text(0)][index]['文字'].append([item4.child(0).text(1),item4.child(1).text(1)])
+                    elif item4.childCount() == 2:
+                        re[item1.text(0)][index]['文字'].append([item4.child(0).text(1), item4.child(1).text(1)])
                     else:
-                        index2=len(re[item1.text(0)][index]['文字'])
-                        re[item1.text(0)][index]['文字'].append([item4.child(0).text(1),item4.child(1).text(1),item4.child(2).text(1),item4.child(3).text(1)])
-                        if re[item1.text(0)][index]['文字'][index2][1]=='':
-                            re[item1.text(0)][index]['文字'][index2][1]=edit_json.version[item.text(0)][1]
-                        if re[item1.text(0)][index]['文字'][index2][2]=='':
-                            re[item1.text(0)][index]['文字'][index2][2]=re[item1.text(0)][index]['文字'][index2][0]
-                        if re[item1.text(0)][index]['文字'][index2][3]=='' and re[item1.text(0)][index]['文字'][index2][1] in self.json_base and re[item1.text(0)][index]['文字'][index2][2] in self.json_base[re[item1.text(0)][index]['文字'][index2][1]]:
-                            re[item1.text(0)][index]['文字'][index2][3]=self.json_base[re[item1.text(0)][index]['文字'][index2][1]][re[item1.text(0)][index]['文字'][index2][2]]['迷你图片']
+                        index2 = len(re[item1.text(0)][index]['文字'])
+                        re[item1.text(0)][index]['文字'].append([item4.child(0).text(1), item4.child(1).text(1), item4.child(2).text(1), item4.child(3).text(1)])
+                        if re[item1.text(0)][index]['文字'][index2][1] == '':
+                            re[item1.text(0)][index]['文字'][index2][1] = edit_json.version[item.text(0)][1]
+                        if re[item1.text(0)][index]['文字'][index2][2] == '':
+                            re[item1.text(0)][index]['文字'][index2][2] = re[item1.text(0)][index]['文字'][index2][0]
+                        if re[item1.text(0)][index]['文字'][index2][3] == '' and re[item1.text(0)][index]['文字'][index2][1] in self.json_base and \
+                                re[item1.text(0)][index]['文字'][index2][2] in self.json_base[re[item1.text(0)][index]['文字'][index2][1]]:
+                            re[item1.text(0)][index]['文字'][index2][3] = self.json_base[re[item1.text(0)][index]['文字'][index2][1]][re[item1.text(0)][index]['文字'][index2][2]]['迷你图片']
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
                     re[item1.text(0)][index]['目标'].append(item4.text(1))
@@ -1602,6 +1618,7 @@ class Main(QMainWindow):
                     new = VersionItemEdit(item)
                     new.itemtype = 'list_text'
                     new.set_value(text2)
+
 
 class upload_text(QWidget):
     def __init__(self, first_txt):
