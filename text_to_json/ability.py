@@ -88,7 +88,7 @@ def findabilityspecial(source, data, tb):
                 return
 
 
-def get_hero_data_from_txt(base_txt,address):
+def get_hero_data_from_txt(base_txt, address):
     this_file = open("E:/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_abilities.txt", mode="r")
     this_string = this_file.read()
     tb = [0, 0]
@@ -106,9 +106,9 @@ def get_hero_data_from_txt(base_txt,address):
             break
 
 
-def get_source_to_data(all_json, upgrade_json,version):
+def get_source_to_data(all_json, upgrade_json, version):
     for ijk in all_json['技能']:
-        unit_dic=copy.deepcopy(all_json['技能'][ijk])
+        unit_dic = copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"
         unit_dic["版本"] = version
         unit_dic["应用"] = 1
@@ -334,10 +334,13 @@ def complete_upgrade(all_json, base_txt):
 
 
 def fulfil(arr, json):
-    if "1" in arr and arr["1"] == "":
-        arr["1"] = "技能"
-    if "2" in arr and arr["2"] == "":
-        arr["2"] = json["代码"]
+    if '0' in arr and arr['0']=='手填':
+        return
+    else:
+        if "1" in arr and arr["1"] == "":
+            arr["1"] = "技能"
+        if "2" in arr and arr["2"] == "":
+            arr["2"] = json["代码"]
 
 
 def one_upgrade(json, base_txt):
@@ -346,12 +349,12 @@ def one_upgrade(json, base_txt):
     getvalue = [[], [], [], []]
     calvalue = [[], [], [], []]
     caloprate = [[], [], []]
-    if "0" in json["1"]["代码"]:
+    if "0" in json["1"]["代码"] and json["1"]["代码"]['0'] != '':
         if json["1"]["代码"]["0"] == "手填":
             k = 0
             while True:
                 k += 1
-                if str(k) in json["1"]["代码"]:
+                if str(k) in json["1"]["代码"] and json["1"]["代码"][str(k)]!='':
                     getvalue[0].append(json["1"]["代码"][str(k)])
                 else:
                     break
@@ -437,9 +440,15 @@ def one_upgrade(json, base_txt):
 def array_cal(arr1, arr2, op, num):
     for i in range(len(arr1)):
         if i < len(arr2):
-            temp = arr2[i]
+            try:
+                temp = float(arr2[i])
+            except ValueError:
+                temp=arr2[i]
         else:
-            temp = arr2[0]
+            try:
+                temp = float(arr2[0])
+            except ValueError:
+                temp = arr2[0]
         if num == 0:
             opp = '1' + op[0] + '1'
         elif num == -1:
@@ -466,7 +475,7 @@ def array_cal(arr1, arr2, op, num):
             arr1[i] = arr1[i] * (1 - temp)
 
 
-def complete_mech(all_json,mech_json):
+def complete_mech(all_json, mech_json):
     for i in all_json:
         for j in all_json[i]["施法目标"]:
             mech_target(all_json[i]["施法目标"][j], mech_json["目标"])

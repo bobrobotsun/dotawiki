@@ -19,6 +19,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from text_to_json import hero, ability, item, unit, edit_json
+import win32con
+import win32clipboard as wincld
+
+
 
 
 class Main(QMainWindow):
@@ -640,6 +644,7 @@ class Main(QMainWindow):
             self.editlayout['修改核心']['竖布局']['代码库'][0].activated.connect(self.edit_text_base_selected_changed)
             self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
             self.editlayout['修改核心']['竖布局']['树'][0].doubleClicked.connect(self.tree_item_double_clicked)
+            self.editlayout['基础数据']['竖布局']['树'][0].doubleClicked.connect(lambda:self.copy_text_from_tree(0))
             """
             以下是版本更新的内容
             """
@@ -878,7 +883,7 @@ class Main(QMainWindow):
                         if len(edict[i]) > 2 and edict[i][2]:
                             tdict[i][0].setBackground(1, self.red)
                         else:
-                            sdict = self.add_another_to_json(i, edict[i])
+                            self.add_another_to_json(i, edict[i],sdict)
                         self.complex_dict_to_tree(tdict[i], edict[i][1], {})
                     else:
                         tdict[i] = TreeItemEdit(tdict[0], i)
@@ -890,7 +895,7 @@ class Main(QMainWindow):
             while True:
                 if str(index) not in sdict:
                     if str(index + 1) in sdict:
-                        sdict = self.add_another_to_json(str(index), edict['list'])
+                        self.add_another_to_json(str(index), edict['list'],sdict)
                     else:
                         break
                 i = str(index)
@@ -940,8 +945,7 @@ class Main(QMainWindow):
                     tdict[i].settype('number')
                 tdict[i].set_value(sdict[i])
 
-    def add_another_to_json(self, name, edict):
-        sdict = {}
+    def add_another_to_json(self, name, edict,sdict):
         if name == 'list':
             if edict[4] and edict[3] < edict[2]:
                 pass
@@ -950,7 +954,7 @@ class Main(QMainWindow):
                     if edict[0] == 'tree':
                         sdict[str(i)] = {}
                         for j in edict[1]:
-                            sdict[str(i)] = self.add_another_to_json(j, edict[1][j])
+                            self.add_another_to_json(j, edict[1][j],sdict[str(i)])
                     else:
                         sdict[str(i)] = edict[1]
         elif len(edict) ==3 and edict[2]:
@@ -959,12 +963,11 @@ class Main(QMainWindow):
             if edict[0] == 'tree':
                 sdict[name] = {}
                 for j in edict[1]:
-                    sdict[name]=self.add_another_to_json(j, edict[1][j])
+                    self.add_another_to_json(j, edict[1][j],sdict[name])
             elif edict[0] == 'random_tree':
                 sdict[name] = {}
             else:
                 sdict[name] = edict[1]
-        return sdict
 
     def edit_text_base_selected_changed(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['代码库'][0].currentText()]
@@ -980,8 +983,7 @@ class Main(QMainWindow):
             self.json_name[selected].append(text)
             self.json_base[selected][text] = {}
             for i in edit_json.edit[selected]:
-                self.json_base[selected][text]
-                self.add_another_to_json(i, edit_json.edit[selected][i])
+                self.add_another_to_json(i, edit_json.edit[selected][i],self.json_base[selected][text])
             self.resort()
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
             self.edit_category_selected_changed()
@@ -1073,6 +1075,12 @@ class Main(QMainWindow):
         if sender.hasvalue:
             self.json_edit_change_value()
 
+    def copy_text_from_tree(self,index=0):
+        wincld.OpenClipboard()
+        wincld.EmptyClipboard()
+        wincld.SetClipboardData(win32con.CF_UNICODETEXT, self.sender().currentItem().text(index))
+        wincld.CloseClipboard()
+
     def self_edit_button_default(self, bool=False):
         self.editlayout['竖布局']['修改数据'].setEnabled(bool)
         self.editlayout['竖布局']['增加列表'].setEnabled(bool)
@@ -1117,7 +1125,7 @@ class Main(QMainWindow):
             temp.islist = True
         else:
             sdict = {}
-            sdict = self.add_another_to_json(i, item.listtype)
+            self.add_another_to_json(i, item.listtype,sdict)
             if item.listtype[0] == 'tree':
                 temp = {0: TreeItemEdit(item, i)}
                 temp[0].set_type(item.listtype[0])
