@@ -920,15 +920,19 @@ class Main(QMainWindow):
         for i in sdict['混合文字']:
             if isinstance(sdict['混合文字'][i], dict):
                 tdict['混合文字'][i] = {0: TreeItemEdit(tdict['混合文字'][0], i)}
-                tdict['混合文字'][i].set_type('tree')
+                tdict['混合文字'][i][0].set_type('tree')
                 self.complex_dict_to_tree(tdict['混合文字'][i], {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 3, False]}, 1, 1, False]},
                                           sdict['混合文字'][i])
+                tdict['混合文字'][i][0].islist = True
             else:
                 tdict['混合文字'][i] = TreeItemEdit(tdict['混合文字'][0], i)
                 tdict['混合文字'][i].set_type('text')
                 tdict['混合文字'][i].set_value(sdict['混合文字'][i])
+                tdict['混合文字'][i].islist = True
             tdict['混合文字'][0].tree_or_text = not tdict['混合文字'][0].tree_or_text
-            tdict['混合文字'][i].islist = True
+            tdict['混合文字'][0].listtype[2] += 1
+            tdict['混合文字'][0].listtype[3] += 1
+
 
     def random_dict_to_tree(self, tdict, sdict):
         for i in sdict:
@@ -1143,10 +1147,11 @@ class Main(QMainWindow):
         ii = int(item.text(0))
         parent = item.parent()
         parent.removeChild(item)
-        for i in range(ii - parent.listtype[2] + parent.listtype[3], parent.childCount()):
-            parent.child(i).setText(0, str(i + parent.listtype[2] - parent.listtype[3]))
+        counts=parent.childCount()
         parent.listtype[2] -= 1
         parent.listtype[3] -= 1
+        for i in range(counts-parent.listtype[3],counts):
+            parent.child(i).setText(0, str(i -counts+ parent.listtype[2]))
         if parent.itemtype == 'combine_tree':
             parent.tree_or_text = not parent.tree_or_text
 
