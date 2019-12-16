@@ -170,7 +170,7 @@ def get_source_to_data(all_json, upgrade_json, version):
                     else:
                         break
             elif i == "升级":
-                if "A杖" in temp1[i] or "技能" in temp1[i] or "混合" in temp1[i]:
+                if "A杖" in temp1[i] and len(temp1[i]["A杖"]) > 0 or "技能" in temp1[i] and len(temp1[i]["技能"]) > 0 or "混合" in temp1[i] and len(temp1[i]["混合"]) > 0:
                     upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
             elif i == "页面名":
                 continue
@@ -217,11 +217,11 @@ def input_upgrade(all_json, upgrade_json):
             else:
                 temp["2"] = upgrade_json[i]["A杖"][j]["值"]
         for j in upgrade_json[i]["技能"]:
-            if "代码" in upgrade_json[i]["A杖"][j]["值"]:
-                if "1" in upgrade_json[i]["A杖"][j]["值"]["代码"] and upgrade_json[i]["A杖"][j]["值"]["代码"]["1"] == "":
-                    upgrade_json[i]["A杖"][j]["值"]["代码"]["1"] = "技能"
-                if "2" in upgrade_json[i]["A杖"][j]["值"]["代码"] and upgrade_json[i]["A杖"][j]["值"]["代码"]["2"] == "":
-                    upgrade_json[i]["A杖"][j]["值"]["代码"]["2"] = all_json["技能"][i]["代码"]
+            if "代码" in upgrade_json[i]["技能"][j]["值"]:
+                if "1" in upgrade_json[i]["技能"][j]["值"]["代码"] and upgrade_json[i]["技能"][j]["值"]["代码"]["1"] == "":
+                    upgrade_json[i]["技能"][j]["值"]["代码"]["1"] = "技能"
+                if "2" in upgrade_json[i]["技能"][j]["值"]["代码"] and upgrade_json[i]["技能"][j]["值"]["代码"]["2"] == "":
+                    upgrade_json[i]["技能"][j]["值"]["代码"]["2"] = all_json["技能"][i]["代码"]
             k = 1
             temp = all_json[upgrade_json[i]["技能"][j]["目标"]["1"]]
             while True:
@@ -243,11 +243,11 @@ def input_upgrade(all_json, upgrade_json):
             else:
                 temp["3"]["升级来源"]["1"]["图片"] = all_json["技能"][i]["迷你图片"]
         for j in upgrade_json[i]["混合"]:
-            if "代码" in upgrade_json[i]["A杖"][j]["值"]:
-                if "1" in upgrade_json[i]["A杖"][j]["值"]["代码"] and upgrade_json[i]["A杖"][j]["值"]["代码"]["1"] == "":
-                    upgrade_json[i]["A杖"][j]["值"]["代码"]["1"] = "技能"
-                if "2" in upgrade_json[i]["A杖"][j]["值"]["代码"] and upgrade_json[i]["A杖"][j]["值"]["代码"]["2"] == "":
-                    upgrade_json[i]["A杖"][j]["值"]["代码"]["2"] = all_json["技能"][i]["代码"]
+            if "代码" in upgrade_json[i]["混合"][j]["值"]:
+                if "1" in upgrade_json[i]["混合"][j]["值"]["代码"] and upgrade_json[i]["混合"][j]["值"]["代码"]["1"] == "":
+                    upgrade_json[i]["混合"][j]["值"]["代码"]["1"] = "技能"
+                if "2" in upgrade_json[i]["混合"][j]["值"]["代码"] and upgrade_json[i]["混合"][j]["值"]["代码"]["2"] == "":
+                    upgrade_json[i]["混合"][j]["值"]["代码"]["2"] = all_json["技能"][i]["代码"]
             k = 1
             temp = all_json[upgrade_json[i]["混合"][j]["目标"]["1"]]
             while True:
@@ -316,25 +316,33 @@ def complete_upgrade(all_json, base_txt):
             fulfil(all_json[i]["属性"][j]["1"]["代码"], all_json[i])
             one_upgrade(all_json[i]["属性"][j], base_txt)
         for j in all_json[i]["冷却时间"]:
-            if all_json[i]["冷却时间"][j]["1"]["代码"]["1"] != '不存在':
+            if all_json[i]["冷却时间"][j]["1"]["代码"]["1"] == '不存在':
+                all_json[i]["冷却时间"][j]["1"]["代码"] = {"1": "不存在"}
+            else:
                 fulfil(all_json[i]["冷却时间"][j]["1"]["代码"], all_json[i])
                 one_upgrade(all_json[i]["冷却时间"][j], base_txt)
         for j in all_json[i]["魔法消耗"]:
             for k in all_json[i]["魔法消耗"][j]:
                 if k != '名称':
-                    if all_json[i]["魔法消耗"][j][k]["1"]["代码"]["1"] != '不存在':
+                    if all_json[i]["魔法消耗"][j][k]["1"]["代码"]["1"] == '不存在':
+                        all_json[i]["魔法消耗"][j][k]["1"]["代码"] = {"1": "不存在"}
+                    else:
                         fulfil(all_json[i]["魔法消耗"][j][k]["1"]["代码"], all_json[i])
                         one_upgrade(all_json[i]["魔法消耗"][j][k], base_txt)
-        if all_json[i]["施法前摇"]["1"]["代码"]["1"] != '不存在':
+        if all_json[i]["施法前摇"]["1"]["代码"]["1"] == '不存在':
+            all_json[i]["施法前摇"]["1"]["代码"] = {"1": "不存在"}
+        else:
             fulfil(all_json[i]["施法前摇"]["1"]["代码"], all_json[i])
             one_upgrade(all_json[i]["施法前摇"], base_txt)
-        if all_json[i]["施法后摇"]["1"]["代码"]["1"] != '不存在':
+        if all_json[i]["施法后摇"]["1"]["代码"]["1"] == '不存在':
+            all_json[i]["施法后摇"]["1"]["代码"] = {"1": "不存在"}
+        else:
             fulfil(all_json[i]["施法后摇"]["1"]["代码"], all_json[i])
             one_upgrade(all_json[i]["施法后摇"], base_txt)
 
 
 def fulfil(arr, json):
-    if '0' in arr and arr['0']=='手填':
+    if '0' in arr and arr['0'] == '手填':
         return
     else:
         if "1" in arr and arr["1"] == "":
@@ -354,7 +362,7 @@ def one_upgrade(json, base_txt):
             k = 0
             while True:
                 k += 1
-                if str(k) in json["1"]["代码"] and json["1"]["代码"][str(k)]!='':
+                if str(k) in json["1"]["代码"] and json["1"]["代码"][str(k)] != '':
                     getvalue[0].append(json["1"]["代码"][str(k)])
                 else:
                     break
@@ -443,7 +451,7 @@ def array_cal(arr1, arr2, op, num):
             try:
                 temp = float(arr2[i])
             except ValueError:
-                temp=arr2[i]
+                temp = arr2[i]
         else:
             try:
                 temp = float(arr2[0])
@@ -728,6 +736,19 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                 re[1].append(temp[str(j)])
             else:
                 break
+    elif json['0']=='普通属性':
+        temp = all_json[json["1"]][json["2"]][json["3"]]
+        i = 3
+        while True:
+            i += 1
+            if str(i) in json:
+                temp = temp[str(i)]
+            else:
+                break
+        re[1].append(temp)
+    elif json['0']=='图片链接':
+        temp=all_json[json["1"]][json["2"]]
+        re[1].append('[[file:'+temp['迷你图片']+'|'+json['3']+'|link=]][['+temp['页面名']+']]')
     elif json["0"] == "手填":
         j = 0
         while True:

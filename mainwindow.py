@@ -943,15 +943,16 @@ class Main(QMainWindow):
         for i in sdict:
             if isinstance(sdict[i], dict):
                 tdict[i] = {0: TreeItemEdit(tdict[0], i)}
-                tdict[i][0].settype('tree')
+                tdict[i][0].set_type('tree')
                 tdict[i][0].israndom = True
+                self.random_dict_to_tree(tdict[i],sdict[i])
             else:
                 tdict[i] = TreeItemEdit(tdict[0], i)
-                tdict[i][0].israndom = True
+                tdict[i].israndom = True
                 if isinstance(sdict[i], str):
-                    tdict[i].settype('text')
+                    tdict[i].set_type('text')
                 else:
-                    tdict[i].settype('number')
+                    tdict[i].set_type('number')
                 tdict[i].set_value(sdict[i])
 
     def add_another_to_json(self, name, edict, sdict):
