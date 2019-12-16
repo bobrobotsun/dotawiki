@@ -533,6 +533,8 @@ class Main(QMainWindow):
             self.ml['高级功能'] = {0: self.ml[0].addMenu('高级功能')}
             self.ml['高级功能']['更新数据'] = self.ml['高级功能'][0].addAction('更新数据')
             self.ml['高级功能']['更新数据'].triggered.connect(lambda: self.update_json_base())
+            self.ml['高级功能']['上传基础文件'] = self.ml['高级功能'][0].addAction('上传基础文件')
+            self.ml['高级功能']['上传基础文件'].triggered.connect(self.upload_all)
             self.ml['高级功能']['上传'] = self.ml['高级功能'][0].addAction('上传')
             self.ml['高级功能']['上传'].triggered.connect(self.upload_all)
             """
@@ -771,6 +773,11 @@ class Main(QMainWindow):
 
         self.file_save_all()
         QMessageBox.information(self, "已完成", info)
+
+    def upload_basic_json(self):
+        self.upload_json('Data:text_base.json', json.dumps(self.text_base))
+        self.upload_json('Data:json_name.json', json.dumps(self.json_name))
+        QMessageBox.information(self, "上传完成", '已经上传完毕基础文件')
 
     def upload_all(self):
         self.w = upload_text('开始上传数据')
