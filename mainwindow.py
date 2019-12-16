@@ -534,7 +534,7 @@ class Main(QMainWindow):
             self.ml['高级功能']['更新数据'] = self.ml['高级功能'][0].addAction('更新数据')
             self.ml['高级功能']['更新数据'].triggered.connect(lambda: self.update_json_base())
             self.ml['高级功能']['上传基础文件'] = self.ml['高级功能'][0].addAction('上传基础文件')
-            self.ml['高级功能']['上传基础文件'].triggered.connect(self.upload_all)
+            self.ml['高级功能']['上传基础文件'].triggered.connect(self.upload_basic_json)
             self.ml['高级功能']['上传'] = self.ml['高级功能'][0].addAction('上传')
             self.ml['高级功能']['上传'].triggered.connect(self.upload_all)
             """
