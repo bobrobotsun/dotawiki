@@ -1556,9 +1556,11 @@ class Main(QMainWindow):
             item.setBackground(1, self.green)
             item.setExpanded(True)
         elif item.background(1) == self.green:
-            while item.childCount() > 0:
-                item.removeChild(item.child(0))
-            item.setBackground(1, self.red)
+            clickb=QMessageBox.critical(self, '禁用大分类', '您正试图禁用【'+item.text(0)+'】分类！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if clickb==QMessageBox.Yes:
+                while item.childCount() > 0:
+                    item.removeChild(item.child(0))
+                item.setBackground(1, self.red)
         self.version_edit_all_button_clicked()
 
     def version_button_tree1_add_tree2(self):
