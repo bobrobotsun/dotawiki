@@ -528,216 +528,215 @@ class Main(QMainWindow):
 
     # 如果开启软件后未登陆，请在登录了有bot（机器人）权限的账户后重启使用
     def check_test(self):
-        has_bot = self.seesion.post(self.target_url, data={'action': 'query', 'meta': 'userinfo', 'uiprop': 'rights', 'format': 'json'})
-        if 'bot' in has_bot.json()['query']['userinfo']['rights']:
-            self.ml['高级功能'] = {0: self.ml[0].addMenu('高级功能')}
-            self.ml['高级功能']['更新数据'] = self.ml['高级功能'][0].addAction('更新数据')
-            self.ml['高级功能']['更新数据'].triggered.connect(lambda: self.update_json_base())
-            self.ml['高级功能']['上传基础文件'] = self.ml['高级功能'][0].addAction('上传基础文件')
-            self.ml['高级功能']['上传基础文件'].triggered.connect(self.upload_basic_json)
-            self.ml['高级功能']['上传'] = self.ml['高级功能'][0].addAction('上传')
-            self.ml['高级功能']['上传'].triggered.connect(self.upload_all)
-            """
-            制作一个默认的单位统称列表，具体效果见edit_json.py
-            """
-            self.version_default = edit_json.set_version_default(self.json_base)
-            """
-            下面是重新排序的情况
-            """
-            self.resort()
-            """
-            下面是修改tab的页面情况
-            """
-            self.editWidget = QWidget(self)
-            self.centralWidget().addTab(self.editWidget, '修改页面')
-            self.editlayout = {0: QHBoxLayout()}
-            self.editWidget.setLayout(self.editlayout[0])
-            self.editlayout['基础数据'] = {0: QGroupBox('基础数据', self)}
-            self.editlayout[0].addWidget(self.editlayout['基础数据'][0], 1)
-            self.editlayout['基础数据']['竖布局'] = {0: QVBoxLayout()}
-            self.editlayout['基础数据'][0].setLayout(self.editlayout['基础数据']['竖布局'][0])
-            self.editlayout['基础数据']['竖布局']['树'] = {0: QTreeWidget(self)}
-            self.editlayout['基础数据']['竖布局'][0].addWidget(self.editlayout['基础数据']['竖布局']['树'][0])
-            self.editlayout['基础数据']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
-            self.editlayout['基础数据']['竖布局']['树'][0].setColumnWidth(0, 300)
+        self.ml['高级功能'] = {0: self.ml[0].addMenu('高级功能')}
+        self.ml['高级功能']['更新数据'] = self.ml['高级功能'][0].addAction('更新数据')
+        self.ml['高级功能']['更新数据'].triggered.connect(lambda: self.update_json_base())
+        self.ml['高级功能']['上传基础文件'] = self.ml['高级功能'][0].addAction('上传基础文件')
+        self.ml['高级功能']['上传基础文件'].triggered.connect(self.upload_basic_json)
+        self.ml['高级功能']['上传'] = self.ml['高级功能'][0].addAction('上传')
+        self.ml['高级功能']['上传'].triggered.connect(self.upload_all)
+        """
+        制作一个默认的单位统称列表，具体效果见edit_json.py
+        """
+        self.version_default = edit_json.set_version_default(self.json_base)
+        """
+        下面是重新排序的情况
+        """
+        self.resort()
+        """
+        下面是修改tab的页面情况
+        """
+        self.editWidget = QWidget(self)
+        self.centralWidget().addTab(self.editWidget, '修改页面')
+        self.editlayout = {0: QHBoxLayout()}
+        self.editWidget.setLayout(self.editlayout[0])
+        self.editlayout['基础数据'] = {0: QGroupBox('基础数据', self)}
+        self.editlayout[0].addWidget(self.editlayout['基础数据'][0], 1)
+        self.editlayout['基础数据']['竖布局'] = {0: QVBoxLayout()}
+        self.editlayout['基础数据'][0].setLayout(self.editlayout['基础数据']['竖布局'][0])
+        self.editlayout['基础数据']['竖布局']['树'] = {0: QTreeWidget(self)}
+        self.editlayout['基础数据']['竖布局'][0].addWidget(self.editlayout['基础数据']['竖布局']['树'][0])
+        self.editlayout['基础数据']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
+        self.editlayout['基础数据']['竖布局']['树'][0].setColumnWidth(0, 300)
 
-            self.editlayout['修改核心'] = {0: QGroupBox('修改核心', self)}
-            self.editlayout[0].addWidget(self.editlayout['修改核心'][0], 2)
-            self.editlayout['修改核心']['竖布局'] = {0: QVBoxLayout()}
-            self.editlayout['修改核心'][0].setLayout(self.editlayout['修改核心']['竖布局'][0])
-            self.editlayout['修改核心']['竖布局']['大分类'] = {0: QComboBox(self)}
-            self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['大分类'][0])
-            self.editlayout['修改核心']['竖布局']['具体库'] = {0: QComboBox(self)}
-            self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['具体库'][0])
-            self.editlayout['修改核心']['竖布局']['代码库'] = {0: QComboBox(self)}
-            self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['代码库'][0])
-            self.editlayout['修改核心']['竖布局']['树'] = {0: QTreeWidget(self)}
-            self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['树'][0])
-            self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
+        self.editlayout['修改核心'] = {0: QGroupBox('修改核心', self)}
+        self.editlayout[0].addWidget(self.editlayout['修改核心'][0], 2)
+        self.editlayout['修改核心']['竖布局'] = {0: QVBoxLayout()}
+        self.editlayout['修改核心'][0].setLayout(self.editlayout['修改核心']['竖布局'][0])
+        self.editlayout['修改核心']['竖布局']['大分类'] = {0: QComboBox(self)}
+        self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['大分类'][0])
+        self.editlayout['修改核心']['竖布局']['具体库'] = {0: QComboBox(self)}
+        self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['具体库'][0])
+        self.editlayout['修改核心']['竖布局']['代码库'] = {0: QComboBox(self)}
+        self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['代码库'][0])
+        self.editlayout['修改核心']['竖布局']['树'] = {0: QTreeWidget(self)}
+        self.editlayout['修改核心']['竖布局'][0].addWidget(self.editlayout['修改核心']['竖布局']['树'][0])
+        self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
 
-            self.editlayout['竖布局'] = {0: QVBoxLayout()}
-            self.editlayout[0].addLayout(self.editlayout['竖布局'][0])
-            self.editlayout['竖布局']['新增'] = QPushButton('新增', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['新增'])
-            self.editlayout['竖布局']['新增'].clicked.connect(self.json_edit_new)
-            self.editlayout['竖布局']['下载更新'] = QPushButton('下载更新', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['下载更新'])
-            self.editlayout['竖布局']['下载更新'].clicked.connect(self.json_edit_download)
-            self.editlayout['竖布局']['删除'] = QPushButton('删除', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除'])
-            self.editlayout['竖布局']['删除'].clicked.connect(self.json_edit_delete)
-            self.editlayout['竖布局']['改名'] = QPushButton('改名', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['改名'])
-            self.editlayout['竖布局']['改名'].clicked.connect(self.json_edit_change_name)
-            self.editlayout['竖布局']['保存'] = QPushButton('保存', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['保存'])
-            self.editlayout['竖布局']['保存'].clicked.connect(self.json_edit_save)
-            self.editlayout['竖布局']['保存并上传'] = QPushButton('保存并上传', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['保存并上传'])
-            self.editlayout['竖布局']['保存并上传'].clicked.connect(self.json_edit_save_and_upload)
-            self.editlayout['竖布局'][0].addStretch(1)
-            self.editlayout['竖布局']['修改数据'] = QPushButton('修改数据', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['修改数据'])
-            self.editlayout['竖布局']['修改数据'].clicked.connect(self.json_edit_change_value)
-            self.editlayout['竖布局']['增加列表'] = QPushButton('增加列表', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['增加列表'])
-            self.editlayout['竖布局']['增加列表'].clicked.connect(self.json_edit_add_list)
-            self.editlayout['竖布局']['删除列表'] = QPushButton('删除列表', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除列表'])
-            self.editlayout['竖布局']['删除列表'].clicked.connect(self.json_edit_delete_list)
-            self.editlayout['竖布局']['启用条目'] = QPushButton('启用条目', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['启用条目'])
-            self.editlayout['竖布局']['启用条目'].clicked.connect(self.json_edit_tree_use_true)
-            self.editlayout['竖布局']['禁用条目'] = QPushButton('禁用条目', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['禁用条目'])
-            self.editlayout['竖布局']['禁用条目'].clicked.connect(self.json_edit_tree_use_false)
-            self.editlayout['竖布局']['增加新次级条目'] = QPushButton('增加新次级条目', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['增加新次级条目'])
-            self.editlayout['竖布局']['增加新次级条目'].clicked.connect(self.json_edit_add_new_item)
-            self.editlayout['竖布局']['删除该次级条目'] = QPushButton('删除该次级条目', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除该次级条目'])
-            self.editlayout['竖布局']['删除该次级条目'].clicked.connect(self.json_edit_delete_item)
-            self.editlayout['竖布局']['转换为混合文字'] = QPushButton('转换为混合文字', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['转换为混合文字'])
-            self.editlayout['竖布局']['转换为混合文字'].clicked.connect(self.json_edit_text_to_combine)
-            self.editlayout['竖布局']['转换为普通文字'] = QPushButton('转换为普通文字', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['转换为普通文字'])
-            self.editlayout['竖布局']['转换为普通文字'].clicked.connect(self.json_edit_combine_to_text)
-            self.editlayout['竖布局'][0].addStretch(1)
-            self.editlayout['竖布局']['传统目标设定'] = QPushButton('传统目标设定', self)
-            self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['传统目标设定'])
-            self.editlayout['竖布局']['传统目标设定'].clicked.connect(self.json_edit_target_default)
-            self.editlayout['竖布局'][0].addStretch(5)
+        self.editlayout['竖布局'] = {0: QVBoxLayout()}
+        self.editlayout[0].addLayout(self.editlayout['竖布局'][0])
+        self.editlayout['竖布局']['新增'] = QPushButton('新增', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['新增'])
+        self.editlayout['竖布局']['新增'].clicked.connect(self.json_edit_new)
+        self.editlayout['竖布局']['下载更新'] = QPushButton('下载更新', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['下载更新'])
+        self.editlayout['竖布局']['下载更新'].clicked.connect(self.json_edit_download)
+        self.editlayout['竖布局']['删除'] = QPushButton('删除', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除'])
+        self.editlayout['竖布局']['删除'].clicked.connect(self.json_edit_delete)
+        self.editlayout['竖布局']['改名'] = QPushButton('改名', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['改名'])
+        self.editlayout['竖布局']['改名'].clicked.connect(self.json_edit_change_name)
+        self.editlayout['竖布局']['保存'] = QPushButton('保存', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['保存'])
+        self.editlayout['竖布局']['保存'].clicked.connect(self.json_edit_save)
+        self.editlayout['竖布局']['保存并上传'] = QPushButton('保存并上传', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['保存并上传'])
+        self.editlayout['竖布局']['保存并上传'].clicked.connect(self.json_edit_save_and_upload)
+        self.editlayout['竖布局'][0].addStretch(1)
+        self.editlayout['竖布局']['修改数据'] = QPushButton('修改数据', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['修改数据'])
+        self.editlayout['竖布局']['修改数据'].clicked.connect(self.json_edit_change_value)
+        self.editlayout['竖布局']['增加列表'] = QPushButton('增加列表', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['增加列表'])
+        self.editlayout['竖布局']['增加列表'].clicked.connect(self.json_edit_add_list)
+        self.editlayout['竖布局']['删除列表'] = QPushButton('删除列表', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除列表'])
+        self.editlayout['竖布局']['删除列表'].clicked.connect(self.json_edit_delete_list)
+        self.editlayout['竖布局']['启用条目'] = QPushButton('启用条目', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['启用条目'])
+        self.editlayout['竖布局']['启用条目'].clicked.connect(self.json_edit_tree_use_true)
+        self.editlayout['竖布局']['禁用条目'] = QPushButton('禁用条目', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['禁用条目'])
+        self.editlayout['竖布局']['禁用条目'].clicked.connect(self.json_edit_tree_use_false)
+        self.editlayout['竖布局']['增加新次级条目'] = QPushButton('增加新次级条目', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['增加新次级条目'])
+        self.editlayout['竖布局']['增加新次级条目'].clicked.connect(self.json_edit_add_new_item)
+        self.editlayout['竖布局']['删除该次级条目'] = QPushButton('删除该次级条目', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除该次级条目'])
+        self.editlayout['竖布局']['删除该次级条目'].clicked.connect(self.json_edit_delete_item)
+        self.editlayout['竖布局']['转换为混合文字'] = QPushButton('转换为混合文字', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['转换为混合文字'])
+        self.editlayout['竖布局']['转换为混合文字'].clicked.connect(self.json_edit_text_to_combine)
+        self.editlayout['竖布局']['转换为普通文字'] = QPushButton('转换为普通文字', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['转换为普通文字'])
+        self.editlayout['竖布局']['转换为普通文字'].clicked.connect(self.json_edit_combine_to_text)
+        self.editlayout['竖布局'][0].addStretch(1)
+        self.editlayout['竖布局']['传统目标设定'] = QPushButton('传统目标设定', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['传统目标设定'])
+        self.editlayout['竖布局']['传统目标设定'].clicked.connect(self.json_edit_target_default)
+        self.editlayout['竖布局'][0].addStretch(5)
 
-            self.editlayout['额外机制'] = {0: QGroupBox('额外机制', self)}
-            self.editlayout[0].addWidget(self.editlayout['额外机制'][0], 1)
-            self.editlayout['额外机制']['竖布局'] = {0: QVBoxLayout()}
-            self.editlayout['额外机制'][0].setLayout(self.editlayout['额外机制']['竖布局'][0])
-            self.editlayout['额外机制']['竖布局']['树'] = {0: QTreeWidget(self)}
-            self.editlayout['额外机制']['竖布局'][0].addWidget(self.editlayout['额外机制']['竖布局']['树'][0])
-            self.editlayout['额外机制']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
-            self.dict_to_tree(self.editlayout['额外机制']['竖布局']['树'], self.mech)
-            self.editlayout['额外机制']['竖布局']['树'][0].setColumnWidth(0, 150)
-            self.editlayout['额外机制']['竖布局']['树'][0].expandAll()
+        self.editlayout['额外机制'] = {0: QGroupBox('额外机制', self)}
+        self.editlayout[0].addWidget(self.editlayout['额外机制'][0], 1)
+        self.editlayout['额外机制']['竖布局'] = {0: QVBoxLayout()}
+        self.editlayout['额外机制'][0].setLayout(self.editlayout['额外机制']['竖布局'][0])
+        self.editlayout['额外机制']['竖布局']['树'] = {0: QTreeWidget(self)}
+        self.editlayout['额外机制']['竖布局'][0].addWidget(self.editlayout['额外机制']['竖布局']['树'][0])
+        self.editlayout['额外机制']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
+        self.dict_to_tree(self.editlayout['额外机制']['竖布局']['树'], self.mech)
+        self.editlayout['额外机制']['竖布局']['树'][0].setColumnWidth(0, 150)
+        self.editlayout['额外机制']['竖布局']['树'][0].expandAll()
 
-            for i in edit_json.edit:
-                self.editlayout['修改核心']['竖布局']['大分类'][0].addItem(i)
-            self.editlayout['修改核心']['竖布局']['大分类'][0].activated.connect(self.edit_category_selected_changed)
-            self.edit_category_selected_changed()
-            self.editlayout['修改核心']['竖布局']['具体库'][0].activated.connect(self.edit_target_selected_changed)
-            self.editlayout['修改核心']['竖布局']['代码库'][0].activated.connect(self.edit_text_base_selected_changed)
-            self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
-            self.editlayout['修改核心']['竖布局']['树'][0].doubleClicked.connect(self.tree_item_double_clicked)
-            self.editlayout['基础数据']['竖布局']['树'][0].doubleClicked.connect(lambda: self.copy_text_from_tree(0))
-            """
-            以下是版本更新的内容
-            """
-            self.versionWidget = QWidget(self)
-            self.centralWidget().addTab(self.versionWidget, '版本更新')
-            self.versionlayout = {0: QHBoxLayout()}
-            self.versionWidget.setLayout(self.versionlayout[0])
-            self.versionlayout['版本列表'] = {0: QGroupBox('版本列表', self)}
-            self.versionlayout[0].addWidget(self.versionlayout['版本列表'][0])
-            self.versionlayout['版本列表']['横排版'] = {0: QHBoxLayout()}
-            self.versionlayout['版本列表'][0].setLayout(self.versionlayout['版本列表']['横排版'][0])
-            self.versionlayout['版本列表']['横排版']['列表'] = QListWidget(self)
-            self.versionlayout['版本列表']['横排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['列表'])
-            self.versionlayout['版本列表']['横排版']['竖排版'] = {0: QVBoxLayout()}
-            self.versionlayout['版本列表']['横排版'][0].addLayout(self.versionlayout['版本列表']['横排版']['竖排版'][0])
-            self.versionlayout['版本列表']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
-            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['下载'])
-            self.versionlayout['版本列表']['横排版']['竖排版']['下载'].clicked.connect(self.download_version_list)
-            self.versionlayout['版本列表']['横排版']['竖排版']['上传'] = QPushButton('上传', self)
-            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['上传'])
-            self.versionlayout['版本列表']['横排版']['竖排版']['上传'].clicked.connect(self.upload_version_list)
-            self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'] = QPushButton('向上插入新版本', self)
-            self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'].clicked.connect(lambda: self.add_version_list(0))
-            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'])
-            self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'] = QPushButton('向下插入新版本', self)
-            self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'].clicked.connect(lambda: self.add_version_list(1))
-            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'])
-            self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(1)
-            self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'] = QPushButton('下载全部更新内容', self)
-            self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'].clicked.connect(self.download_all_versions)
-            self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'])
-            self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(5)
+        for i in edit_json.edit:
+            self.editlayout['修改核心']['竖布局']['大分类'][0].addItem(i)
+        self.editlayout['修改核心']['竖布局']['大分类'][0].activated.connect(self.edit_category_selected_changed)
+        self.edit_category_selected_changed()
+        self.editlayout['修改核心']['竖布局']['具体库'][0].activated.connect(self.edit_target_selected_changed)
+        self.editlayout['修改核心']['竖布局']['代码库'][0].activated.connect(self.edit_text_base_selected_changed)
+        self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
+        self.editlayout['修改核心']['竖布局']['树'][0].doubleClicked.connect(self.tree_item_double_clicked)
+        self.editlayout['基础数据']['竖布局']['树'][0].doubleClicked.connect(lambda: self.copy_text_from_tree(0))
+        """
+        以下是版本更新的内容
+        """
+        self.versionWidget = QWidget(self)
+        self.centralWidget().addTab(self.versionWidget, '版本更新')
+        self.versionlayout = {0: QHBoxLayout()}
+        self.versionWidget.setLayout(self.versionlayout[0])
+        self.versionlayout['版本列表'] = {0: QGroupBox('版本列表', self)}
+        self.versionlayout[0].addWidget(self.versionlayout['版本列表'][0])
+        self.versionlayout['版本列表']['横排版'] = {0: QHBoxLayout()}
+        self.versionlayout['版本列表'][0].setLayout(self.versionlayout['版本列表']['横排版'][0])
+        self.versionlayout['版本列表']['横排版']['列表'] = QListWidget(self)
+        self.versionlayout['版本列表']['横排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['列表'])
+        self.versionlayout['版本列表']['横排版']['竖排版'] = {0: QVBoxLayout()}
+        self.versionlayout['版本列表']['横排版'][0].addLayout(self.versionlayout['版本列表']['横排版']['竖排版'][0])
+        self.versionlayout['版本列表']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['下载'])
+        self.versionlayout['版本列表']['横排版']['竖排版']['下载'].clicked.connect(self.download_version_list)
+        self.versionlayout['版本列表']['横排版']['竖排版']['上传'] = QPushButton('上传', self)
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['上传'])
+        self.versionlayout['版本列表']['横排版']['竖排版']['上传'].clicked.connect(self.upload_version_list)
+        self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'] = QPushButton('向上插入新版本', self)
+        self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'].clicked.connect(lambda: self.add_version_list(0))
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向上插入新版本'])
+        self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'] = QPushButton('向下插入新版本', self)
+        self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'].clicked.connect(lambda: self.add_version_list(1))
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'])
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(1)
+        self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'] = QPushButton('下载全部更新内容', self)
+        self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'].clicked.connect(self.download_all_versions)
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'])
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(5)
 
-            self.versionlayout['版本内容'] = {0: QGroupBox('版本内容', self)}
-            self.versionlayout[0].addWidget(self.versionlayout['版本内容'][0], 1)
-            self.versionlayout['版本内容']['横排版'] = {0: QHBoxLayout()}
-            self.versionlayout['版本内容'][0].setLayout(self.versionlayout['版本内容']['横排版'][0])
-            self.versionlayout['版本内容']['横排版']['树'] = {0: QTreeWidget(self)}
-            self.versionlayout['版本内容']['横排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['树'][0])
-            self.versionlayout['版本内容']['横排版']['树'][0].setHeaderLabels(['名称', '值'])
-            self.versionlayout['版本内容']['横排版']['树'][0].setColumnWidth(0, 350)
-            self.versionlayout['版本内容']['横排版']['竖排版'] = {0: QVBoxLayout()}
-            self.versionlayout['版本内容']['横排版'][0].addLayout(self.versionlayout['版本内容']['横排版']['竖排版'][0])
-            self.versionlayout['版本内容']['横排版']['竖排版']['新建'] = QPushButton('新建', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['新建'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['新建'].clicked.connect(self.create_one_version)
-            self.versionlayout['版本内容']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['下载'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['下载'].clicked.connect(self.download_one_version)
-            self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'] = QPushButton('保存并上传', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'].clicked.connect(self.upload_one_version)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(1)
-            self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'] = QPushButton('修改内容', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'].clicked.connect(self.version_edit_change_value)
-            self.versionlayout['版本内容']['横排版']['竖排版']['大分类'] = QPushButton('大分类', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['大分类'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].clicked.connect(self.version_button_tree1)
-            self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'] = QPushButton('加小分类', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].clicked.connect(self.version_button_tree1_add_tree2)
-            self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'] = QPushButton('删除小分类', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].clicked.connect(self.version_button_delete_tree_item)
-            self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'] = QPushButton('加一条新条目', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].clicked.connect(self.version_button_tree2_add_tree_list)
-            self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'] = QPushButton('删除该条目', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].clicked.connect(self.version_button_delete_tree_item)
-            self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'] = QPushButton('增加一段文字内容', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].clicked.connect(self.version_button_complex_tree_add_text)
-            self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'] = QPushButton('删除该文字内容', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].clicked.connect(self.version_button_delete_tree_item)
-            self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'] = QPushButton('增加新目标', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].clicked.connect(self.version_button_list_add_list_text)
-            self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'] = QPushButton('删除该目标', self)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'])
-            self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].clicked.connect(self.version_button_delete_tree_item)
-            self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(5)
+        self.versionlayout['版本内容'] = {0: QGroupBox('版本内容', self)}
+        self.versionlayout[0].addWidget(self.versionlayout['版本内容'][0], 1)
+        self.versionlayout['版本内容']['横排版'] = {0: QHBoxLayout()}
+        self.versionlayout['版本内容'][0].setLayout(self.versionlayout['版本内容']['横排版'][0])
+        self.versionlayout['版本内容']['横排版']['树'] = {0: QTreeWidget(self)}
+        self.versionlayout['版本内容']['横排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['树'][0])
+        self.versionlayout['版本内容']['横排版']['树'][0].setHeaderLabels(['名称', '值'])
+        self.versionlayout['版本内容']['横排版']['树'][0].setColumnWidth(0, 350)
+        self.versionlayout['版本内容']['横排版']['竖排版'] = {0: QVBoxLayout()}
+        self.versionlayout['版本内容']['横排版'][0].addLayout(self.versionlayout['版本内容']['横排版']['竖排版'][0])
+        self.versionlayout['版本内容']['横排版']['竖排版']['新建'] = QPushButton('新建', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['新建'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['新建'].clicked.connect(self.create_one_version)
+        self.versionlayout['版本内容']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['下载'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['下载'].clicked.connect(self.download_one_version)
+        self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'] = QPushButton('保存并上传', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'].clicked.connect(self.upload_one_version)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(1)
+        self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'] = QPushButton('修改内容', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'].clicked.connect(self.version_edit_change_value)
+        self.versionlayout['版本内容']['横排版']['竖排版']['大分类'] = QPushButton('大分类', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['大分类'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].clicked.connect(self.version_button_tree1)
+        self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'] = QPushButton('加小分类', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].clicked.connect(self.version_button_tree1_add_tree2)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'] = QPushButton('删除小分类', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].clicked.connect(self.version_button_delete_tree_item)
+        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'] = QPushButton('加一条新条目', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].clicked.connect(self.version_button_tree2_add_tree_list)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'] = QPushButton('删除该条目', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].clicked.connect(self.version_button_delete_tree_item)
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'] = QPushButton('增加一段文字内容', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].clicked.connect(self.version_button_complex_tree_add_text)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'] = QPushButton('删除该文字内容', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].clicked.connect(self.version_button_delete_tree_item)
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'] = QPushButton('增加新目标', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].clicked.connect(self.version_button_list_add_list_text)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'] = QPushButton('删除该目标', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].clicked.connect(self.version_button_delete_tree_item)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(5)
 
-            self.check_version()
-            self.versionlayout['版本列表']['横排版']['列表'].clicked.connect(self.check_version_content)
-            self.versionlayout['版本内容']['横排版']['树'][0].clicked.connect(self.version_edit_all_button_clicked)
-            self.version_edit_all_button_default()
+        self.check_version()
+        self.versionlayout['版本列表']['横排版']['列表'].clicked.connect(self.check_version_content)
+        self.versionlayout['版本内容']['横排版']['树'][0].clicked.connect(self.version_edit_all_button_clicked)
+        self.version_edit_all_button_default()
+
 
     def resort(self):
         for i in self.text_base:
