@@ -535,6 +535,8 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传基础文件'].triggered.connect(self.upload_basic_json)
         self.ml['高级功能']['上传'] = self.ml['高级功能'][0].addAction('上传')
         self.ml['高级功能']['上传'].triggered.connect(self.upload_all)
+        self.ml['高级功能']['测试窗口'] = self.ml['高级功能'][0].addAction('测试用，看见了不要点，没用')
+        self.ml['高级功能']['测试窗口'].triggered.connect(self.test_inputwindow)
         """
         制作一个默认的单位统称列表，具体效果见edit_json.py
         """
@@ -736,6 +738,7 @@ class Main(QMainWindow):
         self.versionlayout['版本列表']['横排版']['列表'].clicked.connect(self.check_version_content)
         self.versionlayout['版本内容']['横排版']['树'][0].clicked.connect(self.version_edit_all_button_clicked)
         self.version_edit_all_button_default()
+        self.versionlayout['版本内容']['横排版']['树'][0].doubleClicked.connect(self.version_item_double_clicked)
 
 
     def resort(self):
@@ -1568,6 +1571,11 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].setEnabled(False)
 
+    def version_item_double_clicked(self):
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        if item.hasvalue:
+            self.version_edit_change_value()
+
     def version_edit_change_value(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         text, ok = QInputDialog.getText(self, '修改值', '您想将其修改为:', QLineEdit.Normal, item.text(1))
@@ -1692,6 +1700,9 @@ class Main(QMainWindow):
                     new.itemtype = 'list_text'
                     new.set_value(text2)
 
+    def test_inputwindow(self):
+        pass
+
 
 class upload_text(QWidget):
     def __init__(self, first_txt):
@@ -1769,3 +1780,16 @@ class VersionItemEdit(QTreeWidgetItem):
     def set_list(self, ll):
         self.list = copy.deepcopy(ll)
         self.setText(1, str(self.list))
+
+
+class MoInputWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.b = QTextBrowser(self)
+        self.l = QVBoxLayout()
+        self.l.addWidget(self.b)
+        self.p = QProgressBar(self)
+        self.setLayout(self.l)
+        thread = threading.Thread(target=self.addtext, args=(first_txt,))
+        thread.start()
+        self.show()
