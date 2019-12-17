@@ -1191,7 +1191,7 @@ class Main(QMainWindow):
         item.delete_value()
         temp = TreeItemEdit(item, '混合文字')
         temp.set_type('combine_tree')
-        temp.set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 3, False]}, 1, 1, False]}, 1, 0, False])
+        temp.set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 4, False]}, 1, 1, False]}, 1, 0, False])
         self.tree_item_clicked()
         item.setExpanded(True)
 
