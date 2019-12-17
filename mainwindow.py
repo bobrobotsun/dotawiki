@@ -1379,6 +1379,7 @@ class Main(QMainWindow):
                 self.version_base[text][item.text(0)] = self.version_tree_to_json(item)
         self.upload_json('Data:' + text + '.json', json.dumps(self.version_base[text]))
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+        self.complex_json_to_version_tree()
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
     def version_tree_to_json(self, item):
@@ -1386,6 +1387,8 @@ class Main(QMainWindow):
         for i in range(item.childCount()):
             item1 = item.child(i)
             re[item1.text(0)] = [item1.text(1)]
+            print(edit_json.version[item.text(0)][1],edit_json.version[item.text(0)][1] in self.json_base,item1.text(0),item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]])
+            print()
             if edit_json.version[item.text(0)][1] in self.json_base and item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]]:
                 re[item1.text(0)][0] = self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
             for j in range(item1.childCount()):
@@ -1755,7 +1758,10 @@ class VersionItemEdit(QTreeWidgetItem):
     def set_value(self, text=''):
         self.hasvalue = True
         self.itemvalue = text
-        self.setText(1, str(text))
+        if text=='None':
+            self.setText(1, '')
+        else:
+            self.setText(1, str(text))
 
     def set_list(self, ll):
         self.list = copy.deepcopy(ll)
