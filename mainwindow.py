@@ -1387,8 +1387,6 @@ class Main(QMainWindow):
         for i in range(item.childCount()):
             item1 = item.child(i)
             re[item1.text(0)] = [item1.text(1)]
-            print(edit_json.version[item.text(0)][1],edit_json.version[item.text(0)][1] in self.json_base,item1.text(0),item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]])
-            print()
             if edit_json.version[item.text(0)][1] in self.json_base and item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]]:
                 re[item1.text(0)][0] = self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
             for j in range(item1.childCount()):
