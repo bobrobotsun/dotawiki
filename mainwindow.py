@@ -936,6 +936,7 @@ class Main(QMainWindow):
                 self.complex_dict_to_tree(tdict['混合文字'][i], {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 3, False]}, 1, 1, False]},
                                           sdict['混合文字'][i])
                 tdict['混合文字'][i][0].islist = True
+                tdict['混合文字'][i][0].setExpanded(True)
             else:
                 tdict['混合文字'][i] = TreeItemEdit(tdict['混合文字'][0], i)
                 tdict['混合文字'][i].set_type('text')
@@ -944,6 +945,7 @@ class Main(QMainWindow):
             tdict['混合文字'][0].tree_or_text = not tdict['混合文字'][0].tree_or_text
             tdict['混合文字'][0].listtype[2] += 1
             tdict['混合文字'][0].listtype[3] += 1
+        tdict['混合文字'][0].setExpanded(True)
 
     def random_dict_to_tree(self, tdict, sdict):
         for i in sdict:
@@ -952,6 +954,7 @@ class Main(QMainWindow):
                 tdict[i][0].set_type('tree')
                 tdict[i][0].israndom = True
                 self.random_dict_to_tree(tdict[i],sdict[i])
+                tdict[i][0].setExpanded(True)
             else:
                 tdict[i] = TreeItemEdit(tdict[0], i)
                 tdict[i].israndom = True
@@ -1156,6 +1159,7 @@ class Main(QMainWindow):
                 temp.set_type(item.listtype[0])
                 temp.set_value(sdict[i])
                 temp.islist = True
+        item.setExpanded(True)
 
     def json_edit_delete_list(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -1189,6 +1193,7 @@ class Main(QMainWindow):
         temp.set_type('combine_tree')
         temp.set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 3, False]}, 1, 1, False]}, 1, 0, False])
         self.tree_item_clicked()
+        item.setExpanded(True)
 
     def json_edit_combine_to_text(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
