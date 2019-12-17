@@ -206,7 +206,11 @@ def input_upgrade(all_json, upgrade_json):
             while True:
                 k += 1
                 if str(k) in upgrade_json[i]["A杖"][j]["目标"]:
-                    temp = temp[upgrade_json[i]["A杖"][j]["目标"][str(k)]]
+                    if upgrade_json[i]["A杖"][j]["目标"][str(k)] in temp:
+                        temp = temp[upgrade_json[i]["A杖"][j]["目标"][str(k)]]
+                    else:
+                        temp[upgrade_json[i]["A杖"][j]["目标"][str(k)]]={}
+                        temp=temp[upgrade_json[i]["A杖"][j]["目标"][str(k)]]
                 else:
                     break
             if "0" in upgrade_json[i]["A杖"][j]["目标"] and upgrade_json[i]["A杖"][j]["目标"]["0"] == "替换":
@@ -217,7 +221,7 @@ def input_upgrade(all_json, upgrade_json):
             else:
                 temp["2"] = upgrade_json[i]["A杖"][j]["值"]
         for j in upgrade_json[i]["技能"]:
-            if "代码" in upgrade_json[i]["技能"][j]["值"]:
+            if "代码" in upgrade_json[i]["技能"][j]["值"] and isinstance(upgrade_json[i]["技能"][j]["值"]["代码"],dict):
                 if "1" in upgrade_json[i]["技能"][j]["值"]["代码"] and upgrade_json[i]["技能"][j]["值"]["代码"]["1"] == "":
                     upgrade_json[i]["技能"][j]["值"]["代码"]["1"] = "技能"
                 if "2" in upgrade_json[i]["技能"][j]["值"]["代码"] and upgrade_json[i]["技能"][j]["值"]["代码"]["2"] == "":
@@ -227,7 +231,11 @@ def input_upgrade(all_json, upgrade_json):
             while True:
                 k += 1
                 if str(k) in upgrade_json[i]["技能"][j]["目标"]:
-                    temp = temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]
+                    if upgrade_json[i]["技能"][j]["目标"][str(k)] in temp:
+                        temp = temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]
+                    else:
+                        temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]={}
+                        temp=temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]
                 else:
                     break
             if "0" in upgrade_json[i]["技能"][j]["目标"] and upgrade_json[i]["技能"][j]["目标"]["0"] == "替换":
@@ -253,7 +261,11 @@ def input_upgrade(all_json, upgrade_json):
             while True:
                 k += 1
                 if str(k) in upgrade_json[i]["混合"][j]["目标"]:
-                    temp = temp[upgrade_json[i]["混合"][j]["目标"][str(k)]]
+                    if upgrade_json[i]["混合"][j]["目标"][str(k)] in temp:
+                        temp = temp[upgrade_json[i]["混合"][j]["目标"][str(k)]]
+                    else:
+                        temp[upgrade_json[i]["混合"][j]["目标"][str(k)]]={}
+                        temp=temp[upgrade_json[i]["混合"][j]["目标"][str(k)]]
                 else:
                     break
             if "0" in upgrade_json[i]["混合"][j]["目标"] and upgrade_json[i]["混合"][j]["目标"]["0"] == "替换":
@@ -283,6 +295,9 @@ def input_upgrade(all_json, upgrade_json):
         for j in all_json["技能"][i]["效果"]:
             for k in ["2", "3"]:
                 if k in all_json["技能"][i]["效果"][j]:
+                    if '名称' in all_json["技能"][i]["效果"][j][k]:
+                        all_json["技能"][i]["效果"][j]['名称']=all_json["技能"][i]["效果"][j][k]['名称']
+                        all_json["技能"][i]["效果"][j][k].pop('名称')
                     l = 0
                     while True:
                         l += 1
