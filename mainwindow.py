@@ -1352,6 +1352,7 @@ class Main(QMainWindow):
         else:
             self.version_base[text] = download_info.json()['jsondata']
             self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+            self.complex_json_to_version_tree()
             QMessageBox.information(self, '下载成功', text + '版本已更新至本地。')
 
     def download_all_versions(self):
@@ -1388,12 +1389,24 @@ class Main(QMainWindow):
             if edit_json.version[item.text(0)][1] in self.json_base and item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]]:
                 re[item1.text(0)][0] = self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
             for j in range(item1.childCount()):
-                item2 = item1.child(j).child(0)
-                item3 = item1.child(j).child(1)
+                item2 = item1.child(j).child(1)
+                item3 = item1.child(j).child(2)
                 index = len(re[item1.text(0)])
-                re[item1.text(0)].append({'文字': [], '目标': []})
+                re[item1.text(0)].append({'序列级数':1,'文字': [], '目标': []})
+                item0 = item1.child(j).child(0)
+                try:
+                    re[item1.text(0)][index]['序列级数'] = int(item0.itemvalue)
+                except ValueError:
+                    QMessageBox.critical(self, '错误的序列级数', '您的【' + item1.text(0) + '】中的【' + item1.child(j).text(0) + '】的第' + str(j) + '个序列级数不为正整数，请修改！')
+                    while True:
+                        text, ok = QInputDialog.getText(self, "序列级数", '请输入一个正整数，否则会报错')
+                        try:
+                            re[item1.text(0)][index]['序列级数'] = int(text)
+                            break
+                        except ValueError:
+                            continue
                 for k in range(item2.childCount()):
-                    item4 = item2.child(k)
+                    item4=item2.child(k)
                     if item4.childCount() == 0:
                         re[item1.text(0)][index]['文字'].append([item4.text(1)])
                     elif item4.childCount() == 2:
@@ -1451,6 +1464,13 @@ class Main(QMainWindow):
                                 new3 = VersionItemEdit(new2)
                                 new3.itemtype = 'tree_list'
                                 new3.setText(0, str(k))
+                                new0 = VersionItemEdit(new3)
+                                new0.itemtype = 'text'
+                                new0.setText(0, '序列级数')
+                                if '序列级数' in self.version_base[text][i][j][k]:
+                                    new0.set_value(self.version_base[text][i][j][k]['序列级数'])
+                                else:
+                                    new0.set_value(1)
                                 new4 = VersionItemEdit(new3)
                                 new4.itemtype = 'complex_tree'
                                 new4.setText(0, '文字')
@@ -1504,6 +1524,7 @@ class Main(QMainWindow):
                     new1.itemtype = 'tree1'
                     new1.setText(0, i)
                     new1.setBackground(1, self.red)
+        self.versionlayout['版本内容']['横排版']['树'][0].expandAll()
 
     def version_edit_all_button_clicked(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
@@ -1586,6 +1607,10 @@ class Main(QMainWindow):
         new3 = VersionItemEdit(item)
         new3.itemtype = 'tree_list'
         new3.setText(0, str(item.childCount()))
+        new6 = VersionItemEdit(new3)
+        new6.itemtype = 'text'
+        new6.setText(0, '序列级数')
+        new6.set_value('1')
         new4 = VersionItemEdit(new3)
         new4.itemtype = 'complex_tree'
         new4.setText(0, '文字')
@@ -1730,7 +1755,7 @@ class VersionItemEdit(QTreeWidgetItem):
     def set_value(self, text=''):
         self.hasvalue = True
         self.itemvalue = text
-        self.setText(1, text)
+        self.setText(1, str(text))
 
     def set_list(self, ll):
         self.list = copy.deepcopy(ll)
