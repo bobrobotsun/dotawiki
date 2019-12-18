@@ -1385,42 +1385,45 @@ class Main(QMainWindow):
         re = {}
         for i in range(item.childCount()):
             item1 = item.child(i)
-            re[item1.text(0)] = [item1.text(1)]
+            if i==0:
+                re[str(i)]=['','']
+            else:
+                re[str(i)] = [item1.text(0),item1.text(1)]
             if edit_json.version[item.text(0)][1] in self.json_base and item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]]:
-                re[item1.text(0)][0] = self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
+                re[str(i)][1] = self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
             for j in range(item1.childCount()):
                 item2 = item1.child(j).child(1)
                 item3 = item1.child(j).child(2)
-                index = len(re[item1.text(0)])
-                re[item1.text(0)].append({'序列级数': 1, '文字': [], '目标': []})
+                index = len(re[str(i)])
+                re[str(i)].append({'序列级数': 1, '文字': [], '目标': []})
                 item0 = item1.child(j).child(0)
                 try:
-                    re[item1.text(0)][index]['序列级数'] = int(item0.itemvalue)
+                    re[str(i)][index]['序列级数'] = int(item0.itemvalue)
                 except ValueError:
                     QMessageBox.critical(self, '错误的序列级数', '您的【' + item1.text(0) + '】中的【' + item1.child(j).text(0) + '】的第' + str(j) + '个序列级数不为正整数，请修改！')
                     while True:
                         text, ok = MoInputWindow.getInt(self, "序列级数", '请输入一个正整数，否则会报错')
                         if ok:
-                            re[item1.text(0)][index]['序列级数'] = text
+                            re[str(i)][index]['序列级数'] = text
                 for k in range(item2.childCount()):
                     item4 = item2.child(k)
                     if item4.childCount() == 0:
-                        re[item1.text(0)][index]['文字'].append([item4.text(1)])
+                        re[str(i)][index]['文字'].append([item4.text(1)])
                     elif item4.childCount() == 2:
-                        re[item1.text(0)][index]['文字'].append([item4.child(0).text(1), item4.child(1).text(1)])
+                        re[str(i)][index]['文字'].append([item4.child(0).text(1), item4.child(1).text(1)])
                     else:
-                        index2 = len(re[item1.text(0)][index]['文字'])
-                        re[item1.text(0)][index]['文字'].append([item4.child(0).text(1), item4.child(1).text(1), item4.child(2).text(1), item4.child(3).text(1)])
-                        if re[item1.text(0)][index]['文字'][index2][1] == '':
-                            re[item1.text(0)][index]['文字'][index2][1] = edit_json.version[item.text(0)][1]
-                        if re[item1.text(0)][index]['文字'][index2][2] == '':
-                            re[item1.text(0)][index]['文字'][index2][2] = re[item1.text(0)][index]['文字'][index2][0]
-                        if re[item1.text(0)][index]['文字'][index2][3] == '' and re[item1.text(0)][index]['文字'][index2][1] in self.json_base and \
-                                re[item1.text(0)][index]['文字'][index2][2] in self.json_base[re[item1.text(0)][index]['文字'][index2][1]]:
-                            re[item1.text(0)][index]['文字'][index2][3] = self.json_base[re[item1.text(0)][index]['文字'][index2][1]][re[item1.text(0)][index]['文字'][index2][2]]['迷你图片']
+                        index2 = len(re[str(i)][index]['文字'])
+                        re[str(i)][index]['文字'].append([item4.child(0).text(1), item4.child(1).text(1), item4.child(2).text(1), item4.child(3).text(1)])
+                        if re[str(i)][index]['文字'][index2][1] == '':
+                            re[str(i)][index]['文字'][index2][1] = edit_json.version[item.text(0)][1]
+                        if re[str(i)][index]['文字'][index2][2] == '':
+                            re[str(i)][index]['文字'][index2][2] = re[str(i)][index]['文字'][index2][0]
+                        if re[str(i)][index]['文字'][index2][3] == '' and re[str(i)][index]['文字'][index2][1] in self.json_base and \
+                                re[str(i)][index]['文字'][index2][2] in self.json_base[re[str(i)][index]['文字'][index2][1]]:
+                            re[str(i)][index]['文字'][index2][3] = self.json_base[re[str(i)][index]['文字'][index2][1]][re[str(i)][index]['文字'][index2][2]]['迷你图片']
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
-                    re[item1.text(0)][index]['目标'].append(item4.text(1))
+                    re[str(i)][index]['目标'].append(item4.text(1))
         return re
 
     def create_one_version(self):
@@ -1454,13 +1457,16 @@ class Main(QMainWindow):
                     for j in self.version_base[text][i]:
                         new2 = VersionItemEdit(new1)
                         new2.itemtype = 'tree2'
-                        new2.setText(0, j)
-                        new2.set_value(self.version_base[text][i][j][0])
+                        if self.version_base[text][i][j][0]=='':
+                            new2.setText(0,'无标题')
+                        else:
+                            new2.setText(0, self.version_base[text][i][j][0])
+                        new2.set_value(self.version_base[text][i][j][1])
                         for k in range(len(self.version_base[text][i][j])):
-                            if k > 0:
+                            if k > 1:
                                 new3 = VersionItemEdit(new2)
                                 new3.itemtype = 'tree_list'
-                                new3.setText(0, str(k))
+                                new3.setText(0, str(k-1))
                                 new0 = VersionItemEdit(new3)
                                 new0.itemtype = 'text'
                                 new0.setText(0, '序列级数')
