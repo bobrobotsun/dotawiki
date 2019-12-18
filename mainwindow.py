@@ -740,7 +740,6 @@ class Main(QMainWindow):
         self.version_edit_all_button_default()
         self.versionlayout['版本内容']['横排版']['树'][0].doubleClicked.connect(self.version_item_double_clicked)
 
-
     def resort(self):
         for i in self.text_base:
             self.text_base[i] = edit_json.sortedDictValues(self.text_base[i], False)
@@ -956,7 +955,7 @@ class Main(QMainWindow):
                 tdict[i] = {0: TreeItemEdit(tdict[0], i)}
                 tdict[i][0].set_type('tree')
                 tdict[i][0].israndom = True
-                self.random_dict_to_tree(tdict[i],sdict[i])
+                self.random_dict_to_tree(tdict[i], sdict[i])
                 tdict[i][0].setExpanded(True)
             else:
                 tdict[i] = TreeItemEdit(tdict[0], i)
@@ -1000,7 +999,7 @@ class Main(QMainWindow):
 
     def json_edit_new(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
-        text, ok = QInputDialog.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:')
+        text, ok = MoInputWindow.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:')
         if ok:
             self.json_name[selected].append(text)
             self.json_base[selected][text] = {}
@@ -1041,7 +1040,7 @@ class Main(QMainWindow):
         warning = QMessageBox.warning(self, '改名', '您正改变库的名字，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if warning == QMessageBox.Yes:
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
-            text, ok = QInputDialog.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:')
+            text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:')
             if ok:
                 self.json_base[ss[0]][text] = copy.deepcopy(self.json_base[ss[0]][ss[1]])
                 self.json_base[ss[0]][ss[1]]['应用'] = '改名'
@@ -1119,22 +1118,14 @@ class Main(QMainWindow):
 
     def json_edit_change_value(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-        text, ok = QInputDialog.getText(self, '修改值', '您想将其修改为:', QLineEdit.Normal, item.text(1))
+        if item.itemtype == 'number':
+            text, ok = MoInputWindow.getNumber(self, '修改值', '您想将其修改为:', item.text(1))
+        elif item.itemtype == 'int':
+            text, ok = MoInputWindow.getInt(self, '修改值', '您想将其修改为:', item.text(1))
+        else:
+            text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', item.text(1))
         if ok:
-            if item.itemtype == 'number':
-                try:
-                    ii = float(text)
-                    item.set_value(ii)
-                except ValueError:
-                    QMessageBox.critical(self, '输入格式错误', '您应当输入一串数字，而不是文字！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            elif item.itemtype == 'int':
-                try:
-                    ii = int(text)
-                    item.set_value(ii)
-                except ValueError:
-                    QMessageBox.critical(self, '输入格式错误', '您应当输入一串整数，而不是文字或小数！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            else:
-                item.set_value(text)
+            item.set_value(text)
 
     def json_edit_add_list(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -1207,9 +1198,9 @@ class Main(QMainWindow):
     def json_edit_add_new_item(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
         choose = ('文字（可以填入任意信息）', '数字（只能填入有效数字）', '整数（只能填入不含小数点的整数）', '树（可以拥有下属信息，但自身没有值）')
-        text1, ok1 = QInputDialog.getItem(self, "增加新条目", '条目的类型', choose, 0, False)
-        text2, ok2 = QInputDialog.getText(self, '增加新条目', '新条目的名称为：')
-        if ok1 and ok2:
+        choose_style = ['text', 'number', 'int', 'text']
+        text1, text2, ok = MoInputWindow.get_item_and_content(self, "增加新条目", '条目的类型', choose, choose_style)
+        if ok:
             temp = TreeItemEdit(item, text2)
             temp.israndom = True
             if choose[0] == text1:
@@ -1238,14 +1229,14 @@ class Main(QMainWindow):
 
     def json_edit_target_default(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-        choose=[]
+        choose = []
         for i in edit_json.edit_default_category:
             choose.append(i)
-        text, ok = QInputDialog.getItem(self, "增加新条目", '条目的类型', choose, 0, False)
+        text, ok = MoInputWindow.getItem(self, "增加新条目", '条目的类型', choose)
         if ok:
             for i in range(item.childCount()):
                 item.removeChild(item.child(i))
-            tdict={0:item}
+            tdict = {0: item}
             self.complex_dict_to_tree(tdict, edit_json.edit_default_target, edit_json.edit_default_category[text])
 
     def read_tree_to_json(self, tree, sdict):
@@ -1318,7 +1309,7 @@ class Main(QMainWindow):
                 index = self.versionlayout['版本列表']['横排版']['列表'].count()
         else:
             index += next
-        text, ok = QInputDialog.getText(self, "增加新版本", '版本号')
+        text, ok = MoInputWindow.getText(self, "增加新版本", '版本号')
         if ok:
             new = QListWidgetItem()
             new.setText(text)
@@ -1334,7 +1325,7 @@ class Main(QMainWindow):
         text = item.text()
         if text in self.version_base:
             self.complex_json_to_version_tree()
-            self.versionlayout['版本内容']['横排版']['树'][0].expandAll()
+            self.version_tree_expand_toplevelitem()
         else:
             messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "您没有这个版本更新的库，请问您准备从哪里获取？", QMessageBox.NoButton, self)
             button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
@@ -1401,21 +1392,18 @@ class Main(QMainWindow):
                 item2 = item1.child(j).child(1)
                 item3 = item1.child(j).child(2)
                 index = len(re[item1.text(0)])
-                re[item1.text(0)].append({'序列级数':1,'文字': [], '目标': []})
+                re[item1.text(0)].append({'序列级数': 1, '文字': [], '目标': []})
                 item0 = item1.child(j).child(0)
                 try:
                     re[item1.text(0)][index]['序列级数'] = int(item0.itemvalue)
                 except ValueError:
                     QMessageBox.critical(self, '错误的序列级数', '您的【' + item1.text(0) + '】中的【' + item1.child(j).text(0) + '】的第' + str(j) + '个序列级数不为正整数，请修改！')
                     while True:
-                        text, ok = QInputDialog.getText(self, "序列级数", '请输入一个正整数，否则会报错')
-                        try:
-                            re[item1.text(0)][index]['序列级数'] = int(text)
-                            break
-                        except ValueError:
-                            continue
+                        text, ok = MoInputWindow.getInt(self, "序列级数", '请输入一个正整数，否则会报错')
+                        if ok:
+                            re[item1.text(0)][index]['序列级数'] = text
                 for k in range(item2.childCount()):
-                    item4=item2.child(k)
+                    item4 = item2.child(k)
                     if item4.childCount() == 0:
                         re[item1.text(0)][index]['文字'].append([item4.text(1)])
                     elif item4.childCount() == 2:
@@ -1533,7 +1521,7 @@ class Main(QMainWindow):
                     new1.itemtype = 'tree1'
                     new1.setText(0, i)
                     new1.setBackground(1, self.red)
-        self.versionlayout['版本内容']['横排版']['树'][0].expandAll()
+        self.version_tree_expand_toplevelitem()
 
     def version_edit_all_button_clicked(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
@@ -1578,7 +1566,7 @@ class Main(QMainWindow):
 
     def version_edit_change_value(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
-        text, ok = QInputDialog.getText(self, '修改值', '您想将其修改为:', QLineEdit.Normal, item.text(1))
+        text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', item.text(1))
         if ok:
             item.set_value(text)
 
@@ -1591,8 +1579,8 @@ class Main(QMainWindow):
             item.setBackground(1, self.green)
             item.setExpanded(True)
         elif item.background(1) == self.green:
-            clickb=QMessageBox.critical(self, '禁用大分类', '您正试图禁用【'+item.text(0)+'】分类！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            if clickb==QMessageBox.Yes:
+            clickb = QMessageBox.critical(self, '禁用大分类', '您正试图禁用【' + item.text(0) + '】分类！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if clickb == QMessageBox.Yes:
                 while item.childCount() > 0:
                     item.removeChild(item.child(0))
                 item.setBackground(1, self.red)
@@ -1600,7 +1588,7 @@ class Main(QMainWindow):
 
     def version_button_tree1_add_tree2(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
-        text, ok = QInputDialog.getText(self, '新增一个小分类', '请输入你想要增加的分类名称:')
+        text, ok = MoInputWindow.getText(self, '新增一个小分类', '请输入你想要增加的分类名称:')
         if ok:
             new = VersionItemEdit(item)
             new.setText(0, text)
@@ -1637,7 +1625,7 @@ class Main(QMainWindow):
     def version_button_complex_tree_add_text(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         choose = ('纯文字', '带有链接的文字', '带有图片的链接')
-        text1, ok1 = QInputDialog.getItem(self, "增加新文字", '文字的类型', choose, 0, False)
+        text1, ok1 = MoInputWindow.getItem(self, "增加新文字", '文字的类型', choose)
         if ok1:
             if text1 == choose[0]:
                 new6 = VersionItemEdit(item)
@@ -1686,7 +1674,7 @@ class Main(QMainWindow):
         choose = ['自行填入']
         for i in self.version_default:
             choose.append(i)
-        text1, ok1 = QInputDialog.getItem(self, "增加新目标", '目标类型', choose, 0, False)
+        text1, ok1 = MoInputWindow.getItem(self, "增加新目标", '目标类型', choose)
         if ok1:
             if text1 in self.version_default:
                 for i in self.version_default[text1]:
@@ -1694,14 +1682,29 @@ class Main(QMainWindow):
                     new.itemtype = 'list_text'
                     new.set_value(i)
             else:
-                text2, ok2 = QInputDialog.getText(self, "增加新目标", '目标名称')
+                text2, ok2 = MoInputWindow.getText(self, "增加新目标", '目标名称')
                 if ok2:
                     new = VersionItemEdit(item)
                     new.itemtype = 'list_text'
                     new.set_value(text2)
 
+    def version_tree_expand_toplevelitem(self):
+        for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):
+            item=self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
+            if item.itemtype == 'text':
+                item.setExpanded(True)
+            elif item.background(1) == self.green:
+                item.setExpanded(True)
+            for j in range(item.childCount()):
+                self.expand_all_childs(item.child(j))
+
+    def expand_all_childs(self,item):
+        for i in range(item.childCount()):
+            item.child(i).setExpanded(True)
+            self.expand_all_childs(item.child(i))
+
     def test_inputwindow(self):
-        pass
+        print(MoInputWindow.get_item_and_content(self, [1, 2, 3, 4, 5, 6, 7, 8, 9, 0], ['int', 'number']))
 
 
 class upload_text(QWidget):
@@ -1772,7 +1775,7 @@ class VersionItemEdit(QTreeWidgetItem):
     def set_value(self, text=''):
         self.hasvalue = True
         self.itemvalue = text
-        if text=='None':
+        if text == 'None':
             self.setText(1, '')
         else:
             self.setText(1, str(text))
@@ -1782,14 +1785,153 @@ class VersionItemEdit(QTreeWidgetItem):
         self.setText(1, str(self.list))
 
 
-class MoInputWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.b = QTextBrowser(self)
-        self.l = QVBoxLayout()
-        self.l.addWidget(self.b)
-        self.p = QProgressBar(self)
-        self.setLayout(self.l)
-        thread = threading.Thread(target=self.addtext, args=(first_txt,))
-        thread.start()
-        self.show()
+class MoInputWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        screen_rect = QApplication.desktop().screenGeometry()
+        self.screen_size = [screen_rect.width(), screen_rect.height()]
+        self.icon = QIcon(os.path.join('material_lib', 'DOTA2.jpg'))
+        self.setWindowIcon(self.icon)
+        self.layout = {"0": QVBoxLayout()}
+        self.setLayout(self.layout["0"])
+        self.layout["输入区域"] = {"0": QVBoxLayout()}
+        self.layout["0"].addLayout(self.layout["输入区域"]["0"])
+        self.layout["按钮区域"] = {"0": QHBoxLayout()}
+        self.layout["0"].addLayout(self.layout["按钮区域"]["0"])
+        self.layout["按钮区域"]["0"].addStretch(1)
+        self.layout["按钮区域"]["确认"] = QPushButton("确认修改", self)
+        self.layout["按钮区域"]["0"].addWidget(self.layout["按钮区域"]["确认"])
+        self.layout["按钮区域"]["确认"].clicked.connect(self.accept)
+        self.layout["按钮区域"]["取消"] = QPushButton("放弃修改", self)
+        self.layout["按钮区域"]["0"].addWidget(self.layout["按钮区域"]["取消"])
+        self.layout["按钮区域"]["取消"].clicked.connect(self.reject)
+
+    @staticmethod
+    def getText(parent=None, title='输入文字', tip_str='输入', default_text=''):
+        dialog = MoInputWindow(parent)
+        dialog.setWindowTitle(title)
+        dialog.setGeometry(dialog.screen_size[0] * 0.2, dialog.screen_size[1] * 0.2, dialog.screen_size[0] * 0.6, dialog.screen_size[1] * 0.6)
+        dialog.s = QLabel(dialog)
+        dialog.s.setText(tip_str + '：')
+        dialog.layout["输入区域"]["0"].addWidget(dialog.s)
+        dialog.b = QTextEdit(dialog)
+        dialog.b.setPlainText(default_text)
+        dialog.layout["输入区域"]["0"].addWidget(dialog.b)
+        result = dialog.exec_()
+        return dialog.b.toPlainText(), result
+
+    @staticmethod
+    def getNumber(parent=None, title='输入数字', tip_str='输入', default_text=0):
+        dialog = MoInputWindow(parent)
+        dialog.setWindowTitle(title)
+        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1, dialog.screen_size[1] * 0.1)
+        dialog.s = QLabel(dialog)
+        dialog.s.setText(tip_str + '：')
+        dialog.layout["输入区域"]["0"].addWidget(dialog.s)
+        dialog.b = QLineEdit(dialog)
+        dialog.b.setText(str(default_text))
+        dialog.layout["输入区域"]["0"].addWidget(dialog.b)
+        while True:
+            result = dialog.exec_()
+            if result:
+                try:
+                    re = float(dialog.b.text())
+                    return re, result
+                except ValueError:
+                    QMessageBox.critical(dialog, '输入格式错误', '您应当输入一串数字！')
+            else:
+                return 0, False
+
+    @staticmethod
+    def getInt(parent=None, title='输入整数', tip_str='输入', default_text=0):
+        dialog = MoInputWindow(parent)
+        dialog.setWindowTitle(title)
+        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1, dialog.screen_size[1] * 0.1)
+        dialog.s = QLabel(dialog)
+        dialog.s.setText(tip_str + '：')
+        dialog.layout["输入区域"]["0"].addWidget(dialog.s)
+        dialog.b = QLineEdit(dialog)
+        dialog.b.setText(str(default_text))
+        dialog.layout["输入区域"]["0"].addWidget(dialog.b)
+        while True:
+            result = dialog.exec_()
+            if result:
+                try:
+                    re = int(dialog.b.text())
+                    return re, result
+                except ValueError:
+                    QMessageBox.critical(dialog, '输入格式错误', '您应当输入一串整数！')
+            else:
+                return 0, False
+
+    @staticmethod
+    def getItem(parent=None, title='做选择', tip_str='您将选择', iterable=[]):
+        dialog = MoInputWindow(parent)
+        dialog.setWindowTitle(title)
+        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1, dialog.screen_size[1] * 0.1)
+        dialog.s = QLabel(dialog)
+        dialog.s.setText(tip_str + '：')
+        dialog.layout["输入区域"]["0"].addWidget(dialog.s)
+        selects = []
+        for i in range(len(iterable)):
+            selects.append(QRadioButton(dialog))
+            selects[i].setText(str(iterable[i]))
+            dialog.layout["输入区域"]["0"].addWidget(selects[i])
+        selects[0].setChecked(True)
+        result = dialog.exec_()
+        re = ''
+        for i in selects:
+            if i.isChecked():
+                re = i.text()
+                break
+        return re, result
+
+    @staticmethod
+    def get_item_and_content(parent=None, title='选择后输入内容', tip_str='选择并输入', iterable=[], style=[]):
+        dialog = MoInputWindow(parent)
+        dialog.setWindowTitle(title)
+        dialog.setGeometry(dialog.screen_size[0] * 0.4, dialog.screen_size[1] * 0.4, dialog.screen_size[0] * 0.2, dialog.screen_size[1] * 0.2)
+        dialog.s = QLabel(dialog)
+        dialog.s.setText(tip_str + '：')
+        dialog.layout["输入区域"]["0"].addWidget(dialog.s)
+        selects = []
+        for i in range(len(iterable)):
+            selects.append(QRadioButton(dialog))
+            selects[i].setText(str(iterable[i]))
+            dialog.layout["输入区域"]["0"].addWidget(selects[i])
+        selects[0].setChecked(True)
+        dialog.b = QTextEdit(dialog)
+        dialog.layout["输入区域"]["0"].addWidget(dialog.b)
+        while True:
+            result = dialog.exec_()
+            ii = 0
+            styles = []
+            for i in range(len(iterable)):
+                if len(style) <= i:
+                    if len(style) > 0:
+                        styles.append(style[0])
+                    else:
+                        styles.append('text')
+                else:
+                    styles.append(style[i])
+            for i in range(len(selects)):
+                if selects[i].isChecked():
+                    ii = i
+                    break
+            if result:
+                if styles[ii] == 'int':
+                    try:
+                        re = int(dialog.b.toPlainText())
+                        return iterable[ii], re, result
+                    except ValueError:
+                        QMessageBox.critical(dialog, '输入格式错误', '您应当输入一串整数！')
+                elif styles[ii] == 'number':
+                    try:
+                        re = float(dialog.b.text())
+                        return iterable[ii], re, result
+                    except ValueError:
+                        QMessageBox.critical(dialog, '输入格式错误', '您应当输入一串数字！')
+                else:
+                    return iterable[ii], dialog.b.text(), result
+            else:
+                return '不选择', '', False
