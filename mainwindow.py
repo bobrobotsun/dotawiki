@@ -713,7 +713,7 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].clicked.connect(self.version_button_tree1_add_tree2)
         self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'] = QPushButton('小分类改名', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].clicked.connect(self.version_button_tree_change_name)
+        self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].clicked.connect(self.version_button_tree2_change_name)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'] = QPushButton('删除小分类', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'])
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].clicked.connect(self.version_button_delete_tree_item)
@@ -1547,6 +1547,7 @@ class Main(QMainWindow):
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('大分类')
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(False)
             self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].setEnabled(item.itemtype == 'tree2')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(item.itemtype == 'tree2')
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(item.itemtype == 'tree2')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(item.itemtype == 'tree_list')
@@ -1560,6 +1561,7 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('大分类')
         self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(False)
@@ -1606,7 +1608,7 @@ class Main(QMainWindow):
             self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new)
             self.version_button_tree2_add_tree_list()
 
-    def version_button_tree_change_name(self):
+    def version_button_tree2_change_name(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         parent=item.parent()
         text, ok = MoInputWindow.getText(self, '小分类改名', '你现在正试图将【'+parent.text(0)+'】的【'+item.text(0)+'】的名字改为:',item.text(0))
