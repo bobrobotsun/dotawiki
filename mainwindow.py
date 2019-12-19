@@ -1008,6 +1008,7 @@ class Main(QMainWindow):
             self.json_base[selected][text] = {}
             for i in edit_json.edit[selected]:
                 self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
+            self.json_base[selected][text]['页面名']=text
             self.resort()
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
             self.edit_category_selected_changed()
@@ -1217,6 +1218,7 @@ class Main(QMainWindow):
                 temp.set_value(0)
             elif choose[3] == text1:
                 temp.set_type('tree')
+        item.setExpanded(True)
 
     def json_edit_delete_item(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -1828,12 +1830,14 @@ class MoInputWindow(QDialog):
     def getText(parent=None, title='输入文字', tip_str='输入', default_text=''):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
-        dialog.setGeometry(dialog.screen_size[0] * 0.2, dialog.screen_size[1] * 0.2, dialog.screen_size[0] * 0.6, dialog.screen_size[1] * 0.6)
+        dialog.setGeometry(dialog.screen_size[0] * 0.3, dialog.screen_size[1] * 0.3, dialog.screen_size[0] * 0.4, dialog.screen_size[1] * 0.4)
         dialog.s = QLabel(dialog)
         dialog.s.setText(tip_str + '：')
         dialog.layout["输入区域"]["0"].addWidget(dialog.s)
         dialog.b = QTextEdit(dialog)
         dialog.b.setPlainText(default_text)
+        dialog.b.setFocus()
+        dialog.b.selectAll()
         dialog.layout["输入区域"]["0"].addWidget(dialog.b)
         result = dialog.exec_()
         return dialog.b.toPlainText(), result
@@ -1848,6 +1852,8 @@ class MoInputWindow(QDialog):
         dialog.layout["输入区域"]["0"].addWidget(dialog.s)
         dialog.b = QLineEdit(dialog)
         dialog.b.setText(str(default_text))
+        dialog.b.setFocus()
+        dialog.b.selectAll()
         dialog.layout["输入区域"]["0"].addWidget(dialog.b)
         while True:
             result = dialog.exec_()
@@ -1870,6 +1876,8 @@ class MoInputWindow(QDialog):
         dialog.layout["输入区域"]["0"].addWidget(dialog.s)
         dialog.b = QLineEdit(dialog)
         dialog.b.setText(str(default_text))
+        dialog.b.setFocus()
+        dialog.b.selectAll()
         dialog.layout["输入区域"]["0"].addWidget(dialog.b)
         while True:
             result = dialog.exec_()
@@ -1919,9 +1927,10 @@ class MoInputWindow(QDialog):
             dialog.layout["输入区域"]["0"].addWidget(selects[i])
         selects[0].setChecked(True)
         dialog.b = QTextEdit(dialog)
+        dialog.b.setFocus()
+        dialog.b.selectAll()
         dialog.layout["输入区域"]["0"].addWidget(dialog.b)
         while True:
-            result = dialog.exec_()
             ii = 0
             styles = []
             for i in range(len(iterable)):
@@ -1932,6 +1941,7 @@ class MoInputWindow(QDialog):
                         styles.append('text')
                 else:
                     styles.append(style[i])
+            result = dialog.exec_()
             for i in range(len(selects)):
                 if selects[i].isChecked():
                     ii = i
@@ -1945,11 +1955,11 @@ class MoInputWindow(QDialog):
                         QMessageBox.critical(dialog, '输入格式错误', '您应当输入一串整数！')
                 elif styles[ii] == 'number':
                     try:
-                        re = float(dialog.b.text())
+                        re = float(dialog.b.toPlainText())
                         return iterable[ii], re, result
                     except ValueError:
                         QMessageBox.critical(dialog, '输入格式错误', '您应当输入一串数字！')
                 else:
-                    return iterable[ii], dialog.b.text(), result
+                    return iterable[ii], dialog.b.toPlainText(), result
             else:
                 return '不选择', '', False

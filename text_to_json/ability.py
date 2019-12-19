@@ -445,20 +445,38 @@ def one_upgrade(json, base_txt):
     if inbool[1]:
         array_cal(calvalue[2], getvalue[3], caloprate[2], 1)
         array_cal(calvalue[3], getvalue[3], caloprate[2], 1)
+    cut_the_same_to_one(calvalue[0])
     for k in range(len(calvalue[0])):
         json["1"][str(k + 1)] = calvalue[0][k]
     if inbool[0]:
+        cut_the_same_to_one(calvalue[1])
         for k in range(len(calvalue[1])):
             json["2"][str(k + 1)] = calvalue[1][k]
     if inbool[1]:
+        cut_the_same_to_one(calvalue[2])
         for k in range(len(calvalue[2])):
             json["3"][str(k + 1)] = calvalue[2][k]
     if inbool[2]:
+        cut_the_same_to_one(calvalue[3])
         json["4"] = {}
         for k in range(len(calvalue[3])):
             json["4"][str(k + 1)] = calvalue[3][k]
         json["4"]["升级来源"] = copy.deepcopy(json["3"]["升级来源"])
 
+def cut_the_same_to_one(lists):
+    bool=True
+    i=1
+    delete_number=0
+    while i<len(lists):
+        if lists[0] == lists[i]:
+            delete_number+=1
+            i = i + 1
+        else:
+            bool = False
+            break
+    if bool and i>1:
+        for i in range(delete_number):
+            lists.pop(1)
 
 def array_cal(arr1, arr2, op, num):
     for i in range(len(arr1)):
