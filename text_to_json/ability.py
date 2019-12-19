@@ -758,7 +758,7 @@ def one_combine_txt_numbers(json, all_json, base_txt):
         i = 3
         while True:
             i += 1
-            if str(i) in json:
+            if str(i) in temp:
                 temp = temp[str(i)]
             else:
                 break
