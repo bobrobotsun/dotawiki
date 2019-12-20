@@ -602,6 +602,12 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['增加列表'] = QPushButton('增加列表', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['增加列表'])
         self.editlayout['竖布局']['增加列表'].clicked.connect(self.json_edit_add_list)
+        self.editlayout['竖布局']['向上移动列表'] = QPushButton('向上移动列表', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['向上移动列表'])
+        self.editlayout['竖布局']['向上移动列表'].clicked.connect(lambda:self.json_edit_move_list_item(-1))
+        self.editlayout['竖布局']['向下移动列表'] = QPushButton('向下移动列表', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['向下移动列表'])
+        self.editlayout['竖布局']['向下移动列表'].clicked.connect(lambda:self.json_edit_move_list_item(1))
         self.editlayout['竖布局']['删除列表'] = QPushButton('删除列表', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除列表'])
         self.editlayout['竖布局']['删除列表'].clicked.connect(self.json_edit_delete_list)
@@ -720,6 +726,12 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'] = QPushButton('加一条新条目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'])
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].clicked.connect(self.version_button_tree2_add_tree_list)
+        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'] = QPushButton('向上移动题目', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].clicked.connect(lambda:self.version_button_move_list_item(-1))
+        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'] = QPushButton('向下移动题目', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].clicked.connect(lambda:self.version_button_move_list_item(1))
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'] = QPushButton('删除该条目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'])
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].clicked.connect(self.version_button_delete_tree_item)
@@ -1085,6 +1097,8 @@ class Main(QMainWindow):
         parent = sender.parent()
         self.editlayout['竖布局']['修改数据'].setEnabled(sender.hasvalue)
         self.editlayout['竖布局']['增加列表'].setEnabled(sender.haslist and not sender.israndom)
+        self.editlayout['竖布局']['向上移动列表'].setEnabled(sender.islist and not sender.israndom)
+        self.editlayout['竖布局']['向下移动列表'].setEnabled(sender.islist and not sender.israndom)
         self.editlayout['竖布局']['删除列表'].setEnabled(sender.islist and not sender.israndom)
 
         self.editlayout['竖布局']['启用条目'].setEnabled(sender.background(1) == self.red)
@@ -1111,6 +1125,8 @@ class Main(QMainWindow):
     def self_edit_button_default(self, bool=False):
         self.editlayout['竖布局']['修改数据'].setEnabled(bool)
         self.editlayout['竖布局']['增加列表'].setEnabled(bool)
+        self.editlayout['竖布局']['向上移动列表'].setEnabled(bool)
+        self.editlayout['竖布局']['向下移动列表'].setEnabled(bool)
         self.editlayout['竖布局']['删除列表'].setEnabled(bool)
         self.editlayout['竖布局']['启用条目'].setEnabled(bool)
         self.editlayout['竖布局']['禁用条目'].setEnabled(bool)
@@ -1158,6 +1174,21 @@ class Main(QMainWindow):
                 temp.set_value(sdict[i])
                 temp.islist = True
         item.setExpanded(True)
+
+    def json_edit_move_list_item(self,move_step=1):
+        tree=self.editlayout['修改核心']['竖布局']['树'][0]
+        item = tree.currentItem()
+        parent=item.parent()
+        index=parent.indexOfChild(item)
+        counts=parent.childCount()
+        parent.removeChild(item)
+        targetind=max(counts - parent.listtype[3],min(index+move_step,counts-1))
+        parent.insertChild(targetind,item)
+        for i in range(counts - parent.listtype[3], counts):
+            parent.child(i).setText(0, str(i - counts + parent.listtype[2]))
+        item.setExpanded(True)
+        tree.setCurrentItem(item)
+        self.tree_item_clicked()
 
     def json_edit_delete_list(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -1552,6 +1583,8 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].setEnabled(item.itemtype == 'tree2')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(item.itemtype == 'tree2')
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(item.itemtype == 'tree2')
+        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(item.itemtype == 'tree_list')
+        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].setEnabled(item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].setEnabled(item.itemtype == 'complex_tree')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].setEnabled(item.itemtype == 'text_text' or item.itemtype == 'text_image' or item.itemtype == 'text_link')
@@ -1566,6 +1599,8 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].setEnabled(False)
@@ -1616,6 +1651,22 @@ class Main(QMainWindow):
         text, ok = MoInputWindow.getText(self, '小分类改名', '你现在正试图将【'+parent.text(0)+'】的【'+item.text(0)+'】的名字改为:',item.text(0))
         if ok:
             item.setText(0, text)
+
+    def version_button_move_list_item(self,move_step=1):
+        tree=self.versionlayout['版本内容']['横排版']['树'][0]
+        item = tree.currentItem()
+        parent=item.parent()
+        index=parent.indexOfChild(item)
+        counts=parent.childCount()
+        parent.removeChild(item)
+        targetind=max(0,min(index+move_step,counts-1))
+        parent.insertChild(targetind,item)
+        for i in range(0, counts):
+            parent.child(i).setText(0, str(i+1))
+        item.setExpanded(True)
+        tree.setCurrentItem(item)
+        self.version_edit_all_button_clicked()
+        self.expand_all_childs(item)
 
     def version_button_delete_tree_item(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
