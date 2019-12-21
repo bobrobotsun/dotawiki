@@ -474,7 +474,7 @@ class Main(QMainWindow):
                     else:
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
-            for i in range(10):
+            for i in range(8):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1))
                 t.start()
             while (threading.activeCount() > 1):
@@ -1391,15 +1391,26 @@ class Main(QMainWindow):
             QMessageBox.information(self, '下载成功', text + '版本已更新至本地。')
 
     def download_all_versions(self):
+        self.w = upload_text('开始上传数据')
+        self.w.setGeometry(self.screen_size[0] * 0.3, self.screen_size[1] * 0.15, self.screen_size[0] * 0.4, self.screen_size[1] * 0.7)
+        self.w.setWindowIcon(self.icon)
+        self.w.setWindowTitle('上传json中……')
+        self.w.confirm_numbers(len(self.version_list['版本']))
         for i in range(len(self.version_list['版本'])):
             download_data = {'action': 'jsondata', 'title': self.version_list['版本'][i] + '.json', 'format': 'json'}
             download_info = self.seesion.post(self.target_url, data=download_data)
-            print(download_info.json())
             if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
-                continue
+                self.w.addtext('【' + QTime.currentTime().toString() + '】'+self.version_list['版本'][i]+'版本json不存在。')
+                self.w.set_progress(i + 1)
+                QApplication.processEvents()
+                time.sleep(0.1)
             else:
                 self.version_base[self.version_list['版本'][i]] = download_info.json()['jsondata']
                 self.versionlayout['版本列表']['横排版']['列表'].item(i).setBackground(self.green)
+                self.w.addtext('【' + QTime.currentTime().toString() + '】' + self.version_list['版本'][i] + '版本json下载保存成功。')
+                self.w.set_progress(i + 1)
+                QApplication.processEvents()
+                time.sleep(0.1)
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         QMessageBox.information(self, '下载成功', '所有版本号已经下载并保存完毕。')
 
