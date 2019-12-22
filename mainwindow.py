@@ -15,6 +15,7 @@ import os
 import time
 import threading
 import copy
+import vpk
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -391,9 +392,9 @@ class Main(QMainWindow):
     def catch_file_from_dota2(self, address):
         has_text = [['英雄', '技能', '非英雄单位', '物品'],
                     ['npc_heroes.txt', 'npc_abilities.txt', 'npc_units.txt', 'items.txt'],
-                    [False, False, False, False]]
+                    [False, False, False]]
         ttt = ''
-        for i in range(4):
+        for i in range(3):
             if i > 0:
                 ttt += '\n'
             ttt += has_text[0][i] + '数据：'
@@ -402,21 +403,22 @@ class Main(QMainWindow):
                 has_text[2][i] = True
             else:
                 ttt += has_text[1][i] + '文件不存在，读取失败'
-        if has_text[2][0] and has_text[2][1] and has_text[2][2] and has_text[2][3]:
-            messagebox = QMessageBox(QMessageBox.Information, '文件抓取', ttt, QMessageBox.NoButton, self)
-            messagebox.setStandardButtons(QMessageBox.Ok)
-            messagebox.button(QMessageBox.Ok).animateClick(1000)
-            messagebox.exec_()
+        ttt+='\n已经从vpk处提取物品文件'
+        if has_text[2][0] or has_text[2][1] or has_text[2][2]:
             if has_text[2][0]:
                 hero.get_hero_data_from_txt(self.text_base['英雄'], os.path.join(address, has_text[1][0]))
             if has_text[2][1]:
                 ability.get_hero_data_from_txt(self.text_base['技能'], os.path.join(address, has_text[1][1]))
             if has_text[2][2]:
                 unit.get_hero_data_from_txt(self.text_base['非英雄单位'], os.path.join(address, has_text[1][2]))
-            if has_text[2][3]:
-                item.get_hero_data_from_txt(self.text_base['物品'], os.path.join(address, has_text[1][3]))
+            pak1 = vpk.open(address.replace('scripts\\npc',"pak01_dir.vpk"))
+            pakfile = pak1.get_file("scripts/npc\\items.txt")
+            item.get_hero_data_from_txt(self.text_base['物品'], pakfile)
             self.file_save(os.path.join('database', 'dota2_address.json'), address)
             self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
+            messagebox = QMessageBox(QMessageBox.Information, '文件抓取', ttt, QMessageBox.NoButton, self)
+            messagebox.setStandardButtons(QMessageBox.Ok)
+            messagebox.exec_()
         else:
             messagebox = QMessageBox(QMessageBox.Critical, '错误的路径', '路径错误，没有发现任何有效文件，请重新选择路径！', QMessageBox.NoButton, self)
             messagebox.setStandardButtons(QMessageBox.Ok)

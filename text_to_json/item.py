@@ -116,9 +116,8 @@ def finditemspecial(source, data, tb):
                 return
 
 
-def get_hero_data_from_txt(base_txt,address):
-    ffile = open(address, mode="r")
-    source_string = ffile.read()
+def get_hero_data_from_txt(base_txt,ffile):
+    source_string = ffile.read().decode('utf8')
     tb = [0, source_string.find("{") + 1]
     item_all = {}
     item_count = 0
