@@ -403,7 +403,7 @@ class Main(QMainWindow):
                 has_text[2][i] = True
             else:
                 ttt += has_text[1][i] + '文件不存在，读取失败'
-        ttt+='\n已经从vpk处提取物品文件'
+        ttt += '\n已经从vpk处提取物品文件'
         if has_text[2][0] or has_text[2][1] or has_text[2][2]:
             if has_text[2][0]:
                 hero.get_hero_data_from_txt(self.text_base['英雄'], os.path.join(address, has_text[1][0]))
@@ -411,7 +411,7 @@ class Main(QMainWindow):
                 ability.get_hero_data_from_txt(self.text_base['技能'], os.path.join(address, has_text[1][1]))
             if has_text[2][2]:
                 unit.get_hero_data_from_txt(self.text_base['非英雄单位'], os.path.join(address, has_text[1][2]))
-            pak1 = vpk.open(address.replace('scripts\\npc',"pak01_dir.vpk"))
+            pak1 = vpk.open(address.replace('scripts\\npc', "pak01_dir.vpk"))
             pakfile = pak1.get_file("scripts/npc\\items.txt")
             item.get_hero_data_from_txt(self.text_base['物品'], pakfile)
             self.file_save(os.path.join('database', 'dota2_address.json'), address)
@@ -606,10 +606,10 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['增加列表'].clicked.connect(self.json_edit_add_list)
         self.editlayout['竖布局']['向上移动列表'] = QPushButton('向上移动列表', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['向上移动列表'])
-        self.editlayout['竖布局']['向上移动列表'].clicked.connect(lambda:self.json_edit_move_list_item(-1))
+        self.editlayout['竖布局']['向上移动列表'].clicked.connect(lambda: self.json_edit_move_list_item(-1))
         self.editlayout['竖布局']['向下移动列表'] = QPushButton('向下移动列表', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['向下移动列表'])
-        self.editlayout['竖布局']['向下移动列表'].clicked.connect(lambda:self.json_edit_move_list_item(1))
+        self.editlayout['竖布局']['向下移动列表'].clicked.connect(lambda: self.json_edit_move_list_item(1))
         self.editlayout['竖布局']['删除列表'] = QPushButton('删除列表', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除列表'])
         self.editlayout['竖布局']['删除列表'].clicked.connect(self.json_edit_delete_list)
@@ -668,8 +668,9 @@ class Main(QMainWindow):
         self.versionlayout[0].addWidget(self.versionlayout['版本列表'][0])
         self.versionlayout['版本列表']['横排版'] = {0: QHBoxLayout()}
         self.versionlayout['版本列表'][0].setLayout(self.versionlayout['版本列表']['横排版'][0])
-        self.versionlayout['版本列表']['横排版']['列表'] = QListWidget(self)
+        self.versionlayout['版本列表']['横排版']['列表'] = QTreeWidget(self)
         self.versionlayout['版本列表']['横排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['列表'])
+        self.versionlayout['版本列表']['横排版']['列表'].setHeaderLabels(['名称'])
         self.versionlayout['版本列表']['横排版']['竖排版'] = {0: QVBoxLayout()}
         self.versionlayout['版本列表']['横排版'][0].addLayout(self.versionlayout['版本列表']['横排版']['竖排版'][0])
         self.versionlayout['版本列表']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
@@ -684,6 +685,9 @@ class Main(QMainWindow):
         self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'] = QPushButton('向下插入新版本', self)
         self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'].clicked.connect(lambda: self.add_version_list(1))
         self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['向下插入新版本'])
+        self.versionlayout['版本列表']['横排版']['竖排版']['插入次级版本'] = QPushButton('插入次级版本', self)
+        self.versionlayout['版本列表']['横排版']['竖排版']['插入次级版本'].clicked.connect(self.add_junior_version_list)
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['插入次级版本'])
         self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(1)
         self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'] = QPushButton('下载全部更新内容', self)
         self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'].clicked.connect(self.download_all_versions)
@@ -730,10 +734,10 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].clicked.connect(self.version_button_tree2_add_tree_list)
         self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'] = QPushButton('向上移动题目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].clicked.connect(lambda:self.version_button_move_list_item(-1))
+        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].clicked.connect(lambda: self.version_button_move_list_item(-1))
         self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'] = QPushButton('向下移动题目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].clicked.connect(lambda:self.version_button_move_list_item(1))
+        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].clicked.connect(lambda: self.version_button_move_list_item(1))
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'] = QPushButton('删除该条目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'])
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].clicked.connect(self.version_button_delete_tree_item)
@@ -1022,7 +1026,7 @@ class Main(QMainWindow):
             self.json_base[selected][text] = {}
             for i in edit_json.edit[selected]:
                 self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
-            self.json_base[selected][text]['页面名']=text
+            self.json_base[selected][text]['页面名'] = text
             self.resort()
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
             self.edit_category_selected_changed()
@@ -1177,15 +1181,15 @@ class Main(QMainWindow):
                 temp.islist = True
         item.setExpanded(True)
 
-    def json_edit_move_list_item(self,move_step=1):
-        tree=self.editlayout['修改核心']['竖布局']['树'][0]
+    def json_edit_move_list_item(self, move_step=1):
+        tree = self.editlayout['修改核心']['竖布局']['树'][0]
         item = tree.currentItem()
-        parent=item.parent()
-        index=parent.indexOfChild(item)
-        counts=parent.childCount()
+        parent = item.parent()
+        index = parent.indexOfChild(item)
+        counts = parent.childCount()
         parent.removeChild(item)
-        targetind=max(counts - parent.listtype[3],min(index+move_step,counts-1))
-        parent.insertChild(targetind,item)
+        targetind = max(counts - parent.listtype[3], min(index + move_step, counts - 1))
+        parent.insertChild(targetind, item)
         for i in range(counts - parent.listtype[3], counts):
             parent.child(i).setText(0, str(i - counts + parent.listtype[2]))
         item.setExpanded(True)
@@ -1305,13 +1309,21 @@ class Main(QMainWindow):
             version_file.close()
             self.versionlayout['版本列表']['横排版']['列表'].clear()
             for i in self.version_list['版本']:
-                new = QListWidgetItem()
-                new.setText(i)
-                if i in self.version_base:
-                    new.setBackground(self.green)
-                else:
-                    new.setBackground(self.red)
-                self.versionlayout['版本列表']['横排版']['列表'].addItem(new)
+                for j in range(len(i)):
+                    if j == 0:
+                        new1 = QTreeWidgetItem(self.versionlayout['版本列表']['横排版']['列表'])
+                        new1.setText(0, i[j])
+                        if i[j] in self.version_base:
+                            new1.setBackground(0, self.green)
+                        else:
+                            new1.setBackground(0, self.red)
+                    else:
+                        new2 = QTreeWidgetItem(new2)
+                        new2.setText(0, i[j])
+                        if i[0] + '/' + i[j] in self.version_base:
+                            new2.setBackground(0, self.green)
+                        else:
+                            new2.setBackground(0, self.red)
         except FileNotFoundError:
             messageBox = QMessageBox(QMessageBox.Critical, "获取版本数据失败", "请问您是否想要从网络上重新下载？", QMessageBox.NoButton, self)
             buttonWeb = messageBox.addButton('从网络下载', QMessageBox.YesRole)
@@ -1325,13 +1337,21 @@ class Main(QMainWindow):
         QMessageBox.information(self, '下载成功', '版本信息已经下载保存完毕。')
         self.versionlayout['版本列表']['横排版']['列表'].clear()
         for i in self.version_list['版本']:
-            new = QListWidgetItem()
-            new.setText(i)
-            if i in self.version_base:
-                new.setBackground(self.green)
-            else:
-                new.setBackground(self.red)
-            self.versionlayout['版本列表']['横排版']['列表'].addItem(new)
+            for j in range(len(i)):
+                if j == 0:
+                    new1 = QTreeWidgetItem(self.versionlayout['版本列表']['横排版']['列表'])
+                    new1.setText(0, i[j])
+                    if i[j] in self.version_base:
+                        new1.setBackground(0, self.green)
+                    else:
+                        new1.setBackground(0, self.red)
+                else:
+                    new2 = QTreeWidgetItem(new2)
+                    new2.setText(0, i[j])
+                    if i[0] + '/' + i[j] in self.version_base:
+                        new2.setBackground(0, self.green)
+                    else:
+                        new2.setBackground(0, self.red)
 
     def upload_version_list(self):
         self.upload_json('Data:版本更新.json', json.dumps(self.version_list))
@@ -1339,28 +1359,47 @@ class Main(QMainWindow):
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
     def add_version_list(self, next=0):
-        index = self.versionlayout['版本列表']['横排版']['列表'].currentRow()
+        index = self.versionlayout['版本列表']['横排版']['列表'].currentIndex()
         if index == -1:
             if next == 0:
                 index = 0
             elif next == 1:
-                index = self.versionlayout['版本列表']['横排版']['列表'].count()
+                index = self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()
         else:
             index += next
         text, ok = MoInputWindow.getText(self, "增加新版本", '版本号')
         if ok:
-            new = QListWidgetItem()
-            new.setText(text)
+            new = QTreeWidgetItem()
+            new.setText(0, text)
             new.setBackground(self.red)
-            self.versionlayout['版本列表']['横排版']['列表'].insertItem(index, new)
+            self.versionlayout['版本列表']['横排版']['列表'].insertTopLevelItem(index, new)
             self.versionlayout['版本列表']['横排版']['列表'].setCurrentRow(index)
             self.version_list = {'版本': []}
-            for i in range(self.versionlayout['版本列表']['横排版']['列表'].count()):
-                self.version_list['版本'].append(self.versionlayout['版本列表']['横排版']['列表'].item(i).text())
+            for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
+                self.version_list['版本'].append([self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0)])
+                for j in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).childCount()):
+                    self.version_list['版本'][i].append(
+                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0) + '/' + self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
+
+    def add_junior_version_list(self):
+        item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
+        text, ok = MoInputWindow.getText(self, "增加新版本", '次级版本号')
+        if ok:
+            new = QTreeWidgetItem(item)
+            new.setText(0, text)
+            new.setBackground(0, self.red)
+            self.version_list = {'版本': []}
+            for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
+                self.version_list['版本'].append([self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0)])
+                for j in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).childCount()):
+                    self.version_list['版本'][i].append(
+                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0) + '/' + self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
+            item.setExpanded(True)
 
     def check_version_content(self):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
-        text = item.text()
+        text = item.text(0)
+        self.versionlayout['版本列表']['横排版']['竖排版']['插入次级版本'].setEnabled(item.parent() == None)
         if text in self.version_base:
             self.complex_json_to_version_tree()
             self.version_tree_expand_toplevelitem()
@@ -1376,8 +1415,14 @@ class Main(QMainWindow):
                 self.create_one_version()
 
     def download_one_version(self):
-        text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
-        download_data = {'action': 'jsondata', 'title': text + '.json', 'format': 'json'}
+        item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
+        if item.parent() == self.versionlayout['版本列表']['横排版']['列表']:
+            text = item.text(0)
+            title = text
+        else:
+            text = item.text(0)
+            title = item.parent().text(0) + '/' + text
+        download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
         download_info = self.seesion.post(self.target_url, data=download_data)
         if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
             messageBox = QMessageBox(QMessageBox.Critical, "下载失败", "网络上没有这个版本更新的库，请问是否自行创建？", QMessageBox.NoButton, self)
@@ -1387,10 +1432,10 @@ class Main(QMainWindow):
             if messageBox.clickedButton() == button1:
                 self.create_one_version()
         else:
-            self.version_base[text] = download_info.json()['jsondata']
+            self.version_base[title] = download_info.json()['jsondata']
             self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
             self.complex_json_to_version_tree()
-            QMessageBox.information(self, '下载成功', text + '版本已更新至本地。')
+            QMessageBox.information(self, '下载成功', title + '版本已更新至本地。')
 
     def download_all_versions(self):
         self.w = upload_text('开始上传数据')
@@ -1399,33 +1444,49 @@ class Main(QMainWindow):
         self.w.setWindowTitle('上传json中……')
         self.w.confirm_numbers(len(self.version_list['版本']))
         for i in range(len(self.version_list['版本'])):
-            download_data = {'action': 'jsondata', 'title': self.version_list['版本'][i] + '.json', 'format': 'json'}
-            download_info = self.seesion.post(self.target_url, data=download_data)
-            if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
-                self.w.addtext('【' + QTime.currentTime().toString() + '】'+self.version_list['版本'][i]+'版本json不存在。')
-                self.w.set_progress(i + 1)
-                QApplication.processEvents()
-                time.sleep(0.1)
-            else:
-                self.version_base[self.version_list['版本'][i]] = download_info.json()['jsondata']
-                self.versionlayout['版本列表']['横排版']['列表'].item(i).setBackground(self.green)
-                self.w.addtext('【' + QTime.currentTime().toString() + '】' + self.version_list['版本'][i] + '版本json下载保存成功。')
-                self.w.set_progress(i + 1)
-                QApplication.processEvents()
-                time.sleep(0.1)
+            for j in range(len(self.version_list['版本'][i])):
+                if j == 0:
+                    title = self.version_list['版本'][i][j]
+                else:
+                    title = self.version_list['版本'][i][0] + '/' + self.version_list['版本'][i][j]
+                download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
+                download_info = self.seesion.post(self.target_url, data=download_data)
+                if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
+                    self.w.addtext('【' + QTime.currentTime().toString() + '】' + self.version_list['版本'][i][j] + '版本json不存在。')
+                    self.w.set_progress(i + 1)
+                    QApplication.processEvents()
+                    time.sleep(0.1)
+                else:
+                    self.version_base[title] = download_info.json()['jsondata']
+                    if j == 0:
+                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).setBackground(0, self.green)
+                    else:
+                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).item(j - 1).setBackground(0, self.green)
+                    self.w.addtext('【' + QTime.currentTime().toString() + '】' + title + '版本json下载保存成功。')
+                    self.w.set_progress(i + 1)
+                    QApplication.processEvents()
+                    time.sleep(0.1)
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         QMessageBox.information(self, '下载成功', '所有版本号已经下载并保存完毕。')
 
     def upload_one_version(self):
-        text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
-        self.version_base[text] = {'分类': '版本更新', '版本': text}
+        item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
+        if item.parent() == self.versionlayout['版本列表']['横排版']['列表']:
+            title = item.text(0)
+        else:
+            title = item.parent().text(0) + '/' + item.text(0)
+        self.version_base[title] = {'分类': '版本更新', '版本': title}
         for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):
             item = self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
             if item.itemtype == 'text':
-                self.version_base[text][item.text(0)] = item.text(1)
+                self.version_base[title][item.text(0)] = item.text(1)
             elif item.background(1) == self.green:
-                self.version_base[text][item.text(0)] = self.version_tree_to_json(item)
-        self.upload_json('Data:' + text + '.json', json.dumps(self.version_base[text]))
+                self.version_base[title][item.text(0)] = self.version_tree_to_json(item)
+        if item.parent() == self.versionlayout['版本列表']['横排版']['列表']:
+            self.version_base[title]['次级版本'] = []
+            for i in range(item.childCount()):
+                self.version_base[title]['次级版本'].append(item.text(0) + '/' + item.child(i).text(0))
+        self.upload_json('Data:' + title + '.json', json.dumps(self.version_base[title]))
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         self.complex_json_to_version_tree()
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
@@ -1434,10 +1495,10 @@ class Main(QMainWindow):
         re = {}
         for i in range(item.childCount()):
             item1 = item.child(i)
-            if i==0:
-                re[str(i)]=['','']
+            if i == 0:
+                re[str(i)] = ['', '']
             else:
-                re[str(i)] = [item1.text(0),item1.text(1)]
+                re[str(i)] = [item1.text(0), item1.text(1)]
             if edit_json.version[item.text(0)][1] in self.json_base and item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]]:
                 re[str(i)][1] = self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
             for j in range(item1.childCount()):
@@ -1476,57 +1537,65 @@ class Main(QMainWindow):
         return re
 
     def create_one_version(self):
-        text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
-        self.version_base[text] = {}
+        item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
+        if item.parent() == None:
+            title = item.text(0)
+        else:
+            title = item.parent().text(0) + '/' + item.text(0)
+        self.version_base[title] = {}
         for i in edit_json.version:
             if edit_json.version[i][0] == 'text':
-                self.version_base[text][i] = edit_json.version[i][1]
-        self.versionlayout['版本列表']['横排版']['列表'].item(self.version_list['版本'].index(text)).setBackground(self.green)
+                self.version_base[title][i] = edit_json.version[i][1]
+        item.setBackground(0, self.green)
         self.complex_json_to_version_tree()
 
     def complex_json_to_version_tree(self):
         self.versionlayout['版本内容']['横排版']['树'][0].clear()
-        text = self.versionlayout['版本列表']['横排版']['列表'].currentItem().text()
+        item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
+        if item.parent() == None:
+            title = item.text(0)
+        else:
+            title = item.parent().text(0) + '/' + item.text(0)
         for i in edit_json.version:
             if edit_json.version[i][0] == 'text':
-                if i not in self.version_base[text]:
-                    self.version_base[text][i] = edit_json.version[i][1]
+                if i not in self.version_base[title]:
+                    self.version_base[title][i] = edit_json.version[i][1]
                     self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
                 new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
                 new1.itemtype = 'text'
-                new1.itemvalue = self.version_base[text][i]
+                new1.itemvalue = self.version_base[title][i]
                 new1.setText(0, i)
-                new1.set_value(self.version_base[text][i])
+                new1.set_value(self.version_base[title][i])
             elif edit_json.version[i][0] == 'tree':
-                if i in self.version_base[text] and '0' in self.version_base[text][i]:
+                if i in self.version_base[title] and '0' in self.version_base[title][i]:
                     new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
                     new1.itemtype = 'tree1'
                     new1.setText(0, i)
                     new1.setBackground(1, self.green)
-                    for j in self.version_base[text][i]:
+                    for j in self.version_base[title][i]:
                         new2 = VersionItemEdit(new1)
                         new2.itemtype = 'tree2'
-                        if self.version_base[text][i][j][0]=='':
-                            new2.setText(0,'无标题')
+                        if self.version_base[title][i][j][0] == '':
+                            new2.setText(0, '无标题')
                         else:
-                            new2.setText(0, self.version_base[text][i][j][0])
-                        new2.set_value(self.version_base[text][i][j][1])
-                        for k in range(len(self.version_base[text][i][j])):
+                            new2.setText(0, self.version_base[title][i][j][0])
+                        new2.set_value(self.version_base[title][i][j][1])
+                        for k in range(len(self.version_base[title][i][j])):
                             if k > 1:
                                 new3 = VersionItemEdit(new2)
                                 new3.itemtype = 'tree_list'
-                                new3.setText(0, str(k-1))
+                                new3.setText(0, str(k - 1))
                                 new0 = VersionItemEdit(new3)
                                 new0.itemtype = 'text'
                                 new0.setText(0, '序列级数')
-                                if '序列级数' in self.version_base[text][i][j][k]:
-                                    new0.set_value(self.version_base[text][i][j][k]['序列级数'])
+                                if '序列级数' in self.version_base[title][i][j][k]:
+                                    new0.set_value(self.version_base[title][i][j][k]['序列级数'])
                                 else:
                                     new0.set_value(1)
                                 new4 = VersionItemEdit(new3)
                                 new4.itemtype = 'complex_tree'
                                 new4.setText(0, '文字')
-                                for l in self.version_base[text][i][j][k]['文字']:
+                                for l in self.version_base[title][i][j][k]['文字']:
                                     if len(l) == 1:
                                         new6 = VersionItemEdit(new4)
                                         new6.itemtype = 'text_text'
@@ -1567,7 +1636,7 @@ class Main(QMainWindow):
                                 new5 = VersionItemEdit(new3)
                                 new5.itemtype = 'list'
                                 new5.setText(0, '目标')
-                                for l in self.version_base[text][i][j][k]['目标']:
+                                for l in self.version_base[title][i][j][k]['目标']:
                                     new6 = VersionItemEdit(new5)
                                     new6.itemtype = 'list_text'
                                     new6.set_value(l)
@@ -1660,22 +1729,22 @@ class Main(QMainWindow):
 
     def version_button_tree2_change_name(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
-        parent=item.parent()
-        text, ok = MoInputWindow.getText(self, '小分类改名', '你现在正试图将【'+parent.text(0)+'】的【'+item.text(0)+'】的名字改为:',item.text(0))
+        parent = item.parent()
+        text, ok = MoInputWindow.getText(self, '小分类改名', '你现在正试图将【' + parent.text(0) + '】的【' + item.text(0) + '】的名字改为:', item.text(0))
         if ok:
             item.setText(0, text)
 
-    def version_button_move_list_item(self,move_step=1):
-        tree=self.versionlayout['版本内容']['横排版']['树'][0]
+    def version_button_move_list_item(self, move_step=1):
+        tree = self.versionlayout['版本内容']['横排版']['树'][0]
         item = tree.currentItem()
-        parent=item.parent()
-        index=parent.indexOfChild(item)
-        counts=parent.childCount()
+        parent = item.parent()
+        index = parent.indexOfChild(item)
+        counts = parent.childCount()
         parent.removeChild(item)
-        targetind=max(0,min(index+move_step,counts-1))
-        parent.insertChild(targetind,item)
+        targetind = max(0, min(index + move_step, counts - 1))
+        parent.insertChild(targetind, item)
         for i in range(0, counts):
-            parent.child(i).setText(0, str(i+1))
+            parent.child(i).setText(0, str(i + 1))
         item.setExpanded(True)
         tree.setCurrentItem(item)
         self.version_edit_all_button_clicked()
@@ -1774,7 +1843,7 @@ class Main(QMainWindow):
 
     def version_tree_expand_toplevelitem(self):
         for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):
-            item=self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
+            item = self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
             if item.itemtype == 'text':
                 item.setExpanded(True)
             elif item.background(1) == self.green:
@@ -1782,7 +1851,7 @@ class Main(QMainWindow):
             for j in range(item.childCount()):
                 self.expand_all_childs(item.child(j))
 
-    def expand_all_childs(self,item):
+    def expand_all_childs(self, item):
         for i in range(item.childCount()):
             item.child(i).setExpanded(True)
             self.expand_all_childs(item.child(i))
