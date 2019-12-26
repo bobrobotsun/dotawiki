@@ -1416,7 +1416,7 @@ class Main(QMainWindow):
 
     def download_one_version(self):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
-        if item.parent() == self.versionlayout['版本列表']['横排版']['列表']:
+        if item.parent() == None:
             text = item.text(0)
             title = text
         else:
@@ -1471,7 +1471,7 @@ class Main(QMainWindow):
 
     def upload_one_version(self):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
-        if item.parent() == self.versionlayout['版本列表']['横排版']['列表']:
+        if item.parent() == None:
             title = item.text(0)
         else:
             title = item.parent().text(0) + '/' + item.text(0)
@@ -1482,7 +1482,7 @@ class Main(QMainWindow):
                 self.version_base[title][item.text(0)] = item.text(1)
             elif item.background(1) == self.green:
                 self.version_base[title][item.text(0)] = self.version_tree_to_json(item)
-        if item.parent() == self.versionlayout['版本列表']['横排版']['列表']:
+        if item.parent() == None:
             self.version_base[title]['次级版本'] = []
             for i in range(item.childCount()):
                 self.version_base[title]['次级版本'].append(item.text(0) + '/' + item.child(i).text(0))
