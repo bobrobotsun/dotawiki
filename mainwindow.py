@@ -897,7 +897,7 @@ class Main(QMainWindow):
                     elif edict[i][0] == 'text':
                         if isinstance(sdict[i], dict) and '混合文字' in sdict[i]:
                             tdict[i] = {0: TreeItemEdit(tdict[0], i)}
-                            tdict[i][0].set_type('combine_text')
+                            tdict[i][0].set_type('text')
                             self.combine_text_to_tree(tdict[i], sdict[i])
                         else:
                             tdict[i] = TreeItemEdit(tdict[0], i)
@@ -1318,7 +1318,7 @@ class Main(QMainWindow):
                         else:
                             new1.setBackground(0, self.red)
                     else:
-                        new2 = QTreeWidgetItem(new2)
+                        new2 = QTreeWidgetItem(new1)
                         new2.setText(0, i[j])
                         if i[0] + '/' + i[j] in self.version_base:
                             new2.setBackground(0, self.green)
@@ -1346,7 +1346,7 @@ class Main(QMainWindow):
                     else:
                         new1.setBackground(0, self.red)
                 else:
-                    new2 = QTreeWidgetItem(new2)
+                    new2 = QTreeWidgetItem(new1)
                     new2.setText(0, i[j])
                     if i[0] + '/' + i[j] in self.version_base:
                         new2.setBackground(0, self.green)
@@ -1392,15 +1392,17 @@ class Main(QMainWindow):
             for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
                 self.version_list['版本'].append([self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0)])
                 for j in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).childCount()):
-                    self.version_list['版本'][i].append(
-                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0) + '/' + self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
+                    self.version_list['版本'][i].append(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
             item.setExpanded(True)
 
     def check_version_content(self):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
-        text = item.text(0)
+        if item.parent()==None:
+            title = item.text(0)
+        else:
+            title=item.parent().text(0) +'/'+item.text(0)
         self.versionlayout['版本列表']['横排版']['竖排版']['插入次级版本'].setEnabled(item.parent() == None)
-        if text in self.version_base:
+        if title in self.version_base:
             self.complex_json_to_version_tree()
             self.version_tree_expand_toplevelitem()
         else:
