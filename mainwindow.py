@@ -1479,11 +1479,11 @@ class Main(QMainWindow):
             title = item.parent().text(0) + '/' + item.text(0)
         self.version_base[title] = {'分类': '版本更新', '版本': title}
         for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):
-            item = self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
-            if item.itemtype == 'text':
-                self.version_base[title][item.text(0)] = item.text(1)
-            elif item.background(1) == self.green:
-                self.version_base[title][item.text(0)] = self.version_tree_to_json(item)
+            items = self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
+            if items.itemtype == 'text':
+                self.version_base[title][items.text(0)] = items.text(1)
+            elif items.background(1) == self.green:
+                self.version_base[title][items.text(0)] = self.version_tree_to_json(items)
         if item.parent() == None:
             self.version_base[title]['次级版本'] = []
             for i in range(item.childCount()):
