@@ -1463,7 +1463,7 @@ class Main(QMainWindow):
                     if j == 0:
                         self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).setBackground(0, self.green)
                     else:
-                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).item(j - 1).setBackground(0, self.green)
+                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j - 1).setBackground(0, self.green)
                     self.w.addtext('【' + QTime.currentTime().toString() + '】' + title + '版本json下载保存成功。')
                     self.w.set_progress(i + 1)
                     QApplication.processEvents()
