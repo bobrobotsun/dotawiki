@@ -134,8 +134,12 @@ def get_source_to_data(all_json, upgrade_json, version):
             unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
             unit_dic["迷你图片"] = all_json["英雄"][unit_dic["技能归属"]]["迷你图片"]
         elif unit_dic["次级分类"] == "物品技能":
-            unit_dic["图片"] = all_json["物品"][unit_dic["技能归属"]]["图片"]
-            unit_dic["迷你图片"] = all_json["物品"][unit_dic["技能归属"]]["迷你图片"]
+            if unit_dic["技能归属"] in all_json["物品"]:
+                unit_dic["图片"] = all_json["物品"][unit_dic["技能归属"]]["图片"]
+                unit_dic["迷你图片"] = all_json["物品"][unit_dic["技能归属"]]["迷你图片"]
+            else:
+                unit_dic["图片"] = "items_" + temp1["代码"] + ".png"
+                unit_dic["迷你图片"] = "items_" + temp1["代码"] + ".png"
         else:
             unit_dic["图片"] = "spellicons " + temp1["代码"] + ".png"
             unit_dic["迷你图片"] = "spellicons " + temp1["代码"] + ".png"
@@ -361,7 +365,10 @@ def fulfil(arr, json):
         return
     else:
         if "1" in arr and arr["1"] == "":
-            arr["1"] = "技能"
+            if json['次级分类']=='物品技能':
+                arr["1"] = "物品"
+            else:
+                arr["1"] = "技能"
         if "2" in arr and arr["2"] == "":
             arr["2"] = json["代码"]
 
@@ -378,7 +385,10 @@ def one_upgrade(json, base_txt):
             while True:
                 k += 1
                 if str(k) in json["1"]["代码"] and json["1"]["代码"][str(k)] != '':
-                    getvalue[0].append(json["1"]["代码"][str(k)])
+                    try:
+                        getvalue[0].append(float(json["1"]["代码"][str(k)]))
+                    except ValueError:
+                        getvalue[0].append(json["1"]["代码"][str(k)])
                 else:
                     break
         elif json["1"]["代码"]["0"] == "不存在":
@@ -404,7 +414,10 @@ def one_upgrade(json, base_txt):
             while True:
                 k += 1
                 if str(k) in json["2"]["代码"]:
-                    getvalue[2].append(json["2"]["代码"][str(k)])
+                    try:
+                        getvalue[2].append(float(json["2"]["代码"][str(k)]))
+                    except ValueError:
+                        getvalue[2].append(json["2"]["代码"][str(k)])
                 else:
                     break
         else:
@@ -417,7 +430,10 @@ def one_upgrade(json, base_txt):
             while True:
                 k += 1
                 if str(k) in json["3"]["代码"]:
-                    getvalue[3].append(json["3"]["代码"][str(k)])
+                    try:
+                        getvalue[3].append(float(json["3"]["代码"][str(k)]))
+                    except ValueError:
+                        getvalue[3].append(json["3"]["代码"][str(k)])
                 else:
                     break
         else:
@@ -500,6 +516,8 @@ def array_cal(arr1, arr2, op, num):
             arr1[i] = temp
         elif opp == '1+1':
             arr1[i] = arr1[i] + temp
+        elif opp == '1-1':
+            arr1[i] = arr1[i] - temp
         elif opp == '1\\-1':
             arr1[i] = temp - arr1[i]
         elif opp == '1*1':
@@ -596,7 +614,7 @@ def mech_junior(json, mech):
         else:
             for j in json["效果"]:
                 for k in json["效果"][j]:
-                    if i in json["效果"][j][k]:
+                    if isinstance(json["效果"][j][k],dict) and i in json["效果"][j][k]:
                         if str(json["效果"][j][k][i]["代码"]) in mech[i]:
                             json["效果"][j][k][i]["值"] = mech[i][str(json["效果"][j][k][i]["代码"])]["名称"]
                             if "图片" in mech[i][str(json["效果"][j][k][i]["代码"])]:
@@ -787,7 +805,10 @@ def one_combine_txt_numbers(json, all_json, base_txt):
         while True:
             j += 1
             if str(j) in json:
-                re[1].append(json[str(j)])
+                try:
+                    re[1].append(float(json[str(j)]))
+                except ValueError:
+                    re[1].append(json[str(j)])
             else:
                 break
     else:
