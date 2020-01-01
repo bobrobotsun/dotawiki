@@ -822,7 +822,6 @@ class Main(QMainWindow):
             self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1]))
             self.w.set_progress(i + 1)
             QApplication.processEvents()
-            time.sleep(0.1)
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
     # 向wiki网站上传对应的信息
@@ -830,7 +829,12 @@ class Main(QMainWindow):
         upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
         upload_info = self.seesion.post(self.target_url, data=upload_data)
         if upload_info.json()['edit']['result'] == 'Success':
-            return '【' + QTime.currentTime().toString() + '】上传《' + pagename + '》内容成功'
+            if 'nochange' in upload_info.json()['edit']:
+                return '【' + QTime.currentTime().toString() + '】没有修改《' + pagename + '》'
+            elif 'oldrevid' in upload_info.json()['edit']:
+                return '【' + QTime.currentTime().toString() + '】上传《' + pagename + '》，【'+str(upload_info.json()['edit']['oldrevid'])+'】-->【'+str(upload_info.json()['edit']['newrevid'])+'】'
+            else:
+                return '【' + QTime.currentTime().toString() + '】上传《' + pagename + '》内容成功'
         else:
             return json.dumps(upload_info.json())
 
