@@ -635,7 +635,7 @@ def mech_sign(json, mech):
 def mech_repeat(json, mech):
     for i in json:
         for j in json[i]:
-            if "叠加" in json[i][j]:
+            if isinstance(json[i][j],dict) and "叠加" in json[i][j]:
                 for k in json[i][j]["叠加"]:
                     if str(json[i][j]["叠加"][k]["代码1"]) in mech["来源"] and str(json[i][j]["叠加"][k]["代码2"]) in mech["方式"]:
                         json[i][j]["叠加"][k]["来源"] = mech["来源"][str(json[i][j]["叠加"][k]["代码1"])]
@@ -882,7 +882,7 @@ def calculate_combine_txt_numbers(re, temp, op):
             elif op == 'max' or op == "↑":
                 re[i + 1][j] = max(re[i + 1][j], temp[i + 1][j])
             elif op == 'round':
-                re[i + 1][j] = round(re[i + 1][j], temp[i + 1][j])
+                re[i + 1][j] = round(re[i + 1][j], int(temp[i + 1][j]))
             elif op == 'ceil':
                 re[i + 1][j] = math.ceil(re[i + 1][j] * pow(10, temp[i + 1][j])) / pow(10, temp[i + 1][j])
             elif op == 'floor':
