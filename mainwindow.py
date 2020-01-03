@@ -1026,12 +1026,14 @@ class Main(QMainWindow):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         text, ok = MoInputWindow.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:')
         if ok:
+            self.json_name = self.download_json('json_name.json')
             self.json_name[selected].append(text)
             self.json_base[selected][text] = {}
             for i in edit_json.edit[selected]:
                 self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
             self.json_base[selected][text]['页面名'] = text
             self.resort()
+            self.upload_json('Data:json_name.json', json.dumps(self.json_name))
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
             self.edit_category_selected_changed()
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
@@ -1060,6 +1062,7 @@ class Main(QMainWindow):
             self.resort()
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
             self.edit_category_selected_changed()
+            self.upload_json('Data:json_name.json', json.dumps(self.json_name))
             QMessageBox.information(self, '删除完毕', '删除成功！您将不会再看到这个库。')
 
     def json_edit_change_name(self):
