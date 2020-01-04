@@ -874,6 +874,10 @@ class Main(QMainWindow):
             if target in self.text_base[edit_json.edit_source[selected[0]][0]]:
                 self.editlayout['修改核心']['竖布局']['代码库'][0].setCurrentText(target)
                 self.edit_text_base_selected_changed()
+            else:
+                for i in self.text_base:
+                    if target in self.text_base[i]:
+                        self.edit_text_base_selected_changed(i,target)
         QApplication.processEvents()
         self.editlayout['修改核心']['竖布局']['树'][0].clear()
         self.editlayout['修改核心']['竖布局']['树'] = {0: self.editlayout['修改核心']['竖布局']['树'][0]}
@@ -1015,8 +1019,12 @@ class Main(QMainWindow):
             else:
                 sdict[name] = edict[1]
 
-    def edit_text_base_selected_changed(self):
-        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['代码库'][0].currentText()]
+    def edit_text_base_selected_changed(self,ss1='',ss2=''):
+        ss=[ss1,ss2]
+        if ss1=='':
+            ss[0]=self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        if ss2=='':
+            ss[1]=self.editlayout['修改核心']['竖布局']['代码库'][0].currentText()
         self.editlayout['基础数据']['竖布局']['树'][0].clear()
         self.editlayout['基础数据']['竖布局']['树'] = {0: self.editlayout['基础数据']['竖布局']['树'][0]}
         self.dict_to_tree(self.editlayout['基础数据']['竖布局']['树'], self.text_base[edit_json.edit_source[ss[0]][0]][ss[1]])
