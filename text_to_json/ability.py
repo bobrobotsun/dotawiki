@@ -715,12 +715,12 @@ def change_combine_txt(json, ii, data, all_json, name):
                         returntxt += combine_numbers_post_level(temp[2], post, level)
                     if temp[0][1]:
                         for j in temp[0][3]:
-                            returntxt += "[[file:" + temp[0][3][j]["图片"] + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
+                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png','talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[3], post, level)
                     if temp[0][2]:
                         returntxt += "[[file:agha.png|x18px|link=阿哈利姆神杖]]"
                         for j in temp[0][3]:
-                            returntxt += "[[file:" + temp[0][3][j]["图片"] + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
+                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png','talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[4], post, level)
                     returntxt += ")"
             else:
@@ -887,6 +887,12 @@ def calculate_combine_txt_numbers(re, temp, op):
                 re[i + 1][j] = math.ceil(re[i + 1][j] * pow(10, temp[i + 1][j])) / pow(10, temp[i + 1][j])
             elif op == 'floor':
                 re[i + 1][j] = math.floor(re[i + 1][j] * pow(10, temp[i + 1][j])) / pow(10, temp[i + 1][j])
+            elif op == '%*%':
+                re[i + 1][j] = (100-(100-re[i + 1][j]) * (100 - temp[i + 1][j]) / 100)
+            elif op == 'a2%':
+                re[i + 1][j] = 13 * re[i + 1][j] / (225 + 12 *abs(re[i + 1][j]))*temp[i + 1][j]
+            elif op == '%2a':
+                re[i + 1][j] = 225 * re[i + 1][j] / (13*temp[i + 1][j] - 12 *abs(re[i + 1][j]))
 
 
 def combine_numbers_post_level(arr, post, level):
