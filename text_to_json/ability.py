@@ -855,6 +855,8 @@ def calculate_combine_txt_numbers(re, temp, op):
         for j in range(max(len(re[i + 1]), len(temp[i + 1]))):
             if j >= len(re[i + 1]):
                 re[i + 1].append(re[i + 1][0])
+    for i in range(4):
+        for j in range(max(len(re[i + 1]), len(temp[i + 1]))):
             if j >= len(temp[i + 1]):
                 temp[i + 1].append(temp[i + 1][0])
             if op == '+':
