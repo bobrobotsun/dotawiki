@@ -597,9 +597,6 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['保存并上传'] = QPushButton('保存并上传', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['保存并上传'])
         self.editlayout['竖布局']['保存并上传'].clicked.connect(self.json_edit_save_and_upload)
-        self.editlayout['竖布局']['软件内更新'] = QPushButton('软件内更新', self)
-        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['软件内更新'])
-        self.editlayout['竖布局']['软件内更新'].clicked.connect(self.json_edit_loop_update)
         self.editlayout['竖布局'][0].addStretch(1)
         self.editlayout['竖布局']['修改数据'] = QPushButton('修改数据', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['修改数据'])
@@ -638,6 +635,10 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['传统目标设定'] = QPushButton('传统目标设定', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['传统目标设定'])
         self.editlayout['竖布局']['传统目标设定'].clicked.connect(self.json_edit_target_default)
+        self.editlayout['竖布局'][0].addStretch(1)
+        self.editlayout['竖布局']['软件内更新'] = QPushButton('软件内更新', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['软件内更新'])
+        self.editlayout['竖布局']['软件内更新'].clicked.connect(self.json_edit_loop_update)
         self.editlayout['竖布局'][0].addStretch(5)
 
         self.editlayout['额外机制'] = {0: QGroupBox('额外机制', self)}
