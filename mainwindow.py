@@ -597,6 +597,9 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['保存并上传'] = QPushButton('保存并上传', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['保存并上传'])
         self.editlayout['竖布局']['保存并上传'].clicked.connect(self.json_edit_save_and_upload)
+        self.editlayout['竖布局']['软件内更新'] = QPushButton('软件内更新', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['软件内更新'])
+        self.editlayout['竖布局']['软件内更新'].clicked.connect(self.json_edit_loop_update)
         self.editlayout['竖布局'][0].addStretch(1)
         self.editlayout['竖布局']['修改数据'] = QPushButton('修改数据', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['修改数据'])
@@ -1112,6 +1115,19 @@ class Main(QMainWindow):
         else:
             self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
         self.edit_target_selected_changed()
+
+    def json_edit_loop_update(self):
+        ss = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        for i in self.json_base[ss]:
+            self.editlayout['修改核心']['竖布局']['树'][0].clear()
+            self.editlayout['修改核心']['竖布局']['树'] = {0: self.editlayout['修改核心']['竖布局']['树'][0]}
+            self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
+            self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 300)
+            self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[ss], self.json_base[ss][i])
+            self.json_base[ss][i]={}
+            self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss][i])
+            self.file_save_all()
+            QApplication.processEvents()
 
     def tree_item_clicked(self):
         sender = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
