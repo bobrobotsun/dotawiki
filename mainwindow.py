@@ -1128,7 +1128,9 @@ class Main(QMainWindow):
             self.json_base[ss][i]={}
             self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss][i])
             self.file_save_all()
+            time.sleep(0.1)
             QApplication.processEvents()
+        self.edit_target_selected_changed()
 
     def tree_item_clicked(self):
         sender = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
