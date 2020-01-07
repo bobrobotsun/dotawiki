@@ -37,7 +37,7 @@ def sortedList(alist):
         keys.append([p.get_pinyin(i), i])
         keys = sorted(keys, key=lambda x: x[0])
     for i in keys:
-        new.append(alist[i[1]])
+        new.append(i[1])
     return new
 
 

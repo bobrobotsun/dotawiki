@@ -445,8 +445,14 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
 
     def download_json_name(self):
-        self.json_name = self.download_json('json_name.json')
+        self.update_json_name(self.download_json('json_name.json'))
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
+
+    def update_json_name(self, list):
+        for i in list:
+            for j in list[i]:
+                if j not in self.json_name[i]:
+                    self.json_name[i].append(j)
 
     def download_mech(self):
         self.mech = self.download_json('机制检索.json')
@@ -770,9 +776,7 @@ class Main(QMainWindow):
             self.text_base[i] = edit_json.sortedDictValues(self.text_base[i], False)
         for i in self.json_base:
             self.json_base[i] = edit_json.sortedDictValues(self.json_base[i], True)
-            self.json_name[i] = []
-            for j in self.json_base[i]:
-                self.json_name[i].append(j)
+            self.json_name[i] = edit_json.sortedList(self.json_name[i])
         self.file_save_all()
 
     def file_save_all(self):
@@ -836,7 +840,8 @@ class Main(QMainWindow):
             if 'nochange' in upload_info.json()['edit']:
                 return '【' + QTime.currentTime().toString() + '】没有修改《' + pagename + '》'
             elif 'oldrevid' in upload_info.json()['edit']:
-                return '【' + QTime.currentTime().toString() + '】上传《' + pagename + '》，【'+str(upload_info.json()['edit']['oldrevid'])+'】-->【'+str(upload_info.json()['edit']['newrevid'])+'】'
+                return '【' + QTime.currentTime().toString() + '】上传《' + pagename + '》，【' + str(upload_info.json()['edit']['oldrevid']) + '】-->【' + str(
+                    upload_info.json()['edit']['newrevid']) + '】'
             else:
                 return '【' + QTime.currentTime().toString() + '】上传《' + pagename + '》内容成功'
         else:
@@ -881,7 +886,7 @@ class Main(QMainWindow):
             else:
                 for i in self.text_base:
                     if target in self.text_base[i]:
-                        self.edit_text_base_selected_changed(i,target)
+                        self.edit_text_base_selected_changed("", i, target)
         QApplication.processEvents()
         self.editlayout['修改核心']['竖布局']['树'][0].clear()
         self.editlayout['修改核心']['竖布局']['树'] = {0: self.editlayout['修改核心']['竖布局']['树'][0]}
@@ -1023,12 +1028,12 @@ class Main(QMainWindow):
             else:
                 sdict[name] = edict[1]
 
-    def edit_text_base_selected_changed(self,ss1='',ss2=''):
-        ss=[ss1,ss2]
-        if ss1=='':
-            ss[0]=self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
-        if ss2=='':
-            ss[1]=self.editlayout['修改核心']['竖布局']['代码库'][0].currentText()
+    def edit_text_base_selected_changed(self, ss0='', ss1='', ss2=''):
+        ss = [ss1, ss2]
+        if ss1 == '':
+            ss[0] = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        if ss2 == '':
+            ss[1] = self.editlayout['修改核心']['竖布局']['代码库'][0].currentText()
         self.editlayout['基础数据']['竖布局']['树'][0].clear()
         self.editlayout['基础数据']['竖布局']['树'] = {0: self.editlayout['基础数据']['竖布局']['树'][0]}
         self.dict_to_tree(self.editlayout['基础数据']['竖布局']['树'], self.text_base[edit_json.edit_source[ss[0]][0]][ss[1]])
@@ -1038,7 +1043,7 @@ class Main(QMainWindow):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         text, ok = MoInputWindow.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:')
         if ok:
-            self.json_name = self.download_json('json_name.json')
+            self.update_json_name(self.download_json('json_name.json'))
             self.json_name[selected].append(text)
             self.json_base[selected][text] = {}
             for i in edit_json.edit[selected]:
@@ -1125,7 +1130,7 @@ class Main(QMainWindow):
             self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
             self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 300)
             self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[ss], self.json_base[ss][i])
-            self.json_base[ss][i]={}
+            self.json_base[ss][i] = {}
             self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss][i])
             self.file_save_all()
             time.sleep(0.1)
@@ -1431,10 +1436,10 @@ class Main(QMainWindow):
 
     def check_version_content(self):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
-        if item.parent()==None:
+        if item.parent() == None:
             title = item.text(0)
         else:
-            title=item.parent().text(0) +'/'+item.text(0)
+            title = item.parent().text(0) + '/' + item.text(0)
         self.versionlayout['版本列表']['横排版']['竖排版']['插入次级版本'].setEnabled(item.parent() == None)
         if title in self.version_base:
             self.complex_json_to_version_tree()
