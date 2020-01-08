@@ -1472,6 +1472,7 @@ class Main(QMainWindow):
             if messageBox.clickedButton() == button1:
                 self.create_one_version()
         else:
+            item.setBackground(0, self.green)
             self.version_base[title] = download_info.json()['jsondata']
             self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
             self.complex_json_to_version_tree()
