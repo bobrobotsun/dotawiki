@@ -702,6 +702,10 @@ class Main(QMainWindow):
         self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'] = QPushButton('下载全部更新内容', self)
         self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'].clicked.connect(self.download_all_versions)
         self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['下载全部更新内容'])
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(1)
+        self.versionlayout['版本列表']['横排版']['竖排版']['软件内更新'] = QPushButton('软件内更新', self)
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['软件内更新'])
+        self.versionlayout['版本列表']['横排版']['竖排版']['软件内更新'].clicked.connect(self.version_edit_loop_update)
         self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(5)
 
         self.versionlayout['版本内容'] = {0: QGroupBox('版本内容', self)}
@@ -1510,7 +1514,25 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         QMessageBox.information(self, '下载成功', '所有版本号已经下载并保存完毕。')
 
-    def upload_one_version(self):
+    def version_edit_loop_update(self):
+        for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
+            topitem=self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i)
+            if topitem.background(0)==self.green:
+                self.versionlayout['版本列表']['横排版']['列表'].setCurrentItem(topitem)
+                self.check_version_content()
+                self.upload_one_version(False)
+                time.sleep(0.1)
+                QApplication.processEvents()
+                for j in range(topitem.childCount()):
+                    item=topitem.child(j)
+                    if item.background(0)==self.green:
+                        self.versionlayout['版本列表']['横排版']['列表'].setCurrentItem(item)
+                        self.check_version_content()
+                        self.upload_one_version(False)
+                        time.sleep(0.1)
+                        QApplication.processEvents()
+
+    def upload_one_version(self,bool=True):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
         if item.parent() == None:
             title = item.text(0)
@@ -1530,7 +1552,8 @@ class Main(QMainWindow):
         self.upload_json('Data:' + title + '.json', json.dumps(self.version_base[title]))
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         self.complex_json_to_version_tree()
-        QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
+        if bool:
+            QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
     def version_tree_to_json(self, item):
         re = {}
@@ -1604,9 +1627,14 @@ class Main(QMainWindow):
                     self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
                 new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
                 new1.itemtype = 'text'
-                new1.itemvalue = self.version_base[title][i]
                 new1.setText(0, i)
-                new1.set_value(self.version_base[title][i])
+                if i == '官网链接' and self.version_base[title][i] == '':
+                    if item.parent() == None:
+                        new1.set_value('http://www.dota2.com/patches/' + title)
+                    else:
+                        new1.set_value('http://www.dota2.com/news/updates/')
+                else:
+                    new1.set_value(self.version_base[title][i])
             elif edit_json.version[i][0] == 'tree':
                 if i in self.version_base[title] and '0' in self.version_base[title][i]:
                     new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
