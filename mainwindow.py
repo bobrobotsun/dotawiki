@@ -32,7 +32,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.23e'
+        self.version = '7.23f'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -1398,7 +1398,7 @@ class Main(QMainWindow):
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
     def add_version_list(self, next=0):
-        index = self.versionlayout['版本列表']['横排版']['列表'].currentIndex()
+        index = self.versionlayout['版本列表']['横排版']['列表'].indexOfTopLevelItem(self.versionlayout['版本列表']['横排版']['列表'].currentItem())
         if index == -1:
             if next == 0:
                 index = 0
@@ -1410,9 +1410,8 @@ class Main(QMainWindow):
         if ok:
             new = QTreeWidgetItem()
             new.setText(0, text)
-            new.setBackground(self.red)
+            new.setBackground(0, self.red)
             self.versionlayout['版本列表']['横排版']['列表'].insertTopLevelItem(index, new)
-            self.versionlayout['版本列表']['横排版']['列表'].setCurrentRow(index)
             self.version_list = {'版本': []}
             for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
                 self.version_list['版本'].append([self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0)])
