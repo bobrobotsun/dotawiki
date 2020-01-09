@@ -350,6 +350,17 @@ class Main(QMainWindow):
             if messageBox.clickedButton() == button1:
                 self.download_json_base()
         try:
+            basefile = open(os.path.join('database', 'json_name.json'), mode="r", encoding="utf-8")
+            self.json_name = json.loads(basefile.read())
+            basefile.close()
+        except FileNotFoundError:
+            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton, self)
+            button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
+            button2 = messageBox.addButton('没有网络，没法下载', QMessageBox.NoRole)
+            messageBox.exec_()
+            if messageBox.clickedButton() == button1:
+                self.download_json_name()
+        try:
             basefile = open(os.path.join('database', 'mech.json'), mode="r", encoding="utf-8")
             self.mech = json.loads(basefile.read())
             basefile.close()
@@ -515,7 +526,11 @@ class Main(QMainWindow):
             self.local.download_info = self.local.seesion.post(self.local.target_url, data=self.local.download_data)
             self.lock.acquire()
             try:
-                self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]] = self.local.download_info.json()['jsondata']
+                if '应用' not in self.local.download_info.json()['jsondata'] or self.local.download_info.json()['jsondata']['应用'] == 1:
+                    self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]] = self.local.download_info.json()[
+                        'jsondata']
+                else:
+                    self.json_name[self.download_json_list[self.local.current_num][0]].pop(self.json_name[self.download_json_list[self.local.current_num][0]].index(self.download_json_list[self.local.current_num][1]))
                 self.progress.addtext(
                     '【' + QTime.currentTime().toString() + '】【' + threading.current_thread().name + '】下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功')
                 self.current_num[0] += 1
@@ -781,6 +796,7 @@ class Main(QMainWindow):
         for i in self.json_base:
             self.json_base[i] = edit_json.sortedDictValues(self.json_base[i], True)
             self.json_name[i] = edit_json.sortedList(self.json_name[i])
+            print(self.json_name)
         self.file_save_all()
 
     def file_save_all(self):
@@ -1080,6 +1096,7 @@ class Main(QMainWindow):
             else:
                 self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
             self.json_base[ss[0]].pop(ss[1])
+            self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
             self.resort()
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
             self.edit_category_selected_changed()
@@ -1099,6 +1116,8 @@ class Main(QMainWindow):
                 else:
                     self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
                 self.json_base[ss[0]].pop(ss[1])
+                self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
+                self.json_name[ss[0]].append(text)
                 self.resort()
                 self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
                 self.edit_category_selected_changed()
@@ -1516,23 +1535,23 @@ class Main(QMainWindow):
 
     def version_edit_loop_update(self):
         for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
-            topitem=self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i)
-            if topitem.background(0)==self.green:
+            topitem = self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i)
+            if topitem.background(0) == self.green:
                 self.versionlayout['版本列表']['横排版']['列表'].setCurrentItem(topitem)
                 self.check_version_content()
                 self.upload_one_version(False)
                 time.sleep(0.1)
                 QApplication.processEvents()
                 for j in range(topitem.childCount()):
-                    item=topitem.child(j)
-                    if item.background(0)==self.green:
+                    item = topitem.child(j)
+                    if item.background(0) == self.green:
                         self.versionlayout['版本列表']['横排版']['列表'].setCurrentItem(item)
                         self.check_version_content()
                         self.upload_one_version(False)
                         time.sleep(0.1)
                         QApplication.processEvents()
 
-    def upload_one_version(self,bool=True):
+    def upload_one_version(self, bool=True):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
         if item.parent() == None:
             title = item.text(0)
