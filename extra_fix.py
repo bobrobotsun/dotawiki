@@ -12,3 +12,7 @@ for i in jt:
 
 with open('database/json_base.json',mode='w') as f:
     f.write(json.dumps(jt))
+
+    self.update_json_name(self.download_json('json_name.json'))
+
+    self.upload_json('Data:json_name.json', json.dumps(self.json_name))

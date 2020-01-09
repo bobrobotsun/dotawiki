@@ -1089,6 +1089,7 @@ class Main(QMainWindow):
     def json_edit_delete(self):
         warning = QMessageBox.warning(self, '删除', '您正试图删除一个库，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if warning == QMessageBox.Yes:
+            self.update_json_name(self.download_json('json_name.json'))
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             self.json_base[ss[0]][ss[1]]['应用'] = 0
             if ss[0] == '技能源':
@@ -1098,6 +1099,7 @@ class Main(QMainWindow):
             self.json_base[ss[0]].pop(ss[1])
             self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
             self.resort()
+            self.upload_json('Data:json_name.json', json.dumps(self.json_name))
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
             self.edit_category_selected_changed()
             self.upload_json('Data:json_name.json', json.dumps(self.json_name))
@@ -1106,6 +1108,7 @@ class Main(QMainWindow):
     def json_edit_change_name(self):
         warning = QMessageBox.warning(self, '改名', '您正改变库的名字，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if warning == QMessageBox.Yes:
+            self.update_json_name(self.download_json('json_name.json'))
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:')
             if ok:
@@ -1119,6 +1122,7 @@ class Main(QMainWindow):
                 self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
                 self.json_name[ss[0]].append(text)
                 self.resort()
+                self.upload_json('Data:json_name.json', json.dumps(self.json_name))
                 self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
                 self.edit_category_selected_changed()
                 self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
