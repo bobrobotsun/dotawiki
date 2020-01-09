@@ -1108,10 +1108,10 @@ class Main(QMainWindow):
     def json_edit_change_name(self):
         warning = QMessageBox.warning(self, '改名', '您正改变库的名字，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if warning == QMessageBox.Yes:
-            self.update_json_name(self.download_json('json_name.json'))
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:')
             if ok:
+                self.update_json_name(self.download_json('json_name.json'))
                 self.json_base[ss[0]][text] = copy.deepcopy(self.json_base[ss[0]][ss[1]])
                 self.json_base[ss[0]][ss[1]]['应用'] = '改名'
                 if ss[0] == '技能源':
