@@ -796,7 +796,6 @@ class Main(QMainWindow):
         for i in self.json_base:
             self.json_base[i] = edit_json.sortedDictValues(self.json_base[i], True)
             self.json_name[i] = edit_json.sortedList(self.json_name[i])
-            print(self.json_name)
         self.file_save_all()
 
     def file_save_all(self):
