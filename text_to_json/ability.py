@@ -200,7 +200,7 @@ def input_upgrade(all_json, upgrade_json):
                 upgrade_json[i]["A杖"][j]["目标"]["1"] = "技能"
             if upgrade_json[i]["A杖"][j]["目标"]["2"] == "":
                 upgrade_json[i]["A杖"][j]["目标"]["2"] = i
-            if "代码" in upgrade_json[i]["A杖"][j]["值"]:
+            if "代码" in upgrade_json[i]["A杖"][j]["值"] and isinstance(upgrade_json[i]["A杖"][j]["值"]["代码"],dict):
                 if "1" in upgrade_json[i]["A杖"][j]["值"]["代码"] and upgrade_json[i]["A杖"][j]["值"]["代码"]["1"] == "":
                     upgrade_json[i]["A杖"][j]["值"]["代码"]["1"] = "技能"
                 if "2" in upgrade_json[i]["A杖"][j]["值"]["代码"] and upgrade_json[i]["A杖"][j]["值"]["代码"]["2"] == "":
@@ -905,7 +905,7 @@ def calculate_combine_txt_numbers(re, temp, op):
             re[i + 1] = [re[i + 1][0]]
             j = 0
             while True:
-                if j * temp[i + 1][0] < re[i + 1][0]:
+                if j * temp[i + 1][0] < re[i + 1][j]:
                     re[i + 1].insert(j, j * temp[i + 1][0])
                     j += 1
                 else:
@@ -953,6 +953,8 @@ def calculate_combine_txt_numbers(re, temp, op):
                     re[i + 1][j] = 13 * re[i + 1][j] / (225 + 12 * abs(re[i + 1][j])) * temp[i + 1][j]
                 elif op == '%2a':
                     re[i + 1][j] = 225 * re[i + 1][j] / (13 * temp[i + 1][j] - 12 * abs(re[i + 1][j]))
+                elif op=='int':
+                    re[i + 1][j]=int(re[i + 1][j])
 
 
 def combine_numbers_post_level(arr, post, level):
