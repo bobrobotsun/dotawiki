@@ -213,8 +213,8 @@ def input_upgrade(all_json, upgrade_json):
                     if upgrade_json[i]["A杖"][j]["目标"][str(k)] in temp:
                         temp = temp[upgrade_json[i]["A杖"][j]["目标"][str(k)]]
                     else:
-                        temp[upgrade_json[i]["A杖"][j]["目标"][str(k)]]={}
-                        temp=temp[upgrade_json[i]["A杖"][j]["目标"][str(k)]]
+                        temp[upgrade_json[i]["A杖"][j]["目标"][str(k)]] = {}
+                        temp = temp[upgrade_json[i]["A杖"][j]["目标"][str(k)]]
                 else:
                     break
             if "0" in upgrade_json[i]["A杖"][j]["目标"] and upgrade_json[i]["A杖"][j]["目标"]["0"] == "替换":
@@ -225,7 +225,7 @@ def input_upgrade(all_json, upgrade_json):
             else:
                 temp["2"] = upgrade_json[i]["A杖"][j]["值"]
         for j in upgrade_json[i]["技能"]:
-            if "代码" in upgrade_json[i]["技能"][j]["值"] and isinstance(upgrade_json[i]["技能"][j]["值"]["代码"],dict):
+            if "代码" in upgrade_json[i]["技能"][j]["值"] and isinstance(upgrade_json[i]["技能"][j]["值"]["代码"], dict):
                 if "1" in upgrade_json[i]["技能"][j]["值"]["代码"] and upgrade_json[i]["技能"][j]["值"]["代码"]["1"] == "":
                     upgrade_json[i]["技能"][j]["值"]["代码"]["1"] = "技能"
                 if "2" in upgrade_json[i]["技能"][j]["值"]["代码"] and upgrade_json[i]["技能"][j]["值"]["代码"]["2"] == "":
@@ -238,8 +238,8 @@ def input_upgrade(all_json, upgrade_json):
                     if upgrade_json[i]["技能"][j]["目标"][str(k)] in temp:
                         temp = temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]
                     else:
-                        temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]={}
-                        temp=temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]
+                        temp[upgrade_json[i]["技能"][j]["目标"][str(k)]] = {}
+                        temp = temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]
                 else:
                     break
             if "0" in upgrade_json[i]["技能"][j]["目标"] and upgrade_json[i]["技能"][j]["目标"]["0"] == "替换":
@@ -268,8 +268,8 @@ def input_upgrade(all_json, upgrade_json):
                     if upgrade_json[i]["混合"][j]["目标"][str(k)] in temp:
                         temp = temp[upgrade_json[i]["混合"][j]["目标"][str(k)]]
                     else:
-                        temp[upgrade_json[i]["混合"][j]["目标"][str(k)]]={}
-                        temp=temp[upgrade_json[i]["混合"][j]["目标"][str(k)]]
+                        temp[upgrade_json[i]["混合"][j]["目标"][str(k)]] = {}
+                        temp = temp[upgrade_json[i]["混合"][j]["目标"][str(k)]]
                 else:
                     break
             if "0" in upgrade_json[i]["混合"][j]["目标"] and upgrade_json[i]["混合"][j]["目标"]["0"] == "替换":
@@ -300,7 +300,7 @@ def input_upgrade(all_json, upgrade_json):
             for k in ["2", "3"]:
                 if k in all_json["技能"][i]["效果"][j]:
                     if '名称' in all_json["技能"][i]["效果"][j][k]:
-                        all_json["技能"][i]["效果"][j]['名称']=all_json["技能"][i]["效果"][j][k]['名称']
+                        all_json["技能"][i]["效果"][j]['名称'] = all_json["技能"][i]["效果"][j][k]['名称']
                         all_json["技能"][i]["效果"][j][k].pop('名称')
                     l = 0
                     while True:
@@ -365,7 +365,7 @@ def fulfil(arr, json):
         return
     else:
         if "1" in arr and arr["1"] == "":
-            if json['次级分类']=='物品技能':
+            if json['次级分类'] == '物品技能':
                 arr["1"] = "物品"
             else:
                 arr["1"] = "技能"
@@ -479,20 +479,22 @@ def one_upgrade(json, base_txt):
             json["4"][str(k + 1)] = calvalue[3][k]
         json["4"]["升级来源"] = copy.deepcopy(json["3"]["升级来源"])
 
+
 def cut_the_same_to_one(lists):
-    bool=True
-    i=1
-    delete_number=0
-    while i<len(lists):
+    bool = True
+    i = 1
+    delete_number = 0
+    while i < len(lists):
         if lists[0] == lists[i]:
-            delete_number+=1
+            delete_number += 1
             i = i + 1
         else:
             bool = False
             break
-    if bool and i>1:
+    if bool and i > 1:
         for i in range(delete_number):
             lists.pop(1)
+
 
 def array_cal(arr1, arr2, op, num):
     for i in range(len(arr1)):
@@ -614,7 +616,7 @@ def mech_junior(json, mech):
         else:
             for j in json["效果"]:
                 for k in json["效果"][j]:
-                    if isinstance(json["效果"][j][k],dict) and i in json["效果"][j][k]:
+                    if isinstance(json["效果"][j][k], dict) and i in json["效果"][j][k]:
                         if str(json["效果"][j][k][i]["代码"]) in mech[i]:
                             json["效果"][j][k][i]["值"] = mech[i][str(json["效果"][j][k][i]["代码"])]["名称"]
                             if "图片" in mech[i][str(json["效果"][j][k][i]["代码"])]:
@@ -635,7 +637,7 @@ def mech_sign(json, mech):
 def mech_repeat(json, mech):
     for i in json:
         for j in json[i]:
-            if isinstance(json[i][j],dict) and "叠加" in json[i][j]:
+            if isinstance(json[i][j], dict) and "叠加" in json[i][j]:
                 for k in json[i][j]["叠加"]:
                     if str(json[i][j]["叠加"][k]["代码1"]) in mech["来源"] and str(json[i][j]["叠加"][k]["代码2"]) in mech["方式"]:
                         json[i][j]["叠加"][k]["来源"] = mech["来源"][str(json[i][j]["叠加"][k]["代码1"])]
@@ -715,12 +717,12 @@ def change_combine_txt(json, ii, data, all_json, name):
                         returntxt += combine_numbers_post_level(temp[2], post, level)
                     if temp[0][1]:
                         for j in temp[0][3]:
-                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png','talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
+                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[3], post, level)
                     if temp[0][2]:
                         returntxt += "[[file:agha.png|x18px|link=阿哈利姆神杖]]"
                         for j in temp[0][3]:
-                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png','talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
+                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[4], post, level)
                     returntxt += ")"
             else:
@@ -787,7 +789,7 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                 re[1].append(temp[str(j)])
             else:
                 break
-    elif json['0']=='普通属性':
+    elif json['0'] == '普通属性':
         temp = all_json[json["1"]][json["2"]][json["3"]]
         i = 3
         while True:
@@ -797,9 +799,9 @@ def one_combine_txt_numbers(json, all_json, base_txt):
             else:
                 break
         re[1].append(temp)
-    elif json['0']=='图片链接':
-        temp=all_json[json["1"]][json["2"]]
-        re[1].append('[[file:'+temp['迷你图片']+'|'+json['3']+'|link=]][['+temp['页面名']+']]')
+    elif json['0'] == '图片链接':
+        temp = all_json[json["1"]][json["2"]]
+        re[1].append('[[file:' + temp['迷你图片'] + '|' + json['3'] + '|link=]][[' + temp['页面名'] + ']]')
     elif json["0"] == "手填":
         j = 0
         while True:
@@ -811,13 +813,52 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                     re[1].append(json[str(j)])
             else:
                 break
+    elif json["0"] == "升级属性":
+        temp = all_json[json["1"]][json["2"]][json["3"]]
+        i = 3
+        while True:
+            i += 1
+            if str(i) in json:
+                if str(json[str(i)]) == '升级':
+                    ii = i + 1
+                    break
+                else:
+                    if str(json[str(i)]) in temp:
+                        temp = temp[str(json[str(i)])]
+                    elif str(json[str(i)]).isdigit():
+                        temp = temp["1"]
+            else:
+                ii = 0
+                break
+        for i in range(4):
+            if str(i + 1) in temp:
+                if i > 0:
+                    re[0][i - 1] = True
+                    if i == 2:
+                        re[0][3] = copy.deepcopy(temp["3"]["升级来源"])
+                if ii == 0:
+                    j = 0
+                    while True:
+                        j += 1
+                        if str(j) in temp[str(i + 1)]:
+                            re[i + 1].append(temp[str(i + 1)][str(j)])
+                        else:
+                            break
+                else:
+                    if str(json[str(ii)]) in temp[str(i + 1)]:
+                        re[i + 1] = [temp[str(i + 1)][json[str(ii)]]]
+                    elif str(json[str(ii)]).isdigit():
+                        re[i + 1] = [temp[str(i + 1)]["1"]]
     else:
         temp = all_json[json["1"]][json["2"]][json["3"]]
         i = 3
         while True:
             i += 1
             if str(i) in json:
-                temp = temp[str(json[str(i)])]
+                if str(json[str(i)]) in temp:
+                    temp = temp[str(json[str(i)])]
+                elif str(json[str(i)]).isdigit():
+                    temp = temp["1"]
             else:
                 break
         for i in range(4):
@@ -826,13 +867,16 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                     re[0][i - 1] = True
                     if i == 2:
                         re[0][3] = copy.deepcopy(temp["3"]["升级来源"])
-                j = 0
-                while True:
-                    j += 1
-                    if str(j) in temp[str(i + 1)]:
-                        re[i + 1].append(temp[str(i + 1)][str(j)])
-                    else:
-                        break
+                if isinstance(temp[str(i + 1)], dict):
+                    j = 0
+                    while True:
+                        j += 1
+                        if str(j) in temp[str(i + 1)]:
+                            re[i + 1].append(temp[str(i + 1)][str(j)])
+                        else:
+                            break
+                else:
+                    re[i + 1] = [temp[str(i + 1)]]
     if not re[0][0]:
         re[2] = copy.deepcopy(re[1])
     if not re[0][1]:
@@ -857,43 +901,58 @@ def calculate_combine_txt_numbers(re, temp, op):
                 re[i + 1].append(re[i + 1][0])
             if j >= len(temp[i + 1]):
                 temp[i + 1].append(temp[i + 1][0])
-        for j in range(len(re[i + 1])):
-            if op == '+':
-                re[i + 1][j] += temp[i + 1][j]
-            elif op == '-':
-                re[i + 1][j] -= temp[i + 1][j]
-            elif op == '*':
-                re[i + 1][j] *= temp[i + 1][j]
-            elif op == '/':
-                re[i + 1][j] /= temp[i + 1][j]
-            elif op == '\\':
-                re[i + 1][j] = temp[i + 1][j] / re[i + 1][j]
-            elif op == '^' or op == 'pow':
-                re[i + 1][j] = pow(re[i + 1][j], temp[i + 1][j])
-            elif op == '%-':
-                re[i + 1][j] = re[i + 1][j] * (100 - temp[i + 1][j]) / 100
-            elif op == '-%':
-                re[i + 1][j] = re[i + 1][j] * (1 - temp[i + 1][j])
-            elif op == '%+':
-                re[i + 1][j] = re[i + 1][j] * (100 + temp[i + 1][j]) / 100
-            elif op == '+%':
-                re[i + 1][j] = re[i + 1][j] * (1 + temp[i + 1][j])
-            elif op == 'min' or op == "↓":
-                re[i + 1][j] = min(re[i + 1][j], temp[i + 1][j])
-            elif op == 'max' or op == "↑":
-                re[i + 1][j] = max(re[i + 1][j], temp[i + 1][j])
-            elif op == 'round':
-                re[i + 1][j] = round(re[i + 1][j], int(temp[i + 1][j]))
-            elif op == 'ceil':
-                re[i + 1][j] = math.ceil(re[i + 1][j] * pow(10, temp[i + 1][j])) / pow(10, temp[i + 1][j])
-            elif op == 'floor':
-                re[i + 1][j] = math.floor(re[i + 1][j] * pow(10, temp[i + 1][j])) / pow(10, temp[i + 1][j])
-            elif op == '%*%':
-                re[i + 1][j] = (100-(100-re[i + 1][j]) * (100 - temp[i + 1][j]) / 100)
-            elif op == 'a2%':
-                re[i + 1][j] = 13 * re[i + 1][j] / (225 + 12 *abs(re[i + 1][j]))*temp[i + 1][j]
-            elif op == '%2a':
-                re[i + 1][j] = 225 * re[i + 1][j] / (13*temp[i + 1][j] - 12 *abs(re[i + 1][j]))
+        if op == 'max_stack':
+            re[i + 1] = [re[i + 1][0]]
+            j = 0
+            while True:
+                if j * temp[i + 1][0] < re[i + 1][0]:
+                    re[i + 1].insert(j, j * temp[i + 1][0])
+                    j += 1
+                else:
+                    break
+        elif op == 'num_stack':
+            jj = re[i + 1][0]
+            re[i + 1] = []
+            for j in range(int(jj)):
+                re[i + 1].append(j * temp[i + 1][0])
+        else:
+            for j in range(len(re[i + 1])):
+                if op == '+':
+                    re[i + 1][j] += temp[i + 1][j]
+                elif op == '-':
+                    re[i + 1][j] -= temp[i + 1][j]
+                elif op == '*':
+                    re[i + 1][j] *= temp[i + 1][j]
+                elif op == '/':
+                    re[i + 1][j] /= temp[i + 1][j]
+                elif op == '\\':
+                    re[i + 1][j] = temp[i + 1][j] / re[i + 1][j]
+                elif op == '^' or op == 'pow':
+                    re[i + 1][j] = pow(re[i + 1][j], temp[i + 1][j])
+                elif op == '%-':
+                    re[i + 1][j] = re[i + 1][j] * (100 - temp[i + 1][j]) / 100
+                elif op == '-%':
+                    re[i + 1][j] = re[i + 1][j] * (1 - temp[i + 1][j])
+                elif op == '%+':
+                    re[i + 1][j] = re[i + 1][j] * (100 + temp[i + 1][j]) / 100
+                elif op == '+%':
+                    re[i + 1][j] = re[i + 1][j] * (1 + temp[i + 1][j])
+                elif op == 'min' or op == "↓":
+                    re[i + 1][j] = min(re[i + 1][j], temp[i + 1][j])
+                elif op == 'max' or op == "↑":
+                    re[i + 1][j] = max(re[i + 1][j], temp[i + 1][j])
+                elif op == 'round':
+                    re[i + 1][j] = round(re[i + 1][j], int(temp[i + 1][j]))
+                elif op == 'ceil':
+                    re[i + 1][j] = math.ceil(re[i + 1][j] * pow(10, temp[i + 1][j])) / pow(10, temp[i + 1][j])
+                elif op == 'floor':
+                    re[i + 1][j] = math.floor(re[i + 1][j] * pow(10, temp[i + 1][j])) / pow(10, temp[i + 1][j])
+                elif op == '%*%':
+                    re[i + 1][j] = (100 - (100 - re[i + 1][j]) * (100 - temp[i + 1][j]) / 100)
+                elif op == 'a2%':
+                    re[i + 1][j] = 13 * re[i + 1][j] / (225 + 12 * abs(re[i + 1][j])) * temp[i + 1][j]
+                elif op == '%2a':
+                    re[i + 1][j] = 225 * re[i + 1][j] / (13 * temp[i + 1][j] - 12 * abs(re[i + 1][j]))
 
 
 def combine_numbers_post_level(arr, post, level):
