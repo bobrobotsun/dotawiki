@@ -45,14 +45,15 @@ def findabilitypro(source, data, tb, pro, bool=False):
             j = source.find('\"', i + 1, tb[1])
             j = source.find('\"', j + 1, tb[1])
             k = source.find('\"', j + 1, tb[1])
-            splitit = source[j + 1:k].split(' ')
-            data[pro[1]] = {}
-            bool = True
-            for j in range(len(splitit)):
-                data[pro[1]][str(j + 1)] = float(splitit[j])
-                bool = bool and splitit[0] == splitit[j]
-            if bool:
-                data[pro[1]] = {"1": data[pro[1]]["1"]}
+            if k>j+1:
+                splitit = source[j + 1:k].split(' ')
+                data[pro[1]] = {}
+                bool = True
+                for j in range(len(splitit)):
+                    data[pro[1]][str(j + 1)] = float(splitit[j])
+                    bool = bool and splitit[0] == splitit[j]
+                if bool:
+                    data[pro[1]] = {"1": data[pro[1]]["1"]}
     return
 
 
@@ -988,7 +989,9 @@ abilitypro_num = [["a_cast_range", "AbilityCastRange"]
     , ["a_cool", "AbilityCooldown"]
     , ["a_duration", "AbilityDuration"]
     , ["a_damage", "AbilityDamage"]
-    , ["a_mana", "AbilityManaCost"]]
+    , ["a_mana", "AbilityManaCost"]
+    , ["a_charges", "AbilityCharges"]
+    , ["a_charges_restore_time", "AbilityChargeRestoreTime"]]
 abilitypro_bool = [["immediate", "DOTA_ABILITY_BEHAVIOR_IMMEDIATE"]
     , ["ignore_channel", "DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"]]
 ability_trait_level = [["中文名", "英文名", "代码", "传说", "描述", "天赋代码", "A杖信息", "注释"], ["效果", "属性", "冷却时间"], ["魔法消耗"]]

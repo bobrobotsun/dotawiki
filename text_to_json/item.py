@@ -80,7 +80,7 @@ def finditemrequire(source, data, tb):
                 splitit = source[r[0]:r[1]].split(';')
                 data["ItemRequirements"][str(len(data["ItemRequirements"]) + 1)] = {}
                 for l in range(len(splitit)):
-                    if len(splitit[l])>5:
+                    if len(splitit[l]) > 5:
                         data["ItemRequirements"][str(len(data["ItemRequirements"]))][str(l + 1)] = splitit[l][5:]
             else:
                 return
@@ -116,7 +116,7 @@ def finditemspecial(source, data, tb):
                 return
 
 
-def get_hero_data_from_txt(base_txt,ffile):
+def get_hero_data_from_txt(base_txt, ffile):
     source_string = ffile.read().decode('utf8')
     tb = [0, source_string.find("{") + 1]
     item_all = {}
@@ -137,7 +137,7 @@ def get_hero_data_from_txt(base_txt,ffile):
             break
 
 
-def fulfill_item_json(base_txt, all_json,version):
+def fulfill_item_json(base_txt, all_json, version):
     for ii in all_json:
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
@@ -157,19 +157,20 @@ def fulfill_item_json(base_txt, all_json,version):
                     all_json[ii][i]["1"] = base_txt["物品"][all_json[ii]["代码名"]][all_json[ii][i]["代码"]][str(all_json[ii]['等级'])]
                 else:
                     all_json[ii][i]["1"] = base_txt["物品"][all_json[ii]["代码名"]][all_json[ii][i]["代码"]]["1"]
-        if all_json[ii]["商店"]["1"][:2]=='中立':
-            all_json[ii]["价格"]["1"]='中立生物掉落'
+        if all_json[ii]["商店"]["1"][:2] == '中立':
+            all_json[ii]["价格"]["1"] = '中立生物掉落'
         # 以下是确认物品的组件、卷轴情况
-        if all_json[ii]["合成"]>=0:
-            if all_json[ii]["合成"]==0:
-                hecheng="1"
+        if all_json[ii]["合成"] >= 0:
+            if all_json[ii]["合成"] == 0:
+                hecheng = "1"
             else:
-                hecheng=str(all_json[ii]["合成"])
-            if ('recipe_' + all_json[ii]["代码名"]) in base_txt["物品"]:
+                hecheng = str(all_json[ii]["合成"])
+            if ('recipe_' + all_json[ii]["代码名"]) in base_txt["物品"] and len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"])>=int(hecheng):
                 all_json[ii]["组件"] = {}
                 if base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"] != 0:
-                    if all_json[ii]["商店"]["1"][:2]=='中立':
-                        all_json[ii]["价格"] = {'代码': 'ItemCost', '1': base_txt["物品"][all_json[ii]["代码名"]]['ItemCost']["1"]-base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]['ItemCost']["1"]}
+                    if all_json[ii]["商店"]["1"][:2] == '中立':
+                        all_json[ii]["价格"] = {'代码': 'ItemCost',
+                                              '1': base_txt["物品"][all_json[ii]["代码名"]]['ItemCost']["1"] - base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]['ItemCost']["1"]}
                         all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': '中立生物掉落'}
                     else:
                         all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"]}
@@ -177,8 +178,8 @@ def fulfill_item_json(base_txt, all_json,version):
                     for jj in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng]:
                         all_json[ii]["组件"][jj] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng][jj]
                 else:
-                    if base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng][str(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng]))][
-                       0:6] == 'recipe':
+                    if base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng][str(
+                            len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng]))][0:6] == 'recipe':
                         all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1':
                             base_txt["物品"][
                                 base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng][
@@ -221,8 +222,8 @@ def fulfill_item_json(base_txt, all_json,version):
                                                                                                                                   "图片": all_json[i]["图片"]}
         # 这里开始同商店物品填入
         all_json[i]["同商店物品"] = {}
-        if isinstance(all_json[i]["商店"],str):
-            all_json[i]["商店"]={"1":all_json[i]["商店"]}
+        if isinstance(all_json[i]["商店"], str):
+            all_json[i]["商店"] = {"1": all_json[i]["商店"]}
     for i in all_json:
         for j in all_json[i]["商店"]:
             all_json[i]["同商店物品"][j] = {}
@@ -237,6 +238,7 @@ def create_file(all_json):
         file = open("E:/json/pythonupload/" + i + '.json', mode="w")
         file.write(json.dumps(all_json[i]))
         file.close()
+
 
 itempro_txt = [["商店标识", "ItemShopTags"]
     , ["质量", "ItemQuality"]
@@ -260,4 +262,3 @@ itempro_num = [["施法距离", "AbilityCastRange"]
                ]
 itempro_bool = [["即时生效", "DOTA_ABILITY_BEHAVIOR_IMMEDIATE"]]
 item_for_item = ["边路商店", "价格", "上货时间", "初始货量", "最大货量", "初始上货时间", "可提醒队友", "可拆分"]
-
