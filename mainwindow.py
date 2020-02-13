@@ -820,6 +820,23 @@ class Main(QMainWindow):
         for i in self.json_base["技能"]:
             ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i)
 
+        #增加拥有技能
+        ability_own={}
+        for i in self.json_base["技能"]:
+            if self.json_base["技能"][i]['技能归属'] in ability_own:
+                ability_own[self.json_base["技能"][i]['技能归属']].append([self.json_base["技能"][i]['页面名'],self.json_base["技能"][i]['技能排序']])
+            else:
+                ability_own[self.json_base["技能"][i]['技能归属']]=[[self.json_base["技能"][i]['页面名'],self.json_base["技能"][i]['技能排序']]]
+        for i in ability_own:
+            ability_own[i].sort(key=lambda x:x[1])
+        print(ability_own)
+        for i in ['英雄','非英雄单位','物品']:
+            for j in self.json_base[i]:
+                self.json_base[i][j]['技能']={}
+                if self.json_base[i][j]['页面名'] in ability_own:
+                    for k in range(len(ability_own[self.json_base[i][j]['页面名']])):
+                        self.json_base[i][j]['技能'][str(k+1)]=ability_own[self.json_base[i][j]['页面名']][k][0]
+
         self.file_save_all()
         QMessageBox.information(self, "已完成", info)
 
