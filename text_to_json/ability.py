@@ -763,8 +763,8 @@ def one_combine_txt_numbers(json, all_json, base_txt):
         i = 3
         while True:
             i += 1
-            if str(i) in json:
-                temp = temp[str(i)]
+            if str(i) in json and json[str(i)]!='':
+                temp = temp[json[str(i)]]
             else:
                 break
         j = 0
@@ -779,8 +779,8 @@ def one_combine_txt_numbers(json, all_json, base_txt):
         i = 3
         while True:
             i += 1
-            if str(i) in temp:
-                temp = temp[str(i)]
+            if str(i) in json and json[str(i)]!='':
+                temp = temp[json[str(i)]]
             else:
                 break
         j = 0
@@ -795,8 +795,8 @@ def one_combine_txt_numbers(json, all_json, base_txt):
         i = 3
         while True:
             i += 1
-            if str(i) in json:
-                temp = temp[str(i)]
+            if str(i) in json and json[str(i)]!='':
+                temp = temp[json[str(i)]]
             else:
                 break
         re[1].append(temp)
