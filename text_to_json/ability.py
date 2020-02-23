@@ -893,7 +893,7 @@ def one_combine_txt_numbers(json, all_json, base_txt):
 def calculate_combine_txt_numbers(re, temp, op):
     re[0][0] = re[0][0] or temp[0][0]
     re[0][1] = re[0][1] or temp[0][1]
-    re[0][2] = re[0][2] or temp[0][2]
+    re[0][2] = re[0][2] or temp[0][2] or re[0][0] and re[0][1]
     if re[0][3] == {} and temp[0][3] != {}:
         re[0][3] = copy.deepcopy(temp[0][3])
     for i in range(4):
