@@ -45,7 +45,7 @@ def findabilitypro(source, data, tb, pro, bool=False):
             j = source.find('\"', i + 1, tb[1])
             j = source.find('\"', j + 1, tb[1])
             k = source.find('\"', j + 1, tb[1])
-            if k>j+1:
+            if k > j + 1:
                 splitit = source[j + 1:k].split(' ')
                 data[pro[1]] = {}
                 bool = True
@@ -201,7 +201,7 @@ def input_upgrade(all_json, upgrade_json):
                 upgrade_json[i]["A杖"][j]["目标"]["1"] = "技能"
             if upgrade_json[i]["A杖"][j]["目标"]["2"] == "":
                 upgrade_json[i]["A杖"][j]["目标"]["2"] = i
-            if "代码" in upgrade_json[i]["A杖"][j]["值"] and isinstance(upgrade_json[i]["A杖"][j]["值"]["代码"],dict):
+            if "代码" in upgrade_json[i]["A杖"][j]["值"] and isinstance(upgrade_json[i]["A杖"][j]["值"]["代码"], dict):
                 if "1" in upgrade_json[i]["A杖"][j]["值"]["代码"] and upgrade_json[i]["A杖"][j]["值"]["代码"]["1"] == "":
                     upgrade_json[i]["A杖"][j]["值"]["代码"]["1"] = "技能"
                 if "2" in upgrade_json[i]["A杖"][j]["值"]["代码"] and upgrade_json[i]["A杖"][j]["值"]["代码"]["2"] == "":
@@ -714,16 +714,18 @@ def change_combine_txt(json, ii, data, all_json, name):
                 if temp[0][0] or temp[0][1]:
                     returntxt += "("
                     if temp[0][0]:
-                        returntxt += "[[file:agha.png|x18px|link=阿哈利姆神杖]]"
+                        for j in temp[0][3]:
+                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[2], post, level)
                     if temp[0][1]:
-                        for j in temp[0][3]:
-                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
+                        for j in temp[0][4]:
+                            returntxt += "[[file:" + temp[0][4][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][4][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[3], post, level)
                     if temp[0][2]:
-                        returntxt += "[[file:agha.png|x18px|link=阿哈利姆神杖]]"
                         for j in temp[0][3]:
                             returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
+                        for j in temp[0][4]:
+                            returntxt += "[[file:" + temp[0][4][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][4][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[4], post, level)
                     returntxt += ")"
             else:
@@ -757,13 +759,13 @@ def combine_txt_numbers(json, index, all_json, base_txt):
 
 
 def one_combine_txt_numbers(json, all_json, base_txt):
-    re = [[False, False, False, {}], [], [], [], []]
+    re = [[False, False, False, {"1": {"名称": "阿哈利姆神杖", "图片": "agha.png"}}, {}], [], [], [], []]
     if json["0"] == "属性":
         temp = all_json[json["1"]][json["2"]][json["3"]]
         i = 3
         while True:
             i += 1
-            if str(i) in json and json[str(i)]!='':
+            if str(i) in json and json[str(i)] != '':
                 temp = temp[json[str(i)]]
             else:
                 break
@@ -779,7 +781,7 @@ def one_combine_txt_numbers(json, all_json, base_txt):
         i = 3
         while True:
             i += 1
-            if str(i) in json and json[str(i)]!='':
+            if str(i) in json and json[str(i)] != '':
                 temp = temp[json[str(i)]]
             else:
                 break
@@ -795,7 +797,7 @@ def one_combine_txt_numbers(json, all_json, base_txt):
         i = 3
         while True:
             i += 1
-            if str(i) in json and json[str(i)]!='':
+            if str(i) in json and json[str(i)] != '':
                 temp = temp[json[str(i)]]
             else:
                 break
@@ -836,7 +838,7 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                 if i > 0:
                     re[0][i - 1] = True
                     if i == 2:
-                        re[0][3] = copy.deepcopy(temp["3"]["升级来源"])
+                        re[0][4] = copy.deepcopy(temp["3"]["升级来源"])
                 if ii == 0:
                     j = 0
                     while True:
@@ -867,7 +869,7 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                 if i > 0:
                     re[0][i - 1] = True
                     if i == 2:
-                        re[0][3] = copy.deepcopy(temp["3"]["升级来源"])
+                        re[0][4] = copy.deepcopy(temp["3"]["升级来源"])
                 if isinstance(temp[str(i + 1)], dict):
                     j = 0
                     while True:
@@ -894,8 +896,15 @@ def calculate_combine_txt_numbers(re, temp, op):
     re[0][0] = re[0][0] or temp[0][0]
     re[0][1] = re[0][1] or temp[0][1]
     re[0][2] = re[0][2] or temp[0][2] or re[0][0] and re[0][1]
-    if re[0][3] == {} and temp[0][3] != {}:
-        re[0][3] = copy.deepcopy(temp[0][3])
+    if temp[0][4] != {}:
+        if re[0][4] == {}:
+            re[0][4] = copy.deepcopy(temp[0][4])
+        elif re[0][4]["1"]["名称"]!=temp[0][4]["1"]["名称"]:
+            re[0][0]=True
+            re[0][2]=True
+            re[0][3]=copy.deepcopy(temp[0][4])
+            temp[2]=copy.deepcopy(temp[3])
+            temp[3]=copy.deepcopy(temp[1])
     for i in range(4):
         for j in range(max(len(re[i + 1]), len(temp[i + 1]))):
             if j >= len(re[i + 1]):
@@ -954,8 +963,8 @@ def calculate_combine_txt_numbers(re, temp, op):
                     re[i + 1][j] = 13 * re[i + 1][j] / (225 + 12 * abs(re[i + 1][j])) * temp[i + 1][j]
                 elif op == '%2a':
                     re[i + 1][j] = 225 * re[i + 1][j] / (13 * temp[i + 1][j] - 12 * abs(re[i + 1][j]))
-                elif op=='int':
-                    re[i + 1][j]=int(re[i + 1][j])
+                elif op == 'int':
+                    re[i + 1][j] = int(re[i + 1][j])
 
 
 def combine_numbers_post_level(arr, post, level):
