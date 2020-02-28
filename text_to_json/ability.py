@@ -3,6 +3,12 @@ import os
 import copy
 import math
 
+#将数字转化为文字，取消小数点和无用末尾0
+def better_float_to_text(x):
+    if isinstance(x,float) and int(x)==x:
+        return str(int(x))
+    else:
+        return str(x)
 
 # 查询数据范围
 def findtb(source, start, end, tb, brace=0):
@@ -971,15 +977,15 @@ def combine_numbers_post_level(arr, post, level):
     re = ""
     if level > 0:
         if level < len(arr):
-            re += str(arr[level])
+            re += better_float_to_text(arr[level])
         else:
-            re += str(arr[0])
+            re += better_float_to_text(arr[0])
         re += post
     else:
         for i in range(len(arr)):
             if i > 0:
                 re += "/"
-            re += str(arr[i])
+            re += better_float_to_text(arr[i])
             re += post
     return re
 
