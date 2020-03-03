@@ -971,6 +971,8 @@ def calculate_combine_txt_numbers(re, temp, op):
                     re[i + 1][j] = 225 * re[i + 1][j] / (13 * temp[i + 1][j] - 12 * abs(re[i + 1][j]))
                 elif op == 'int':
                     re[i + 1][j] = int(re[i + 1][j])
+                elif op == 'gp_s':#等比数列（GP）求和
+                    re[i + 1][j] = (1-pow(re[i + 1][j],temp[i + 1][j]))/(1-re[i + 1][j])
 
 
 def combine_numbers_post_level(arr, post, level):
