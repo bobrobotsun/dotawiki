@@ -187,6 +187,7 @@ def get_source_to_data(all_json, upgrade_json, version):
                 continue
             else:
                 unit_dic[i] = group_source(temp1[i])
+        unit_dic["技能升级信息"]={}
         all_json["技能"][unit_dic["页面名"]] = copy.deepcopy(unit_dic)
 
 
@@ -261,6 +262,15 @@ def input_upgrade(all_json, upgrade_json):
                 temp["3"]["升级来源"]["1"]["图片"] = "talent.png"
             else:
                 temp["3"]["升级来源"]["1"]["图片"] = all_json["技能"][i]["迷你图片"]
+            if upgrade_json[i]["技能"][j]["目标"]["1"]=='技能':
+                upgrade_info = all_json['技能'][upgrade_json[i]["技能"][j]["目标"]["2"]]['技能升级信息']
+                upbool = True
+                for upi in upgrade_info:
+                    if upgrade_info[upi]['技能名'] == i:
+                        upbool = False
+                if upbool:
+                    upnum = len(upgrade_info)
+                    upgrade_info[str(upnum + 1)] = {'技能名': i}
         for j in upgrade_json[i]["混合"]:
             if "代码" in upgrade_json[i]["混合"][j]["值"]:
                 if "1" in upgrade_json[i]["混合"][j]["值"]["代码"] and upgrade_json[i]["混合"][j]["值"]["代码"]["1"] == "":
@@ -302,6 +312,15 @@ def input_upgrade(all_json, upgrade_json):
                         temp["3"]["升级来源"][k]["图片"] = "talent.png"
                     else:
                         temp["3"]["升级来源"][k]["图片"] = all_json["技能"][upgrade_json[i]["混合"][j]["来源技能"][k]]["迷你图片"]
+            if upgrade_json[i]["技能"][j]["目标"]["1"]=='技能':
+                upgrade_info = all_json['技能'][upgrade_json[i]["技能"][j]["目标"]["2"]]['技能升级信息']
+                upbool = True
+                for upi in upgrade_info:
+                    if upgrade_info[upi]['技能名'] == i:
+                        upbool = False
+                if upbool:
+                    upnum = len(upgrade_info)
+                    upgrade_info[str(upnum + 1)] = {'技能名': i}
     for i in all_json["技能"]:
         for j in all_json["技能"][i]["效果"]:
             for k in ["2", "3"]:
@@ -990,6 +1009,13 @@ def combine_numbers_post_level(arr, post, level):
             re += better_float_to_text(arr[i])
             re += post
     return re
+
+def confirm_upgrade_info(arr):
+    for i in arr:
+        if len(arr[i])>0:
+            for j in arr[i]['技能升级信息']:
+                arr[i]['技能升级信息'][j]['中文名']=arr[arr[i]['技能升级信息'][j]['技能名']]['中文名']
+                arr[i]['技能升级信息'][j]['图片']=arr[arr[i]['技能升级信息'][j]['技能名']]['迷你图片']
 
 
 def create_file(all_json):
