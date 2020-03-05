@@ -466,6 +466,13 @@ def one_upgrade(json, base_txt):
             for k in base_txt[json["3"]["代码"]["1"]][json["3"]["代码"]["2"]][json["3"]["代码"]["3"]]:
                 getvalue[3].append(base_txt[json["3"]["代码"]["1"]][json["3"]["代码"]["2"]][json["3"]["代码"]["3"]][k])
         caloprate[2].append(json["3"]["修正"]["1"])
+    maxlen=0
+    for i in range(4):
+        maxlen=max(maxlen,len(getvalue[i]))
+    for i in range(4):
+        for j in range(maxlen):
+            if 0<len(getvalue[i]) and len(getvalue[i])<=j:
+                getvalue[i].append(getvalue[i][j-1])
     calvalue[0] = copy.deepcopy(getvalue[0])
     calvalue[1] = copy.deepcopy(getvalue[0])
     calvalue[2] = copy.deepcopy(getvalue[0])
