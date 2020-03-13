@@ -16,6 +16,7 @@ import time
 import threading
 import copy
 import vpk
+import re
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -456,7 +457,14 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
 
     def download_json_name(self):
-        self.update_json_name(self.download_json('json_name.json'))
+        #self.update_json_name(self.download_json('json_name.json'))
+        for i in self.json_name:
+            temp = self.seesion.post(self.target_url, data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|'+i+'}}', 'contentmodel': 'wikitext', 'prop': 'text',
+                                                            'disablelimitreport': 'false', 'format': 'json'}).json()['parse']['text']['*']
+            texttemp = re.sub('<.*?>', '', temp)[:-1]
+            tempjson=json.loads(texttemp)
+            self.json_name.update(tempjson)
+        print(self.json_name)
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
 
     def update_json_name(self, list):
@@ -526,7 +534,7 @@ class Main(QMainWindow):
             self.local.download_info = self.local.seesion.post(self.local.target_url, data=self.local.download_data)
             self.lock.acquire()
             try:
-                if '应用' not in self.local.download_info.json()['jsondata'] or self.local.download_info.json()['jsondata']['应用'] == 1:
+                if self.local.download_info.json()['jsondata']['应用'] == 1:
                     self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]] = self.local.download_info.json()[
                         'jsondata']
                 else:
@@ -838,7 +846,7 @@ class Main(QMainWindow):
                     for k in range(len(ability_own[self.json_base[i][j]['页面名']])):
                         self.json_base[i][j]['技能'][str(k+1)]=ability_own[self.json_base[i][j]['页面名']][k][0]
 
-        self.file_save_all()
+        self.resort()
         QMessageBox.information(self, "已完成", info)
 
     def upload_basic_json(self):

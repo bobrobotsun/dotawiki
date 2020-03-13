@@ -114,6 +114,9 @@ def get_hero_data_from_txt(base_txt, address):
 
 
 def get_source_to_data(all_json, upgrade_json, version):
+    for i in all_json['技能源']:
+        all_json['技能源'][i]['应用']=1
+        all_json['技能源'][i]['分类']='技能源'
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"
@@ -183,7 +186,7 @@ def get_source_to_data(all_json, upgrade_json, version):
             elif i == "升级":
                 if "A杖" in temp1[i] and len(temp1[i]["A杖"]) > 0 or "技能" in temp1[i] and len(temp1[i]["技能"]) > 0 or "混合" in temp1[i] and len(temp1[i]["混合"]) > 0:
                     upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
-            elif i == "页面名":
+            elif i == "页面名" or i=='应用' or i=='分类':
                 continue
             else:
                 unit_dic[i] = group_source(temp1[i])
