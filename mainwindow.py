@@ -2110,7 +2110,10 @@ class MoInputWindow(QDialog):
             if result:
                 try:
                     re = float(dialog.b.text())
-                    return re, result
+                    if float(int(re))==re:
+                        return int(re),result
+                    else:
+                        return re, result
                 except ValueError:
                     QMessageBox.critical(dialog, '输入格式错误', '您应当输入一串数字！')
             else:
