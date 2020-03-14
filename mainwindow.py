@@ -1331,7 +1331,7 @@ class Main(QMainWindow):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
         choose = ('文字（可以填入任意信息）', '数字（只能填入有效数字）', '整数（只能填入不含小数点的整数）', '树（可以拥有下属信息，但自身没有值）')
         choose_style = ['text', 'number', 'int', 'text']
-        text1, text2, ok = MoInputWindow.get_item_and_content(self, "增加新条目", '条目的类型', choose, choose_style)
+        text1, text2, ok = MoInputWindow.get_item_and_content(self, "增加新条目", '条目的类型', choose, choose_style,False)
         if ok:
             temp = TreeItemEdit(item, text2)
             temp.israndom = True
@@ -2166,7 +2166,7 @@ class MoInputWindow(QDialog):
         return re, result
 
     @staticmethod
-    def get_item_and_content(parent=None, title='选择后输入内容', tip_str='选择并输入', iterable=[], style=[]):
+    def get_item_and_content(parent=None, title='选择后输入内容', tip_str='选择并输入', iterable=[], style=[],check=True):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
         dialog.setGeometry(dialog.screen_size[0] * 0.4, dialog.screen_size[1] * 0.4, dialog.screen_size[0] * 0.2, dialog.screen_size[1] * 0.2)
@@ -2200,13 +2200,13 @@ class MoInputWindow(QDialog):
                     ii = i
                     break
             if result:
-                if styles[ii] == 'int':
+                if check and styles[ii] == 'int':
                     try:
                         re = int(dialog.b.toPlainText())
                         return iterable[ii], re, result
                     except ValueError:
                         QMessageBox.critical(dialog, '输入格式错误', '您应当输入一串整数！')
-                elif styles[ii] == 'number':
+                elif check and  styles[ii] == 'number':
                     try:
                         re = float(dialog.b.toPlainText())
                         return iterable[ii], re, result
