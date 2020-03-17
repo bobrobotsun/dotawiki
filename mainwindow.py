@@ -33,7 +33,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.24b'
+        self.version = '7.25'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -2206,7 +2206,7 @@ class MoInputWindow(QDialog):
                         return iterable[ii], re, result
                     except ValueError:
                         QMessageBox.critical(dialog, '输入格式错误', '您应当输入一串整数！')
-                elif check and  styles[ii] == 'number':
+                elif check and styles[ii] == 'number':
                     try:
                         re = float(dialog.b.toPlainText())
                         return iterable[ii], re, result
