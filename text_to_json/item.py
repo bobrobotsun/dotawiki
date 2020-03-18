@@ -146,12 +146,10 @@ def fulfill_item_json(base_txt, all_json, version):
         all_json[ii]['迷你图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
         md5 = hashlib.md5()
         md5.update(all_json[ii]['图片'].encode('utf-8'))
-        hmd5 = md5.hexdigest()
-        all_json[ii]['图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + all_json[ii]['图片']
+        all_json[ii]['图片地址'] = md5.hexdigest()
         md5 = hashlib.md5()
         md5.update(all_json[ii]['迷你图片'].encode('utf-8'))
-        hmd5 = md5.hexdigest()
-        all_json[ii]['迷你图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + all_json[ii]['迷你图片']
+        all_json[ii]['迷你图片地址'] = md5.hexdigest()
         if '升级' in all_json[ii]:
             all_json[ii].pop('升级')
         for i in item_for_item:

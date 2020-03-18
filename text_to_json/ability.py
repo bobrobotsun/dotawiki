@@ -156,12 +156,10 @@ def get_source_to_data(all_json, upgrade_json, version):
             unit_dic["迷你图片"] = "Spellicons " + temp1["代码"] + ".png"
         md5 = hashlib.md5()
         md5.update(unit_dic['图片'].encode('utf-8'))
-        hmd5 = md5.hexdigest()
-        unit_dic['图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + unit_dic['图片']
+        unit_dic['图片地址'] = md5.hexdigest()
         md5 = hashlib.md5()
         md5.update(unit_dic['迷你图片'].encode('utf-8'))
-        hmd5 = md5.hexdigest()
-        unit_dic['迷你图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + unit_dic['迷你图片']
+        unit_dic['迷你图片地址'] = md5.hexdigest()
         for i in temp1:
             if i in ability_trait_level[0]:
                 unit_dic[i] = temp1[i]
