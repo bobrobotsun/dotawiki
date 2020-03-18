@@ -1,6 +1,7 @@
 import json
 import os
 import copy
+import hashlib
 
 
 # 查询数据范围
@@ -78,6 +79,20 @@ def fulfill_unit_json(base_txt, all_json,version):
         all_json[i]["分类"] = "非英雄单位"
         all_json[i]["版本"] = version
         all_json[i]["应用"] = 1
+        if len(all_json[i]['图片'])>1:
+            all_json[i]['图片']=all_json[i]['图片'][0].upper()+all_json[i]['图片'][1:]
+            all_json[i]['图片']=all_json[i]['图片'].replace(' ','_')
+        if len(all_json[i]['迷你图片'])>1:
+            all_json[i]['迷你图片']=all_json[i]['迷你图片'][0].upper()+all_json[i]['迷你图片'][1:]
+        md5 = hashlib.md5()
+        md5.update(all_json[i]['图片'].encode('utf-8'))
+        hmd5 = md5.hexdigest()
+        all_json[i]['图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + all_json[i]['图片']
+        md5 = hashlib.md5()
+        md5.update(all_json[i]['迷你图片'].encode('utf-8'))
+        hmd5 = md5.hexdigest()
+        all_json[i]['迷你图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + all_json[i]['迷你图片']
+
         for j in unitpro_txt + unitpro_num:
             popit = []
             for k in all_json[i][j[0]]:

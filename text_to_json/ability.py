@@ -2,6 +2,7 @@ import json
 import os
 import copy
 import math
+import hashlib
 
 #将数字转化为文字，取消小数点和无用末尾0
 def better_float_to_text(x):
@@ -148,11 +149,19 @@ def get_source_to_data(all_json, upgrade_json, version):
                 unit_dic["图片"] = all_json["物品"][unit_dic["技能归属"]]["图片"]
                 unit_dic["迷你图片"] = all_json["物品"][unit_dic["技能归属"]]["迷你图片"]
             else:
-                unit_dic["图片"] = "items_" + temp1["代码"] + ".png"
-                unit_dic["迷你图片"] = "items_" + temp1["代码"] + ".png"
+                unit_dic["图片"] = "Items_" + temp1["代码"] + ".png"
+                unit_dic["迷你图片"] = "Items_" + temp1["代码"] + ".png"
         else:
-            unit_dic["图片"] = "spellicons " + temp1["代码"] + ".png"
-            unit_dic["迷你图片"] = "spellicons " + temp1["代码"] + ".png"
+            unit_dic["图片"] = "Spellicons " + temp1["代码"] + ".png"
+            unit_dic["迷你图片"] = "Spellicons " + temp1["代码"] + ".png"
+        md5 = hashlib.md5()
+        md5.update(unit_dic['图片'].encode('utf-8'))
+        hmd5 = md5.hexdigest()
+        unit_dic['图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + unit_dic['图片']
+        md5 = hashlib.md5()
+        md5.update(unit_dic['迷你图片'].encode('utf-8'))
+        hmd5 = md5.hexdigest()
+        unit_dic['迷你图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + unit_dic['迷你图片']
         for i in temp1:
             if i in ability_trait_level[0]:
                 unit_dic[i] = temp1[i]

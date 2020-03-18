@@ -1,6 +1,6 @@
 import json
 import os
-
+import hashlib
 
 # 查询数据范围
 def findtb(source, start, end, tb, brace=0):
@@ -142,10 +142,16 @@ def fulfill_item_json(base_txt, all_json, version):
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
         all_json[ii]["应用"] = 1
-        if '图片' not in all_json[ii] or all_json[ii]['图片'] == '':
-            all_json[ii]['图片'] = 'items_' + all_json[ii]["代码名"] + '.png'
-        if '迷你图片' not in all_json[ii] or all_json[ii]['迷你图片'] == '':
-            all_json[ii]['迷你图片'] = 'items_' + all_json[ii]["代码名"] + '.png'
+        all_json[ii]['图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
+        all_json[ii]['迷你图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
+        md5 = hashlib.md5()
+        md5.update(all_json[ii]['图片'].encode('utf-8'))
+        hmd5 = md5.hexdigest()
+        all_json[ii]['图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + all_json[ii]['图片']
+        md5 = hashlib.md5()
+        md5.update(all_json[ii]['迷你图片'].encode('utf-8'))
+        hmd5 = md5.hexdigest()
+        all_json[ii]['迷你图片地址'] = 'https://huiji-public.huijistatic.com/dota/uploads/' + hmd5[0] + '/' + hmd5[0:2] + '/' + all_json[ii]['迷你图片']
         if '升级' in all_json[ii]:
             all_json[ii].pop('升级')
         for i in item_for_item:

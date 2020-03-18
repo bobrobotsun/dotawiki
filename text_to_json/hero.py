@@ -1,5 +1,5 @@
 import json
-import os
+import hashlib
 
 
 # 查询数据范围
@@ -94,10 +94,16 @@ def fulfill_hero_json(base_txt, all_json,version):
             all_json[i]["分类"] = "英雄"
             all_json[i]["版本"] = version
             all_json[i]["应用"] = 1
-            if '图片' not in all_json[i] or all_json[i]['图片']=='':
-                all_json[i]['图片']='heroes_'+all_json[i]["代码名"]+'.png'
-            if '迷你图片' not in all_json[i] or all_json[i]['迷你图片']=='':
-                all_json[i]['迷你图片']='miniheroes_'+all_json[i]["代码名"]+'.png'
+            all_json[i]['图片']='Heroes_'+all_json[i]["代码名"]+'.png'
+            all_json[i]['迷你图片']='Miniheroes_'+all_json[i]["代码名"]+'.png'
+            md5 = hashlib.md5()
+            md5.update(all_json[i]['图片'].encode('utf-8'))
+            hmd5=md5.hexdigest()
+            all_json[i]['图片地址']= 'https://huiji-public.huijistatic.com/dota/uploads/'+hmd5[0]+'/'+hmd5[0:2]+'/'+all_json[i]['图片']
+            md5 = hashlib.md5()
+            md5.update(all_json[i]['迷你图片'].encode('utf-8'))
+            hmd5=md5.hexdigest()
+            all_json[i]['迷你图片地址']= 'https://huiji-public.huijistatic.com/dota/uploads/'+hmd5[0]+'/'+hmd5[0:2]+'/'+all_json[i]['迷你图片']
             for j in heropro_txt:
                 if j[1] in base_txt["英雄"][all_json[i]["代码名"]]:
                     all_json[i][j[0]] = {"代码": j[1]}
