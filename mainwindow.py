@@ -1468,8 +1468,7 @@ class Main(QMainWindow):
             for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
                 self.version_list['版本'].append([self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0)])
                 for j in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).childCount()):
-                    self.version_list['版本'][i].append(
-                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0) + '/' + self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
+                    self.version_list['版本'][i].append(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
 
     def add_junior_version_list(self):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
