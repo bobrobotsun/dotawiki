@@ -1494,6 +1494,7 @@ class Main(QMainWindow):
         if title in self.version_base:
             self.complex_json_to_version_tree()
             self.version_tree_expand_toplevelitem()
+            self.version_edit_all_button_default()
         else:
             messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "您没有这个版本更新的库，请问您准备从哪里获取？", QMessageBox.NoButton, self)
             button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
