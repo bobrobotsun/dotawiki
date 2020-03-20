@@ -4,12 +4,14 @@ import copy
 import math
 import hashlib
 
-#将数字转化为文字，取消小数点和无用末尾0
+
+# 将数字转化为文字，取消小数点和无用末尾0
 def better_float_to_text(x):
-    if isinstance(x,float) and int(x)==x:
+    if isinstance(x, float) and int(x) == x:
         return str(int(x))
     else:
         return str(x)
+
 
 # 查询数据范围
 def findtb(source, start, end, tb, brace=0):
@@ -116,8 +118,8 @@ def get_hero_data_from_txt(base_txt, address):
 
 def get_source_to_data(all_json, upgrade_json, version):
     for i in all_json['技能源']:
-        all_json['技能源'][i]['应用']=1
-        all_json['技能源'][i]['分类']='技能源'
+        all_json['技能源'][i]['应用'] = 1
+        all_json['技能源'][i]['分类'] = '技能源'
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"
@@ -193,11 +195,11 @@ def get_source_to_data(all_json, upgrade_json, version):
             elif i == "升级":
                 if "A杖" in temp1[i] and len(temp1[i]["A杖"]) > 0 or "技能" in temp1[i] and len(temp1[i]["技能"]) > 0 or "混合" in temp1[i] and len(temp1[i]["混合"]) > 0:
                     upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
-            elif i == "页面名" or i=='应用' or i=='分类':
+            elif i == "页面名" or i == '应用' or i == '分类':
                 continue
             else:
                 unit_dic[i] = group_source(temp1[i])
-        unit_dic["技能升级信息"]={}
+        unit_dic["技能升级信息"] = {}
         all_json["技能"][unit_dic["页面名"]] = copy.deepcopy(unit_dic)
 
 
@@ -272,7 +274,7 @@ def input_upgrade(all_json, upgrade_json):
                 temp["3"]["升级来源"]["1"]["图片"] = "talent.png"
             else:
                 temp["3"]["升级来源"]["1"]["图片"] = all_json["技能"][i]["迷你图片"]
-            if upgrade_json[i]["技能"][j]["目标"]["1"]=='技能':
+            if upgrade_json[i]["技能"][j]["目标"]["1"] == '技能':
                 upgrade_info = all_json['技能'][upgrade_json[i]["技能"][j]["目标"]["2"]]['技能升级信息']
                 upbool = True
                 for upi in upgrade_info:
@@ -322,7 +324,7 @@ def input_upgrade(all_json, upgrade_json):
                         temp["3"]["升级来源"][k]["图片"] = "talent.png"
                     else:
                         temp["3"]["升级来源"][k]["图片"] = all_json["技能"][upgrade_json[i]["混合"][j]["来源技能"][k]]["迷你图片"]
-            if upgrade_json[i]["技能"][j]["目标"]["1"]=='技能':
+            if upgrade_json[i]["技能"][j]["目标"]["1"] == '技能':
                 upgrade_info = all_json['技能'][upgrade_json[i]["技能"][j]["目标"]["2"]]['技能升级信息']
                 upbool = True
                 for upi in upgrade_info:
@@ -476,13 +478,13 @@ def one_upgrade(json, base_txt):
             for k in base_txt[json["3"]["代码"]["1"]][json["3"]["代码"]["2"]][json["3"]["代码"]["3"]]:
                 getvalue[3].append(base_txt[json["3"]["代码"]["1"]][json["3"]["代码"]["2"]][json["3"]["代码"]["3"]][k])
         caloprate[2].append(json["3"]["修正"]["1"])
-    maxlen=0
+    maxlen = 0
     for i in range(4):
-        maxlen=max(maxlen,len(getvalue[i]))
+        maxlen = max(maxlen, len(getvalue[i]))
     for i in range(4):
         for j in range(maxlen):
-            if 0<len(getvalue[i]) and len(getvalue[i])<=j:
-                getvalue[i].append(getvalue[i][j-1])
+            if 0 < len(getvalue[i]) and len(getvalue[i]) <= j:
+                getvalue[i].append(getvalue[i][j - 1])
     calvalue[0] = copy.deepcopy(getvalue[0])
     calvalue[1] = copy.deepcopy(getvalue[0])
     calvalue[2] = copy.deepcopy(getvalue[0])
@@ -780,7 +782,7 @@ def change_combine_txt(json, ii, data, all_json, name):
 def combine_txt_numbers(json, index, all_json, base_txt):
     i = index[0]
     if json[str(i)]["1"] == "(" or json[str(i)]["1"] == "（":
-        index[0] += 1
+        index[0] = i + 1
         re = combine_txt_numbers(json, index, all_json, base_txt)
         i = index[0]
     re = one_combine_txt_numbers(json[str(i)], all_json, base_txt)
@@ -788,14 +790,16 @@ def combine_txt_numbers(json, index, all_json, base_txt):
         i += 1
         if str(i) in json:
             if json[str(i)]["1"] == "(" or json[str(i)]["1"] == "（":
-                index[0] += 1
+                index[0] = i + 1
                 temp = combine_txt_numbers(json, index, all_json, base_txt)
+                calculate_combine_txt_numbers(re, temp, json[str(i)]["符号"])
                 i = index[0]
             elif json[str(i)]["符号"] == ")" or json[str(i)]["符号"] == "）":
+                index[0] = i
                 return re
             else:
                 temp = one_combine_txt_numbers(json[str(i)], all_json, base_txt)
-            calculate_combine_txt_numbers(re, temp, json[str(i)]["符号"])
+                calculate_combine_txt_numbers(re, temp, json[str(i)]["符号"])
         else:
             return re
 
@@ -941,12 +945,12 @@ def calculate_combine_txt_numbers(re, temp, op):
     if temp[0][4] != {}:
         if re[0][4] == {}:
             re[0][4] = copy.deepcopy(temp[0][4])
-        elif re[0][4]["1"]["名称"]!=temp[0][4]["1"]["名称"]:
-            re[0][0]=True
-            re[0][2]=True
-            re[0][3]=copy.deepcopy(temp[0][4])
-            temp[2]=copy.deepcopy(temp[3])
-            temp[3]=copy.deepcopy(temp[1])
+        elif re[0][4]["1"]["名称"] != temp[0][4]["1"]["名称"]:
+            re[0][0] = True
+            re[0][2] = True
+            re[0][3] = copy.deepcopy(temp[0][4])
+            temp[2] = copy.deepcopy(temp[3])
+            temp[3] = copy.deepcopy(temp[1])
     for i in range(4):
         for j in range(max(len(re[i + 1]), len(temp[i + 1]))):
             if j >= len(re[i + 1]):
@@ -1007,8 +1011,8 @@ def calculate_combine_txt_numbers(re, temp, op):
                     re[i + 1][j] = 225 * re[i + 1][j] / (13 * temp[i + 1][j] - 12 * abs(re[i + 1][j]))
                 elif op == 'int':
                     re[i + 1][j] = int(re[i + 1][j])
-                elif op == 'gp_s':#等比数列（GP）求和
-                    re[i + 1][j] = (1-pow(re[i + 1][j],temp[i + 1][j]))/(1-re[i + 1][j])
+                elif op == 'gp_s':  # 等比数列（GP）求和
+                    re[i + 1][j] = (1 - pow(re[i + 1][j], temp[i + 1][j])) / (1 - re[i + 1][j])
 
 
 def combine_numbers_post_level(arr, post, level):
@@ -1027,12 +1031,13 @@ def combine_numbers_post_level(arr, post, level):
             re += post
     return re
 
+
 def confirm_upgrade_info(arr):
     for i in arr:
-        if len(arr[i])>0:
+        if len(arr[i]) > 0:
             for j in arr[i]['技能升级信息']:
-                arr[i]['技能升级信息'][j]['中文名']=arr[arr[i]['技能升级信息'][j]['技能名']]['中文名']
-                arr[i]['技能升级信息'][j]['图片']=arr[arr[i]['技能升级信息'][j]['技能名']]['迷你图片']
+                arr[i]['技能升级信息'][j]['中文名'] = arr[arr[i]['技能升级信息'][j]['技能名']]['中文名']
+                arr[i]['技能升级信息'][j]['图片'] = arr[arr[i]['技能升级信息'][j]['技能名']]['迷你图片']
 
 
 def create_file(all_json):
