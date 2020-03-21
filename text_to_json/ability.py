@@ -957,7 +957,7 @@ def calculate_combine_txt_numbers(re, temp, op):
                 re[i + 1].append(re[i + 1][0])
             if j >= len(temp[i + 1]):
                 temp[i + 1].append(temp[i + 1][0])
-        if op == 'max_stack':#前最大值，后公差，首项为0
+        if op == 'max_stack':  # 前最大值，后公差，首项为0
             re[i + 1] = [re[i + 1][0]]
             j = 0
             while True:
@@ -966,21 +966,21 @@ def calculate_combine_txt_numbers(re, temp, op):
                     j += 1
                 else:
                     break
-        elif op == 'max_stack2':#前最大值，后项数，首项为0
+        elif op == 'max_stack2':  # 前最大值，后项数，首项为0
             re[i + 1] = [re[i + 1][0]]
-            for j in range(temp[i + 1][0]):
-                re[i + 1].insert(j, j * re[i + 1][j]/temp[i + 1][0])
+            for j in range(int(temp[i + 1][0])):
+                re[i + 1].insert(j, j * re[i + 1][j] / temp[i + 1][0])
         elif op == 'num_stack':
             jj = re[i + 1][0]
             re[i + 1] = []
             for j in range(int(jj)):
                 re[i + 1].append(j * temp[i + 1][0])
-        elif op == 'stack_list':#将这列数字延展到固定长度
+        elif op == 'stack_list':  # 将这列数字延展到固定长度
             while len(re[i + 1]) > temp[i + 1][0]:
                 re[i + 1].pop()
             while len(re[i + 1]) < temp[i + 1][0]:
                 re[i + 1].append(re[i + 1][len(re[i + 1]) - 1])
-        elif op == 'stack_sum':#对这列数字求和
+        elif op == 'stack_sum':  # 对这列数字求和
             if temp[i + 1][0] > 0:
                 while len(re[i + 1]) > temp[i + 1][0]:
                     re[i + 1].pop()
@@ -992,11 +992,11 @@ def calculate_combine_txt_numbers(re, temp, op):
                 for y in range(lenre - x):
                     sum += re[i + 1][y]
                 re[i + 1][lenre - x - 1] = sum
-        elif op=='catch':#抓取第n个数字提出
-            if len(re[i+1])<temp[i+1][0]:
-                re[i+1]=[re[i+1][len(re[i+1])-1]]
+        elif op == 'catch':  # 抓取第n个数字提出
+            if len(re[i + 1]) < temp[i + 1][0]:
+                re[i + 1] = [re[i + 1][len(re[i + 1]) - 1]]
             else:
-                re[i + 1]=[re[i+1][temp[i+1][0]]]
+                re[i + 1] = [re[i + 1][temp[i + 1][0]]]
         else:
             for j in range(len(re[i + 1])):
                 if op == '+':
@@ -1040,9 +1040,9 @@ def calculate_combine_txt_numbers(re, temp, op):
                 elif op == 'gp_s':  # 等比数列（GP）求和（前公比，后项数，首项1）
                     re[i + 1][j] = (1 - pow(re[i + 1][j], temp[i + 1][j])) / (1 - re[i + 1][j])
                 elif op == 'ap_s':  # 等比数列（AP）求和（前公差，后项数，首项1倍公差）
-                    re[i + 1][j] = re[i + 1][j]*(1+temp[i + 1][j])*temp[i + 1][j]/2
+                    re[i + 1][j] = re[i + 1][j] * (1 + temp[i + 1][j]) * temp[i + 1][j] / 2
                 elif op == 'ap_s2':  # 等比数列（AP）求和（前末项，后项数，首项1倍公差）
-                    re[i + 1][j] = re[i + 1][j]*(1+temp[i + 1][j])/2
+                    re[i + 1][j] = re[i + 1][j] * (1 + temp[i + 1][j]) / 2
 
 
 def combine_numbers_post_level(arr, post, level):
