@@ -1816,6 +1816,24 @@ class Main(QMainWindow):
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', item.text(1))
         if ok:
             item.set_value(text)
+            iparent=item.parent().parent()
+            icount=iparent.childCount()
+            if iparent.child(icount-1).text(0)=='目标':
+                ipattern = re.compile(r'{{a\|.+?}}', re.I)
+                iresult=ipattern.findall(text)
+                for i in iresult:
+                    ibool=True
+                    itarget=iparent.child(icount-1)
+                    for j in range(itarget.childCount()):
+                        if itarget.child(j).text(1)==i[4:-2]:
+                            ibool=False
+                            break
+                    if ibool:
+                        new = VersionItemEdit(iparent.child(icount-1))
+                        new.itemtype = 'list_text'
+                        new.set_value(i[4:-2])
+
+
 
     def version_button_tree1(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
