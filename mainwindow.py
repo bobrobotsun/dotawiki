@@ -1631,20 +1631,24 @@ class Main(QMainWindow):
                     item4 = item2.child(k)
                     if k==0:
                         if item4.childCount() == 0:
-                            re[str(i)][index]['文字'].append([item4.text(1)])
+                            re[str(i)][index]['文字']=[[item4.text(1)]]
                         elif item4.childCount() == 2:
-                            re[str(i)][index]['文字'].append(['[['+item4.child(0).text(1)+'|'+item4.child(1).text(1)+']]'])
+                            re[str(i)][index]['文字']=[['[['+item4.child(0).text(1)+'|'+item4.child(1).text(1)+']]']]
                         else:
-                            re[str(i)][index]['文字'].append(['{{A|'+item4.child(0).text(1)+'}}'])
+                            re[str(i)][index]['文字']=[['{{A|'+item4.child(0).text(1)+'}}']]
                             re[str(i)][index]['目标'].append(item4.child(0).text(1))
                     else:
                         if item4.childCount() == 0:
-                            re[str(i)][index]['文字'][0]+=item4.text(1)
+                            re[str(i)][index]['文字'][0][0]+=item4.text(1)
                         elif item4.childCount() == 2:
-                            re[str(i)][index]['文字'][0]+=('[['+item4.child(0).text(1)+'|'+item4.child(1).text(1)+']]')
+                            re[str(i)][index]['文字'][0][0]+=('[['+item4.child(0).text(1)+'|'+item4.child(1).text(1)+']]')
                         else:
-                            re[str(i)][index]['文字'][0]+=('{{A|'+item4.child(0).text(1)+'}}')
+                            re[str(i)][index]['文字'][0][0]+=('{{A|'+item4.child(0).text(1)+'}}')
                             re[str(i)][index]['目标'].append(item4.child(0).text(1))
+                if re[str(i)][index]['文字'][0][0][2:5]=='级天赋':
+                    temp=item1.text(0)+re[str(i)][index]['文字'][0][0][:5]
+                    re[str(i)][index]['目标'].append(temp)
+                    re[str(i)][index]['文字'][0][0]=re[str(i)][index]['文字'][0][0].replace(re[str(i)][index]['文字'][0][0][:5],'{{A|'+temp+'}}')
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
                     re[str(i)][index]['目标'].append(item4.text(1))
