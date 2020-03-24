@@ -154,8 +154,8 @@ def get_source_to_data(all_json, upgrade_json, version):
                 unit_dic["图片"] = "Items_" + temp1["代码"] + ".png"
                 unit_dic["迷你图片"] = "Items_" + temp1["代码"] + ".png"
         else:
-            unit_dic["图片"] = "Spellicons " + temp1["代码"] + ".png"
-            unit_dic["迷你图片"] = "Spellicons " + temp1["代码"] + ".png"
+            unit_dic["图片"] = "Spellicons_" + temp1["代码"] + ".png"
+            unit_dic["迷你图片"] = "Spellicons_" + temp1["代码"] + ".png"
         md5 = hashlib.md5()
         md5.update(unit_dic['图片'].encode('utf-8'))
         unit_dic['图片地址'] = md5.hexdigest()
@@ -429,6 +429,13 @@ def one_upgrade(json, base_txt):
                         getvalue[0].append(json["1"]["代码"][str(k)])
                 else:
                     break
+        elif json["1"]["代码"]["0"] == "高等级":
+            levels=int(json["1"]["代码"]["4"])
+            for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
+                if int(k)<levels:
+                    getvalue[0].append(0)
+                else:
+                    getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
         elif json["1"]["代码"]["0"] == "不存在":
             return
     else:
