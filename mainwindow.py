@@ -1825,7 +1825,7 @@ class Main(QMainWindow):
             iparent=item.parent().parent()
             icount=iparent.childCount()
             if iparent.child(icount-1).text(0)=='目标':
-                ipattern = re.compile(r'{{a\|.+?}}', re.I)
+                ipattern = re.compile(r'{{[ahi]\|.+?}}', re.I)
                 iresult=ipattern.findall(text)
                 for i in iresult:
                     ibool=True
