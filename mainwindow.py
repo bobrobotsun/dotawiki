@@ -1629,20 +1629,22 @@ class Main(QMainWindow):
                             re[str(i)][index]['序列级数'] = text
                 for k in range(item2.childCount()):
                     item4 = item2.child(k)
-                    if item4.childCount() == 0:
-                        re[str(i)][index]['文字'].append([item4.text(1)])
-                    elif item4.childCount() == 2:
-                        re[str(i)][index]['文字'].append([item4.child(0).text(1), item4.child(1).text(1)])
+                    if k==0:
+                        if item4.childCount() == 0:
+                            re[str(i)][index]['文字'].append([item4.text(1)])
+                        elif item4.childCount() == 2:
+                            re[str(i)][index]['文字'].append(['[['+item4.child(0).text(1)+'|'+item4.child(1).text(1)+']]'])
+                        else:
+                            re[str(i)][index]['文字'].append(['{{A|'+item4.child(0).text(1)+'}}'])
+                            re[str(i)][index]['目标'].append(item4.child(0).text(1))
                     else:
-                        index2 = len(re[str(i)][index]['文字'])
-                        re[str(i)][index]['文字'].append([item4.child(0).text(1), item4.child(1).text(1), item4.child(2).text(1), item4.child(3).text(1)])
-                        if re[str(i)][index]['文字'][index2][1] == '':
-                            re[str(i)][index]['文字'][index2][1] = edit_json.version[item.text(0)][1]
-                        if re[str(i)][index]['文字'][index2][2] == '':
-                            re[str(i)][index]['文字'][index2][2] = re[str(i)][index]['文字'][index2][0]
-                        if re[str(i)][index]['文字'][index2][3] == '' and re[str(i)][index]['文字'][index2][1] in self.json_base and \
-                                re[str(i)][index]['文字'][index2][2] in self.json_base[re[str(i)][index]['文字'][index2][1]]:
-                            re[str(i)][index]['文字'][index2][3] = self.json_base[re[str(i)][index]['文字'][index2][1]][re[str(i)][index]['文字'][index2][2]]['迷你图片']
+                        if item4.childCount() == 0:
+                            re[str(i)][index]['文字'][0]+=item4.text(1)
+                        elif item4.childCount() == 2:
+                            re[str(i)][index]['文字'][0]+=('[['+item4.child(0).text(1)+'|'+item4.child(1).text(1)+']]')
+                        else:
+                            re[str(i)][index]['文字'][0]+=('{{A|'+item4.child(0).text(1)+'}}')
+                            re[str(i)][index]['目标'].append(item4.child(0).text(1))
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
                     re[str(i)][index]['目标'].append(item4.text(1))
@@ -1832,8 +1834,6 @@ class Main(QMainWindow):
                         new = VersionItemEdit(iparent.child(icount-1))
                         new.itemtype = 'list_text'
                         new.set_value(i[4:-2])
-
-
 
     def version_button_tree1(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
