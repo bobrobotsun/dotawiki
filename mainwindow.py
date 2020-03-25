@@ -1623,7 +1623,7 @@ class Main(QMainWindow):
             if i == 0:
                 re[str(i)] = ['', '']
             else:
-                re[str(i)] = [item1.text(0), '']
+                re[str(i)] = [item1.text(0), item1.text(1)]
             for j in range(item1.childCount()):
                 item2 = item1.child(j).child(1)
                 item3 = item1.child(j).child(2)
