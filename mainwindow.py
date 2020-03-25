@@ -33,7 +33,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.25a'
+        self.version = '7.25b'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -501,15 +501,24 @@ class Main(QMainWindow):
                     else:
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
-            for i in range(8):
+            for i in range(4):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1))
                 t.start()
+            temp=0
+            temptime=0
             while (threading.activeCount() > 1):
                 QApplication.processEvents()
                 time.sleep(0.5)
+                if temp==self.current_num[0]:
+                    temptime+=1
+                    if temptime==8:
+                        break
+                else:
+                    temp=self.current_num[0]
+                    temptime=0
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            QMessageBox.information(self.progress, '下载完毕', "已为您下载完所有的合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
+            QMessageBox.information(self.progress, '下载完毕', "已为您下载"+str(self.current_num[0])+'/'+str(len(self.download_json_list))+"合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
         except FileNotFoundError:
             mb = QMessageBox(QMessageBox.Critical, "获取名称集失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton, self)
             button1 = mb.addButton('从网络下载', QMessageBox.YesRole)
@@ -543,9 +552,13 @@ class Main(QMainWindow):
                     '【' + QTime.currentTime().toString() + '】【' + threading.current_thread().name + '】下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功')
                 self.current_num[0] += 1
                 self.progress.set_progress(self.current_num[0])
+            except:
+                print(self.download_json_list[self.local.current_num],'：下载出现错误，但是原因未知！')
+                break
             finally:
                 self.lock.release()
-                time.sleep(1)
+                time.sleep(0.01)
+
 
     def fix_window_with_json_data(self):
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
@@ -1610,9 +1623,7 @@ class Main(QMainWindow):
             if i == 0:
                 re[str(i)] = ['', '']
             else:
-                re[str(i)] = [item1.text(0), item1.text(1)]
-            if edit_json.version[item.text(0)][1] in self.json_base and item1.text(0) in self.json_base[edit_json.version[item.text(0)][1]]:
-                re[str(i)][1] = self.json_base[edit_json.version[item.text(0)][1]][item1.text(0)]['迷你图片']
+                re[str(i)] = [item1.text(0), '']
             for j in range(item1.childCount()):
                 item2 = item1.child(j).child(1)
                 item3 = item1.child(j).child(2)
@@ -1822,22 +1833,23 @@ class Main(QMainWindow):
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', item.text(1))
         if ok:
             item.set_value(text)
-            iparent=item.parent().parent()
-            icount=iparent.childCount()
-            if iparent.child(icount-1).text(0)=='目标':
-                ipattern = re.compile(r'{{[ahi]\|.+?}}', re.I)
-                iresult=ipattern.findall(text)
-                for i in iresult:
-                    ibool=True
-                    itarget=iparent.child(icount-1)
-                    for j in range(itarget.childCount()):
-                        if itarget.child(j).text(1)==i[4:-2]:
-                            ibool=False
-                            break
-                    if ibool:
-                        new = VersionItemEdit(iparent.child(icount-1))
-                        new.itemtype = 'list_text'
-                        new.set_value(i[4:-2])
+            if item.parent()!=None and item.parent().parent()!=None:
+                iparent = item.parent().parent()
+                icount = iparent.childCount()
+                if iparent.child(icount - 1).text(0) == '目标':
+                    ipattern = re.compile(r'{{[ahi]\|.+?}}', re.I)
+                    iresult = ipattern.findall(text)
+                    for i in iresult:
+                        ibool = True
+                        itarget = iparent.child(icount - 1)
+                        for j in range(itarget.childCount()):
+                            if itarget.child(j).text(1) == i[4:-2]:
+                                ibool = False
+                                break
+                        if ibool:
+                            new = VersionItemEdit(iparent.child(icount - 1))
+                            new.itemtype = 'list_text'
+                            new.set_value(i[4:-2])
 
     def version_button_tree1(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
