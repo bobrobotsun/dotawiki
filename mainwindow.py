@@ -557,7 +557,7 @@ class Main(QMainWindow):
                 break
             finally:
                 self.lock.release()
-                time.sleep(0.01)
+                time.sleep(0.05)
 
 
     def fix_window_with_json_data(self):

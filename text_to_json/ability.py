@@ -838,13 +838,16 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                 temp = temp[json[str(i)]]
             else:
                 break
-        j = 0
-        while True:
-            j += 1
-            if str(j) in temp:
-                re[1].append(temp[str(j)])
-            else:
-                break
+        if isinstance(temp,str):
+            re[1].append(temp)
+        elif isinstance(temp,dict):
+            j = 0
+            while True:
+                j += 1
+                if str(j) in temp:
+                    re[1].append(temp[str(j)])
+                else:
+                    break
     elif json['0'] == '普通属性':
         temp = all_json[json["1"]][json["2"]][json["3"]]
         i = 3
