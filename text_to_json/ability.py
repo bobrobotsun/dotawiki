@@ -838,9 +838,7 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                 temp = temp[json[str(i)]]
             else:
                 break
-        if isinstance(temp,str):
-            re[1].append(temp)
-        elif isinstance(temp,dict):
+        if isinstance(temp,dict):
             j = 0
             while True:
                 j += 1
@@ -848,6 +846,8 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                     re[1].append(temp[str(j)])
                 else:
                     break
+        else:
+            re[1].append(temp)
     elif json['0'] == '普通属性':
         temp = all_json[json["1"]][json["2"]][json["3"]]
         i = 3
@@ -965,7 +965,7 @@ def calculate_combine_txt_numbers(re, temp, op):
         for j in range(max(len(re[i + 1]), len(temp[i + 1]))):
             if j >= len(re[i + 1]):
                 if j==0:
-                    re[i + 1].append(re[math.floor((i-1)/2)][0])
+                    re[i + 1].append(re[math.floor(i/3)][0])
                 else:
                     re[i + 1].append(re[i + 1][j-1])
             if j >= len(temp[i + 1]):
