@@ -964,9 +964,15 @@ def calculate_combine_txt_numbers(re, temp, op):
     for i in range(4):
         for j in range(max(len(re[i + 1]), len(temp[i + 1]))):
             if j >= len(re[i + 1]):
-                re[i + 1].append(re[i + 1][0])
+                if j==0:
+                    re[i + 1].append(re[math.floor((i-1)/2)][0])
+                else:
+                    re[i + 1].append(re[i + 1][j-1])
             if j >= len(temp[i + 1]):
-                temp[i + 1].append(temp[i + 1][0])
+                if j==0:
+                    temp[i + 1].append(temp[math.floor((i-1)/2)][0])
+                else:
+                    temp[i + 1].append(temp[i + 1][j-1])
         if op == 'max_stack':  # 前最大值，后公差，首项为0
             re[i + 1] = [re[i + 1][0]]
             j = 0
