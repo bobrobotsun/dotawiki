@@ -762,7 +762,7 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['下载'].clicked.connect(self.download_one_version)
         self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'] = QPushButton('保存并上传', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'].clicked.connect(self.upload_one_version)
+        self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'].clicked.connect(lambda:self.upload_one_version(True))
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(1)
         self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'] = QPushButton('修改内容', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'])
@@ -1612,8 +1612,8 @@ class Main(QMainWindow):
                 self.version_base[title]['次级版本'].append(item.text(0) + '/' + item.child(i).text(0))
         self.upload_json('Data:' + title + '.json', json.dumps(self.version_base[title]))
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
-        self.complex_json_to_version_tree()
         if bool:
+            self.complex_json_to_version_tree()
             QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
     def version_tree_to_json(self, item):
@@ -1638,28 +1638,11 @@ class Main(QMainWindow):
                         text, ok = MoInputWindow.getInt(self, "序列级数", '请输入一个正整数，否则会报错')
                         if ok:
                             re[str(i)][index]['序列级数'] = text
-                for k in range(item2.childCount()):
-                    item4 = item2.child(k)
-                    if k==0:
-                        if item4.childCount() == 0:
-                            re[str(i)][index]['文字']=[[item4.text(1)]]
-                        elif item4.childCount() == 2:
-                            re[str(i)][index]['文字']=[['[['+item4.child(0).text(1)+'|'+item4.child(1).text(1)+']]']]
-                        else:
-                            re[str(i)][index]['文字']=[['{{A|'+item4.child(0).text(1)+'}}']]
-                            re[str(i)][index]['目标'].append(item4.child(0).text(1))
-                    else:
-                        if item4.childCount() == 0:
-                            re[str(i)][index]['文字'][0][0]+=item4.text(1)
-                        elif item4.childCount() == 2:
-                            re[str(i)][index]['文字'][0][0]+=('[['+item4.child(0).text(1)+'|'+item4.child(1).text(1)+']]')
-                        else:
-                            re[str(i)][index]['文字'][0][0]+=('{{A|'+item4.child(0).text(1)+'}}')
-                            re[str(i)][index]['目标'].append(item4.child(0).text(1))
-                if re[str(i)][index]['文字'][0][0][2:5]=='级天赋':
-                    temp=item1.text(0)+re[str(i)][index]['文字'][0][0][:5]
+                re[str(i)][index]['文字']=item2.text(1)
+                if re[str(i)][index]['文字'][2:5]=='级天赋':
+                    temp=item1.text(0)+re[str(i)][index]['文字'][:5]
                     re[str(i)][index]['目标'].append(temp)
-                    re[str(i)][index]['文字'][0][0]=re[str(i)][index]['文字'][0][0].replace(re[str(i)][index]['文字'][0][0][:5],'{{A|'+temp+'}}')
+                    re[str(i)][index]['文字']=re[str(i)][index]['文字'].replace(re[str(i)][index]['文字'][:5],'{{A|'+temp+'}}')
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
                     re[str(i)][index]['目标'].append(item4.text(1))
@@ -1727,46 +1710,9 @@ class Main(QMainWindow):
                                 else:
                                     new0.set_value(1)
                                 new4 = VersionItemEdit(new3)
-                                new4.itemtype = 'complex_tree'
+                                new4.itemtype = 'text'
                                 new4.setText(0, '文字')
-                                for l in self.version_base[title][i][j][k]['文字']:
-                                    if len(l) == 1:
-                                        new6 = VersionItemEdit(new4)
-                                        new6.itemtype = 'text_text'
-                                        new6.setText(0, '文字')
-                                        new6.set_value(l[0])
-                                    elif len(l) == 2:
-                                        new6 = VersionItemEdit(new4)
-                                        new6.itemtype = 'text_link'
-                                        new6.setText(0, '链接')
-                                        new7 = VersionItemEdit(new6)
-                                        new7.itemtype = 'text_link_1'
-                                        new7.setText(0, '链接')
-                                        new7.set_value(l[0])
-                                        new7 = VersionItemEdit(new6)
-                                        new7.itemtype = 'text_link_2'
-                                        new7.setText(0, '文字')
-                                        new7.set_value(l[1])
-                                    else:
-                                        new6 = VersionItemEdit(new4)
-                                        new6.itemtype = 'text_image'
-                                        new6.setText(0, '带图链接')
-                                        new7 = VersionItemEdit(new6)
-                                        new7.itemtype = 'text_image_1'
-                                        new7.setText(0, '文字')
-                                        new7.set_value(l[0])
-                                        new7 = VersionItemEdit(new6)
-                                        new7.itemtype = 'text_image_2'
-                                        new7.setText(0, '大类名')
-                                        new7.set_value(l[1])
-                                        new7 = VersionItemEdit(new6)
-                                        new7.itemtype = 'text_image_3'
-                                        new7.setText(0, '具体名称')
-                                        new7.set_value(l[2])
-                                        new7 = VersionItemEdit(new6)
-                                        new7.itemtype = 'text_image_4'
-                                        new7.setText(0, '图片名')
-                                        new7.set_value(l[3])
+                                new4.set_value(self.version_base[title][i][j][k]['文字'])
                                 new5 = VersionItemEdit(new3)
                                 new5.itemtype = 'list'
                                 new5.setText(0, '目标')
@@ -1832,9 +1778,12 @@ class Main(QMainWindow):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', item.text(1))
         if ok:
+            text = re.sub(r'[\(（](.+?)[\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
+            text = re.sub(r'[\[【](.+?)[\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
+            text = re.sub(r'[<《](.+?)[>》]', lambda x:'{{I|' + x.group(1) + '}}', text)
             item.set_value(text)
-            if item.parent()!=None and item.parent().parent()!=None:
-                iparent = item.parent().parent()
+            if item.parent()!=None:
+                iparent = item.parent()
                 icount = iparent.childCount()
                 if iparent.child(icount - 1).text(0) == '目标':
                     ipattern = re.compile(r'{{[ahi]\|.+?}}', re.I)
