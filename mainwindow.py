@@ -529,9 +529,9 @@ class Main(QMainWindow):
 
     def download_json_thread(self):
         while True:
-            self.local.current_num = self.current_num[1]
             self.lock.acquire()
             try:
+                self.local.current_num = self.current_num[1]
                 self.current_num[1] += 1
                 if self.local.current_num >= len(self.download_json_list):
                     break
@@ -557,7 +557,7 @@ class Main(QMainWindow):
                 break
             finally:
                 self.lock.release()
-                time.sleep(0.05)
+                time.sleep(0.01)
 
 
     def fix_window_with_json_data(self):
@@ -791,12 +791,6 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'] = QPushButton('删除该条目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'])
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].clicked.connect(self.version_button_delete_tree_item)
-        self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'] = QPushButton('增加一段文字内容', self)
-        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].clicked.connect(self.version_button_complex_tree_add_text)
-        self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'] = QPushButton('删除该文字内容', self)
-        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].clicked.connect(self.version_button_delete_tree_item)
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'] = QPushButton('增加新目标', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'])
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].clicked.connect(self.version_button_list_add_list_text)
@@ -1748,8 +1742,6 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].setEnabled(item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(item.itemtype == 'tree_list')
-        self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].setEnabled(item.itemtype == 'complex_tree')
-        self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].setEnabled(item.itemtype == 'text_text' or item.itemtype == 'text_image' or item.itemtype == 'text_link')
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(item.itemtype == 'list')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].setEnabled(item.itemtype == 'list_text')
 
@@ -1764,8 +1756,6 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(False)
-        self.versionlayout['版本内容']['横排版']['竖排版']['增加一段文字内容'].setEnabled(False)
-        self.versionlayout['版本内容']['横排版']['竖排版']['删除该文字内容'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].setEnabled(False)
 
