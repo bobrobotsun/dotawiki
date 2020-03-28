@@ -1857,59 +1857,13 @@ class Main(QMainWindow):
         new6.setText(0, '序列级数')
         new6.set_value('1')
         new4 = VersionItemEdit(new3)
-        new4.itemtype = 'complex_tree'
+        new4.itemtype = 'text'
         new4.setText(0, '文字')
+        new4.set_value('')
         new5 = VersionItemEdit(new3)
         new5.itemtype = 'list'
         new5.setText(0, '目标')
         new3.setExpanded(True)
-        item.setExpanded(True)
-
-    def version_button_complex_tree_add_text(self):
-        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
-        choose = ('纯文字', '带有链接的文字', '带有图片的链接')
-        text1, ok1 = MoInputWindow.getItem(self, "增加新文字", '文字的类型', choose)
-        if ok1:
-            if text1 == choose[0]:
-                new6 = VersionItemEdit(item)
-                new6.itemtype = 'text_text'
-                new6.setText(0, '文字')
-                new6.set_value()
-            elif text1 == choose[1]:
-                new6 = VersionItemEdit(item)
-                new6.itemtype = 'text_link'
-                new6.setText(0, '链接')
-                new7 = VersionItemEdit(new6)
-                new7.itemtype = 'text_link_1'
-                new7.setText(0, '链接')
-                new7.set_value()
-                new7 = VersionItemEdit(new6)
-                new7.itemtype = 'text_link_2'
-                new7.setText(0, '文字')
-                new7.set_value()
-                new6.setExpanded(True)
-            else:
-                new6 = VersionItemEdit(item)
-                new6.itemtype = 'text_image'
-                new6.set_value()
-                new7 = VersionItemEdit(new6)
-                new7.itemtype = 'text_image_1'
-                new7.setText(0, '文字')
-                new7.set_value()
-                new7.hasvalue = True
-                new7 = VersionItemEdit(new6)
-                new7.itemtype = 'text_image_2'
-                new7.setText(0, '大类名')
-                new7.set_value()
-                new7 = VersionItemEdit(new6)
-                new7.itemtype = 'text_image_3'
-                new7.setText(0, '具体名称')
-                new7.set_value()
-                new7 = VersionItemEdit(new6)
-                new7.itemtype = 'text_image_4'
-                new7.setText(0, '图片名')
-                new7.set_value()
-                new6.setExpanded(True)
         item.setExpanded(True)
 
     def version_button_list_add_list_text(self):
