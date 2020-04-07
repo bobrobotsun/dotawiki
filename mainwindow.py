@@ -33,7 +33,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.25b'
+        self.version = '7.25c'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -457,12 +457,12 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
 
     def download_json_name(self):
-        #self.update_json_name(self.download_json('json_name.json'))
+        # self.update_json_name(self.download_json('json_name.json'))
         for i in self.json_name:
-            temp = self.seesion.post(self.target_url, data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|'+i+'}}', 'contentmodel': 'wikitext', 'prop': 'text',
+            temp = self.seesion.post(self.target_url, data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|' + i + '}}', 'contentmodel': 'wikitext', 'prop': 'text',
                                                             'disablelimitreport': 'false', 'format': 'json'}).json()['parse']['text']['*']
             texttemp = re.sub('<.*?>', '', temp)[:-1]
-            tempjson=json.loads(texttemp)
+            tempjson = json.loads(texttemp)
             self.json_name.update(tempjson)
         print(self.json_name)
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
@@ -504,21 +504,22 @@ class Main(QMainWindow):
             for i in range(4):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1))
                 t.start()
-            temp=0
-            temptime=0
+            temp = 0
+            temptime = 0
             while (threading.activeCount() > 1):
                 QApplication.processEvents()
                 time.sleep(0.5)
-                if temp==self.current_num[0]:
-                    temptime+=1
-                    if temptime==8:
+                if temp == self.current_num[0]:
+                    temptime += 1
+                    if temptime == 8:
                         break
                 else:
-                    temp=self.current_num[0]
-                    temptime=0
+                    temp = self.current_num[0]
+                    temptime = 0
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            QMessageBox.information(self.progress, '下载完毕', "已为您下载"+str(self.current_num[0])+'/'+str(len(self.download_json_list))+"合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
+            QMessageBox.information(self.progress, '下载完毕', "已为您下载" + str(self.current_num[0]) + '/' + str(len(self.download_json_list)) + "合成数据，并已保存。", QMessageBox.Yes,
+                                    QMessageBox.Yes)
         except FileNotFoundError:
             mb = QMessageBox(QMessageBox.Critical, "获取名称集失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton, self)
             button1 = mb.addButton('从网络下载', QMessageBox.YesRole)
@@ -547,18 +548,18 @@ class Main(QMainWindow):
                     self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]] = self.local.download_info.json()[
                         'jsondata']
                 else:
-                    self.json_name[self.download_json_list[self.local.current_num][0]].pop(self.json_name[self.download_json_list[self.local.current_num][0]].index(self.download_json_list[self.local.current_num][1]))
+                    self.json_name[self.download_json_list[self.local.current_num][0]].pop(
+                        self.json_name[self.download_json_list[self.local.current_num][0]].index(self.download_json_list[self.local.current_num][1]))
                 self.progress.addtext(
                     '【' + QTime.currentTime().toString() + '】【' + threading.current_thread().name + '】下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功')
                 self.current_num[0] += 1
                 self.progress.set_progress(self.current_num[0])
             except:
-                print(self.download_json_list[self.local.current_num],'：下载出现错误，但是原因未知！')
+                print(self.download_json_list[self.local.current_num], '：下载出现错误，但是原因未知！')
                 break
             finally:
                 self.lock.release()
                 time.sleep(0.01)
-
 
     def fix_window_with_json_data(self):
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
@@ -762,7 +763,7 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['下载'].clicked.connect(self.download_one_version)
         self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'] = QPushButton('保存并上传', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'].clicked.connect(lambda:self.upload_one_version(True))
+        self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'].clicked.connect(lambda: self.upload_one_version(True))
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(1)
         self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'] = QPushButton('修改内容', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'])
@@ -837,21 +838,21 @@ class Main(QMainWindow):
 
         ability.confirm_upgrade_info(self.json_base['技能'])
 
-        #增加拥有技能
-        ability_own={}
+        # 增加拥有技能
+        ability_own = {}
         for i in self.json_base["技能"]:
             if self.json_base["技能"][i]['技能归属'] in ability_own:
-                ability_own[self.json_base["技能"][i]['技能归属']].append([self.json_base["技能"][i]['页面名'],self.json_base["技能"][i]['技能排序']])
+                ability_own[self.json_base["技能"][i]['技能归属']].append([self.json_base["技能"][i]['页面名'], self.json_base["技能"][i]['技能排序']])
             else:
-                ability_own[self.json_base["技能"][i]['技能归属']]=[[self.json_base["技能"][i]['页面名'],self.json_base["技能"][i]['技能排序']]]
+                ability_own[self.json_base["技能"][i]['技能归属']] = [[self.json_base["技能"][i]['页面名'], self.json_base["技能"][i]['技能排序']]]
         for i in ability_own:
-            ability_own[i].sort(key=lambda x:x[1])
-        for i in ['英雄','非英雄单位','物品']:
+            ability_own[i].sort(key=lambda x: x[1])
+        for i in ['英雄', '非英雄单位', '物品']:
             for j in self.json_base[i]:
-                self.json_base[i][j]['技能']={}
+                self.json_base[i][j]['技能'] = {}
                 if self.json_base[i][j]['页面名'] in ability_own:
                     for k in range(len(ability_own[self.json_base[i][j]['页面名']])):
-                        self.json_base[i][j]['技能'][str(k+1)]=ability_own[self.json_base[i][j]['页面名']][k][0]
+                        self.json_base[i][j]['技能'][str(k + 1)] = ability_own[self.json_base[i][j]['页面名']][k][0]
 
         self.resort()
         QMessageBox.information(self, "已完成", info)
@@ -1338,7 +1339,7 @@ class Main(QMainWindow):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
         choose = ('文字（可以填入任意信息）', '数字（只能填入有效数字）', '整数（只能填入不含小数点的整数）', '树（可以拥有下属信息，但自身没有值）')
         choose_style = ['text', 'number', 'int', 'text']
-        text1, text2, ok = MoInputWindow.get_item_and_content(self, "增加新条目", '条目的类型', choose, choose_style,False)
+        text1, text2, ok = MoInputWindow.get_item_and_content(self, "增加新条目", '条目的类型', choose, choose_style, False)
         if ok:
             temp = TreeItemEdit(item, text2)
             temp.israndom = True
@@ -1632,11 +1633,11 @@ class Main(QMainWindow):
                         text, ok = MoInputWindow.getInt(self, "序列级数", '请输入一个正整数，否则会报错')
                         if ok:
                             re[str(i)][index]['序列级数'] = text
-                re[str(i)][index]['文字']=item2.text(1)
-                if re[str(i)][index]['文字'][2:5]=='级天赋':
-                    temp=item1.text(0)+re[str(i)][index]['文字'][:5]
+                re[str(i)][index]['文字'] = item2.text(1)
+                if re[str(i)][index]['文字'][2:5] == '级天赋':
+                    temp = item1.text(0) + re[str(i)][index]['文字'][:5]
                     re[str(i)][index]['目标'].append(temp)
-                    re[str(i)][index]['文字']=re[str(i)][index]['文字'].replace(re[str(i)][index]['文字'][:5],'{{A|'+temp+'}}')
+                    re[str(i)][index]['文字'] = re[str(i)][index]['文字'].replace(re[str(i)][index]['文字'][:5], '{{A|' + temp + '}}')
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
                     re[str(i)][index]['目标'].append(item4.text(1))
@@ -1766,13 +1767,16 @@ class Main(QMainWindow):
 
     def version_edit_change_value(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
-        text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', item.text(1))
+        ori_text = item.text(1)
+        ori_text = re.sub(r'[\(\)（）\[\]【】<>《》]', lambda x: '\\' + x.group(0), ori_text)
+        text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
-            text = re.sub(r'[\(（](.+?)[\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
-            text = re.sub(r'[\[【](.+?)[\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
-            text = re.sub(r'[<《](.+?)[>》]', lambda x:'{{I|' + x.group(1) + '}}', text)
+            text = re.sub(r'[^\\][\(（](.+?)[^\\][\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
+            text = re.sub(r'[^\\][\[【](.+?)[^\\][\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
+            text = re.sub(r'[^\\][<《](.+?)[^\\][>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
+            text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
             item.set_value(text)
-            if item.parent()!=None:
+            if item.parent() != None:
                 iparent = item.parent()
                 icount = iparent.childCount()
                 if iparent.child(icount - 1).text(0) == '目标':
@@ -2037,8 +2041,8 @@ class MoInputWindow(QDialog):
             if result:
                 try:
                     re = float(dialog.b.text())
-                    if float(int(re))==re:
-                        return int(re),result
+                    if float(int(re)) == re:
+                        return int(re), result
                     else:
                         return re, result
                 except ValueError:
@@ -2093,7 +2097,7 @@ class MoInputWindow(QDialog):
         return re, result
 
     @staticmethod
-    def get_item_and_content(parent=None, title='选择后输入内容', tip_str='选择并输入', iterable=[], style=[],check=True):
+    def get_item_and_content(parent=None, title='选择后输入内容', tip_str='选择并输入', iterable=[], style=[], check=True):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
         dialog.setGeometry(dialog.screen_size[0] * 0.4, dialog.screen_size[1] * 0.4, dialog.screen_size[0] * 0.2, dialog.screen_size[1] * 0.2)
