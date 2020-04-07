@@ -53,7 +53,7 @@ def findunitpro(source, data, tb, pro, inherit=True, number=True):
     return
 
 
-def get_hero_data_from_txt(base_txt,address):
+def get_hero_data_from_txt(base_txt, address):
     ffile = open("E:/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_units.txt", mode="r")
     source_string = ffile.read()
     tb = [0, 0]
@@ -74,16 +74,17 @@ def get_hero_data_from_txt(base_txt,address):
             break
 
 
-def fulfill_unit_json(base_txt, all_json,version):
+def fulfill_unit_json(base_txt, all_json, version):
     for i in all_json:
         all_json[i]["分类"] = "非英雄单位"
         all_json[i]["版本"] = version
         all_json[i]["应用"] = 1
-        if len(all_json[i]['图片'])>1:
-            all_json[i]['图片']=all_json[i]['图片'][0].upper()+all_json[i]['图片'][1:]
-            all_json[i]['图片']=all_json[i]['图片'].replace(' ','_')
-        if len(all_json[i]['迷你图片'])>1:
-            all_json[i]['迷你图片']=all_json[i]['迷你图片'][0].upper()+all_json[i]['迷你图片'][1:]
+        if len(all_json[i]['图片']) > 1:
+            all_json[i]['图片'] = all_json[i]['图片'][0].upper() + all_json[i]['图片'][1:]
+            all_json[i]['图片'] = all_json[i]['图片'].replace(' ', '_')
+        if len(all_json[i]['迷你图片']) > 1:
+            all_json[i]['迷你图片'] = all_json[i]['迷你图片'][0].upper() + all_json[i]['迷你图片'][1:]
+            all_json[i]['迷你图片'] = all_json[i]['迷你图片'].replace(' ', '_')
         md5 = hashlib.md5()
         md5.update(all_json[i]['图片'].encode('utf-8'))
         all_json[i]['图片地址'] = md5.hexdigest()
