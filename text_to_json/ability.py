@@ -145,7 +145,7 @@ def get_source_to_data(all_json, upgrade_json, version):
         temp1 = copy.deepcopy(all_json['技能源'][unit_dic["数据来源"]])
         if unit_dic["次级分类"] == "天赋技能":
             unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
-            unit_dic["迷你图片"] = all_json["英雄"][unit_dic["技能归属"]]["迷你图片"]
+            unit_dic["迷你图片"] = 'Talent.png'
         elif unit_dic["次级分类"] == "物品技能":
             if unit_dic["技能归属"] in all_json["物品"]:
                 unit_dic["图片"] = all_json["物品"][unit_dic["技能归属"]]["图片"]
