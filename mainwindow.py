@@ -699,7 +699,7 @@ class Main(QMainWindow):
             self.editlayout['修改核心']['竖布局']['大分类'][0].addItem(i)
         self.editlayout['修改核心']['竖布局']['大分类'][0].activated.connect(self.edit_category_selected_changed)
         self.edit_category_selected_changed()
-        self.editlayout['修改核心']['竖布局']['具体库'][0].activated.connect(self.edit_target_selected_changed)
+        self.editlayout['修改核心']['竖布局']['具体库'][0].activated.connect(lambda:self.edit_target_selected_changed())
         self.editlayout['修改核心']['竖布局']['代码库'][0].activated.connect(self.edit_text_base_selected_changed)
         self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
         self.editlayout['修改核心']['竖布局']['树'][0].doubleClicked.connect(self.tree_item_double_clicked)
@@ -914,18 +914,30 @@ class Main(QMainWindow):
 
     def edit_category_selected_changed(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        selected_name=self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
+        selected_bool=False
+        alike_name=''
         self.editlayout['修改核心']['竖布局']['具体库'][0].clear()
         self.editlayout['修改核心']['竖布局']['代码库'][0].clear()
         for i in self.json_base[selected]:
             self.editlayout['修改核心']['竖布局']['具体库'][0].addItem(i)
+            if selected_name!='':
+                if selected_name==i:
+                    selected_index=True
+                if selected_name[0]==i[0]:
+                    alike_index=i
         if len(edit_json.edit_source[selected]) > 0:
             for i in self.text_base[edit_json.edit_source[selected][0]]:
                 self.editlayout['修改核心']['竖布局']['代码库'][0].addItem(i)
             QApplication.processEvents()
-        self.edit_target_selected_changed()
+        if not selected_bool and alike_name!='':
+            selected_name=alike_name
+        self.edit_target_selected_changed(selected_name)
 
-    def edit_target_selected_changed(self):
+    def edit_target_selected_changed(self,target_name=''):
         selected = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        if target_name!='':
+            self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(target_name)
         if len(edit_json.edit_source[selected[0]]) > 0:
             if selected[0] == '非英雄单位':
                 target = self.json_base[selected[0]][selected[1]]['代码名']["1"]

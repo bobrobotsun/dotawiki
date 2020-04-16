@@ -376,8 +376,16 @@ def complete_upgrade(all_json, base_txt):
             if fulfil(all_json[i]["冷却时间"][j], all_json[i]):
                 one_upgrade(all_json[i]["冷却时间"][j], base_txt)
         for j in all_json[i]["魔法消耗"]:
+            if '名称' not in all_json[i]["魔法消耗"][j]:
+                all_json[i]["魔法消耗"][j]['名称']=''
             for k in all_json[i]["魔法消耗"][j]:
                 if k != '名称':
+                    if '2' in all_json[i]["魔法消耗"][j][k] and '名称' in all_json[i]["魔法消耗"][j][k]['2']:
+                        all_json[i]["魔法消耗"][j]['名称'] = all_json[i]["魔法消耗"][j][k]['2']['名称']
+                        all_json[i]["魔法消耗"][j][k]['2'].pop('名称')
+                    if '3' in all_json[i]["魔法消耗"][j][k] and '名称' in all_json[i]["魔法消耗"][j][k]['3']:
+                        all_json[i]["魔法消耗"][j]['名称'] = all_json[i]["魔法消耗"][j][k]['3']['名称']
+                        all_json[i]["魔法消耗"][j][k]['3'].pop('名称')
                     if fulfil(all_json[i]["魔法消耗"][j][k], all_json[i]):
                         one_upgrade(all_json[i]["魔法消耗"][j][k], base_txt)
         if fulfil(all_json[i]["施法前摇"], all_json[i]):
@@ -386,7 +394,7 @@ def complete_upgrade(all_json, base_txt):
             one_upgrade(all_json[i]["施法后摇"], base_txt)
 
 
-def fulfil(arr, json):
+def fulfil(arr, json,namebool=False):
     for i in arr:
         if i.isnumeric():
             if '1' in arr[i]['代码'] and arr[i]['代码']['1'] == '不存在':
