@@ -922,10 +922,10 @@ class Main(QMainWindow):
         for i in self.json_base[selected]:
             self.editlayout['修改核心']['竖布局']['具体库'][0].addItem(i)
             if selected_name!='':
-                if selected_name==i:
-                    selected_index=True
-                if selected_name[0]==i[0]:
-                    alike_index=i
+                if not selected_bool and selected_name==i:
+                    selected_bool=True
+                if alike_name=='' and selected_name[0]==i[0]:
+                    alike_name=i
         if len(edit_json.edit_source[selected]) > 0:
             for i in self.text_base[edit_json.edit_source[selected][0]]:
                 self.editlayout['修改核心']['竖布局']['代码库'][0].addItem(i)
@@ -935,9 +935,9 @@ class Main(QMainWindow):
         self.edit_target_selected_changed(selected_name)
 
     def edit_target_selected_changed(self,target_name=''):
-        selected = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         if target_name!='':
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(target_name)
+        selected = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         if len(edit_json.edit_source[selected[0]]) > 0:
             if selected[0] == '非英雄单位':
                 target = self.json_base[selected[0]][selected[1]]['代码名']["1"]
