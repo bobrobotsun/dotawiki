@@ -370,46 +370,39 @@ def input_upgrade(all_json, upgrade_json):
 def complete_upgrade(all_json, base_txt):
     for i in all_json:
         for j in all_json[i]["属性"]:
-            fulfil(all_json[i]["属性"][j]["1"]["代码"], all_json[i])
-            one_upgrade(all_json[i]["属性"][j], base_txt)
+            if fulfil(all_json[i]["属性"][j], all_json[i]):
+                one_upgrade(all_json[i]["属性"][j], base_txt)
         for j in all_json[i]["冷却时间"]:
-            if all_json[i]["冷却时间"][j]["1"]["代码"]["1"] == '不存在':
-                all_json[i]["冷却时间"][j]["1"]["代码"] = {"1": "不存在"}
-            else:
-                fulfil(all_json[i]["冷却时间"][j]["1"]["代码"], all_json[i])
+            if fulfil(all_json[i]["冷却时间"][j], all_json[i]):
                 one_upgrade(all_json[i]["冷却时间"][j], base_txt)
         for j in all_json[i]["魔法消耗"]:
             for k in all_json[i]["魔法消耗"][j]:
                 if k != '名称':
-                    if all_json[i]["魔法消耗"][j][k]["1"]["代码"]["1"] == '不存在':
-                        all_json[i]["魔法消耗"][j][k]["1"]["代码"] = {"1": "不存在"}
-                    else:
-                        fulfil(all_json[i]["魔法消耗"][j][k]["1"]["代码"], all_json[i])
+                    if fulfil(all_json[i]["魔法消耗"][j][k], all_json[i]):
                         one_upgrade(all_json[i]["魔法消耗"][j][k], base_txt)
-        if all_json[i]["施法前摇"]["1"]["代码"]["1"] == '不存在':
-            all_json[i]["施法前摇"]["1"]["代码"] = {"1": "不存在"}
-        else:
-            fulfil(all_json[i]["施法前摇"]["1"]["代码"], all_json[i])
+        if fulfil(all_json[i]["施法前摇"], all_json[i]):
             one_upgrade(all_json[i]["施法前摇"], base_txt)
-        if all_json[i]["施法后摇"]["1"]["代码"]["1"] == '不存在':
-            all_json[i]["施法后摇"]["1"]["代码"] = {"1": "不存在"}
-        else:
-            fulfil(all_json[i]["施法后摇"]["1"]["代码"], all_json[i])
+        if fulfil(all_json[i]["施法后摇"], all_json[i]):
             one_upgrade(all_json[i]["施法后摇"], base_txt)
 
 
 def fulfil(arr, json):
-    if '0' in arr and arr['0'] == '手填':
-        return
-    else:
-        if "1" in arr and arr["1"] == "":
-            if json['次级分类'] == '物品技能':
-                arr["1"] = "物品"
+    for i in arr:
+        if i.isnumeric():
+            if '1' in arr[i]['代码'] and arr[i]['代码']['1'] == '不存在':
+                arr[i]['代码'] = {"1": "不存在"}
+                return False
+            elif '0' in arr[i]['代码'] and arr[i]['代码']['0'] == '手填':
+                continue
             else:
-                arr["1"] = "技能"
-        if "2" in arr and arr["2"] == "":
-            arr["2"] = json["代码"]
-
+                if "1" in arr[i]['代码'] and arr[i]['代码']["1"] == "":
+                    if json['次级分类'] == '物品技能':
+                        arr[i]['代码']["1"] = "物品"
+                    else:
+                        arr[i]['代码']["1"] = "技能"
+                if "2" in arr[i]['代码'] and arr[i]['代码']["2"] == "":
+                    arr[i]['代码']["2"] = json["代码"]
+    return True
 
 def one_upgrade(json, base_txt):
     inbool = ["2" in json, "3" in json]
@@ -417,42 +410,54 @@ def one_upgrade(json, base_txt):
     getvalue = [[], [], [], []]
     calvalue = [[], [], [], []]
     caloprate = [[], [], []]
-    if "0" in json["1"]["代码"] and json["1"]["代码"]['0'] != '':
-        if json["1"]["代码"]["0"] == "手填":
-            k = 0
+    if "1" in json:
+        if "0" in json["1"]["代码"] and json["1"]["代码"]['0'] != '':
+            if json["1"]["代码"]["0"] == "手填":
+                k = 0
+                while True:
+                    k += 1
+                    if str(k) in json["1"]["代码"] and json["1"]["代码"][str(k)] != '':
+                        try:
+                            getvalue[0].append(float(json["1"]["代码"][str(k)]))
+                        except ValueError:
+                            getvalue[0].append(json["1"]["代码"][str(k)])
+                    else:
+                        break
+            elif json["1"]["代码"]["0"] == "高等级":
+                levels = int(json["1"]["代码"]["4"])
+                for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
+                    if int(k) < levels:
+                        getvalue[0].append(0)
+                    else:
+                        getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+            elif json["1"]["代码"]["0"] == "不存在":
+                return
+        else:
+            for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
+                getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+        if json["1"]["修正"]["1"] == "":
+            inbool.append(False)
+        else:
+            inbool.append(True)
+            caloprate[0].append(json["1"]["修正"]["1"])
+            k = 1
             while True:
                 k += 1
-                if str(k) in json["1"]["代码"] and json["1"]["代码"][str(k)] != '':
-                    try:
-                        getvalue[0].append(float(json["1"]["代码"][str(k)]))
-                    except ValueError:
-                        getvalue[0].append(json["1"]["代码"][str(k)])
+                if str(k) in json["1"]["修正"]:
+                    getvalue[1].append(json["1"]["修正"][str(k)])
                 else:
                     break
-        elif json["1"]["代码"]["0"] == "高等级":
-            levels=int(json["1"]["代码"]["4"])
-            for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
-                if int(k)<levels:
-                    getvalue[0].append(0)
-                else:
-                    getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
-        elif json["1"]["代码"]["0"] == "不存在":
-            return
     else:
-        for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
-            getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
-    if json["1"]["修正"]["1"] == "":
+        getvalue[0].append(0)
         inbool.append(False)
-    else:
-        inbool.append(True)
-        caloprate[0].append(json["1"]["修正"]["1"])
-        k = 1
-        while True:
-            k += 1
-            if str(k) in json["1"]["修正"]:
-                getvalue[1].append(json["1"]["修正"][str(k)])
-            else:
-                break
+        json["1"]={}
+        if inbool[0]:
+            tempi="2"
+        elif inbool[1]:
+            tempi="3"
+        for tempj in json[tempi]:
+            if not tempj.isnumeric() and tempj!='代码':
+                json["1"][tempj]=copy.deepcopy(json[tempi][tempj])
     if inbool[0]:
         if "0" in json["2"]["代码"] and json["2"]["代码"]["0"] == "手填":
             k = 0
