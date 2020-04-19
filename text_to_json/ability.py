@@ -120,6 +120,22 @@ def get_source_to_data(all_json, upgrade_json, version):
     for i in all_json['技能源']:
         all_json['技能源'][i]['应用'] = 1
         all_json['技能源'][i]['分类'] = '技能源'
+        unit_dic=all_json['技能源'][i]
+        if "1" in unit_dic['施法前摇']['代码'] and unit_dic['施法前摇']['代码']['1']=='不存在':
+            unit_dic['施法前摇']['代码']={"1":"不存在"}
+        if "1" in unit_dic['施法后摇']['代码'] and unit_dic['施法后摇']['代码']['1']=='不存在':
+            unit_dic['施法后摇']['代码']={"1":"不存在"}
+        if "1" in unit_dic['魔法消耗']["1"]["1"]['代码'] and unit_dic['魔法消耗']["1"]["1"]['代码']['1']=='不存在':
+            unit_dic['魔法消耗']["1"]["1"]['代码']={"1":"不存在"}
+        if  "1" in unit_dic['冷却时间']["1"]['代码'] and unit_dic['冷却时间']["1"]['代码']['1']=='不存在':
+            unit_dic['冷却时间']["1"]['代码']={"1":"不存在"}
+        for j in unit_dic['属性']:
+            if "0" in unit_dic['属性'][j]['代码'] and unit_dic['属性'][j]['代码']["0"]=='不存在' or "1" in unit_dic['属性'][j]['代码'] and unit_dic['属性'][j]['代码']["1"]=='不存在':
+                unit_dic['属性'][j]['代码']={"0":"手填","1":"无"}
+        for j in unit_dic['升级']:
+            for k in unit_dic['升级'][j]:
+                if '值' in unit_dic['升级'][j][k] and '代码' in unit_dic['升级'][j][k]['值'] and isinstance(unit_dic['升级'][j][k]['值']['代码'],dict) and ("0" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码']["0"]=='不存在' or "1" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码']["1"]=='不存在'):
+                    unit_dic['升级'][j][k]['值']['代码']={"0":"手填","1":"无"}
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"
@@ -377,7 +393,7 @@ def complete_upgrade(all_json, base_txt):
                 one_upgrade(all_json[i]["冷却时间"][j], base_txt)
         for j in all_json[i]["魔法消耗"]:
             if '名称' not in all_json[i]["魔法消耗"][j]:
-                all_json[i]["魔法消耗"][j]['名称']=''
+                all_json[i]["魔法消耗"][j]['名称'] = ''
             for k in all_json[i]["魔法消耗"][j]:
                 if k != '名称':
                     if '2' in all_json[i]["魔法消耗"][j][k] and '名称' in all_json[i]["魔法消耗"][j][k]['2']:
@@ -394,11 +410,10 @@ def complete_upgrade(all_json, base_txt):
             one_upgrade(all_json[i]["施法后摇"], base_txt)
 
 
-def fulfil(arr, json,namebool=False):
+def fulfil(arr, json, namebool=False):
     for i in arr:
         if i.isnumeric():
             if '1' in arr[i]['代码'] and arr[i]['代码']['1'] == '不存在':
-                arr[i]['代码'] = {"1": "不存在"}
                 return False
             elif '0' in arr[i]['代码'] and arr[i]['代码']['0'] == '手填':
                 continue
@@ -411,6 +426,7 @@ def fulfil(arr, json,namebool=False):
                 if "2" in arr[i]['代码'] and arr[i]['代码']["2"] == "":
                     arr[i]['代码']["2"] = json["代码"]
     return True
+
 
 def one_upgrade(json, base_txt):
     inbool = ["2" in json, "3" in json]
@@ -441,8 +457,11 @@ def one_upgrade(json, base_txt):
             elif json["1"]["代码"]["0"] == "不存在":
                 return
         else:
-            for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
-                getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+            if json["1"]["代码"]["1"] in base_txt:
+                for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
+                    getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+            else:
+                getvalue[0].append(json["1"]["代码"]["1"])
         if json["1"]["修正"]["1"] == "":
             inbool.append(False)
         else:
@@ -458,14 +477,14 @@ def one_upgrade(json, base_txt):
     else:
         getvalue[0].append(0)
         inbool.append(False)
-        json["1"]={}
+        json["1"] = {}
         if inbool[0]:
-            tempi="2"
+            tempi = "2"
         elif inbool[1]:
-            tempi="3"
+            tempi = "3"
         for tempj in json[tempi]:
-            if not tempj.isnumeric() and tempj!='代码':
-                json["1"][tempj]=copy.deepcopy(json[tempi][tempj])
+            if not tempj.isnumeric() and tempj != '代码':
+                json["1"][tempj] = copy.deepcopy(json[tempi][tempj])
     if inbool[0]:
         if "0" in json["2"]["代码"] and json["2"]["代码"]["0"] == "手填":
             k = 0
@@ -851,7 +870,7 @@ def one_combine_txt_numbers(json, all_json, base_txt):
                 temp = temp[json[str(i)]]
             else:
                 break
-        if isinstance(temp,dict):
+        if isinstance(temp, dict):
             j = 0
             while True:
                 j += 1
@@ -977,15 +996,15 @@ def calculate_combine_txt_numbers(re, temp, op):
     for i in range(4):
         for j in range(max(len(re[i + 1]), len(temp[i + 1]))):
             if j >= len(re[i + 1]):
-                if j==0:
-                    re[i + 1].append(re[math.floor(i/3)][0])
+                if j == 0:
+                    re[i + 1].append(re[math.floor(i / 3)][0])
                 else:
-                    re[i + 1].append(re[i + 1][j-1])
+                    re[i + 1].append(re[i + 1][j - 1])
             if j >= len(temp[i + 1]):
-                if j==0:
-                    temp[i + 1].append(temp[math.floor((i-1)/2)][0])
+                if j == 0:
+                    temp[i + 1].append(temp[math.floor((i - 1) / 2)][0])
                 else:
-                    temp[i + 1].append(temp[i + 1][j-1])
+                    temp[i + 1].append(temp[i + 1][j - 1])
         if op == 'max_stack':  # 前最大值，后公差，首项为0
             re[i + 1] = [re[i + 1][0]]
             j = 0
