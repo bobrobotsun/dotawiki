@@ -33,7 +33,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.26'
+        self.version = '7.26a'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -457,7 +457,6 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
 
     def download_json_name(self):
-        # self.update_json_name(self.download_json('json_name.json'))
         for i in self.json_name:
             temp = self.seesion.post(self.target_url, data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|' + i + '}}', 'contentmodel': 'wikitext', 'prop': 'text',
                                                             'disablelimitreport': 'false', 'format': 'json'}).json()['parse']['text']['*']
@@ -880,14 +879,16 @@ class Main(QMainWindow):
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
-            self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1]))
+            self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1],True))
             self.w.set_progress(i + 1)
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
     # 向wiki网站上传对应的信息
-    def upload_json(self, pagename, content):
+    def upload_json(self, pagename, content,bot=False):
         upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
+        if bot:
+            upload_data['bot']=1
         upload_info = self.seesion.post(self.target_url, data=upload_data)
         if upload_info.json()['edit']['result'] == 'Success':
             if 'nochange' in upload_info.json()['edit']:
