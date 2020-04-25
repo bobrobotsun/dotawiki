@@ -692,16 +692,17 @@ def mech_junior(json, mech):
     for i in mech:
         if i in ["即时攻击", "技能窃取"]:
             for j in json[i]:
-                k = 0
-                while True:
-                    k += 1
-                    if str(k) in json[i][j]:
-                        if str(json[i][j][str(k)]["代码"]) in mech[i]:
-                            json[i][j][str(k)]["值"] = mech[i][str(json[i][j][str(k)]["代码"])]["名称"]
-                            if "简述" not in json[i][j][str(k)] or json[i][j][str(k)]["简述"] == "":
-                                json[i][j][str(k)]["简述"] = mech[i][str(json[i][j][str(k)]["代码"])]["简述"]
-                    else:
-                        break
+                for jj in json[i][j]:
+                    k = 0
+                    while True:
+                        k += 1
+                        if str(k) in json[i][j][jj]:
+                            if str(json[i][j][jj][str(k)]["代码"]) in mech[i]:
+                                json[i][j][jj][str(k)]["值"] = mech[i][str(json[i][j][jj][str(k)]["代码"])]["名称"]
+                                if "简述" not in json[i][j][jj][str(k)] or json[i][j][jj][str(k)]["简述"] == "":
+                                    json[i][j][jj][str(k)]["简述"] = mech[i][str(json[i][j][jj][str(k)]["代码"])]["简述"]
+                        else:
+                            break
         else:
             for j in json["效果"]:
                 for k in json["效果"][j]:
