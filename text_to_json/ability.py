@@ -209,6 +209,10 @@ def get_source_to_data(all_json, upgrade_json, version):
                     else:
                         break
             elif i == "升级":
+                for j in temp1[i]:
+                    for k in temp1[i][j]:
+                        if '目标' in temp1[i][j][k] and '3' in temp1[i][j][k]['目标'] and temp1[i][j][k]['目标']['3'] in ability_trait_level[3]:
+                            temp1[i][j][k]['目标']['4']='1'
                 if "A杖" in temp1[i] and len(temp1[i]["A杖"]) > 0 or "技能" in temp1[i] and len(temp1[i]["技能"]) > 0 or "混合" in temp1[i] and len(temp1[i]["混合"]) > 0:
                     upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
             elif i == "页面名" or i == '应用' or i == '分类':
@@ -676,11 +680,12 @@ def mech_mech(json, mech):
                         json[i][j][k]["图片"] = mech[i][str(json[i][j][k]["代码"])]["图片"]
         else:
             for j in json[i]:
-                if str(json[i][j]["代码"]) in mech[i]:
-                    json[i][j]["值"] = mech[i][str(json[i][j]["代码"])]["名称"]
-                    json[i][j]["图片"] = mech[i][str(json[i][j]["代码"])]["图片"]
-                    if json[i][j]["简述"] == "":
-                        json[i][j]["简述"] = mech[i][str(json[i][j]["代码"])]["简述"]
+                for k in json[i][j]:
+                    if str(json[i][j][k]["代码"]) in mech[i]:
+                        json[i][j][k]["值"] = mech[i][str(json[i][j][k]["代码"])]["名称"]
+                        json[i][j][k]["图片"] = mech[i][str(json[i][j][k]["代码"])]["图片"]
+                        if json[i][j][k]["简述"] == "":
+                            json[i][j][k]["简述"] = mech[i][str(json[i][j][k]["代码"])]["简述"]
 
 
 def mech_junior(json, mech):
@@ -1137,4 +1142,5 @@ abilitypro_num = [["a_cast_range", "AbilityCastRange"]
     , ["a_charges_restore_time", "AbilityChargeRestoreTime"]]
 abilitypro_bool = [["immediate", "DOTA_ABILITY_BEHAVIOR_IMMEDIATE"]
     , ["ignore_channel", "DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"]]
-ability_trait_level = [["中文名", "英文名", "代码", "传说", "描述", "天赋代码", "A杖信息", "注释"], ["效果", "属性", "冷却时间"], ["魔法消耗"]]
+ability_trait_level = [["中文名", "英文名", "代码", "传说", "描述", "天赋代码", "A杖信息", "注释"], ["效果", "属性", "冷却时间"], ["魔法消耗"]
+    ,['技能免疫','无敌','技能抵挡','技能反弹','技能共享','技能窃取','幻象','破坏','持续施法','躲避','缠绕','即时攻击','视野','真实视域']]
