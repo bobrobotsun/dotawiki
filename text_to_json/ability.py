@@ -717,7 +717,7 @@ def mech_junior(json, mech):
 def mech_sign(json, mech):
     for i in json:
         for j in json[i]:
-            if "标记" in json[i][j]:
+            if isinstance(json[i][j],dict) and "标记" in json[i][j]:
                 for k in json[i][j]["标记"]:
                     if json[i][j]["标记"][k]["类型"] in mech and str(json[i][j]["标记"][k]["代码"]) in mech[json[i][j]["标记"][k]["类型"]]:
                         json[i][j]["标记"][k]["值"] = mech[json[i][j]["标记"][k]["类型"]][str(json[i][j]["标记"][k]["代码"])]
