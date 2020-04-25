@@ -153,8 +153,8 @@ def fulfill_item_json(base_txt, all_json, version):
         if '升级' in all_json[ii]:
             all_json[ii].pop('升级')
         for i in item_for_item:
-            if i in base_txt["物品"][all_json[ii]['代码名']]:
-                all_json[ii][i] = base_txt["物品"][all_json[ii]['代码名']][i]
+            if item_for_item[i] in base_txt["物品"][all_json[ii]['代码名']]:
+                all_json[ii][i] = {'代码':item_for_item[i]}
         for i in all_json[ii]:
             if isinstance(all_json[ii][i], dict) and '代码' in all_json[ii][i] and all_json[ii][i]["代码"] in base_txt["物品"][all_json[ii]["代码名"]]:
                 if str(all_json[ii]['等级']) in base_txt["物品"][all_json[ii]["代码名"]][all_json[ii][i]["代码"]]:
@@ -254,7 +254,6 @@ itempro_num = [["施法距离", "AbilityCastRange"]
     , ["施法前摇", "AbilityCastPoint"]
     , ["冷却时间", "AbilityCooldown"]
     , ["价格", "ItemCost"]
-    , ["边路商店", "SideShop"]
     , ["可堆叠", "ItemStackable"]
     , ["耗尽后不消失", "ItemPermanent"]
     , ["初始充能", "ItemInitialCharges"]
@@ -265,4 +264,4 @@ itempro_num = [["施法距离", "AbilityCastRange"]
     , ["可提醒队友", "ItemAlertable"]
                ]
 itempro_bool = [["即时生效", "DOTA_ABILITY_BEHAVIOR_IMMEDIATE"]]
-item_for_item = ["边路商店", "价格", "上货时间", "初始货量", "最大货量", "初始上货时间", "可提醒队友", "可拆分"]
+item_for_item = {"可提醒队友":"ItemAlertable", "可拆分":"ItemDisassembleRule"}

@@ -136,6 +136,8 @@ def get_source_to_data(all_json, upgrade_json, version):
             for k in unit_dic['升级'][j]:
                 if '值' in unit_dic['升级'][j][k] and '代码' in unit_dic['升级'][j][k]['值'] and isinstance(unit_dic['升级'][j][k]['值']['代码'],dict) and ("0" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码']["0"]=='不存在' or "1" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码']["1"]=='不存在'):
                     unit_dic['升级'][j][k]['值']['代码']={"0":"手填","1":"无"}
+                if '目标' in unit_dic['升级'][j][k] and '3' in unit_dic['升级'][j][k]['目标'] and unit_dic['升级'][j][k]['目标']['3'] in ability_trait_level[3]:
+                    unit_dic['升级'][j][k]['目标']['4'] = '1'
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"
@@ -172,12 +174,10 @@ def get_source_to_data(all_json, upgrade_json, version):
         else:
             unit_dic["图片"] = "Spellicons_" + temp1["代码"] + ".png"
             unit_dic["迷你图片"] = "Spellicons_" + temp1["代码"] + ".png"
-        md5 = hashlib.md5()
-        md5.update(unit_dic['图片'].encode('utf-8'))
-        unit_dic['图片地址'] = md5.hexdigest()
-        md5 = hashlib.md5()
-        md5.update(unit_dic['迷你图片'].encode('utf-8'))
-        unit_dic['迷你图片地址'] = md5.hexdigest()
+        if '图片地址' in unit_dic:
+            unit_dic.pop('图片地址')
+        if '迷你图片地址' in unit_dic:
+            unit_dic.pop('迷你图片地址')
         for i in temp1:
             if i in ability_trait_level[0]:
                 unit_dic[i] = temp1[i]
@@ -208,11 +208,11 @@ def get_source_to_data(all_json, upgrade_json, version):
                             unit_dic[i][str(j)]['名称'] = temp1[i][str(j)]['名称']
                     else:
                         break
-            elif i == "升级":
+            elif i in ability_trait_level[3]:
+                unit_dic[i] ={}
                 for j in temp1[i]:
-                    for k in temp1[i][j]:
-                        if '目标' in temp1[i][j][k] and '3' in temp1[i][j][k]['目标'] and temp1[i][j][k]['目标']['3'] in ability_trait_level[3]:
-                            temp1[i][j][k]['目标']['4']='1'
+                    unit_dic[i][j]=group_source(temp1[i][j])
+            elif i == "升级":
                 if "A杖" in temp1[i] and len(temp1[i]["A杖"]) > 0 or "技能" in temp1[i] and len(temp1[i]["技能"]) > 0 or "混合" in temp1[i] and len(temp1[i]["混合"]) > 0:
                     upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
             elif i == "页面名" or i == '应用' or i == '分类':
