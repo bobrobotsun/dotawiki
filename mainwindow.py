@@ -819,6 +819,7 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
 
     def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
+
         hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
         item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
 
