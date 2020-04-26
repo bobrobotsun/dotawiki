@@ -578,6 +578,17 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传'].triggered.connect(self.upload_all)
         self.ml['高级功能']['测试窗口'] = self.ml['高级功能'][0].addAction('测试用，看见了不要点，没用')
         self.ml['高级功能']['测试窗口'].triggered.connect(self.test_inputwindow)
+        self.ml['高级功能'][0].addSeparator()
+        self.ml['高级功能']['上传《英雄》'] = self.ml['高级功能'][0].addAction('上传《英雄》')
+        self.ml['高级功能']['上传《英雄》'].triggered.connect(lambda: self.upload_all('英雄'))
+        self.ml['高级功能']['上传《物品》'] = self.ml['高级功能'][0].addAction('上传《物品》')
+        self.ml['高级功能']['上传《物品》'].triggered.connect(lambda: self.upload_all('物品'))
+        self.ml['高级功能']['上传《非英雄单位》'] = self.ml['高级功能'][0].addAction('上传《非英雄单位》')
+        self.ml['高级功能']['上传《非英雄单位》'].triggered.connect(lambda: self.upload_all('非英雄单位'))
+        self.ml['高级功能']['上传《技能》'] = self.ml['高级功能'][0].addAction('上传《技能》')
+        self.ml['高级功能']['上传《技能》'].triggered.connect(lambda: self.upload_all('技能'))
+        self.ml['高级功能']['上传《技能源》'] = self.ml['高级功能'][0].addAction('上传《技能源》')
+        self.ml['高级功能']['上传《技能源》'].triggered.connect(lambda: self.upload_all('技能源'))
         """
         制作一个默认的单位统称列表，具体效果见edit_json.py
         """
@@ -858,7 +869,7 @@ class Main(QMainWindow):
         self.upload_json('Data:json_name.json', json.dumps(self.json_name))
         QMessageBox.information(self, "上传完成", '已经上传完毕基础文件')
 
-    def upload_all(self):
+    def upload_all(self, chosen=''):
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.3, self.screen_size[1] * 0.15, self.screen_size[0] * 0.4, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
@@ -867,7 +878,15 @@ class Main(QMainWindow):
         all_upload.append(['Data:版本.json', json.dumps({'版本': self.version})])
         all_upload.append(['Data:text_base.json', json.dumps(self.text_base)])
         all_upload.append(['Data:json_name.json', json.dumps(self.json_name)])
-        for i in self.json_base:
+        if chosen == '':
+            for i in self.json_base:
+                for j in self.json_base[i]:
+                    if i == '技能源':
+                        all_upload.append(['Data:' + j + '/源.json', json.dumps(self.json_base[i][j])])
+                    else:
+                        all_upload.append(['Data:' + j + '.json', json.dumps(self.json_base[i][j])])
+        else:
+            i = chosen
             for j in self.json_base[i]:
                 if i == '技能源':
                     all_upload.append(['Data:' + j + '/源.json', json.dumps(self.json_base[i][j])])
@@ -1926,7 +1945,7 @@ class upload_text(QWidget):
         self.show()
 
     def confirm_numbers(self, num):
-        self.maxmax=num
+        self.maxmax = num
 
     def addtext(self, content='', num=-1, threads=''):
         txts = '【' + QTime.currentTime().toString() + '】'
