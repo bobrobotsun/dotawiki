@@ -17,6 +17,7 @@ import threading
 import copy
 import vpk
 import re
+import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -500,25 +501,9 @@ class Main(QMainWindow):
                     else:
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
-            for i in range(4):
-                t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1))
+            for i in range(20):
+                t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 101))
                 t.start()
-            temp = 0
-            temptime = 0
-            while (threading.activeCount() > 1):
-                QApplication.processEvents()
-                time.sleep(0.5)
-                if temp == self.current_num[0]:
-                    temptime += 1
-                    if temptime == 8:
-                        break
-                else:
-                    temp = self.current_num[0]
-                    temptime = 0
-            self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
-            self.fix_window_with_json_data()
-            QMessageBox.information(self.progress, '下载完毕', "已为您下载" + str(self.current_num[0]) + '/' + str(len(self.download_json_list)) + "合成数据，并已保存。", QMessageBox.Yes,
-                                    QMessageBox.Yes)
         except FileNotFoundError:
             mb = QMessageBox(QMessageBox.Critical, "获取名称集失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton, self)
             button1 = mb.addButton('从网络下载', QMessageBox.YesRole)
@@ -535,30 +520,42 @@ class Main(QMainWindow):
                 self.current_num[1] += 1
                 if self.local.current_num >= len(self.download_json_list):
                     break
+            except Exception as xx:
+                print(self.download_json_list[self.local.current_num], '：分配出现错误，原因为：' + str(xx))
             finally:
                 self.lock.release()
-            self.local.download_data = {'action': 'jsondata', 'title': self.download_json_list[self.local.current_num][2], 'format': 'json'}
-            self.local.seesion = self.seesion
-            self.local.target_url = self.target_url
-            self.local.download_info = self.local.seesion.post(self.local.target_url, data=self.local.download_data)
-            self.lock.acquire()
-            try:
-                if self.local.download_info.json()['jsondata']['应用'] == 1:
-                    self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]] = self.local.download_info.json()[
-                        'jsondata']
+            for self.local.ii in range(5):
+                self.local.download_data = {'action': 'jsondata', 'title': self.download_json_list[self.local.current_num][2], 'format': 'json'}
+                self.local.seesion = self.seesion
+                self.local.target_url = self.target_url
+                self.local.download_info = self.local.seesion.post(self.local.target_url, data=self.local.download_data)
+                self.lock.acquire()
+                try:
+                    self.local.jsons = self.local.download_info.json()
+                except Exception as xx:
+                    print(self.download_json_list[self.local.current_num], '：下载出现错误，原因为：' + str(xx))
+                    continue
                 else:
-                    self.json_name[self.download_json_list[self.local.current_num][0]].pop(
-                        self.json_name[self.download_json_list[self.local.current_num][0]].index(self.download_json_list[self.local.current_num][1]))
-                self.progress.addtext(
-                    '【' + QTime.currentTime().toString() + '】【' + threading.current_thread().name + '】下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功')
-                self.current_num[0] += 1
-                self.progress.set_progress(self.current_num[0])
-            except:
-                print(self.download_json_list[self.local.current_num], '：下载出现错误，但是原因未知！')
-                break
-            finally:
-                self.lock.release()
-                time.sleep(0.01)
+                    if self.local.jsons['jsondata']['应用'] == 1:
+                        self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]] = self.local.jsons[
+                            'jsondata']
+                    else:
+                        self.json_name[self.download_json_list[self.local.current_num][0]].pop(
+                            self.json_name[self.download_json_list[self.local.current_num][0]].index(self.download_json_list[self.local.current_num][1]))
+                    self.progress.addtext('下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功', self.current_num[0], threading.current_thread().name)
+                    self.current_num[0] += 1
+                    break
+                finally:
+                    self.lock.release()
+                    time.sleep(0.1)
+        self.download_json_thread_finished()
+
+    def download_json_thread_finished(self):
+        if (threading.activeCount() <= 2):
+            self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
+            self.fix_window_with_json_data()
+            QMessageBox.information(self.progress, '下载完毕', "已为您下载" + str(self.current_num[0]) + '/' + str(len(self.download_json_list)) + "合成数据，并已保存。", QMessageBox.Yes,
+                                    QMessageBox.Yes)
 
     def fix_window_with_json_data(self):
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
@@ -698,7 +695,7 @@ class Main(QMainWindow):
             self.editlayout['修改核心']['竖布局']['大分类'][0].addItem(i)
         self.editlayout['修改核心']['竖布局']['大分类'][0].activated.connect(self.edit_category_selected_changed)
         self.edit_category_selected_changed()
-        self.editlayout['修改核心']['竖布局']['具体库'][0].activated.connect(lambda:self.edit_target_selected_changed())
+        self.editlayout['修改核心']['竖布局']['具体库'][0].activated.connect(lambda: self.edit_target_selected_changed())
         self.editlayout['修改核心']['竖布局']['代码库'][0].activated.connect(self.edit_text_base_selected_changed)
         self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
         self.editlayout['修改核心']['竖布局']['树'][0].doubleClicked.connect(self.tree_item_double_clicked)
@@ -879,25 +876,23 @@ class Main(QMainWindow):
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
-            self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1],True))
-            self.w.set_progress(i + 1)
+            self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1], True), i)
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
     # 向wiki网站上传对应的信息
-    def upload_json(self, pagename, content,bot=False):
+    def upload_json(self, pagename, content, bot=False):
         upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
         if bot:
-            upload_data['bot']=1
+            upload_data['bot'] = 1
         upload_info = self.seesion.post(self.target_url, data=upload_data)
         if upload_info.json()['edit']['result'] == 'Success':
             if 'nochange' in upload_info.json()['edit']:
-                return '【' + QTime.currentTime().toString() + '】没有修改《' + pagename + '》'
+                return '没有修改《' + pagename + '》'
             elif 'oldrevid' in upload_info.json()['edit']:
-                return '【' + QTime.currentTime().toString() + '】上传《' + pagename + '》，【' + str(upload_info.json()['edit']['oldrevid']) + '】-->【' + str(
-                    upload_info.json()['edit']['newrevid']) + '】'
+                return '上传《' + pagename + '》，【' + str(upload_info.json()['edit']['oldrevid']) + '】-->【' + str(upload_info.json()['edit']['newrevid']) + '】'
             else:
-                return '【' + QTime.currentTime().toString() + '】上传《' + pagename + '》内容成功'
+                return '上传《' + pagename + '》内容成功'
         else:
             return json.dumps(upload_info.json())
 
@@ -915,28 +910,28 @@ class Main(QMainWindow):
 
     def edit_category_selected_changed(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
-        selected_name=self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
-        selected_bool=False
-        alike_name=''
+        selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
+        selected_bool = False
+        alike_name = ''
         self.editlayout['修改核心']['竖布局']['具体库'][0].clear()
         self.editlayout['修改核心']['竖布局']['代码库'][0].clear()
         for i in self.json_base[selected]:
             self.editlayout['修改核心']['竖布局']['具体库'][0].addItem(i)
-            if selected_name!='':
-                if not selected_bool and selected_name==i:
-                    selected_bool=True
-                if alike_name=='' and selected_name[0]==i[0]:
-                    alike_name=i
+            if selected_name != '':
+                if not selected_bool and selected_name == i:
+                    selected_bool = True
+                if alike_name == '' and selected_name[0] == i[0]:
+                    alike_name = i
         if len(edit_json.edit_source[selected]) > 0:
             for i in self.text_base[edit_json.edit_source[selected][0]]:
                 self.editlayout['修改核心']['竖布局']['代码库'][0].addItem(i)
             QApplication.processEvents()
-        if not selected_bool and alike_name!='':
-            selected_name=alike_name
+        if not selected_bool and alike_name != '':
+            selected_name = alike_name
         self.edit_target_selected_changed(selected_name)
 
-    def edit_target_selected_changed(self,target_name=''):
-        if target_name!='':
+    def edit_target_selected_changed(self, target_name=''):
+        if target_name != '':
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(target_name)
         selected = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         if len(edit_json.edit_source[selected[0]]) > 0:
@@ -1566,8 +1561,7 @@ class Main(QMainWindow):
                 download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
                 download_info = self.seesion.post(self.target_url, data=download_data)
                 if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
-                    self.w.addtext('【' + QTime.currentTime().toString() + '】' + self.version_list['版本'][i][j] + '版本json不存在。')
-                    self.w.set_progress(i + 1)
+                    self.w.addtext(self.version_list['版本'][i][j] + '版本json不存在。', i)
                     QApplication.processEvents()
                     time.sleep(0.1)
                 else:
@@ -1576,8 +1570,7 @@ class Main(QMainWindow):
                         self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).setBackground(0, self.green)
                     else:
                         self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j - 1).setBackground(0, self.green)
-                    self.w.addtext('【' + QTime.currentTime().toString() + '】' + title + '版本json下载保存成功。')
-                    self.w.set_progress(i + 1)
+                    self.w.addtext(title + '版本json下载保存成功。', i)
                     QApplication.processEvents()
                     time.sleep(0.1)
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
@@ -1927,21 +1920,22 @@ class upload_text(QWidget):
         self.b = QTextBrowser(self)
         self.l = QVBoxLayout()
         self.l.addWidget(self.b)
-        self.p = QProgressBar(self)
         self.setLayout(self.l)
         thread = threading.Thread(target=self.addtext, args=(first_txt,))
         thread.start()
         self.show()
 
     def confirm_numbers(self, num):
-        self.p.setRange(0, num)
-        self.l.addWidget(self.p)
+        self.maxmax=num
 
-    def set_progress(self, num):
-        self.p.setValue(num)
-
-    def addtext(self, content):
-        self.b.append(content)
+    def addtext(self, content='', num=-1, threads=''):
+        txts = '【' + QTime.currentTime().toString() + '】'
+        if num > -1:
+            txts += '【' + str(num + 1) + '/' + str(self.maxmax) + ',' + '{:.2%}'.format((num + 1) / self.maxmax) + '】'
+        if threads != '':
+            txts += '【' + threads + '】'
+        txts += content
+        self.b.append(txts)
         self.cursor = self.b.textCursor()
         self.b.moveCursor(self.b.textCursor().End)
 
