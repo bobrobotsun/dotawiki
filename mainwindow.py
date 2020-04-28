@@ -34,7 +34,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.26a'
+        self.version = '7.26b'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -501,8 +501,8 @@ class Main(QMainWindow):
                     else:
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
-            for i in range(20):
-                t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 101))
+            for i in range(4):
+                t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
         except FileNotFoundError:
             mb = QMessageBox(QMessageBox.Critical, "获取名称集失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton, self)
@@ -547,7 +547,7 @@ class Main(QMainWindow):
                     break
                 finally:
                     self.lock.release()
-                    time.sleep(0.1)
+                    time.sleep(0.3)
         self.download_json_thread_finished()
 
     def download_json_thread_finished(self):
@@ -575,7 +575,7 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传基础文件'] = self.ml['高级功能'][0].addAction('上传基础文件')
         self.ml['高级功能']['上传基础文件'].triggered.connect(self.upload_basic_json)
         self.ml['高级功能']['上传'] = self.ml['高级功能'][0].addAction('上传')
-        self.ml['高级功能']['上传'].triggered.connect(self.upload_all)
+        self.ml['高级功能']['上传'].triggered.connect(lambda: self.upload_all())
         self.ml['高级功能']['测试窗口'] = self.ml['高级功能'][0].addAction('测试用，看见了不要点，没用')
         self.ml['高级功能']['测试窗口'].triggered.connect(self.test_inputwindow)
         self.ml['高级功能'][0].addSeparator()

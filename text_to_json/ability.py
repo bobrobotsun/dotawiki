@@ -393,6 +393,14 @@ def complete_upgrade(all_json, base_txt):
             if fulfil(all_json[i]["属性"][j], all_json[i]):
                 one_upgrade(all_json[i]["属性"][j], base_txt)
         for j in all_json[i]["冷却时间"]:
+            if '名称' not in all_json[i]["冷却时间"][j]:
+                all_json[i]["冷却时间"][j]['名称'] = ''
+            if '2' in all_json[i]["冷却时间"][j] and '名称' in all_json[i]["冷却时间"][j]['2']:
+                all_json[i]["冷却时间"][j]['名称'] = all_json[i]["冷却时间"][j]['2']['名称']
+                all_json[i]["冷却时间"][j]['2'].pop('名称')
+            if '3' in all_json[i]["冷却时间"][j] and '名称' in all_json[i]["冷却时间"][j]['3']:
+                all_json[i]["冷却时间"][j]['名称'] = all_json[i]["冷却时间"][j]['3']['名称']
+                all_json[i]["冷却时间"][j]['3'].pop('名称')
             if fulfil(all_json[i]["冷却时间"][j], all_json[i]):
                 one_upgrade(all_json[i]["冷却时间"][j], base_txt)
         for j in all_json[i]["魔法消耗"]:
@@ -744,9 +752,10 @@ def mech_others(json, mech):
                         json["魔法消耗"][i][j][k]["类型"]["后缀"] = mech["魔法消耗"][str(json["魔法消耗"][i][j][k]["类型"]["代码"])]['后缀']
     for i in json["冷却时间"]:
         for j in json["冷却时间"][i]:
-            if "类型" in json["冷却时间"][i][j]:
-                json["冷却时间"][i][j]["类型"]["值"] = mech["冷却时间"][str(json["冷却时间"][i][j]["类型"]["代码"])]["名称"]
-                json["冷却时间"][i][j]["类型"]["图片"] = mech["冷却时间"][str(json["冷却时间"][i][j]["类型"]["代码"])]["图片"]
+            if j != '名称':
+                if "类型" in json["冷却时间"][i][j]:
+                    json["冷却时间"][i][j]["类型"]["值"] = mech["冷却时间"][str(json["冷却时间"][i][j]["类型"]["代码"])]["名称"]
+                    json["冷却时间"][i][j]["类型"]["图片"] = mech["冷却时间"][str(json["冷却时间"][i][j]["类型"]["代码"])]["图片"]
     for i in json["施法前摇"]:
         if str(json["施法前摇"][i]["即时生效"]["代码"]) in mech["即时生效"]:
             json["施法前摇"][i]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i]["即时生效"]["代码"])]
