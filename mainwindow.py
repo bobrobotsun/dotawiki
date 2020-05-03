@@ -34,7 +34,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.26b'
+        self.version = '7.26c'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -1793,12 +1793,15 @@ class Main(QMainWindow):
     def version_edit_change_value(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         ori_text = item.text(1)
+        if item.parent()!=None and item.parent().parent()!=None:
+            hero_text=item.parent().parent().text(0)
         ori_text = re.sub(r'[\(\)（）\[\]【】<>《》]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
-            text = re.sub(r'[^\\][\(（](.+?)[^\\][\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
-            text = re.sub(r'[^\\][\[【](.+?)[^\\][\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
-            text = re.sub(r'[^\\][<《](.+?)[^\\][>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
+            text = re.sub(r'(?!\\)[\(（](.+?)(?!\\)[\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
+            text = re.sub(r'(?!\\)[\[【](.+?)(?!\\)[\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
+            text = re.sub(r'(?!\\)[<《](.+?)(?!\\)[>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
+            text = re.sub(r'\{\{A\|([0-9]+?)\}\}', lambda x: '{{A|' +hero_text+ x.group(1)+'级天赋}}', text)
             text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
             item.set_value(text)
             if item.parent() != None:
