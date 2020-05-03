@@ -1821,6 +1821,13 @@ class Main(QMainWindow):
                             new = VersionItemEdit(iparent.child(icount - 1))
                             new.itemtype = 'list_text'
                             new.set_value(i[4:-2])
+                if item.parent()!=None and item.parent().parent()!=None:
+                    ipp=item.parent().parent()
+                    if ipp.itemtype=='tree2' and ipp.child(ipp.childCount()-1).child(1).text(1)!='':
+                        self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(ipp)
+                        self.version_button_tree2_add_tree_list()
+                        self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
+
 
     def version_button_tree1(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
@@ -1848,6 +1855,8 @@ class Main(QMainWindow):
             item.setExpanded(True)
             self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new)
             self.version_button_tree2_add_tree_list()
+            new.setExpanded(False)
+            self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
 
     def version_button_tree2_change_name(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
