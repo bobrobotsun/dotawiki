@@ -142,8 +142,14 @@ def fulfill_item_json(base_txt, all_json, version):
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
         all_json[ii]["应用"] = 1
-        all_json[ii]['图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
-        all_json[ii]['迷你图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
+        if all_json[ii]['图片']=='':
+            all_json[ii]['图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
+        if all_json[ii]['迷你图片']=='':
+            all_json[ii]['迷你图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
+        if '图片地址' in all_json[ii]:
+            all_json[ii].pop('图片地址')
+        if '迷你图片地址' in all_json[ii]:
+            all_json[ii].pop('迷你图片地址')
         md5 = hashlib.md5()
         md5.update(all_json[ii]['图片'].encode('utf-8'))
         all_json[ii]['图片地址'] = md5.hexdigest()

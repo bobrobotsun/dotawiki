@@ -480,12 +480,17 @@ def one_upgrade(json, base_txt):
             inbool.append(True)
             caloprate[0].append(json["1"]["修正"]["1"])
             k = 1
-            while True:
-                k += 1
-                if str(k) in json["1"]["修正"]:
-                    getvalue[1].append(json["1"]["修正"][str(k)])
-                else:
-                    break
+            try:
+                while True:
+                    k += 1
+                    if str(k) in json["1"]["修正"]:
+                        getvalue[1].append(float(json["1"]["修正"][str(k)]))
+                    else:
+                        break
+            except ValueError:
+                for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]]:
+                    getvalue[1].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]][k])
+
     else:
         getvalue[0].append(0)
         inbool.append(False)
@@ -630,6 +635,18 @@ def array_cal(arr1, arr2, op, num):
             arr1[i] = arr1[i] * (100 + temp) / 100
         elif opp == '1-%1':
             arr1[i] = arr1[i] * (1 - temp)
+        elif opp=='1round1':
+            arr1[i]=round(arr1[i], int(temp))
+        elif opp=='1ceil1':
+            arr1[i]=math.ceil(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
+        elif opp=='1floor1':
+            arr1[i]=math.floor(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
+        elif opp=='1*round1':
+            arr1[i]=round(arr1[i]*temp)
+        elif opp=='1*ceil1':
+            arr1[i]=math.ceil(arr1[i]*temp)
+        elif opp=='1*floor1':
+            arr1[i]=math.floor(arr1[i]*temp)
 
 
 def complete_mech(all_json, mech_json):

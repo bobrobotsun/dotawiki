@@ -2,6 +2,7 @@ import json
 import os
 import copy
 import hashlib
+import math
 
 
 # 查询数据范围
@@ -85,12 +86,10 @@ def fulfill_unit_json(base_txt, all_json, version):
         if len(all_json[i]['迷你图片']) > 1:
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'][0].upper() + all_json[i]['迷你图片'][1:]
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'].replace(' ', '_')
-        md5 = hashlib.md5()
-        md5.update(all_json[i]['图片'].encode('utf-8'))
-        all_json[i]['图片地址'] = md5.hexdigest()
-        md5 = hashlib.md5()
-        md5.update(all_json[i]['迷你图片'].encode('utf-8'))
-        all_json[i]['迷你图片地址'] = md5.hexdigest()
+        if '图片地址' in all_json[i]:
+            all_json[i].pop('图片地址')
+        if '迷你图片地址' in all_json[i]:
+            all_json[i].pop('迷你图片地址')
 
         for j in unitpro_txt + unitpro_num:
             popit = []
@@ -231,6 +230,18 @@ def array_cal(arr1, arr2, op):
             arr1[i] = temp * op[1]
         elif op[0] == '=/':
             arr1[i] = temp / op[1]
+        elif op[0] == 'round':
+            arr1[i] = round(arr1[i], int(temp))
+        elif op[0] == 'ceil':
+            arr1[i] = math.ceil(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
+        elif op[0] == 'floor':
+            arr1[i] = math.floor(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
+        elif op[0] == '*round':
+            arr1[i] = round(arr1[i] * temp)
+        elif op[0] == '*ceil':
+            arr1[i] = math.ceil(arr1[i] * temp)
+        elif op[0] == '*floor':
+            arr1[i] = math.floor(arr1[i] * temp)
 
 
 def create_file(all_json):

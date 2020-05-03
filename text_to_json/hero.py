@@ -96,12 +96,10 @@ def fulfill_hero_json(base_txt, all_json,version):
             all_json[i]["应用"] = 1
             all_json[i]['图片']='Heroes_'+all_json[i]["代码名"]+'.png'
             all_json[i]['迷你图片']='Miniheroes_'+all_json[i]["代码名"]+'.png'
-            md5 = hashlib.md5()
-            md5.update(all_json[i]['图片'].encode('utf-8'))
-            all_json[i]['图片地址']= md5.hexdigest()
-            md5 = hashlib.md5()
-            md5.update(all_json[i]['迷你图片'].encode('utf-8'))
-            all_json[i]['迷你图片地址']= md5.hexdigest()
+            if '图片地址' in all_json[i]:
+                all_json[i].pop('图片地址')
+            if '迷你图片地址' in all_json[i]:
+                all_json[i].pop('迷你图片地址')
             for j in heropro_txt:
                 if j[1] in base_txt["英雄"][all_json[i]["代码名"]]:
                     all_json[i][j[0]] = {"代码": j[1]}
