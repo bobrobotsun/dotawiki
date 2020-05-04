@@ -115,6 +115,25 @@ def get_hero_data_from_txt(base_txt, address):
         else:
             break
 
+def autoget_talent_source(all_json,base):
+    retxt=''
+    for i in all_json['技能']:
+        bool=True
+        if all_json['技能'][i]['次级分类']=='天赋技能':
+            this_source=cal_ability_source_index(all_json,base,i)
+            for j in all_json['技能源']:
+                if all_json['技能源'][j]['代码']==this_source:
+                    bool=False
+                    all_json['技能'][i]['数据来源']=all_json['技能源'][j]['页面名']
+                    break
+            if bool:
+                retxt+='\n《'+i+'》并没有读取到合理技能源，请查询后添加。'
+    return retxt
+
+
+def cal_ability_source_index(json,base,i):
+    arr={'10级左天赋':-7,'10级右天赋':-8,'15级左天赋':-5,'15级右天赋':-6,'20级左天赋':-3,'20级右天赋':-4,'25级左天赋':-1,'25级右天赋':-2}
+    return base[json['英雄'][i[:-6]]['代码名']]['ability'][arr[i[-6:]]]
 
 def get_source_to_data(all_json, upgrade_json, version):
     for i in all_json['技能源']:

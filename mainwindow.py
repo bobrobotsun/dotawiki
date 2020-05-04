@@ -21,7 +21,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from text_to_json import hero, ability, item, unit, edit_json
+from text_to_json import hero, ability, item, unit, edit_json,dota_menus
 import win32con
 import win32clipboard as wincld
 
@@ -120,6 +120,8 @@ class Main(QMainWindow):
         self.ml['数据']['从wiki重新下载合成数据列表'].triggered.connect(lambda: self.download_json_name)
         self.ml['数据']['从wiki重新下载机制定义'] = self.ml['数据'][0].addAction('从wiki重新下载机制定义')
         self.ml['数据']['从wiki重新下载机制定义'].triggered.connect(lambda: self.download_mech)
+        self.ml['数据']['将wiki目录进行更新（不要乱点）'] = self.ml['数据'][0].addAction('将wiki目录进行更新（不要乱点）')
+        self.ml['数据']['将wiki目录进行更新（不要乱点）'].triggered.connect(lambda: self.download_and_upload_wiki_menu)
 
     def checklogin(self):
         try:
@@ -284,6 +286,9 @@ class Main(QMainWindow):
         self.mainlayout['加载按钮']['从wiki重新下载机制定义'] = QPushButton('从wiki重新下载机制定义', self)
         self.mainlayout['加载按钮']['从wiki重新下载机制定义'].clicked.connect(self.download_mech)
         self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['从wiki重新下载机制定义'])
+        self.mainlayout['加载按钮']['将wiki目录进行更新（不要乱点）'] = QPushButton('将wiki目录进行更新（不要乱点）', self)
+        self.mainlayout['加载按钮']['将wiki目录进行更新（不要乱点）'].clicked.connect(self.download_and_upload_wiki_menu)
+        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['将wiki目录进行更新（不要乱点）'])
         self.mainlayout['加载按钮'][0].addStretch(1)
 
         self.mainlayout['列表'] = {0: QHBoxLayout()}
@@ -477,6 +482,27 @@ class Main(QMainWindow):
         self.mech = self.download_json('机制检索.json')
         self.file_save(os.path.join('database', 'mech.json'), json.dumps(self.mech))
 
+    def download_and_upload_wiki_menu(self):
+        wiki_result = self.seesion.post(self.target_url, data={'action': 'jsondata', 'title': '机制.json', 'format': 'json'}).json()
+        wiki_menu = dota_menus.menu_init(wiki_result['jsondata'])
+        for i in self.json_base['英雄']:
+            wiki_menu['单位']['英雄'].append(i)
+        for i in self.json_base['非英雄单位']:
+            if dota_menus.menu_单位_召唤物(self.json_base['非英雄单位'][i]):
+                wiki_menu['单位']['召唤物'].append(i)
+            if dota_menus.menu_单位_守卫(self.json_base['非英雄单位'][i]):
+                wiki_menu['单位']['守卫'].append(i)
+            if dota_menus.menu_单位_英雄级单位(self.json_base['非英雄单位'][i]):
+                wiki_menu['单位']['英雄级单位'].append(i)
+            if dota_menus.menu_单位_中立生物(self.json_base['非英雄单位'][i]):
+                wiki_menu['单位']['中立生物'].append(i)
+            if dota_menus.menu_单位_远古生物(self.json_base['非英雄单位'][i]):
+                wiki_menu['单位']['远古生物'].append(i)
+            if dota_menus.menu_单位_小兵(self.json_base['非英雄单位'][i]):
+                wiki_menu['单位']['小兵'].append(i)
+        self.upload_json('Data:机制.json', json.dumps(wiki_menu))
+        QMessageBox.information(self, '更改完毕', "已经将wiki目录更改完毕", QMessageBox.Yes, QMessageBox.Yes)
+
     def download_json_base(self):
         try:
             namefile = open(os.path.join('database', 'json_name.json'), mode="r", encoding="utf-8")
@@ -554,7 +580,7 @@ class Main(QMainWindow):
         if (threading.activeCount() <= 2):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            QMessageBox.information(self.progress, '下载完毕', "已为您下载" + str(self.current_num[0]) + '/' + str(len(self.download_json_list)) + "合成数据，并已保存。", QMessageBox.Yes,
+            QMessageBox.information(self, '下载完毕', "已为您下载" + str(self.current_num[0]) + '/' + str(len(self.download_json_list)) + "合成数据，并已保存。", QMessageBox.Yes,
                                     QMessageBox.Yes)
 
     def fix_window_with_json_data(self):
@@ -830,6 +856,7 @@ class Main(QMainWindow):
         hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
         item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
 
+        info+=ability.autoget_talent_source(self.json_base,self.text_base['英雄'])
         ability.get_source_to_data(self.json_base, self.upgrade_base, self.version)
         unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version)
 
@@ -1793,15 +1820,15 @@ class Main(QMainWindow):
     def version_edit_change_value(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         ori_text = item.text(1)
-        if item.parent()!=None and item.parent().parent()!=None:
-            hero_text=item.parent().parent().text(0)
+        if item.parent() != None and item.parent().parent() != None:
+            hero_text = item.parent().parent().text(0)
         ori_text = re.sub(r'[\(\)（）\[\]【】<>《》]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
             text = re.sub(r'(?!\\)[\(（](.+?)(?!\\)[\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
             text = re.sub(r'(?!\\)[\[【](.+?)(?!\\)[\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
             text = re.sub(r'(?!\\)[<《](.+?)(?!\\)[>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
-            text = re.sub(r'\{\{A\|([0-9]+?)\}\}', lambda x: '{{A|' +hero_text+ x.group(1)+'级天赋}}', text)
+            text = re.sub(r'\{\{A\|([0-9]+?)\}\}', lambda x: '{{A|' + hero_text + x.group(1) + '级天赋}}', text)
             text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
             item.set_value(text)
             if item.parent() != None:
@@ -1821,13 +1848,12 @@ class Main(QMainWindow):
                             new = VersionItemEdit(iparent.child(icount - 1))
                             new.itemtype = 'list_text'
                             new.set_value(i[4:-2])
-                if item.parent()!=None and item.parent().parent()!=None:
-                    ipp=item.parent().parent()
-                    if ipp.itemtype=='tree2' and ipp.child(ipp.childCount()-1).child(1).text(1)!='':
+                if item.parent() != None and item.parent().parent() != None:
+                    ipp = item.parent().parent()
+                    if ipp.itemtype == 'tree2' and ipp.child(ipp.childCount() - 1).child(1).text(1) != '':
                         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(ipp)
                         self.version_button_tree2_add_tree_list()
                         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
-
 
     def version_button_tree1(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()

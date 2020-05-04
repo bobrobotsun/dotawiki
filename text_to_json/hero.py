@@ -1,5 +1,6 @@
 import json
 import hashlib
+import re
 
 
 # 查询数据范围
@@ -84,6 +85,18 @@ def get_hero_data_from_txt(base_txt,source_address):
                 findheropro(this_string, base_txt[name], tb, i, True, True)
             findheropro(this_string, base_txt[name], tb, role[0], False, False, True)
             findheropro(this_string, base_txt[name], tb, role[1], False, True, True)
+            base_txt[name]['ability']=[]
+            iters=re.finditer(r'"Ability(\d+?)".*?"(.*?)"',this_string[tb[0]:tb[1]])
+            for i in iters:
+                while len(base_txt[name]['ability'])<=int(i.group(1)):
+                    base_txt[name]['ability'].append('')
+                base_txt[name]['ability'][int(i.group(1))-1]=i.group(2)
+            i=0
+            while i<len(base_txt[name]['ability']):
+                if base_txt[name]['ability'][i]=='':
+                    base_txt[name]['ability'].pop(i)
+                else:
+                    i+=1
         else:
             break
 
