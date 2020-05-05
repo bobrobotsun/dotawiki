@@ -487,6 +487,7 @@ class Main(QMainWindow):
         wiki_menu = dota_menus.menu_init(wiki_result['jsondata'])
         for i in self.json_base['英雄']:
             wiki_menu['单位']['英雄'].append(i)
+
         for i in self.json_base['非英雄单位']:
             if dota_menus.menu_单位_召唤物(self.json_base['非英雄单位'][i]):
                 wiki_menu['单位']['召唤物'].append(i)
@@ -500,6 +501,15 @@ class Main(QMainWindow):
                 wiki_menu['单位']['远古生物'].append(i)
             if dota_menus.menu_单位_小兵(self.json_base['非英雄单位'][i]):
                 wiki_menu['单位']['小兵'].append(i)
+
+        for i in self.json_base['物品']:
+            wiki_menu['地图']['物品'].append(i)
+            if dota_menus.menu_地图_中立物品(self.json_base['物品'][i]):
+                wiki_menu['地图']['中立物品'].append(i)
+
+        for i in self.json_base['技能']:
+            if dota_menus.menu_地图_神符(self.json_base['技能'][i]):
+                wiki_menu['地图']['神符'].append(i)
         self.upload_json('Data:机制.json', json.dumps(wiki_menu))
         QMessageBox.information(self, '更改完毕', "已经将wiki目录更改完毕", QMessageBox.Yes, QMessageBox.Yes)
 
@@ -573,7 +583,7 @@ class Main(QMainWindow):
                     break
                 finally:
                     self.lock.release()
-                    time.sleep(0.4)
+                    time.sleep(0.6)
         self.download_json_thread_finished()
 
     def download_json_thread_finished(self):
