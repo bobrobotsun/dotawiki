@@ -115,8 +115,7 @@ def fulfill_unit_json(base_txt, all_json, version):
                             all_json[i][j[0]][k] = {"代码": {"1": all_json[i][j[0]][k]["代码"]["1"], "2": all_json[i][j[0]][k]["代码"]["2"], "3": all_json[i][j[0]][k]["代码"]["3"]},
                                                     "1": all_json[i][j[0]][k]["1"]}
                     else:
-                        if "修正" in all_json[i][j[0]][k] and all_json[i][j[0]][k]["修正"]["1"] == '=':
-                            for l in base_txt[all_json[i][j[0]][k]["代码"]["1"]][all_json[i][j[0]][k]["代码"]["2"]][all_json[i][j[0]][k]["代码"]["3"]]:
+                        for l in base_txt[all_json[i][j[0]][k]["代码"]["1"]][all_json[i][j[0]][k]["代码"]["2"]][all_json[i][j[0]][k]["代码"]["3"]]:
                                 all_json[i][j[0]][k][l] = base_txt[all_json[i][j[0]][k]["代码"]["1"]][all_json[i][j[0]][k]["代码"]["2"]][all_json[i][j[0]][k]["代码"]["3"]][l]
 
 

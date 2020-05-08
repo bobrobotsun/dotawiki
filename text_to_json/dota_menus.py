@@ -10,6 +10,8 @@ def menu_init(menu):
     menu['地图']['物品']=[]
     menu['地图']['中立物品']=[]
     menu['地图']['神符']=[]
+
+    menu['版本']=[]
     return menu
 
 def menu_单位_召唤物(json):

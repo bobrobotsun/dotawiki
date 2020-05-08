@@ -21,7 +21,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from text_to_json import hero, ability, item, unit, edit_json,dota_menus
+from text_to_json import hero, ability, item, unit, edit_json, dota_menus
 import win32con
 import win32clipboard as wincld
 
@@ -510,6 +510,9 @@ class Main(QMainWindow):
         for i in self.json_base['技能']:
             if dota_menus.menu_地图_神符(self.json_base['技能'][i]):
                 wiki_menu['地图']['神符'].append(i)
+
+        for i in range(8):
+            wiki_menu['版本'].append(self.version_list['版本'][-1 * i - 1][0])
         self.upload_json('Data:机制.json', json.dumps(wiki_menu))
         QMessageBox.information(self, '更改完毕', "已经将wiki目录更改完毕", QMessageBox.Yes, QMessageBox.Yes)
 
@@ -866,7 +869,7 @@ class Main(QMainWindow):
         hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
         item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
 
-        info+=ability.autoget_talent_source(self.json_base,self.text_base['英雄'])
+        info += ability.autoget_talent_source(self.json_base, self.text_base['英雄'])
         ability.get_source_to_data(self.json_base, self.upgrade_base, self.version)
         unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version)
 
@@ -1656,7 +1659,7 @@ class Main(QMainWindow):
             title = item.text(0)
         else:
             title = item.parent().text(0) + '/' + item.text(0)
-        self.version_base[title] = {'分类': '版本更新', '版本': title}
+        self.version_base[title] = {'分类': '版本更新', '版本': title, '图片': 'Patch_' + title + '.png'}
         for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):
             items = self.versionlayout['版本内容']['横排版']['树'][0].topLevelItem(i)
             if items.itemtype == 'text':

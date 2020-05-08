@@ -485,6 +485,11 @@ def one_upgrade(json, base_txt):
                         getvalue[0].append(0)
                     else:
                         getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+            elif json["1"]["代码"]["0"] == "有限等级":
+                levels = int(json["1"]["代码"]["4"])
+                for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
+                    if int(k) <= levels:
+                        getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
             elif json["1"]["代码"]["0"] == "不存在":
                 return
         else:
