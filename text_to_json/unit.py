@@ -94,7 +94,7 @@ def fulfill_unit_json(base_txt, all_json, version):
         for j in unitpro_txt + unitpro_num:
             popit = []
             for k in all_json[i][j[0]]:
-                if k != "代码" and k != "1":
+                if k != "代码" and k != "1" and k != '修正':
                     popit.append(k)
             for k in popit:
                 all_json[i][j[0]].pop(k)
@@ -112,11 +112,11 @@ def fulfill_unit_json(base_txt, all_json, version):
                             all_json[i][j[0]][k][l] = base_txt["非英雄单位"][all_json[i]["代码名"][l]][j[1]]["1"]
                             bool = bool and all_json[i][j[0]][k]["1"] == all_json[i][j[0]][k][l]
                         if bool:
-                            all_json[i][j[0]][k] = {"代码": {"1": all_json[i][j[0]][k]["代码"]["1"], "2": all_json[i][j[0]][k]["代码"]["2"], "3": all_json[i][j[0]][k]["代码"]["3"]},
-                                                    "1": all_json[i][j[0]][k]["1"]}
+                            all_json[i][j[0]][k]['代码'] = {"1": all_json[i][j[0]][k]["代码"]["1"], "2": all_json[i][j[0]][k]["代码"]["2"], "3": all_json[i][j[0]][k]["代码"]["3"]}
+                            all_json[i][j[0]][k]["1"]=all_json[i][j[0]][k]["1"]
                     else:
                         for l in base_txt[all_json[i][j[0]][k]["代码"]["1"]][all_json[i][j[0]][k]["代码"]["2"]][all_json[i][j[0]][k]["代码"]["3"]]:
-                                all_json[i][j[0]][k][l] = base_txt[all_json[i][j[0]][k]["代码"]["1"]][all_json[i][j[0]][k]["代码"]["2"]][all_json[i][j[0]][k]["代码"]["3"]][l]
+                            all_json[i][j[0]][k][l] = base_txt[all_json[i][j[0]][k]["代码"]["1"]][all_json[i][j[0]][k]["代码"]["2"]][all_json[i][j[0]][k]["代码"]["3"]][l]
 
 
 def complete_upgrade(all_json, base_txt):
@@ -127,9 +127,9 @@ def complete_upgrade(all_json, base_txt):
             inbool.append(inbool[0] and inbool[1])
             inbool.append(inbool[0] or inbool[1])
             if inbool[3]:
-                getvalue = [[], [], []]
-                calvalue = [[], [], []]
-                caloprate = [[], []]
+                getvalue = [[], [], [], []]
+                calvalue = [[], [], [], []]
+                caloprate = [[], [], []]
                 k = 0
                 while True:
                     k += 1
@@ -137,23 +137,39 @@ def complete_upgrade(all_json, base_txt):
                         getvalue[0].append(all_json[i][j]["1"][str(k)])
                     else:
                         break
+                if all_json[i][j]["1"]['修正']['1'] != '':
+                    inbool.append(True)
+                    caloprate[0].append(all_json[i][j]["1"]["修正"]["1"])
+                    k = 1
+                    try:
+                        while True:
+                            k += 1
+                            if str(k) in all_json[i][j]["1"]["修正"]:
+                                getvalue[1].append(float(all_json[i][j]["1"]["修正"][str(k)]))
+                            else:
+                                break
+                    except ValueError:
+                        for k in base_txt[all_json[i][j]["1"]["代码"]["1"]][all_json[i][j]["1"]["代码"]["2"]][all_json[i][j]["1"]["修正"]["2"]]:
+                            getvalue[1].append(base_txt[all_json[i][j]["1"]["代码"]["1"]][all_json[i][j]["1"]["代码"]["2"]][all_json[i][j]["1"]["修正"]["2"]][k])
+                else:
+                    inbool.append(False)
                 if inbool[0]:
                     if "0" in all_json[i][j]["2"]["代码"] and all_json[i][j]["2"]["代码"]["0"] == "手填":
                         k = 0
                         while True:
                             k += 1
                             if str(k) in all_json[i][j]["2"]["代码"]:
-                                getvalue[1].append(all_json[i][j]["2"]["代码"][str(k)])
+                                getvalue[2].append(all_json[i][j]["2"]["代码"][str(k)])
                             else:
                                 break
                     else:
                         for k in base_txt[all_json[i][j]["2"]["代码"]["1"]][all_json[i][j]["2"]["代码"]["2"]][all_json[i][j]["2"]["代码"]["3"]]:
-                            getvalue[1].append(base_txt[all_json[i][j]["2"]["代码"]["1"]][all_json[i][j]["2"]["代码"]["2"]][all_json[i][j]["2"]["代码"]["3"]][k])
+                            getvalue[2].append(base_txt[all_json[i][j]["2"]["代码"]["1"]][all_json[i][j]["2"]["代码"]["2"]][all_json[i][j]["2"]["代码"]["3"]][k])
                     k = 0
                     while True:
                         k += 1
                         if str(k) in all_json[i][j]["2"]["修正"]:
-                            caloprate[0].append(all_json[i][j]["2"]["修正"][str(k)])
+                            caloprate[1].append(all_json[i][j]["2"]["修正"][str(k)])
                         else:
                             break
                 if inbool[1]:
@@ -162,84 +178,106 @@ def complete_upgrade(all_json, base_txt):
                         while True:
                             k += 1
                             if str(k) in all_json[i][j]["3"]["代码"]:
-                                getvalue[2].append(all_json[i][j]["3"]["代码"][str(k)])
+                                getvalue[3].append(all_json[i][j]["3"]["代码"][str(k)])
                             else:
                                 break
                     else:
                         for k in base_txt[all_json[i][j]["3"]["代码"]["1"]][all_json[i][j]["3"]["代码"]["2"]][all_json[i][j]["3"]["代码"]["3"]]:
-                            getvalue[2].append(base_txt[all_json[i][j]["3"]["代码"]["1"]][all_json[i][j]["3"]["代码"]["2"]][all_json[i][j]["3"]["代码"]["3"]][k])
+                            getvalue[3].append(base_txt[all_json[i][j]["3"]["代码"]["1"]][all_json[i][j]["3"]["代码"]["2"]][all_json[i][j]["3"]["代码"]["3"]][k])
                     k = 0
                     while True:
                         k += 1
                         if str(k) in all_json[i][j]["3"]["修正"]:
-                            caloprate[1].append(all_json[i][j]["3"]["修正"][str(k)])
+                            caloprate[2].append(all_json[i][j]["3"]["修正"][str(k)])
                         else:
                             break
                 calvalue[0] = copy.deepcopy(getvalue[0])
                 calvalue[1] = copy.deepcopy(getvalue[0])
                 calvalue[2] = copy.deepcopy(getvalue[0])
-                if inbool[0]:
-                    array_cal(calvalue[0], getvalue[1], caloprate[0])
-                    array_cal(calvalue[2], getvalue[1], caloprate[0])
+                calvalue[3] = copy.deepcopy(getvalue[0])
+
                 if inbool[1]:
-                    array_cal(calvalue[1], getvalue[2], caloprate[1])
-                    array_cal(calvalue[2], getvalue[2], caloprate[1])
+                    array_cal(calvalue[2], getvalue[3], caloprate[2], -1)
+                    array_cal(calvalue[3], getvalue[3], caloprate[2], -1)
                 if inbool[0]:
-                    for k in range(len(calvalue[0])):
-                        all_json[i][j]["2"][str(k + 1)] = calvalue[0][k]
+                    array_cal(calvalue[1], getvalue[2], caloprate[1], 0)
+                    array_cal(calvalue[3], getvalue[2], caloprate[1], 0)
                 if inbool[1]:
+                    array_cal(calvalue[2], getvalue[3], caloprate[2], 0)
+                    array_cal(calvalue[3], getvalue[3], caloprate[2], 0)
+                if inbool[4]:
+                    array_cal(calvalue[0], getvalue[1], caloprate[0], 0)
+                    array_cal(calvalue[1], getvalue[1], caloprate[0], 0)
+                    array_cal(calvalue[2], getvalue[1], caloprate[0], 0)
+                    array_cal(calvalue[3], getvalue[1], caloprate[0], 0)
+                if inbool[1]:
+                    array_cal(calvalue[2], getvalue[3], caloprate[2], 1)
+                    array_cal(calvalue[3], getvalue[3], caloprate[2], 1)
+
+                for k in range(len(calvalue[0])):
+                    all_json[i][j]["1"][str(k + 1)] = calvalue[0][k]
+                if inbool[0]:
                     for k in range(len(calvalue[1])):
-                        all_json[i][j]["3"][str(k + 1)] = calvalue[1][k]
+                        all_json[i][j]["2"][str(k + 1)] = calvalue[1][k]
+                if inbool[1]:
+                    for k in range(len(calvalue[2])):
+                        all_json[i][j]["3"][str(k + 1)] = calvalue[2][k]
                 if inbool[2]:
                     all_json[i][j]["4"] = {}
-                    for k in range(len(calvalue[2])):
-                        all_json[i][j]["4"][str(k + 1)] = calvalue[2][k]
+                    for k in range(len(calvalue[3])):
+                        all_json[i][j]["4"][str(k + 1)] = calvalue[3][k]
                     all_json[i][j]["4"]["升级来源"] = copy.deepcopy(all_json[i][j]["3"]["升级来源"])
 
 
-def array_cal(arr1, arr2, op):
+def array_cal(arr1, arr2, op, num):
+    if num == 0:
+        opp = '1' + op[0] + '1'
+    elif num == -1:
+        opp = op[0] + '1'
+    elif num == 1:
+        opp = '1' + op[0]
     for i in range(len(arr1)):
         if i < len(arr2):
             temp = arr2[i]
         else:
             temp = arr2[0]
-        if op[0] == '=':
+        if opp == '1=1':
             arr1[i] = temp
-        elif op[0] == '+':
+        elif opp == '1+1':
             arr1[i] = arr1[i] + temp
-        elif op[0] == '\\-':
+        elif opp == '1\\-1':
             arr1[i] = temp - arr1[i]
-        elif op[0] == '*':
+        elif opp == '1*1':
             arr1[i] = arr1[i] * temp
-        elif op[0] == '/':
+        elif opp == '1/1':
             arr1[i] = arr1[i] / temp
-        elif op[0] == '\\':
+        elif opp == '1\\1':
             arr1[i] = temp / arr1[i]
-        elif op[0] == '%-':
+        elif opp == '1%-1':
             arr1[i] = arr1[i] * (100 - temp) / 100
-        elif op[0] == '%+':
+        elif opp == '1%+1':
             arr1[i] = arr1[i] * (100 + temp) / 100
-        elif op[0] == '-%':
+        elif opp == '1-%1':
             arr1[i] = arr1[i] * (1 - temp)
-        elif op[0] == '=-':
+        elif opp == '1=-1':
             arr1[i] = temp - op[1]
-        elif op[0] == '=+':
+        elif opp == '1=+1':
             arr1[i] = temp + op[1]
-        elif op[0] == '=*':
+        elif opp == '1=*1':
             arr1[i] = temp * op[1]
-        elif op[0] == '=/':
+        elif opp == '1=/1':
             arr1[i] = temp / op[1]
-        elif op[0] == 'round':
+        elif opp == '1round1':
             arr1[i] = round(arr1[i], int(temp))
-        elif op[0] == 'ceil':
+        elif opp == '1ceil1':
             arr1[i] = math.ceil(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
-        elif op[0] == 'floor':
+        elif opp == '1floor1':
             arr1[i] = math.floor(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
-        elif op[0] == '*round':
+        elif opp == '1*round1':
             arr1[i] = round(arr1[i] * temp)
-        elif op[0] == '*ceil':
+        elif opp == '1*ceil1':
             arr1[i] = math.ceil(arr1[i] * temp)
-        elif op[0] == '*floor':
+        elif opp == '1*floor1':
             arr1[i] = math.floor(arr1[i] * temp)
 
 
