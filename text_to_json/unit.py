@@ -126,107 +126,106 @@ def complete_upgrade(all_json, base_txt):
             inbool = ["2" in all_json[i][j], "3" in all_json[i][j]]
             inbool.append(inbool[0] and inbool[1])
             inbool.append(inbool[0] or inbool[1])
-            if inbool[3]:
-                getvalue = [[], [], [], []]
-                calvalue = [[], [], [], []]
-                caloprate = [[], [], []]
+            getvalue = [[], [], [], []]
+            calvalue = [[], [], [], []]
+            caloprate = [[], [], []]
+            k = 0
+            while True:
+                k += 1
+                if str(k) in all_json[i][j]["1"]:
+                    getvalue[0].append(all_json[i][j]["1"][str(k)])
+                else:
+                    break
+            if all_json[i][j]["1"]['修正']['1'] != '':
+                inbool.append(True)
+                caloprate[0].append(all_json[i][j]["1"]["修正"]["1"])
+                k = 1
+                try:
+                    while True:
+                        k += 1
+                        if str(k) in all_json[i][j]["1"]["修正"]:
+                            getvalue[1].append(float(all_json[i][j]["1"]["修正"][str(k)]))
+                        else:
+                            break
+                except ValueError:
+                    for k in base_txt[all_json[i][j]["1"]["代码"]["1"]][all_json[i][j]["1"]["代码"]["2"]][all_json[i][j]["1"]["修正"]["2"]]:
+                        getvalue[1].append(base_txt[all_json[i][j]["1"]["代码"]["1"]][all_json[i][j]["1"]["代码"]["2"]][all_json[i][j]["1"]["修正"]["2"]][k])
+            else:
+                inbool.append(False)
+            if inbool[0]:
+                if "0" in all_json[i][j]["2"]["代码"] and all_json[i][j]["2"]["代码"]["0"] == "手填":
+                    k = 0
+                    while True:
+                        k += 1
+                        if str(k) in all_json[i][j]["2"]["代码"]:
+                            getvalue[2].append(all_json[i][j]["2"]["代码"][str(k)])
+                        else:
+                            break
+                else:
+                    for k in base_txt[all_json[i][j]["2"]["代码"]["1"]][all_json[i][j]["2"]["代码"]["2"]][all_json[i][j]["2"]["代码"]["3"]]:
+                        getvalue[2].append(base_txt[all_json[i][j]["2"]["代码"]["1"]][all_json[i][j]["2"]["代码"]["2"]][all_json[i][j]["2"]["代码"]["3"]][k])
                 k = 0
                 while True:
                     k += 1
-                    if str(k) in all_json[i][j]["1"]:
-                        getvalue[0].append(all_json[i][j]["1"][str(k)])
+                    if str(k) in all_json[i][j]["2"]["修正"]:
+                        caloprate[1].append(all_json[i][j]["2"]["修正"][str(k)])
                     else:
                         break
-                if all_json[i][j]["1"]['修正']['1'] != '':
-                    inbool.append(True)
-                    caloprate[0].append(all_json[i][j]["1"]["修正"]["1"])
-                    k = 1
-                    try:
-                        while True:
-                            k += 1
-                            if str(k) in all_json[i][j]["1"]["修正"]:
-                                getvalue[1].append(float(all_json[i][j]["1"]["修正"][str(k)]))
-                            else:
-                                break
-                    except ValueError:
-                        for k in base_txt[all_json[i][j]["1"]["代码"]["1"]][all_json[i][j]["1"]["代码"]["2"]][all_json[i][j]["1"]["修正"]["2"]]:
-                            getvalue[1].append(base_txt[all_json[i][j]["1"]["代码"]["1"]][all_json[i][j]["1"]["代码"]["2"]][all_json[i][j]["1"]["修正"]["2"]][k])
+            if inbool[1]:
+                if "0" in all_json[i][j]["3"]["代码"] and all_json[i][j]["3"]["代码"]["0"] == "手填":
+                    k = 0
+                    while True:
+                        k += 1
+                        if str(k) in all_json[i][j]["3"]["代码"]:
+                            getvalue[3].append(all_json[i][j]["3"]["代码"][str(k)])
+                        else:
+                            break
                 else:
-                    inbool.append(False)
-                if inbool[0]:
-                    if "0" in all_json[i][j]["2"]["代码"] and all_json[i][j]["2"]["代码"]["0"] == "手填":
-                        k = 0
-                        while True:
-                            k += 1
-                            if str(k) in all_json[i][j]["2"]["代码"]:
-                                getvalue[2].append(all_json[i][j]["2"]["代码"][str(k)])
-                            else:
-                                break
+                    for k in base_txt[all_json[i][j]["3"]["代码"]["1"]][all_json[i][j]["3"]["代码"]["2"]][all_json[i][j]["3"]["代码"]["3"]]:
+                        getvalue[3].append(base_txt[all_json[i][j]["3"]["代码"]["1"]][all_json[i][j]["3"]["代码"]["2"]][all_json[i][j]["3"]["代码"]["3"]][k])
+                k = 0
+                while True:
+                    k += 1
+                    if str(k) in all_json[i][j]["3"]["修正"]:
+                        caloprate[2].append(all_json[i][j]["3"]["修正"][str(k)])
                     else:
-                        for k in base_txt[all_json[i][j]["2"]["代码"]["1"]][all_json[i][j]["2"]["代码"]["2"]][all_json[i][j]["2"]["代码"]["3"]]:
-                            getvalue[2].append(base_txt[all_json[i][j]["2"]["代码"]["1"]][all_json[i][j]["2"]["代码"]["2"]][all_json[i][j]["2"]["代码"]["3"]][k])
-                    k = 0
-                    while True:
-                        k += 1
-                        if str(k) in all_json[i][j]["2"]["修正"]:
-                            caloprate[1].append(all_json[i][j]["2"]["修正"][str(k)])
-                        else:
-                            break
-                if inbool[1]:
-                    if "0" in all_json[i][j]["3"]["代码"] and all_json[i][j]["3"]["代码"]["0"] == "手填":
-                        k = 0
-                        while True:
-                            k += 1
-                            if str(k) in all_json[i][j]["3"]["代码"]:
-                                getvalue[3].append(all_json[i][j]["3"]["代码"][str(k)])
-                            else:
-                                break
-                    else:
-                        for k in base_txt[all_json[i][j]["3"]["代码"]["1"]][all_json[i][j]["3"]["代码"]["2"]][all_json[i][j]["3"]["代码"]["3"]]:
-                            getvalue[3].append(base_txt[all_json[i][j]["3"]["代码"]["1"]][all_json[i][j]["3"]["代码"]["2"]][all_json[i][j]["3"]["代码"]["3"]][k])
-                    k = 0
-                    while True:
-                        k += 1
-                        if str(k) in all_json[i][j]["3"]["修正"]:
-                            caloprate[2].append(all_json[i][j]["3"]["修正"][str(k)])
-                        else:
-                            break
-                calvalue[0] = copy.deepcopy(getvalue[0])
-                calvalue[1] = copy.deepcopy(getvalue[0])
-                calvalue[2] = copy.deepcopy(getvalue[0])
-                calvalue[3] = copy.deepcopy(getvalue[0])
+                        break
+            calvalue[0] = copy.deepcopy(getvalue[0])
+            calvalue[1] = copy.deepcopy(getvalue[0])
+            calvalue[2] = copy.deepcopy(getvalue[0])
+            calvalue[3] = copy.deepcopy(getvalue[0])
 
-                if inbool[1]:
-                    array_cal(calvalue[2], getvalue[3], caloprate[2], -1)
-                    array_cal(calvalue[3], getvalue[3], caloprate[2], -1)
-                if inbool[0]:
-                    array_cal(calvalue[1], getvalue[2], caloprate[1], 0)
-                    array_cal(calvalue[3], getvalue[2], caloprate[1], 0)
-                if inbool[1]:
-                    array_cal(calvalue[2], getvalue[3], caloprate[2], 0)
-                    array_cal(calvalue[3], getvalue[3], caloprate[2], 0)
-                if inbool[4]:
-                    array_cal(calvalue[0], getvalue[1], caloprate[0], 0)
-                    array_cal(calvalue[1], getvalue[1], caloprate[0], 0)
-                    array_cal(calvalue[2], getvalue[1], caloprate[0], 0)
-                    array_cal(calvalue[3], getvalue[1], caloprate[0], 0)
-                if inbool[1]:
-                    array_cal(calvalue[2], getvalue[3], caloprate[2], 1)
-                    array_cal(calvalue[3], getvalue[3], caloprate[2], 1)
+            if inbool[1]:
+                array_cal(calvalue[2], getvalue[3], caloprate[2], -1)
+                array_cal(calvalue[3], getvalue[3], caloprate[2], -1)
+            if inbool[0]:
+                array_cal(calvalue[1], getvalue[2], caloprate[1], 0)
+                array_cal(calvalue[3], getvalue[2], caloprate[1], 0)
+            if inbool[1]:
+                array_cal(calvalue[2], getvalue[3], caloprate[2], 0)
+                array_cal(calvalue[3], getvalue[3], caloprate[2], 0)
+            if inbool[4]:
+                array_cal(calvalue[0], getvalue[1], caloprate[0], 0)
+                array_cal(calvalue[1], getvalue[1], caloprate[0], 0)
+                array_cal(calvalue[2], getvalue[1], caloprate[0], 0)
+                array_cal(calvalue[3], getvalue[1], caloprate[0], 0)
+            if inbool[1]:
+                array_cal(calvalue[2], getvalue[3], caloprate[2], 1)
+                array_cal(calvalue[3], getvalue[3], caloprate[2], 1)
 
-                for k in range(len(calvalue[0])):
-                    all_json[i][j]["1"][str(k + 1)] = calvalue[0][k]
-                if inbool[0]:
-                    for k in range(len(calvalue[1])):
-                        all_json[i][j]["2"][str(k + 1)] = calvalue[1][k]
-                if inbool[1]:
-                    for k in range(len(calvalue[2])):
-                        all_json[i][j]["3"][str(k + 1)] = calvalue[2][k]
-                if inbool[2]:
-                    all_json[i][j]["4"] = {}
-                    for k in range(len(calvalue[3])):
-                        all_json[i][j]["4"][str(k + 1)] = calvalue[3][k]
-                    all_json[i][j]["4"]["升级来源"] = copy.deepcopy(all_json[i][j]["3"]["升级来源"])
+            for k in range(len(calvalue[0])):
+                all_json[i][j]["1"][str(k + 1)] = calvalue[0][k]
+            if inbool[0]:
+                for k in range(len(calvalue[1])):
+                    all_json[i][j]["2"][str(k + 1)] = calvalue[1][k]
+            if inbool[1]:
+                for k in range(len(calvalue[2])):
+                    all_json[i][j]["3"][str(k + 1)] = calvalue[2][k]
+            if inbool[2]:
+                all_json[i][j]["4"] = {}
+                for k in range(len(calvalue[3])):
+                    all_json[i][j]["4"][str(k + 1)] = calvalue[3][k]
+                all_json[i][j]["4"]["升级来源"] = copy.deepcopy(all_json[i][j]["3"]["升级来源"])
 
 
 def array_cal(arr1, arr2, op, num):

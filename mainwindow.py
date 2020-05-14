@@ -593,8 +593,7 @@ class Main(QMainWindow):
         if (threading.activeCount() <= 2):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            QMessageBox.information(self, '下载完毕', "已为您下载" + str(self.current_num[0]) + '/' + str(len(self.download_json_list)) + "合成数据，并已保存。", QMessageBox.Yes,
-                                    QMessageBox.Yes)
+            QMessageBox.information(self, '下载完毕', "已为您下载合成数据，并已保存。", QMessageBox.Yes,QMessageBox.Yes)
 
     def fix_window_with_json_data(self):
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
