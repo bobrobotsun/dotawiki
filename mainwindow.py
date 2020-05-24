@@ -540,7 +540,7 @@ class Main(QMainWindow):
                     else:
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
-            for i in range(10):
+            for i in range(20):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
         except FileNotFoundError:
@@ -585,8 +585,8 @@ class Main(QMainWindow):
                     self.current_num[0] += 1
                     break
                 finally:
+                    time.sleep(0.02)
                     self.lock.release()
-                    time.sleep(0.6)
         self.download_json_thread_finished()
 
     def download_json_thread_finished(self):

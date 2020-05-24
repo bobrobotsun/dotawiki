@@ -671,6 +671,14 @@ def array_cal(arr1, arr2, op, num):
             arr1[i]=math.ceil(arr1[i]*temp)
         elif opp=='1*floor1':
             arr1[i]=math.floor(arr1[i]*temp)
+        elif opp[0:2]=='1=' and opp[-2:]=='+1':
+            arr1[i]=float(opp[2:-2])+temp
+        elif opp[0:2]=='1=' and opp[-2:]=='-1':
+            arr1[i]=float(opp[2:-2])-temp
+        elif opp[0:2]=='1=' and opp[-2:]=='*1':
+            arr1[i]=float(opp[2:-2])*temp
+        elif opp[0:2]=='1=' and opp[-2:]=='/1':
+            arr1[i]=float(opp[2:-2])/temp
 
 
 def complete_mech(all_json, mech_json):
