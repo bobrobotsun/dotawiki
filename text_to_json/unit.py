@@ -115,8 +115,9 @@ def fulfill_unit_json(base_txt, all_json, version):
                             all_json[i][j[0]][k]['代码'] = {"1": all_json[i][j[0]][k]["代码"]["1"], "2": all_json[i][j[0]][k]["代码"]["2"], "3": all_json[i][j[0]][k]["代码"]["3"]}
                             all_json[i][j[0]][k]["1"]=all_json[i][j[0]][k]["1"]
                     else:
-                        for l in base_txt[all_json[i][j[0]][k]["代码"]["1"]][all_json[i][j[0]][k]["代码"]["2"]][all_json[i][j[0]][k]["代码"]["3"]]:
-                            all_json[i][j[0]][k][l] = base_txt[all_json[i][j[0]][k]["代码"]["1"]][all_json[i][j[0]][k]["代码"]["2"]][all_json[i][j[0]][k]["代码"]["3"]][l]
+                        temp_daima=all_json[i][j[0]][k]["代码"]
+                        for l in base_txt[temp_daima["1"]][temp_daima["2"]][temp_daima["3"]]:
+                            all_json[i][j[0]][k][l] = base_txt[temp_daima["1"]][temp_daima["2"]][temp_daima["3"]][l]
 
 
 def complete_upgrade(all_json, base_txt):

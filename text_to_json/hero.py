@@ -1,7 +1,7 @@
 import json
 import hashlib
 import re
-
+import copy
 
 # 查询数据范围
 def findtb(source, start, end, tb, brace=0):
@@ -64,51 +64,57 @@ def findheropro(source, data, tb, pro, inherit=True, number=True, splitit=False)
     return
 
 
-def get_hero_data_from_txt(base_txt,source_address):
+def get_hero_data_from_txt(base_txt, source_address):
     this_file = open(source_address, mode="r")
     this_string = this_file.read()
-    tb = [0, 0]
-    findtb(this_string, 0, len(this_string), tb, -1)
-    for i in heropro_txt:
-        findheropro(this_string, hero_default, tb, i, False, False)
-    for i in heropro_num:
-        findheropro(this_string, hero_default, tb, i, False, True)
-    findheropro(this_string, hero_default, tb, role[0], False, False, True)
-    findheropro(this_string, hero_default, tb, role[1], False, True, True)
-    while (True):
-        if (findtb(this_string, tb[1] + 2, len(this_string), tb, 0)):
-            name = findheroname(this_string, tb)
-            base_txt[name] = {}
-            for i in heropro_txt:
-                findheropro(this_string, base_txt[name], tb, i, True, False)
-            for i in heropro_num:
-                findheropro(this_string, base_txt[name], tb, i, True, True)
-            findheropro(this_string, base_txt[name], tb, role[0], False, False, True)
-            findheropro(this_string, base_txt[name], tb, role[1], False, True, True)
-            base_txt[name]['ability']=[]
-            iters=re.finditer(r'"Ability(\d+?)".*?"(.*?)"',this_string[tb[0]:tb[1]])
-            for i in iters:
-                while len(base_txt[name]['ability'])<=int(i.group(1)):
-                    base_txt[name]['ability'].append('')
-                base_txt[name]['ability'][int(i.group(1))-1]=i.group(2)
-            i=0
-            while i<len(base_txt[name]['ability']):
-                if base_txt[name]['ability'][i]=='':
-                    base_txt[name]['ability'].pop(i)
-                else:
-                    i+=1
+    alltext = re.finditer('\n\t"(.*?)"\n\t\{(.|\n)*?\n\t\}', this_string)
+    for i in alltext:
+        name = i.group(1)[14:]
+        if name=='base':
+            base_txt[name]=copy.deepcopy(hero_default)
         else:
-            break
+            base_txt[name] = copy.deepcopy(base_txt['base'])
+        all_pro = re.finditer('\n\t\t"(.*?)".*?"(.*?)"', i.group(0))
+        base_txt[name]['ability'] = []
+        for j in all_pro:
+            temp_name = j.group(1)
+            temp_value = j.group(2)
+            if re.match('Ability[0-9]+',temp_name)==None:
+                base_txt[name][temp_name] = {}
+                temp_list = temp_value.split(',')
+                for k in range(len(temp_list)):
+                    temp_valuek = temp_list[k].strip()
+                    try:
+                        base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
+                    except ValueError:
+                        try:
+                            base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
+                        except ValueError:
+                            for l in heropro_txt:
+                                if temp_name==l[1] and len(l)>2 and temp_valuek in l[2]:
+                                    base_txt[name][temp_name][str(k + 1)] = l[2][temp_valuek]
+                            if str(k + 1) not in base_txt[name][temp_name]:
+                                base_txt[name][temp_name][str(k + 1)] = temp_valuek
+            else:
+                while len(base_txt[name]['ability']) <= int(temp_name[7:]):
+                    base_txt[name]['ability'].append('')
+                base_txt[name]['ability'][int(temp_name[7:]) - 1] = temp_value
+                i = 0
+                while i < len(base_txt[name]['ability']):
+                    if base_txt[name]['ability'][i] == '':
+                        base_txt[name]['ability'].pop(i)
+                    else:
+                        i += 1
 
 
-def fulfill_hero_json(base_txt, all_json,version):
+def fulfill_hero_json(base_txt, all_json, version):
     for i in all_json:
         if all_json[i]["代码名"] in base_txt["英雄"]:
             all_json[i]["分类"] = "英雄"
             all_json[i]["版本"] = version
             all_json[i]["应用"] = 1
-            all_json[i]['图片']='Heroes_'+all_json[i]["代码名"]+'.png'
-            all_json[i]['迷你图片']='Miniheroes_'+all_json[i]["代码名"]+'.png'
+            all_json[i]['图片'] = 'Heroes_' + all_json[i]["代码名"] + '.png'
+            all_json[i]['迷你图片'] = 'Miniheroes_' + all_json[i]["代码名"] + '.png'
             if '图片地址' in all_json[i]:
                 all_json[i].pop('图片地址')
             if '迷你图片地址' in all_json[i]:
@@ -119,11 +125,6 @@ def fulfill_hero_json(base_txt, all_json,version):
                     for k in base_txt["英雄"][all_json[i]["代码名"]][j[1]]:
                         all_json[i][j[0]][k] = base_txt["英雄"][all_json[i]["代码名"]][j[1]][k]
             for j in heropro_num:
-                if j[1] in base_txt["英雄"][all_json[i]["代码名"]]:
-                    all_json[i][j[0]] = {"代码": j[1]}
-                    for k in base_txt["英雄"][all_json[i]["代码名"]][j[1]]:
-                        all_json[i][j[0]][k] = base_txt["英雄"][all_json[i]["代码名"]][j[1]][k]
-            for j in role:
                 if j[1] in base_txt["英雄"][all_json[i]["代码名"]]:
                     all_json[i][j[0]] = {"代码": j[1]}
                     for k in base_txt["英雄"][all_json[i]["代码名"]][j[1]]:
@@ -140,8 +141,10 @@ def create_file(all_json):
 heropro_txt = [["主属性", "AttributePrimary", {"DOTA_ATTRIBUTE_STRENGTH": "力量", "DOTA_ATTRIBUTE_AGILITY": "敏捷", "DOTA_ATTRIBUTE_INTELLECT": "智力"}]
     , ["近战远程", "AttackCapabilities", {"DOTA_UNIT_CAP_MELEE_ATTACK": "近战", "DOTA_UNIT_CAP_RANGED_ATTACK": "远程", "DOTA_UNIT_CAP_NO_ATTACK": "不攻击"}]
     , ["阵营", "Team", {"Good": "天辉", "Bad": "夜魇", "good": "天辉", "bad": "夜魇"}]
-    , ["体质类型", "GibType"]
-    , ["碰撞体积", "BoundsHullName", {"DOTA_HULL_SIZE_HERO": 24, "DOTA_HULL_SIZE_SMALL": 16}]]
+    , ["碰撞体积", "BoundsHullName", {"DOTA_HULL_SIZE_HERO": 24, "DOTA_HULL_SIZE_SMALL": 16}]
+    , ["定位", "Role", {"Carry": "核心", "Escape": "逃生", "Nuker": "爆发", "Initiator": "先手", "Durable": "耐久", "Disabler": "控制", "Jungler": "打野", "Support": "辅助", "Pusher": "推进"}]
+    ,['定位等级','Rolelevels']
+    ,['体质类型','GibType']]
 heropro_num = [["攻击下限", "AttackDamageMin"]
     , ["攻击上限", "AttackDamageMax"]
     , ["攻击间隔", "AttackRate"]
@@ -168,6 +171,4 @@ heropro_num = [["攻击下限", "AttackDamageMin"]
     , ["复杂度", "Complexity"]
     , ["腿数量", "Legs"]
     , ["攻击速度", "BaseAttackSpeed"]]
-role = [["定位", "Role", {"Carry": "核心", "Escape": "逃生", "Nuker": "爆发", "Initiator": "先手", "Durable": "耐久", "Disabler": "控制", "Jungler": "打野", "Support": "辅助", "Pusher": "推进"}],
-        ["定位等级", "Rolelevels"]]
 hero_default = {"StatusHealthRegen": {"1": 0}, "GibType": {"1": "default"}, "Team": {"1": "天辉"}, "Complexity": {"1": 1}}

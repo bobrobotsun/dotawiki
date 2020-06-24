@@ -3,7 +3,7 @@ import os
 import copy
 import math
 import hashlib
-
+import re
 
 # 将数字转化为文字，取消小数点和无用末尾0
 def better_float_to_text(x):
@@ -12,108 +12,31 @@ def better_float_to_text(x):
     else:
         return str(x)
 
-
-# 查询数据范围
-def findtb(source, start, end, tb, brace=0):
-    i = j = 0
-    tb[0] = start
-    tb[1] = end
-    for i in range(start, end):
-        if source[i] == '{':
-            brace += 1
-            if brace > 0:
-                tb[0] = i + 1
-                for j in range(i + 1, tb[1]):
-                    if source[j] == '{':
-                        brace += 1
-                    elif source[j] == '}':
-                        brace -= 1
-                        if brace == 0:
-                            tb[1] = j - 1
-                            return True
-        elif source[i] == '}':
-            return False
-    return False
-
-
-def findabilityname(source, tb):
-    i = source.rfind('\"', 0, tb[0])
-    j = source.rfind('\"', 0, i - 1)
-    return source[j + 1:i]
-
-
-# 寻找属性（查询源字符串，数据存储位置，上下限，属性序数，是否为存在属性）
-def findabilitypro(source, data, tb, pro, bool=False):
-    if bool:
-        i = source.find(pro[1], tb[0], tb[1])
-        if i != -1:
-            data[pro[1]] = {"1": 1}
-    else:
-        i = source.find('\"' + pro[1] + '\"', tb[0], tb[1])
-        if i != -1:
-            j = source.find('\"', i + 1, tb[1])
-            j = source.find('\"', j + 1, tb[1])
-            k = source.find('\"', j + 1, tb[1])
-            if k > j + 1:
-                splitit = source[j + 1:k].split(' ')
-                data[pro[1]] = {}
-                bool = True
-                for j in range(len(splitit)):
-                    data[pro[1]][str(j + 1)] = float(splitit[j])
-                    bool = bool and splitit[0] == splitit[j]
-                if bool:
-                    data[pro[1]] = {"1": data[pro[1]]["1"]}
-    return
-
-
-def findabilityspecial(source, data, tb):
-    i = source.find("AbilitySpecial", tb[0], tb[1])
-    if i == -1:
-        return
-    else:
-        k = source.find("{", i, tb[1])
-        while True:
-            j = source.find("{", k + 1, tb[1])
-            k = source.find("}", k + 1, tb[1])
-            if j < k and j != -1:
-                r = [0, 0, 0, 0]
-                r[0] = source.find('\"', j, k) + 1
-                r[0] = source.find('\"', r[0], k) + 1
-                r[0] = source.find('\"', r[0], k) + 1
-                r[0] = source.find('\"', r[0], k) + 1
-                r[0] = source.find('\"', r[0], k) + 1
-                r[1] = source.find('\"', r[0], k)
-                r[2] = source.find('\"', r[1] + 1, k) + 1
-                r[3] = source.find('\"', r[2], k)
-                splitit = source[r[2]:r[3]].split(' ')
-                if splitit[0] != '':
-                    data[source[r[0]:r[1]]] = {}
-                    bool = True
-                    for l in range(len(splitit)):
-                        data[source[r[0]:r[1]]][str(l + 1)] = float(splitit[l])
-                        bool = bool and splitit[0] == splitit[l]
-                    if bool:
-                        data[source[r[0]:r[1]]] = {"1": data[source[r[0]:r[1]]]["1"]}
-            else:
-                return
-
-
 def get_hero_data_from_txt(base_txt, address):
-    this_file = open("E:/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_abilities.txt", mode="r")
+    this_file = open(address, mode="r")
     this_string = this_file.read()
-    tb = [0, 0]
-    findtb(this_string, 0, len(this_string), tb, -1)
-    while (True):
-        if (findtb(this_string, tb[1] + 2, len(this_string), tb, 0)):
-            name = findabilityname(this_string, tb)
-            base_txt[name] = {}
-            for i in abilitypro_num:
-                findabilitypro(this_string, base_txt[name], tb, i, False)
-            for i in abilitypro_bool:
-                findabilitypro(this_string, base_txt[name], tb, i, True)
-            findabilityspecial(this_string, base_txt[name], tb)
-        else:
-            break
+    alltext=re.finditer('"(.*?)"\n\t\{(.|\n)*?\n\t\}',this_string)
+    for i in alltext:
+        name=i.group(1)
+        base_txt[name]={}
+        all_pro=re.finditer('\t*?"(.*?)".*?"(.+?)"',i.group(0))
+        for j in all_pro:
+            temp_name=j.group(1)
+            temp_value=j.group(2)
+            base_txt[name][temp_name]={}
+            if temp_value.find('|')==-1:
+                temp_list=temp_value.split(' ')
+            else:
+                temp_list=temp_value.split('|')
+            for k in range(len(temp_list)):
+                temp_valuek=temp_list[k].strip()
+                try:
+                    base_txt[name][temp_name][str(k+1)] = int(temp_valuek)
+                except ValueError:
+                    try:
+                        base_txt[name][temp_name][str(k+1)] = float(temp_valuek)
+                    except ValueError:
+                        base_txt[name][temp_name][str(k+1)] = temp_valuek
 
 def autoget_talent_source(all_json,base):
     retxt=''
@@ -1109,6 +1032,28 @@ def calculate_combine_txt_numbers(re, temp, op):
                 re[i + 1] = [re[i + 1][len(re[i + 1]) - 1]]
             else:
                 re[i + 1] = [re[i + 1][temp[i + 1][0]]]
+        elif op=='matrix*': #前后两组矩阵乘，生成m*n组数值。
+            matx=copy.deepcopy(re[i+1])
+            maty=copy.deepcopy(temp[i+1])
+            leny=len(temp[i+1])
+            re[i+1]=[]
+            for j in range(len(matx)):
+                for k in range(len(maty)):
+                    re[i+1].append(matx[j]*maty[k])
+        #这里要注意，填入的运算数数量很大，它们分别是0、首格填入的字（每行描述：1、前置字符2、初始数字3、步长4、层数5、后置字符）（每列描述：6、前置字符7、初始数字8、步长9、层数10、后置字符）
+        elif op=='matrix_table':
+            at=copy.deepcopy(temp[i+1])
+            x=int(at[4])
+            y=int(at[9])
+            rere='{{属性表格|'+at[0]
+            for j in range(y):
+                rere=rere+','+at[6]+str(int(at[7]+j*at[8]))+at[10]
+            for j in range(x):
+                rere=rere+';'+at[1]+str(int(at[2]+j*at[3]))+at[5]
+                for k in range(y):
+                    rere=rere+','+str(re[i+1][j*y+k])
+            rere=rere+'}}'
+            re[i+1]=[rere]
         else:
             for j in range(len(re[i + 1])):
                 if op == '+':
