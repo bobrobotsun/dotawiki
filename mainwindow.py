@@ -1837,9 +1837,9 @@ class Main(QMainWindow):
         ori_text = re.sub(r'[\(\)（）\[\]【】<>《》]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
-            text = re.sub(r'(?!\\)[\(（](.+?)(?!\\)[\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
-            text = re.sub(r'(?!\\)[\[【](.+?)(?!\\)[\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
-            text = re.sub(r'(?!\\)[<《](.+?)(?!\\)[>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
+            text = re.sub(r'(?<!\\)[\(（](.+?)(?<!\\)[\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
+            text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
+            text = re.sub(r'(?<!\\)[<《](.+?)(?<!\\)[>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
             text = re.sub(r'\{\{A\|([0-9]+?)\}\}', lambda x: '{{A|' + hero_text + x.group(1) + '级天赋}}', text)
             text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
             item.set_value(text)
