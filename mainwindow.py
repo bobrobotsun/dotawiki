@@ -34,7 +34,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.27'
+        self.version = '7.27a'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -540,7 +540,7 @@ class Main(QMainWindow):
                     else:
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
-            for i in range(20):
+            for i in range(10):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
         except FileNotFoundError:
@@ -585,7 +585,7 @@ class Main(QMainWindow):
                     self.current_num[0] += 1
                     break
                 finally:
-                    time.sleep(0.02)
+                    time.sleep(0.05)
                     self.lock.release()
         self.download_json_thread_finished()
 
