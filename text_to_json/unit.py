@@ -257,6 +257,8 @@ def array_cal(arr1, arr2, op, num):
             arr1[i] = arr1[i] * (100 - temp) / 100
         elif opp == '1%+1':
             arr1[i] = arr1[i] * (100 + temp) / 100
+        elif opp == '1+%1':
+            arr1[i] = arr1[i] * (1 + temp)
         elif opp == '1-%1':
             arr1[i] = arr1[i] * (1 - temp)
         elif opp == '1=-1':
