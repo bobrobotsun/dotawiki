@@ -34,7 +34,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.27a'
+        self.version = '7.27b'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -69,7 +69,7 @@ class Main(QMainWindow):
         # 设定软件的图标
         self.setWindowIcon(self.icon)
         # 设定窗口大小、位置至0.8倍屏幕长宽，且边缘为0.1倍长宽
-        self.setGeometry(self.screen_size[0] * 0.1, self.screen_size[1] * 0.1, self.screen_size[0] * 0.8, self.screen_size[1] * 0.8)
+        self.setGeometry(self.screen_size[0] * 0.05, self.screen_size[1] * 0.1, self.screen_size[0] * 0.9, self.screen_size[1] * 0.8)
         # 创建一个菜单栏
         self.create_menubar()
         self.main_layout()
@@ -513,7 +513,7 @@ class Main(QMainWindow):
 
         for i in range(8):
             wiki_menu['版本'].append(self.version_list['版本'][-1 * i - 1][0])
-        self.upload_json('Data:机制.json', json.dumps(wiki_menu))
+        self.upload_json('机制.json', wiki_menu)
         QMessageBox.information(self, '更改完毕', "已经将wiki目录更改完毕", QMessageBox.Yes, QMessageBox.Yes)
 
     def download_json_base(self):
@@ -525,7 +525,7 @@ class Main(QMainWindow):
             for i in self.json_name:
                 total_num += len(self.json_name[i])
             self.progress = upload_text('开始下载json')
-            self.progress.setGeometry(self.screen_size[0] * 0.3, self.screen_size[1] * 0.15, self.screen_size[0] * 0.4, self.screen_size[1] * 0.7)
+            self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
             self.progress.setWindowIcon(self.icon)
             self.progress.setWindowTitle('下载json中……')
             self.current_num = [0, 0]
@@ -593,7 +593,7 @@ class Main(QMainWindow):
         if (threading.activeCount() <= 2):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            QMessageBox.information(self, '下载完毕', "已为您下载合成数据，并已保存。", QMessageBox.Yes,QMessageBox.Yes)
+            QMessageBox.information(self, '下载完毕', "已为您下载合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
 
     def fix_window_with_json_data(self):
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
@@ -627,6 +627,9 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传《技能》'].triggered.connect(lambda: self.upload_all('技能'))
         self.ml['高级功能']['上传《技能源》'] = self.ml['高级功能'][0].addAction('上传《技能源》')
         self.ml['高级功能']['上传《技能源》'].triggered.connect(lambda: self.upload_all('技能源'))
+        self.ml['高级功能'][0].addSeparator()
+        self.ml['高级功能']['上传所有同单位文件'] = self.ml['高级功能'][0].addAction('上传所有同单位文件')
+        self.ml['高级功能']['上传所有同单位文件'].triggered.connect(lambda: self.upload_same_kind())
         """
         制作一个默认的单位统称列表，具体效果见edit_json.py
         """
@@ -643,7 +646,7 @@ class Main(QMainWindow):
         self.editlayout = {0: QHBoxLayout()}
         self.editWidget.setLayout(self.editlayout[0])
         self.editlayout['基础数据'] = {0: QGroupBox('基础数据', self)}
-        self.editlayout[0].addWidget(self.editlayout['基础数据'][0], 1)
+        self.editlayout[0].addWidget(self.editlayout['基础数据'][0], 3)
         self.editlayout['基础数据']['竖布局'] = {0: QVBoxLayout()}
         self.editlayout['基础数据'][0].setLayout(self.editlayout['基础数据']['竖布局'][0])
         self.editlayout['基础数据']['竖布局']['树'] = {0: QTreeWidget(self)}
@@ -652,7 +655,7 @@ class Main(QMainWindow):
         self.editlayout['基础数据']['竖布局']['树'][0].setColumnWidth(0, 300)
 
         self.editlayout['修改核心'] = {0: QGroupBox('修改核心', self)}
-        self.editlayout[0].addWidget(self.editlayout['修改核心'][0], 2)
+        self.editlayout[0].addWidget(self.editlayout['修改核心'][0], 4)
         self.editlayout['修改核心']['竖布局'] = {0: QVBoxLayout()}
         self.editlayout['修改核心'][0].setLayout(self.editlayout['修改核心']['竖布局'][0])
         self.editlayout['修改核心']['竖布局']['大分类'] = {0: QComboBox(self)}
@@ -685,6 +688,9 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['保存并上传'] = QPushButton('保存并上传', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['保存并上传'])
         self.editlayout['竖布局']['保存并上传'].clicked.connect(self.json_edit_save_and_upload)
+        self.editlayout['竖布局']['上传同类'] = QPushButton('上传同类', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['上传同类'])
+        self.editlayout['竖布局']['上传同类'].clicked.connect(self.upload_same_kind)
         self.editlayout['竖布局'][0].addStretch(1)
         self.editlayout['竖布局']['修改数据'] = QPushButton('修改数据', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['修改数据'])
@@ -730,7 +736,7 @@ class Main(QMainWindow):
         self.editlayout['竖布局'][0].addStretch(5)
 
         self.editlayout['额外机制'] = {0: QGroupBox('额外机制', self)}
-        self.editlayout[0].addWidget(self.editlayout['额外机制'][0], 1)
+        self.editlayout[0].addWidget(self.editlayout['额外机制'][0], 2)
         self.editlayout['额外机制']['竖布局'] = {0: QVBoxLayout()}
         self.editlayout['额外机制'][0].setLayout(self.editlayout['额外机制']['竖布局'][0])
         self.editlayout['额外机制']['竖布局']['树'] = {0: QTreeWidget(self)}
@@ -904,33 +910,71 @@ class Main(QMainWindow):
         QMessageBox.information(self, "已完成", info)
 
     def upload_basic_json(self):
-        self.upload_json('Data:text_base.json', json.dumps(self.text_base))
-        self.upload_json('Data:json_name.json', json.dumps(self.json_name))
+        self.upload_json('text_base.json', self.text_base)
+        self.upload_json('json_name.json', self.json_name)
         QMessageBox.information(self, "上传完成", '已经上传完毕基础文件')
 
     def upload_all(self, chosen=''):
         self.w = upload_text('开始上传数据')
-        self.w.setGeometry(self.screen_size[0] * 0.3, self.screen_size[1] * 0.15, self.screen_size[0] * 0.4, self.screen_size[1] * 0.7)
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传json中……')
         all_upload = []
-        all_upload.append(['Data:版本.json', json.dumps({'版本': self.version})])
-        all_upload.append(['Data:text_base.json', json.dumps(self.text_base)])
-        all_upload.append(['Data:json_name.json', json.dumps(self.json_name)])
+        all_upload.append(['版本.json', {'版本': self.version}])
+        all_upload.append(['text_base.json', self.text_base])
+        all_upload.append(['json_name.json', self.json_name])
         if chosen == '':
             for i in self.json_base:
                 for j in self.json_base[i]:
                     if i == '技能源':
-                        all_upload.append(['Data:' + j + '/源.json', json.dumps(self.json_base[i][j])])
+                        all_upload.append([j + '/源.json', self.json_base[i][j]])
                     else:
-                        all_upload.append(['Data:' + j + '.json', json.dumps(self.json_base[i][j])])
+                        all_upload.append([j + '.json', self.json_base[i][j]])
         else:
             i = chosen
             for j in self.json_base[i]:
                 if i == '技能源':
-                    all_upload.append(['Data:' + j + '/源.json', json.dumps(self.json_base[i][j])])
+                    all_upload.append([j + '/源.json', self.json_base[i][j]])
                 else:
-                    all_upload.append(['Data:' + j + '.json', json.dumps(self.json_base[i][j])])
+                    all_upload.append([j + '.json', self.json_base[i][j]])
+        total_num = len(all_upload)
+        self.w.confirm_numbers(total_num)
+        for i in range(total_num):
+            self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1], True), i)
+            QApplication.processEvents()
+        QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+
+    def upload_same_kind(self):
+        selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
+        target_name = ''
+        if selected == '技能':
+            target_name = self.json_base[selected][selected_name]['技能归属']
+        elif selected == '技能源':
+            skill_name = selected_name
+            for i in self.json_base['技能']:
+                if self.json_base['技能'][i]['数据来源'] == skill_name:
+                    target_name = self.json_base['技能'][i]['技能归属']
+        else:
+            target_name = selected_name
+        self.w = upload_text('开始上传数据')
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+        self.w.setWindowIcon(self.icon)
+        self.w.setWindowTitle('上传json中……')
+        QApplication.processEvents()
+        all_upload = []
+        if target_name == '':
+            if selected == '技能源':
+                all_upload.append([selected_name + '/源.json', self.json_base[selected][selected_name]])
+            else:
+                all_upload.append([selected_name + '.json', self.json_base[selected][selected_name]])
+        else:
+            for i in self.json_base['技能']:
+                if self.json_base['技能'][i]['技能归属'] == target_name:
+                    all_upload.append([i + '.json', self.json_base['技能'][i]])
+                    j = self.json_base['技能'][i]['数据来源']
+                    if j in self.json_base['技能源']:
+                        all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
@@ -940,19 +984,77 @@ class Main(QMainWindow):
 
     # 向wiki网站上传对应的信息
     def upload_json(self, pagename, content, bot=False):
-        upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
-        if bot:
-            upload_data['bot'] = 1
-        upload_info = self.seesion.post(self.target_url, data=upload_data)
-        if upload_info.json()['edit']['result'] == 'Success':
-            if 'nochange' in upload_info.json()['edit']:
-                return '没有修改《' + pagename + '》'
-            elif 'oldrevid' in upload_info.json()['edit']:
-                return '上传《' + pagename + '》，【' + str(upload_info.json()['edit']['oldrevid']) + '】-->【' + str(upload_info.json()['edit']['newrevid']) + '】'
-            else:
-                return '上传《' + pagename + '》内容成功'
+        download_data = {'action': 'jsondata', 'title': pagename, 'format': 'json'}
+        download_info = self.seesion.post(self.target_url, data=download_data)
+        download_content = download_info.json()
+        if 'jsondata' in download_content and self.check_dict_equal(download_content['jsondata'], content):
+            return ['《' + pagename + '》通过校验，不需要修改！',0]
         else:
-            return json.dumps(upload_info.json())
+            pagename = 'Data:' + pagename
+            content = json.dumps(content)
+            upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
+            if bot:
+                upload_data['bot'] = 1
+            upload_info = self.seesion.post(self.target_url, data=upload_data)
+            upload_info_json = upload_info.json()
+            if upload_info_json['edit']['result'] == 'Success':
+                if 'nochange' in upload_info.json()['edit']:
+                    return ['没有修改《' + pagename + '》',0]
+                elif 'oldrevid' in upload_info.json()['edit']:
+                    return ['上传《' + pagename + '》，【' + str(upload_info.json()['edit']['oldrevid']) + '】-->【' + str(upload_info.json()['edit']['newrevid']) + '】',1]
+                else:
+                    return ['上传《' + pagename + '》内容成功',1]
+            else:
+                return [json.dumps(upload_info.json()),0]
+
+    def check_dict_equal(self, d1, d2):
+        bool = True
+        temp={}
+        temp.update(d1)
+        temp.update(d2)
+        for i in temp:
+            if i in d1 and i in d2:
+                if type(d1[i]) == type(d2[i]):
+                    if isinstance(d1[i], dict):
+                        bool = bool and self.check_dict_equal(d1[i], d2[i])
+                    elif isinstance(d1[i], list):
+                        bool = bool and self.check_list_equal(d1[i], d2[i])
+                    else:
+                        bool = bool and d1[i] == d2[i]
+                else:
+                    if isinstance(d1[i], int) or isinstance(d1[i], float) and isinstance(d2[i], int) or isinstance(d2[i], float):
+                        if float(d1[i]) == float(d2[i]):
+                            continue
+                        else:
+                            bool = False
+            else:
+                bool = False
+            if not bool:
+                break
+        return bool
+
+    def check_list_equal(self, d1, d2):
+        bool = True
+        for i in range(max(len(d1), len(d2))):
+            if i < len(d1) and i < len(d2):
+                if type(d1[i]) == type(d2[i]):
+                    if isinstance(d1[i], dict):
+                        bool = bool and self.check_dict_equal(d1[i], d2[i])
+                    elif isinstance(d1[i], list):
+                        bool = bool and self.check_list_equal(d1[i], d2[i])
+                    else:
+                        bool = bool and d1[i] == d2[i]
+                else:
+                    if isinstance(d1[i], int) or isinstance(d1[i], float) and isinstance(d2[i], int) or isinstance(d2[i], float):
+                        if float(d1[i]) == float(d2[i]):
+                            continue
+                        else:
+                            bool = False
+            else:
+                bool = False
+            if not bool:
+                break
+        return bool
 
     def dict_to_tree(self, tdict, jdict):
         for j in jdict:
@@ -1169,7 +1271,7 @@ class Main(QMainWindow):
                 self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
             self.json_base[selected][text]['页面名'] = text
             self.resort()
-            self.upload_json('Data:json_name.json', json.dumps(self.json_name))
+            self.upload_json('json_name.json', self.json_name)
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
             self.edit_category_selected_changed()
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
@@ -1192,16 +1294,16 @@ class Main(QMainWindow):
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             self.json_base[ss[0]][ss[1]]['应用'] = 0
             if ss[0] == '技能源':
-                self.upload_json('Data:' + ss[1] + '/源.json', json.dumps(self.json_base[ss[0]][ss[1]]))
+                self.upload_json(ss[1] + '/源.json', self.json_base[ss[0]][ss[1]])
             else:
-                self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
+                self.upload_json(ss[1] + '.json', self.json_base[ss[0]][ss[1]])
             self.json_base[ss[0]].pop(ss[1])
             self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
             self.resort()
-            self.upload_json('Data:json_name.json', json.dumps(self.json_name))
+            self.upload_json('json_name.json', self.json_name)
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
             self.edit_category_selected_changed()
-            self.upload_json('Data:json_name.json', json.dumps(self.json_name))
+            self.upload_json('json_name.json', self.json_name)
             QMessageBox.information(self, '删除完毕', '删除成功！您将不会再看到这个库。')
 
     def json_edit_change_name(self):
@@ -1214,14 +1316,14 @@ class Main(QMainWindow):
                 self.json_base[ss[0]][text] = copy.deepcopy(self.json_base[ss[0]][ss[1]])
                 self.json_base[ss[0]][ss[1]]['应用'] = '改名'
                 if ss[0] == '技能源':
-                    self.upload_json('Data:' + ss[1] + '/源.json', json.dumps(self.json_base[ss[0]][ss[1]]))
+                    self.upload_json(ss[1] + '/源.json', self.json_base[ss[0]][ss[1]])
                 else:
-                    self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
+                    self.upload_json(ss[1] + '.json', self.json_base[ss[0]][ss[1]])
                 self.json_base[ss[0]].pop(ss[1])
                 self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
                 self.json_name[ss[0]].append(text)
                 self.resort()
-                self.upload_json('Data:json_name.json', json.dumps(self.json_name))
+                self.upload_json('json_name.json', self.json_name)
                 self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
                 self.edit_category_selected_changed()
                 self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
@@ -1243,9 +1345,9 @@ class Main(QMainWindow):
         self.file_save_all()
         self.update_json_base(info='已经保存并更新完毕\n确认后会上传本次修改内容\n如果您的修改影响了其他库内容，请之后进行一次统一更新。')
         if ss[0] == '技能源':
-            self.upload_json('Data:' + ss[1] + '/源.json', json.dumps(self.json_base[ss[0]][ss[1]]))
+            self.upload_json(ss[1] + '/源.json', self.json_base[ss[0]][ss[1]])
         else:
-            self.upload_json('Data:' + ss[1] + '.json', json.dumps(self.json_base[ss[0]][ss[1]]))
+            self.upload_json(ss[1] + '.json', self.json_base[ss[0]][ss[1]])
         self.edit_target_selected_changed()
 
     def json_edit_loop_update(self):
@@ -1519,7 +1621,7 @@ class Main(QMainWindow):
                         new2.setBackground(0, self.red)
 
     def upload_version_list(self):
-        self.upload_json('Data:版本更新.json', json.dumps(self.version_list))
+        self.upload_json('版本更新.json', self.version_list)
         self.file_save(os.path.join('database', 'version_list.json'), json.dumps(self.version_list))
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
@@ -1606,7 +1708,7 @@ class Main(QMainWindow):
 
     def download_all_versions(self):
         self.w = upload_text('开始上传数据')
-        self.w.setGeometry(self.screen_size[0] * 0.3, self.screen_size[1] * 0.15, self.screen_size[0] * 0.4, self.screen_size[1] * 0.7)
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传json中……')
         self.w.confirm_numbers(len(self.version_list['版本']))
@@ -1669,7 +1771,7 @@ class Main(QMainWindow):
             self.version_base[title]['次级版本'] = []
             for i in range(item.childCount()):
                 self.version_base[title]['次级版本'].append(item.text(0) + '/' + item.child(i).text(0))
-        self.upload_json('Data:' + title + '.json', json.dumps(self.version_base[title]))
+        self.upload_json(title + '.json', self.version_base[title])
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         if bool:
             self.complex_json_to_version_tree()
@@ -1990,20 +2092,22 @@ class upload_text(QWidget):
         self.l = QVBoxLayout()
         self.l.addWidget(self.b)
         self.setLayout(self.l)
-        thread = threading.Thread(target=self.addtext, args=(first_txt,))
+        self.success=[0,0]
+        thread = threading.Thread(target=self.addtext, args=([first_txt,0],))
         thread.start()
         self.show()
 
     def confirm_numbers(self, num):
         self.maxmax = num
 
-    def addtext(self, content='', num=-1, threads=''):
+    def addtext(self, content=['',0], num=-1, threads=''):
+        self.success[content[1]]+=1
         txts = '【' + QTime.currentTime().toString() + '】'
         if num > -1:
-            txts += '【' + str(num + 1) + '/' + str(self.maxmax) + ',' + '{:.2%}'.format((num + 1) / self.maxmax) + '】'
+            txts += '【' + str(num + 1) +'['+str(self.success[1])+ ']/' + str(self.maxmax) + ',' + '{:.2%}'.format((num + 1) / self.maxmax) + '['+'{:.2%}'.format(self.success[1] / self.maxmax)+']】'
         if threads != '':
             txts += '【' + threads + '】'
-        txts += content
+        txts += content[0]
         self.b.append(txts)
         self.cursor = self.b.textCursor()
         self.b.moveCursor(self.b.textCursor().End)
