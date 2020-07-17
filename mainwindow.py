@@ -1721,7 +1721,7 @@ class Main(QMainWindow):
                 download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
                 download_info = self.seesion.post(self.target_url, data=download_data)
                 if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
-                    self.w.addtext(self.version_list['版本'][i][j] + '版本json不存在。', i)
+                    self.w.addtext([self.version_list['版本'][i][j] + '版本json不存在。',0], i)
                     QApplication.processEvents()
                     time.sleep(0.1)
                 else:
@@ -1730,7 +1730,7 @@ class Main(QMainWindow):
                         self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).setBackground(0, self.green)
                     else:
                         self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j - 1).setBackground(0, self.green)
-                    self.w.addtext(title + '版本json下载保存成功。', i)
+                    self.w.addtext([title + '版本json下载保存成功。',1], i)
                     QApplication.processEvents()
                     time.sleep(0.1)
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
