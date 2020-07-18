@@ -34,7 +34,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.27b'
+        self.version = '7.27c'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -947,34 +947,35 @@ class Main(QMainWindow):
     def upload_same_kind(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
-        target_name = ''
+        target_name = []
         if selected == '技能':
             target_name = self.json_base[selected][selected_name]['技能归属']
         elif selected == '技能源':
             skill_name = selected_name
             for i in self.json_base['技能']:
                 if self.json_base['技能'][i]['数据来源'] == skill_name:
-                    target_name = self.json_base['技能'][i]['技能归属']
+                    target_name.append(self.json_base['技能'][i]['技能归属'])
         else:
-            target_name = selected_name
+            target_name.append(selected_name)
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传json中……')
         QApplication.processEvents()
         all_upload = []
-        if target_name == '':
+        if len(target_name) == 0:
             if selected == '技能源':
                 all_upload.append([selected_name + '/源.json', self.json_base[selected][selected_name]])
             else:
                 all_upload.append([selected_name + '.json', self.json_base[selected][selected_name]])
         else:
-            for i in self.json_base['技能']:
-                if self.json_base['技能'][i]['技能归属'] == target_name:
-                    all_upload.append([i + '.json', self.json_base['技能'][i]])
-                    j = self.json_base['技能'][i]['数据来源']
-                    if j in self.json_base['技能源']:
-                        all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
+            for k in target_name:
+                for i in self.json_base['技能']:
+                    if self.json_base['技能'][i]['技能归属'] == k:
+                        all_upload.append([i + '.json', self.json_base['技能'][i]])
+                        j = self.json_base['技能'][i]['数据来源']
+                        if j in self.json_base['技能源']:
+                            all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
