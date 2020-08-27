@@ -34,7 +34,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.27c'
+        self.version = '7.27d'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -581,7 +581,7 @@ class Main(QMainWindow):
                     else:
                         self.json_name[self.download_json_list[self.local.current_num][0]].pop(
                             self.json_name[self.download_json_list[self.local.current_num][0]].index(self.download_json_list[self.local.current_num][1]))
-                    self.progress.addtext('下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功', self.current_num[0], threading.current_thread().name)
+                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功',0], self.current_num[0], threading.current_thread().name)
                     self.current_num[0] += 1
                     break
                 finally:
@@ -688,6 +688,7 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['保存并上传'] = QPushButton('保存并上传', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['保存并上传'])
         self.editlayout['竖布局']['保存并上传'].clicked.connect(self.json_edit_save_and_upload)
+        self.editlayout['竖布局'][0].addStretch(1)
         self.editlayout['竖布局']['上传同类'] = QPushButton('上传同类', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['上传同类'])
         self.editlayout['竖布局']['上传同类'].clicked.connect(self.upload_same_kind)
@@ -998,7 +999,7 @@ class Main(QMainWindow):
                 upload_data['bot'] = 1
             upload_info = self.seesion.post(self.target_url, data=upload_data)
             upload_info_json = upload_info.json()
-            if upload_info_json['edit']['result'] == 'Success':
+            if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
                 if 'nochange' in upload_info.json()['edit']:
                     return ['没有修改《' + pagename + '》',0]
                 elif 'oldrevid' in upload_info.json()['edit']:
