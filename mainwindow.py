@@ -540,6 +540,7 @@ class Main(QMainWindow):
                     else:
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
+            self.startactiveCount=threading.activeCount()+1
             for i in range(10):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
@@ -581,7 +582,7 @@ class Main(QMainWindow):
                     else:
                         self.json_name[self.download_json_list[self.local.current_num][0]].pop(
                             self.json_name[self.download_json_list[self.local.current_num][0]].index(self.download_json_list[self.local.current_num][1]))
-                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功',0], self.current_num[0], threading.current_thread().name)
+                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容成功',1], self.current_num[0], threading.current_thread().name)
                     self.current_num[0] += 1
                     break
                 finally:
@@ -590,10 +591,10 @@ class Main(QMainWindow):
         self.download_json_thread_finished()
 
     def download_json_thread_finished(self):
-        if (threading.activeCount() <= 2):
+        if (threading.activeCount() <= self.startactiveCount):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            QMessageBox.information(self, '下载完毕', "已为您下载合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
+            QMessageBox.information(self.progress, '下载完毕', "已为您下载合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
 
     def fix_window_with_json_data(self):
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
