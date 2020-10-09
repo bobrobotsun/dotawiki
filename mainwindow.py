@@ -430,7 +430,7 @@ class Main(QMainWindow):
             if has_text[2][2]:
                 unit.get_hero_data_from_txt(self.text_base['非英雄单位'], os.path.join(address, has_text[1][2]))
             pak1 = vpk.open(address.replace('scripts\\npc', "pak01_dir.vpk"))
-            pakfile = pak1.get_file("scripts/npc\\items.txt")
+            pakfile = pak1.get_file("scripts/npc/items.txt")
             item.get_hero_data_from_txt(self.text_base['物品'], pakfile)
             self.file_save(os.path.join('database', 'dota2_address.json'), address)
             self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))

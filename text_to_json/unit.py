@@ -55,7 +55,7 @@ def findunitpro(source, data, tb, pro, inherit=True, number=True):
 
 
 def get_hero_data_from_txt(base_txt, address):
-    ffile = open("E:/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_units.txt", mode="r")
+    ffile = open(address, mode="r")
     source_string = ffile.read()
     tb = [0, 0]
     findtb(source_string, 0, len(source_string), tb, -1)
