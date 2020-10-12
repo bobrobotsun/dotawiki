@@ -21,7 +21,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from text_to_json import hero, ability, item, unit, edit_json, dota_menus
+from text_to_json import hero, ability, item, unit, edit_json, dota_menus,page
 import win32con
 import win32clipboard as wincld
 
@@ -289,6 +289,9 @@ class Main(QMainWindow):
         self.mainlayout['加载按钮']['将wiki目录进行更新（不要乱点）'] = QPushButton('将wiki目录进行更新（不要乱点）', self)
         self.mainlayout['加载按钮']['将wiki目录进行更新（不要乱点）'].clicked.connect(self.download_and_upload_wiki_menu)
         self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['将wiki目录进行更新（不要乱点）'])
+        self.mainlayout['加载按钮']['更新独立的页面（不要乱点）'] = QPushButton('更新独立的页面（不要乱点）', self)
+        self.mainlayout['加载按钮']['更新独立的页面（不要乱点）'].clicked.connect(self.download_and_upload_single_pages)
+        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['更新独立的页面（不要乱点）'])
         self.mainlayout['加载按钮'][0].addStretch(1)
 
         self.mainlayout['列表'] = {0: QHBoxLayout()}
@@ -515,6 +518,9 @@ class Main(QMainWindow):
             wiki_menu['版本'].append(self.version_list['版本'][-1 * i - 1][0])
         self.upload_json('机制.json', wiki_menu)
         QMessageBox.information(self, '更改完毕', "已经将wiki目录更改完毕", QMessageBox.Yes, QMessageBox.Yes)
+
+    def download_and_upload_single_pages(self):
+        page.ability_cast_point_and_backswing(self.seesion,self.json_base,self.csrf_token)
 
     def download_json_base(self):
         try:
