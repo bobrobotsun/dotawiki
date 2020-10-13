@@ -5,6 +5,7 @@ import math
 import hashlib
 import re
 
+
 # 将数字转化为文字，取消小数点和无用末尾0
 def better_float_to_text(x):
     if isinstance(x, float) and int(x) == x:
@@ -12,73 +13,75 @@ def better_float_to_text(x):
     else:
         return str(x)
 
+
 def get_hero_data_from_txt(base_txt, address):
     this_file = open(address, mode="r")
     this_string = this_file.read()
-    alltext=re.finditer('"(.*?)"\n\t\{(.|\n)*?\n\t\}',this_string)
+    alltext = re.finditer('"(.*?)"\n\t\{(.|\n)*?\n\t\}', this_string)
     for i in alltext:
-        name=i.group(1)
-        base_txt[name]={}
-        all_pro=re.finditer('\t*?"(.*?)".*?"(.+?)"',i.group(0))
+        name = i.group(1)
+        base_txt[name] = {}
+        all_pro = re.finditer('\t*?"(.*?)".*?"(.+?)"', i.group(0))
         for j in all_pro:
-            temp_name=j.group(1)
-            temp_value=j.group(2)
-            base_txt[name][temp_name]={}
-            if temp_value.find('|')==-1:
-                temp_list=temp_value.split(' ')
+            temp_name = j.group(1)
+            temp_value = j.group(2)
+            base_txt[name][temp_name] = {}
+            if temp_value.find('|') == -1:
+                temp_list = temp_value.split(' ')
             else:
-                temp_list=temp_value.split('|')
+                temp_list = temp_value.split('|')
             for k in range(len(temp_list)):
-                temp_valuek=temp_list[k].strip()
+                temp_valuek = temp_list[k].strip()
                 try:
-                    base_txt[name][temp_name][str(k+1)] = int(temp_valuek)
+                    base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
                 except ValueError:
                     try:
-                        base_txt[name][temp_name][str(k+1)] = float(temp_valuek)
+                        base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
                     except ValueError:
-                        base_txt[name][temp_name][str(k+1)] = temp_valuek
+                        base_txt[name][temp_name][str(k + 1)] = temp_valuek
 
-def autoget_talent_source(all_json,base):
-    retxt=''
+
+def autoget_talent_source(all_json, base):
+    retxt = ''
     for i in all_json['技能']:
-        bool=True
-        if all_json['技能'][i]['次级分类']=='天赋技能':
-            this_source=cal_ability_source_index(all_json,base,i)
+        bool = True
+        if all_json['技能'][i]['次级分类'] == '天赋技能':
+            this_source = cal_ability_source_index(all_json, base, i)
             for j in all_json['技能源']:
-                if all_json['技能源'][j]['代码']==this_source:
-                    bool=False
-                    all_json['技能'][i]['数据来源']=all_json['技能源'][j]['页面名']
+                if all_json['技能源'][j]['代码'] == this_source:
+                    bool = False
+                    all_json['技能'][i]['数据来源'] = all_json['技能源'][j]['页面名']
                     break
             if bool:
-                retxt+='\n《'+i+'》并没有读取到合理技能源，请查询后添加。'
+                retxt += '\n《' + i + '》并没有读取到合理技能源，请查询后添加。'
     return retxt
 
 
-def cal_ability_source_index(json,base,i):
-    arr={'10级左天赋':-7,'10级右天赋':-8,'15级左天赋':-5,'15级右天赋':-6,'20级左天赋':-3,'20级右天赋':-4,'25级左天赋':-1,'25级右天赋':-2}
+def cal_ability_source_index(json, base, i):
+    arr = {'10级左天赋': -7, '10级右天赋': -8, '15级左天赋': -5, '15级右天赋': -6, '20级左天赋': -3, '20级右天赋': -4, '25级左天赋': -1,
+           '25级右天赋': -2}
     return base[json['英雄'][i[:-6]]['代码名']]['ability'][arr[i[-6:]]]
+
 
 def get_source_to_data(all_json, upgrade_json, version):
     for i in all_json['技能源']:
         all_json['技能源'][i]['应用'] = 1
         all_json['技能源'][i]['分类'] = '技能源'
-        unit_dic=all_json['技能源'][i]
-        if "1" in unit_dic['施法前摇']['代码'] and unit_dic['施法前摇']['代码']['1']=='不存在':
-            unit_dic['施法前摇']['代码']={"1":"不存在"}
-        if "1" in unit_dic['施法后摇']['代码'] and unit_dic['施法后摇']['代码']['1']=='不存在':
-            unit_dic['施法后摇']['代码']={"1":"不存在"}
-        if "1" in unit_dic['魔法消耗']["1"]["1"]['代码'] and unit_dic['魔法消耗']["1"]["1"]['代码']['1']=='不存在':
-            unit_dic['魔法消耗']["1"]["1"]['代码']={"1":"不存在"}
-        if  "1" in unit_dic['冷却时间']["1"]['代码'] and unit_dic['冷却时间']["1"]['代码']['1']=='不存在':
-            unit_dic['冷却时间']["1"]['代码']={"1":"不存在"}
+        unit_dic = all_json['技能源'][i]
         for j in unit_dic['属性']:
-            if "0" in unit_dic['属性'][j]['代码'] and unit_dic['属性'][j]['代码']["0"]=='不存在' or "1" in unit_dic['属性'][j]['代码'] and unit_dic['属性'][j]['代码']["1"]=='不存在':
-                unit_dic['属性'][j]['代码']={"0":"手填","1":"无"}
+            if "0" in unit_dic['属性'][j]['代码'] and unit_dic['属性'][j]['代码']["0"] == '不存在' or "1" in unit_dic['属性'][j][
+                '代码'] and unit_dic['属性'][j]['代码']["1"] == '不存在':
+                unit_dic['属性'][j]['代码'] = {"0": "手填", "1": "无"}
         for j in unit_dic['升级']:
             for k in unit_dic['升级'][j]:
-                if '值' in unit_dic['升级'][j][k] and '代码' in unit_dic['升级'][j][k]['值'] and isinstance(unit_dic['升级'][j][k]['值']['代码'],dict) and ("0" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码']["0"]=='不存在' or "1" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码']["1"]=='不存在'):
-                    unit_dic['升级'][j][k]['值']['代码']={"0":"手填","1":"无"}
-                if '目标' in unit_dic['升级'][j][k] and '3' in unit_dic['升级'][j][k]['目标'] and unit_dic['升级'][j][k]['目标']['3'] in ability_trait_level[3]:
+                if '值' in unit_dic['升级'][j][k] and '代码' in unit_dic['升级'][j][k]['值'] and isinstance(
+                        unit_dic['升级'][j][k]['值']['代码'], dict) and (
+                        "0" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码'][
+                    "0"] == '不存在' or "1" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码'][
+                            "1"] == '不存在'):
+                    unit_dic['升级'][j][k]['值']['代码'] = {"0": "手填", "1": "无"}
+                if '目标' in unit_dic['升级'][j][k] and '3' in unit_dic['升级'][j][k]['目标'] and unit_dic['升级'][j][k]['目标'][
+                    '3'] in ability_trait_level[3]:
                     unit_dic['升级'][j][k]['目标']['4'] = '1'
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
@@ -151,11 +154,12 @@ def get_source_to_data(all_json, upgrade_json, version):
                     else:
                         break
             elif i in ability_trait_level[3]:
-                unit_dic[i] ={}
+                unit_dic[i] = {}
                 for j in temp1[i]:
-                    unit_dic[i][j]=group_source(temp1[i][j])
+                    unit_dic[i][j] = group_source(temp1[i][j])
             elif i == "升级":
-                if "A杖" in temp1[i] and len(temp1[i]["A杖"]) > 0 or "技能" in temp1[i] and len(temp1[i]["技能"]) > 0 or "混合" in temp1[i] and len(temp1[i]["混合"]) > 0:
+                if "A杖" in temp1[i] and len(temp1[i]["A杖"]) > 0 or "技能" in temp1[i] and len(
+                        temp1[i]["技能"]) > 0 or "混合" in temp1[i] and len(temp1[i]["混合"]) > 0:
                     upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
             elif i == "页面名" or i == '应用' or i == '分类':
                 continue
@@ -310,7 +314,8 @@ def input_upgrade(all_json, upgrade_json):
                             while True:
                                 m = m + 1
                                 if str(m) in all_json["技能"][i]["效果"][j][k]:
-                                    all_json["技能"][i]["效果"][j][k][str(m - 1)] = copy.deepcopy(all_json["技能"][i]["效果"][j][k][str(m)])
+                                    all_json["技能"][i]["效果"][j][k][str(m - 1)] = copy.deepcopy(
+                                        all_json["技能"][i]["效果"][j][k][str(m)])
                                 else:
                                     all_json["技能"][i]["效果"][j][k].pop(str(m - 1))
                                     l -= 1
@@ -323,7 +328,8 @@ def input_upgrade(all_json, upgrade_json):
                         m += 1
                         l += 1
                         if "+" + str(m) in all_json["技能"][i]["效果"][j][k]:
-                            all_json["技能"][i]["效果"][j][k][str(l)] = copy.deepcopy(all_json["技能"][i]["效果"][j][k]["+" + str(m)])
+                            all_json["技能"][i]["效果"][j][k][str(l)] = copy.deepcopy(
+                                all_json["技能"][i]["效果"][j][k]["+" + str(m)])
                             all_json["技能"][i]["效果"][j][k].pop("+" + str(m))
                         else:
                             break
@@ -358,18 +364,18 @@ def complete_upgrade(all_json, base_txt):
                         all_json[i]["魔法消耗"][j][k]['3'].pop('名称')
                     if fulfil(all_json[i]["魔法消耗"][j][k], all_json[i]):
                         one_upgrade(all_json[i]["魔法消耗"][j][k], base_txt)
-        if fulfil(all_json[i]["施法前摇"], all_json[i]):
-            one_upgrade(all_json[i]["施法前摇"], base_txt)
-        if fulfil(all_json[i]["施法后摇"], all_json[i]):
-            one_upgrade(all_json[i]["施法后摇"], base_txt)
+        for j in all_json[i]["施法前摇"]:
+            fulfil(all_json[i]["施法前摇"][j], all_json[i])
+            one_upgrade(all_json[i]["施法前摇"][j], base_txt)
+        for j in all_json[i]["施法后摇"]:
+            fulfil(all_json[i]["施法后摇"][j], all_json[i])
+            one_upgrade(all_json[i]["施法后摇"][j], base_txt)
 
 
 def fulfil(arr, json, namebool=False):
     for i in arr:
         if i.isnumeric():
-            if '1' in arr[i]['代码'] and arr[i]['代码']['1'] == '不存在':
-                return False
-            elif '0' in arr[i]['代码'] and arr[i]['代码']['0'] == '手填':
+            if '0' in arr[i]['代码'] and arr[i]['代码']['0'] == '手填':
                 continue
             else:
                 if "1" in arr[i]['代码'] and arr[i]['代码']["1"] == "":
@@ -407,12 +413,14 @@ def one_upgrade(json, base_txt):
                     if int(k) < levels:
                         getvalue[0].append(0)
                     else:
-                        getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+                        getvalue[0].append(
+                            base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
             elif json["1"]["代码"]["0"] == "有限等级":
                 levels = int(json["1"]["代码"]["4"])
                 for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
                     if int(k) <= levels:
-                        getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+                        getvalue[0].append(
+                            base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
             elif json["1"]["代码"]["0"] == "不存在":
                 return
         else:
@@ -437,7 +445,6 @@ def one_upgrade(json, base_txt):
             except ValueError:
                 for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]]:
                     getvalue[1].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]][k])
-
     else:
         getvalue[0].append(0)
         inbool.append(False)
@@ -584,26 +591,26 @@ def array_cal(arr1, arr2, op, num):
             arr1[i] = arr1[i] * (1 - temp)
         elif opp == '1+%1':
             arr1[i] = arr1[i] * (1 + temp)
-        elif opp=='1round1':
-            arr1[i]=round(arr1[i], int(temp))
-        elif opp=='1ceil1':
-            arr1[i]=math.ceil(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
-        elif opp=='1floor1':
-            arr1[i]=math.floor(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
-        elif opp=='1*round1':
-            arr1[i]=round(arr1[i]*temp)
-        elif opp=='1*ceil1':
-            arr1[i]=math.ceil(arr1[i]*temp)
-        elif opp=='1*floor1':
-            arr1[i]=math.floor(arr1[i]*temp)
-        elif opp[0:2]=='1=' and opp[-2:]=='+1':
-            arr1[i]=float(opp[2:-2])+temp
-        elif opp[0:2]=='1=' and opp[-2:]=='-1':
-            arr1[i]=float(opp[2:-2])-temp
-        elif opp[0:2]=='1=' and opp[-2:]=='*1':
-            arr1[i]=float(opp[2:-2])*temp
-        elif opp[0:2]=='1=' and opp[-2:]=='/1':
-            arr1[i]=float(opp[2:-2])/temp
+        elif opp == '1round1':
+            arr1[i] = round(arr1[i], int(temp))
+        elif opp == '1ceil1':
+            arr1[i] = math.ceil(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
+        elif opp == '1floor1':
+            arr1[i] = math.floor(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
+        elif opp == '1*round1':
+            arr1[i] = round(arr1[i] * temp)
+        elif opp == '1*ceil1':
+            arr1[i] = math.ceil(arr1[i] * temp)
+        elif opp == '1*floor1':
+            arr1[i] = math.floor(arr1[i] * temp)
+        elif opp[0:2] == '1=' and opp[-2:] == '+1':
+            arr1[i] = float(opp[2:-2]) + temp
+        elif opp[0:2] == '1=' and opp[-2:] == '-1':
+            arr1[i] = float(opp[2:-2]) - temp
+        elif opp[0:2] == '1=' and opp[-2:] == '*1':
+            arr1[i] = float(opp[2:-2]) * temp
+        elif opp[0:2] == '1=' and opp[-2:] == '/1':
+            arr1[i] = float(opp[2:-2]) / temp
 
 
 def complete_mech(all_json, mech_json):
@@ -636,7 +643,8 @@ def mech_target(json, mech):
                         while True:
                             l += 1
                             if str(l) in json[i][j][str(k)]:
-                                json[i][j][str(k)][str(l)]["值"] = mech["分类"][str(json[i][j][str(k)]["代码"])][str(json[i][j][str(k)][str(l)]["代码"])]
+                                json[i][j][str(k)][str(l)]["值"] = mech["分类"][str(json[i][j][str(k)]["代码"])][
+                                    str(json[i][j][str(k)][str(l)]["代码"])]
                             else:
                                 break
                     else:
@@ -700,9 +708,10 @@ def mech_junior(json, mech):
 def mech_sign(json, mech):
     for i in json:
         for j in json[i]:
-            if isinstance(json[i][j],dict) and "标记" in json[i][j]:
+            if isinstance(json[i][j], dict) and "标记" in json[i][j]:
                 for k in json[i][j]["标记"]:
-                    if json[i][j]["标记"][k]["类型"] in mech and str(json[i][j]["标记"][k]["代码"]) in mech[json[i][j]["标记"][k]["类型"]]:
+                    if json[i][j]["标记"][k]["类型"] in mech and str(json[i][j]["标记"][k]["代码"]) in mech[
+                        json[i][j]["标记"][k]["类型"]]:
                         json[i][j]["标记"][k]["值"] = mech[json[i][j]["标记"][k]["类型"]][str(json[i][j]["标记"][k]["代码"])]
 
 
@@ -731,8 +740,9 @@ def mech_others(json, mech):
                     json["冷却时间"][i][j]["类型"]["值"] = mech["冷却时间"][str(json["冷却时间"][i][j]["类型"]["代码"])]["名称"]
                     json["冷却时间"][i][j]["类型"]["图片"] = mech["冷却时间"][str(json["冷却时间"][i][j]["类型"]["代码"])]["图片"]
     for i in json["施法前摇"]:
-        if str(json["施法前摇"][i]["即时生效"]["代码"]) in mech["即时生效"]:
-            json["施法前摇"][i]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i]["即时生效"]["代码"])]
+        for j in json["施法前摇"][i]:
+            if str(json["施法前摇"][i][j]["即时生效"]["代码"]) in mech["即时生效"]:
+                json["施法前摇"][i][j]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i][j]["即时生效"]["代码"])]
 
 
 def loop_check(json, data, all_json, name):
@@ -787,17 +797,25 @@ def change_combine_txt(json, ii, data, all_json, name):
                     returntxt += "("
                     if temp[0][0]:
                         for j in temp[0][3]:
-                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
+                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png',
+                                                                                 'talentb.png') + "|x18px|link=" + \
+                                         temp[0][3][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[2], post, level)
                     if temp[0][1]:
                         for j in temp[0][4]:
-                            returntxt += "[[file:" + temp[0][4][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][4][j]["名称"] + "]]"
+                            returntxt += "[[file:" + temp[0][4][j]["图片"].replace('talent.png',
+                                                                                 'talentb.png') + "|x18px|link=" + \
+                                         temp[0][4][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[3], post, level)
                     if temp[0][2]:
                         for j in temp[0][3]:
-                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][3][j]["名称"] + "]]"
+                            returntxt += "[[file:" + temp[0][3][j]["图片"].replace('talent.png',
+                                                                                 'talentb.png') + "|x18px|link=" + \
+                                         temp[0][3][j]["名称"] + "]]"
                         for j in temp[0][4]:
-                            returntxt += "[[file:" + temp[0][4][j]["图片"].replace('talent.png', 'talentb.png') + "|x18px|link=" + temp[0][4][j]["名称"] + "]]"
+                            returntxt += "[[file:" + temp[0][4][j]["图片"].replace('talent.png',
+                                                                                 'talentb.png') + "|x18px|link=" + \
+                                         temp[0][4][j]["名称"] + "]]"
                         returntxt += combine_numbers_post_level(temp[4], post, level)
                     returntxt += ")"
             else:
@@ -1034,28 +1052,28 @@ def calculate_combine_txt_numbers(re, temp, op):
                 re[i + 1] = [re[i + 1][len(re[i + 1]) - 1]]
             else:
                 re[i + 1] = [re[i + 1][temp[i + 1][0]]]
-        elif op=='matrix*': #前后两组矩阵乘，生成m*n组数值。
-            matx=copy.deepcopy(re[i+1])
-            maty=copy.deepcopy(temp[i+1])
-            leny=len(temp[i+1])
-            re[i+1]=[]
+        elif op == 'matrix*':  # 前后两组矩阵乘，生成m*n组数值。
+            matx = copy.deepcopy(re[i + 1])
+            maty = copy.deepcopy(temp[i + 1])
+            leny = len(temp[i + 1])
+            re[i + 1] = []
             for j in range(len(matx)):
                 for k in range(len(maty)):
-                    re[i+1].append(matx[j]*maty[k])
-        #这里要注意，填入的运算数数量很大，它们分别是0、首格填入的字（每行描述：1、前置字符2、初始数字3、步长4、层数5、后置字符）（每列描述：6、前置字符7、初始数字8、步长9、层数10、后置字符）
-        elif op=='matrix_table':
-            at=copy.deepcopy(temp[i+1])
-            x=int(at[4])
-            y=int(at[9])
-            rere='{{属性表格|'+at[0]
+                    re[i + 1].append(matx[j] * maty[k])
+        # 这里要注意，填入的运算数数量很大，它们分别是0、首格填入的字（每行描述：1、前置字符2、初始数字3、步长4、层数5、后置字符）（每列描述：6、前置字符7、初始数字8、步长9、层数10、后置字符）
+        elif op == 'matrix_table':
+            at = copy.deepcopy(temp[i + 1])
+            x = int(at[4])
+            y = int(at[9])
+            rere = '{{属性表格|' + at[0]
             for j in range(y):
-                rere=rere+','+at[6]+str(int(at[7]+j*at[8]))+at[10]
+                rere = rere + ',' + at[6] + str(int(at[7] + j * at[8])) + at[10]
             for j in range(x):
-                rere=rere+';'+at[1]+str(int(at[2]+j*at[3]))+at[5]
+                rere = rere + ';' + at[1] + str(int(at[2] + j * at[3])) + at[5]
                 for k in range(y):
-                    rere=rere+','+str(re[i+1][j*y+k])
-            rere=rere+'}}'
-            re[i+1]=[rere]
+                    rere = rere + ',' + str(re[i + 1][j * y + k])
+            rere = rere + '}}'
+            re[i + 1] = [rere]
         else:
             for j in range(len(re[i + 1])):
                 if op == '+':
@@ -1148,5 +1166,5 @@ abilitypro_num = [["a_cast_range", "AbilityCastRange"]
     , ["a_charges_restore_time", "AbilityChargeRestoreTime"]]
 abilitypro_bool = [["immediate", "DOTA_ABILITY_BEHAVIOR_IMMEDIATE"]
     , ["ignore_channel", "DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"]]
-ability_trait_level = [["中文名", "英文名", "代码", "传说", "描述", "天赋代码", "A杖信息", "注释"], ["效果", "属性", "冷却时间"], ["魔法消耗"]
-    ,['技能免疫','无敌','技能抵挡','技能反弹','技能共享','技能窃取','幻象','破坏','持续施法','躲避','缠绕','即时攻击','视野','真实视域']]
+ability_trait_level = [["中文名", "英文名", "代码", "传说", "描述", "天赋代码", "A杖信息", "注释"], ["效果", "属性","施法前摇","施法后摇", "冷却时间"], ["魔法消耗"]
+    , ['技能免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域']]

@@ -79,40 +79,74 @@ edit = {
         "英文名": ['tree', {"list": ['text', '', 1, 1, False]}],
         "攻击后摇": ['tree', {"list": ['number', 0, 1, 1, False]}],
         "源技能": ['tree', {"list": ['text', '', 1, 1, False]}],
-        "英雄级单位": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "远古单位": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "中立生物": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "召唤物": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "等级": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "生命值": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "生命恢复": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "魔法值": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "魔法恢复": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "攻击上限": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "攻击下限": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "攻击间隔": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "攻击前摇": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "攻击距离": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "攻击距离缓冲": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "警戒范围": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "弹道速度": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "护甲": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "魔法抗性": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "移动速度": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "转身速率": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "攻击类型": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "护甲类型": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "近战远程": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "移动方式": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "经验": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "金钱下限": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "金钱上限": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "跟随距离": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "攻击欲望": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "白天视野": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "夜晚视野": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "碰撞体积": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
-        "模型比例": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}], '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "英雄级单位": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                          '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "远古单位": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "中立生物": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "召唤物": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                        '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "等级": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                       '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "生命值": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                        '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "生命恢复": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "魔法值": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                        '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "魔法恢复": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "攻击上限": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "攻击下限": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "攻击间隔": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "攻击前摇": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "攻击距离": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "攻击距离缓冲": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                           '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "警戒范围": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "弹道速度": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "护甲": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                       '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "魔法抗性": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "移动速度": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "转身速率": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "攻击类型": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "护甲类型": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "近战远程": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "移动方式": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "经验": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                       '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "金钱下限": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "金钱上限": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "跟随距离": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "攻击欲望": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "白天视野": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "夜晚视野": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "碰撞体积": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
+        "模型比例": ['tree', {"1": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                         '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}]}],
     },
     '物品': {
         "页面名": ['text', ''],
@@ -216,74 +250,87 @@ edit = {
                                                          }, 1, 0, True]
                                            }]}],
         "施法类型": ['tree', {'list': ['tree', {'代码': ['int', 1]}, 1, 1, False]}],
-        "效果": ['tree', {'list': ['tree', {'list': ['tree', {'list': ['int', 1, 1, 1, False], '名称': ['text', ''], '简述': ['text', '']}, 1, 1, False],
-                                          '名称': ['text', ''],
-                                          '代码': ['int', 1],
-                                          '驱散': ['tree', {'代码': ['int', 0], '简述': ['text', '']}],
-                                          '技能免疫': ['tree', {'代码': ['int', 0], '简述': ['text', '']}],
-                                          '状态抗性': ['tree', {'代码': ['int', 0], '简述': ['text', '']}],
-                                          '无敌': ['tree', {'代码': ['int', 0], '简述': ['text', '']}],
-                                          '标记': ['tree', {'list': ['tree', {'类型': ['text', ''], '代码': ['int', 0]}, 1, 1, False]}],
-                                          '叠加': ['tree', {'list': ['tree', {'代码1': ['int', 0], '代码2': ['int', 0]}, 1, 1, False]}],
-                                          '生效从属': ['tree', {'代码': ['int', 1], '简述': ['text', '']}],
-                                          '生效目标': ['tree', {'不分类': ['tree', {"list":
-                                                                                 ['tree', {'代码': ['int', 1], 'list':
-                                                                                     ['tree', {'代码': ['int', 1], 'list':
-                                                                                         ['tree', {'代码': ['int', 1]}, 1, 1, False]
-                                                                                               }, 1, 1, False]
-                                                                                           }, 1, 0, True]
-                                                                             }],
-                                                            '英雄': ['tree', {"list":
-                                                                                ['tree', {'代码': ['int', 1], 'list':
-                                                                                    ['tree', {'代码': ['int', 1], 'list':
-                                                                                        ['tree', {'代码': ['int', 1]}, 1, 1, False]
-                                                                                              }, 1, 1, False]
-                                                                                          }, 1, 0, True]
-                                                                            }],
-                                                            '非英雄': ['tree', {"list":
-                                                                                 ['tree', {'代码': ['int', 1], 'list':
-                                                                                     ['tree', {'代码': ['int', 1], 'list':
-                                                                                         ['tree', {'代码': ['int', 1]}, 1, 1, False]
-                                                                                               }, 1, 1, False]
-                                                                                           }, 1, 0, True]
-                                                                             }]
-                                                            }],
-                                          }, 1, 1, False]}],
+        "效果": ['tree', {'list': ['tree', {
+            'list': ['tree', {'list': ['int', 1, 1, 1, False], '名称': ['text', ''], '简述': ['text', '']}, 1, 1, False],
+            '名称': ['text', ''],
+            '代码': ['int', 1],
+            '驱散': ['tree', {'代码': ['int', 0], '简述': ['text', '']}],
+            '技能免疫': ['tree', {'代码': ['int', 0], '简述': ['text', '']}],
+            '状态抗性': ['tree', {'代码': ['int', 0], '简述': ['text', '']}],
+            '无敌': ['tree', {'代码': ['int', 0], '简述': ['text', '']}],
+            '标记': ['tree', {'list': ['tree', {'类型': ['text', ''], '代码': ['int', 0]}, 1, 1, False]}],
+            '叠加': ['tree', {'list': ['tree', {'代码1': ['int', 0], '代码2': ['int', 0]}, 1, 1, False]}],
+            '生效从属': ['tree', {'代码': ['int', 1], '简述': ['text', '']}],
+            '生效目标': ['tree', {'不分类': ['tree', {"list":
+                                                   ['tree', {'代码': ['int', 1], 'list':
+                                                       ['tree', {'代码': ['int', 1], 'list':
+                                                           ['tree', {'代码': ['int', 1]}, 1, 1, False]
+                                                                 }, 1, 1, False]
+                                                             }, 1, 0, True]
+                                               }],
+                              '英雄': ['tree', {"list":
+                                                  ['tree', {'代码': ['int', 1], 'list':
+                                                      ['tree', {'代码': ['int', 1], 'list':
+                                                          ['tree', {'代码': ['int', 1]}, 1, 1, False]
+                                                                }, 1, 1, False]
+                                                            }, 1, 0, True]
+                                              }],
+                              '非英雄': ['tree', {"list":
+                                                   ['tree', {'代码': ['int', 1], 'list':
+                                                       ['tree', {'代码': ['int', 1], 'list':
+                                                           ['tree', {'代码': ['int', 1]}, 1, 1, False]
+                                                                 }, 1, 1, False]
+                                                             }, 1, 0, True]
+                                               }]
+                              }],
+            }, 1, 1, False]}],
         "技能免疫": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "无敌": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "技能抵挡": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "技能反弹": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "技能共享": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
-        "技能窃取": ['tree', {"list": ['tree', {'list': ['tree', {'代码': ['int', 0]}, 1, 1, False], '代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
+        "技能窃取": ['tree', {
+            "list": ['tree', {'list': ['tree', {'代码': ['int', 0]}, 1, 1, False], '代码': ['int', 0], '简述': ['text', '']},
+                     1, 0, True]}],
         "幻象": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "破坏": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "持续施法": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "躲避": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "缠绕": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
-        "即时攻击": ['tree', {"list": ['tree', {'list': ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 1, False], '代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
+        "即时攻击": ['tree', {"list": ['tree', {'list': ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 1, False],
+                                            '代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "视野": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "真实视域": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
-        "施法前摇": ['tree', {'代码': ['tree', {'list': ['text', '', 0, 4, False]}], '修正': ['tree', {'list': ['text', '', 1, 1, False]}], '即时生效': ['tree', {'代码': ['int', 0]}]}],
-        "施法后摇": ['tree', {'代码': ['tree', {'list': ['text', '', 0, 4, False]}], '修正': ['tree', {'list': ['text', '', 1, 1, False]}]}],
+        "施法前摇": ['tree', {'list': ['tree', {'代码': ['tree', {'list': ['text', '', 0, 4, False]}],
+                                            '修正': ['tree', {'list': ['text', '', 1, 1, False]}],
+                                            '即时生效': ['tree', {'代码': ['int', 0]}]}, 1, 0, True]}],
+        "施法后摇": ['tree', {'list': ['tree', {'代码': ['tree', {'list': ['text', '', 0, 4, False]}],
+                                            '修正': ['tree', {'list': ['text', '', 1, 1, False]}]}, 1, 0, True]}],
         "魔法消耗": ['tree', {'list': ['tree', {'名称': ['text', ''], 'list': ['tree', {
             '代码': ['tree', {'list': ['text', '', 0, 4, False]}],
             '类型': ['tree', {'代码': ['int', 1]}],
-            '修正': ['tree', {'list': ['text', '', 1, 1, False]}]}, 1, 1, False]}, 1, 1, False]}],
+            '修正': ['tree', {'list': ['text', '', 1, 1, False]}]}, 1, 1, False]}, 1, 0, True]}],
         "冷却时间": ['tree', {'list': ['tree', {
             '名称': ['text', ''],
             '代码': ['tree', {'list': ['text', '', 0, 4, False]}],
             '类型': ['tree', {'代码': ['int', 1]}],
-            '修正': ['tree', {'list': ['text', '', 1, 1, False]}]}, 1, 1, False]}],
+            '修正': ['tree', {'list': ['text', '', 1, 1, False]}]}, 1, 0, True]}],
         "属性": ['tree', {'list': ['tree', {
             '名称': ['text', ''],
             '后缀': ['text', ''],
             '代码': ['tree', {'list': ['text', '', 0, 4, False]}],
             '修正': ['tree', {'list': ['text', '', 1, 1, False]}]}, 1, 1, False]}],
         "升级": ['tree', {
-            'A杖': ['tree', {'list': ['tree', {'目标': ['tree', {'list': ['text', '', 0, 4, False]}], '值': ['random_tree', {}], }, 1, 0, True]}],
-            '技能': ['tree', {'list': ['tree', {'目标': ['tree', {'list': ['text', '', 0, 4, False]}], '值': ['random_tree', {}], }, 1, 0, True]}],
+            'A杖': ['tree', {
+                'list': ['tree', {'目标': ['tree', {'list': ['text', '', 0, 4, False]}], '值': ['random_tree', {}], }, 1,
+                         0, True]}],
+            '技能': ['tree', {
+                'list': ['tree', {'目标': ['tree', {'list': ['text', '', 0, 4, False]}], '值': ['random_tree', {}], }, 1,
+                         0, True]}],
             '混合': ['tree', {
-                'list': ['tree', {'目标': ['tree', {'list': ['text', '', 0, 4, False]}], '来源技能': ['tree', {"1": ['text', ""], "2": ['text', ""]}], '值': ['random_tree', {}], }, 1, 0,
+                'list': ['tree', {'目标': ['tree', {'list': ['text', '', 0, 4, False]}],
+                                  '来源技能': ['tree', {"1": ['text', ""], "2": ['text', ""]}], '值': ['random_tree', {}], },
+                         1, 0,
                          True]}]
         }]
     }
