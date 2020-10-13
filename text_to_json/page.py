@@ -6,16 +6,17 @@ target_url = 'https://dota.huijiwiki.com/w/api.php'
 
 def analyse_upload_json(text, upload_info):
     upload_info_json = upload_info.json()
+    retxt=''
     if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
         if 'nochange' in upload_info.json()['edit']:
-            print('《', text, '》', '没有修改')
+            retxt= '《'+text+ '》没有修改'
         elif 'oldrevid' in upload_info.json()['edit']:
-            print('《', text, '》', '修改', upload_info.json()['edit']['oldrevid'], '为',
-                  upload_info.json()['edit']['newrevid'])
+            retxt= '《'+text+'》修改'+ upload_info.json()['edit']['oldrevid']+'为'+upload_info.json()['edit']['newrevid']
         else:
-            print('《', text, '》', '修改成功')
+            retxt= '《'+text+'》修改成功'
     else:
-        print('《', text, '》', '修改失败')
+        retxt= '《'+text+'》修改失败'
+    return retxt+'\n'
 
 
 def create_upgrade_cast_text(numjson):
@@ -35,7 +36,15 @@ def create_upgrade_cast_text(numjson):
                 if str(j) in numjson[i]:
                     if j > 1:
                         retext += "/"
-                    retext += str(numjson[i][str(j)])
+                    try:
+                        if float(int(numjson[i][str(j)]))==float(numjson[i][str(j)]):
+                            retext += str(int(numjson[i][str(j)]))
+                        else:
+                            retext += str(numjson[i][str(j)])
+                    except ValueError:
+                        retext += str(numjson[i][str(j)])
+                    if '即时生效' in numjson[i] and numjson[i]['即时生效']['代码']!=0:
+                        retext+=numjson[i]['即时生效']['图片']['图片']
                 else:
                     break
                 j+=1
@@ -61,4 +70,4 @@ def ability_cast_point_and_backswing(seesion, json_base, csrf_token):
     upload_data = {'action': 'edit', 'title': '施法前摇和后摇', 'text': retxt, 'format': 'json',
                    'token': csrf_token}
     upload_info = seesion.post(target_url, data=upload_data)
-    analyse_upload_json('技能前摇和后摇', upload_info)
+    return analyse_upload_json('施法前摇和后摇', upload_info)

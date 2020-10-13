@@ -520,7 +520,9 @@ class Main(QMainWindow):
         QMessageBox.information(self, '更改完毕', "已经将wiki目录更改完毕", QMessageBox.Yes, QMessageBox.Yes)
 
     def download_and_upload_single_pages(self):
-        page.ability_cast_point_and_backswing(self.seesion,self.json_base,self.csrf_token)
+        info_txt=''
+        info_txt+=page.ability_cast_point_and_backswing(self.seesion,self.json_base,self.csrf_token)
+        QMessageBox.information(self, '更改完毕', info_txt, QMessageBox.Yes, QMessageBox.Yes)
 
     def download_json_base(self):
         try:
