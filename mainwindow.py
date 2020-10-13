@@ -1033,7 +1033,7 @@ class Main(QMainWindow):
                     else:
                         bool = bool and d1[i] == d2[i]
                 else:
-                    if isinstance(d1[i], int) or isinstance(d1[i], float) and isinstance(d2[i], int) or isinstance(d2[i], float):
+                    if (isinstance(d1[i], int) or isinstance(d1[i], float)) and (isinstance(d2[i], int) or isinstance(d2[i], float)):
                         if float(d1[i]) == float(d2[i]):
                             continue
                         else:

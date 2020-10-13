@@ -65,6 +65,10 @@ def cal_ability_source_index(json, base, i):
 
 def get_source_to_data(all_json, upgrade_json, version):
     for i in all_json['技能源']:
+        for j in all_json['技能源'][i]['升级']:
+            for k in all_json['技能源'][i]['升级'][j]:
+                if all_json['技能源'][i]['升级'][j][k]['目标']['3']=='施法前摇' or all_json['技能源'][i]['升级'][j][k]['目标']['3']=='施法后摇':
+                    all_json['技能源'][i]['升级'][j][k]['目标']['4']='1'
         all_json['技能源'][i]['应用'] = 1
         all_json['技能源'][i]['分类'] = '技能源'
         unit_dic = all_json['技能源'][i]
@@ -741,8 +745,9 @@ def mech_others(json, mech):
                     json["冷却时间"][i][j]["类型"]["图片"] = mech["冷却时间"][str(json["冷却时间"][i][j]["类型"]["代码"])]["图片"]
     for i in json["施法前摇"]:
         for j in json["施法前摇"][i]:
-            if str(json["施法前摇"][i][j]["即时生效"]["代码"]) in mech["即时生效"]:
-                json["施法前摇"][i][j]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i][j]["即时生效"]["代码"])]
+            if j!='名称':
+                if str(json["施法前摇"][i][j]["即时生效"]["代码"]) in mech["即时生效"]:
+                    json["施法前摇"][i][j]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i][j]["即时生效"]["代码"])]
 
 
 def loop_check(json, data, all_json, name):
