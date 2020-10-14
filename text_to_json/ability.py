@@ -80,9 +80,6 @@ def get_source_to_data(all_json, upgrade_json, version):
                     "0"] == '不存在' or "1" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码'][
                             "1"] == '不存在'):
                     unit_dic['升级'][j][k]['值']['代码'] = {"0": "手填", "1": "无"}
-                if '目标' in unit_dic['升级'][j][k] and '3' in unit_dic['升级'][j][k]['目标'] and unit_dic['升级'][j][k]['目标'][
-                    '3'] in ability_trait_level[3]:
-                    unit_dic['升级'][j][k]['目标']['4'] = '1'
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"
@@ -210,6 +207,7 @@ def input_upgrade(all_json, upgrade_json):
                     temp["2"][k] = copy.deepcopy(upgrade_json[i]["A杖"][j]["值"][k])
             else:
                 temp["2"] = upgrade_json[i]["A杖"][j]["值"]
+            temp["2"]["升级来源"] = {"1": {"名称": '阿哈利姆神杖','图片':'agha.png'}}
         for j in upgrade_json[i]["技能"]:
             if "代码" in upgrade_json[i]["技能"][j]["值"] and isinstance(upgrade_json[i]["技能"][j]["值"]["代码"], dict):
                 if "1" in upgrade_json[i]["技能"][j]["值"]["代码"] and upgrade_json[i]["技能"][j]["值"]["代码"]["1"] == "":
@@ -228,18 +226,21 @@ def input_upgrade(all_json, upgrade_json):
                         temp = temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]
                 else:
                     break
+            ind="3"
             if "0" in upgrade_json[i]["技能"][j]["目标"] and upgrade_json[i]["技能"][j]["目标"]["0"] == "替换":
                 if "3" not in temp:
                     temp["3"] = copy.deepcopy(temp["1"])
                 for k in upgrade_json[i]["技能"][j]["值"]:
                     temp["3"][k] = copy.deepcopy(upgrade_json[i]["技能"][j]["值"][k])
             else:
-                temp["3"] = upgrade_json[i]["技能"][j]["值"]
-            temp["3"]["升级来源"] = {"1": {"名称": i}}
+                if "3" in temp:
+                    ind="2"
+            temp[ind] = upgrade_json[i]["技能"][j]["值"]
+            temp[ind]["升级来源"] = {"1": {"名称": i}}
             if all_json["技能"][i]["次级分类"] == "天赋技能":
-                temp["3"]["升级来源"]["1"]["图片"] = "talent.png"
+                temp[ind]["升级来源"]["1"]["图片"] = "talent.png"
             else:
-                temp["3"]["升级来源"]["1"]["图片"] = all_json["技能"][i]["迷你图片"]
+                temp[ind]["升级来源"]["1"]["图片"] = all_json["技能"][i]["迷你图片"]
             if upgrade_json[i]["技能"][j]["目标"]["1"] == '技能':
                 upgrade_info = all_json['技能'][upgrade_json[i]["技能"][j]["目标"]["2"]]['技能升级信息']
                 upbool = True
@@ -532,7 +533,10 @@ def one_upgrade(json, base_txt):
         json["4"] = {}
         for k in range(len(calvalue[3])):
             json["4"][str(k + 1)] = calvalue[3][k]
-        json["4"]["升级来源"] = copy.deepcopy(json["3"]["升级来源"])
+        json["4"]["升级来源"] = copy.deepcopy(json["2"]["升级来源"])
+        l=len(json["4"]["升级来源"])
+        for k in json["3"]["升级来源"]:
+            json["4"]["升级来源"][str(l+int(k))]=copy.deepcopy(json["3"]["升级来源"][k])
 
 
 def cut_the_same_to_one(lists):

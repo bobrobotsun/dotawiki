@@ -996,27 +996,45 @@ class Main(QMainWindow):
     # 向wiki网站上传对应的信息
     def upload_json(self, pagename, content, bot=False):
         download_data = {'action': 'jsondata', 'title': pagename, 'format': 'json'}
-        download_info = self.seesion.post(self.target_url, data=download_data)
-        download_content = download_info.json()
-        if 'jsondata' in download_content and self.check_dict_equal(download_content['jsondata'], content):
-            return ['《' + pagename + '》通过校验，不需要修改！',0]
-        else:
-            pagename = 'Data:' + pagename
-            content = json.dumps(content)
-            upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
-            if bot:
-                upload_data['bot'] = 1
-            upload_info = self.seesion.post(self.target_url, data=upload_data)
-            upload_info_json = upload_info.json()
-            if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
-                if 'nochange' in upload_info.json()['edit']:
-                    return ['没有修改《' + pagename + '》',0]
-                elif 'oldrevid' in upload_info.json()['edit']:
-                    return ['上传《' + pagename + '》，【' + str(upload_info.json()['edit']['oldrevid']) + '】-->【' + str(upload_info.json()['edit']['newrevid']) + '】',1]
-                else:
-                    return ['上传《' + pagename + '》内容成功',1]
+        k=0
+        while True:
+            download_info = self.seesion.post(self.target_url, data=download_data)
+            if download_info.status_code==200:
+                download_content = download_info.json()
+                if 'jsondata' in download_content and self.check_dict_equal(download_content['jsondata'], content):
+                    return ['《' + pagename + '》通过校验，不需要修改！', 0]
+                break
             else:
-                return [json.dumps(upload_info.json()),0]
+                k+=1
+                time.sleep(0.2)
+                if k>=5:
+                    break
+        pagename = 'Data:' + pagename
+        content = json.dumps(content)
+        upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
+        if bot:
+            upload_data['bot'] = 1
+        k=0
+        while True:
+            upload_info = self.seesion.post(self.target_url, data=upload_data)
+            if upload_info.status_code==200:
+                upload_info_json = upload_info.json()
+                break
+            else:
+                k+=1
+                time.sleep(0.2)
+                if k>=5:
+                    return ['《' + pagename + '》上传失败，请之后重新上传！', 10000]
+        if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
+            if 'nochange' in upload_info.json()['edit']:
+                return ['没有修改《' + pagename + '》', 0]
+            elif 'oldrevid' in upload_info.json()['edit']:
+                return ['上传《' + pagename + '》，【' + str(upload_info.json()['edit']['oldrevid']) + '】-->【' + str(
+                    upload_info.json()['edit']['newrevid']) + '】', 1]
+            else:
+                return ['上传《' + pagename + '》内容成功', 1]
+        else:
+            return [json.dumps(upload_info.json()), 0]
 
     def check_dict_equal(self, d1, d2):
         bool = True
