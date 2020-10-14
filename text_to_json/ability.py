@@ -65,10 +65,6 @@ def cal_ability_source_index(json, base, i):
 
 def get_source_to_data(all_json, upgrade_json, version):
     for i in all_json['技能源']:
-        for j in all_json['技能源'][i]['升级']:
-            for k in all_json['技能源'][i]['升级'][j]:
-                if all_json['技能源'][i]['升级'][j][k]['目标']['3']=='施法前摇' or all_json['技能源'][i]['升级'][j][k]['目标']['3']=='施法后摇':
-                    all_json['技能源'][i]['升级'][j][k]['目标']['4']='1'
         all_json['技能源'][i]['应用'] = 1
         all_json['技能源'][i]['分类'] = '技能源'
         unit_dic = all_json['技能源'][i]
