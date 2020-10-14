@@ -235,7 +235,7 @@ def input_upgrade(all_json, upgrade_json):
             else:
                 if "3" in temp:
                     ind="2"
-            temp[ind] = upgrade_json[i]["技能"][j]["值"]
+                temp[ind] = upgrade_json[i]["技能"][j]["值"]
             temp[ind]["升级来源"] = {"1": {"名称": i}}
             if all_json["技能"][i]["次级分类"] == "天赋技能":
                 temp[ind]["升级来源"]["1"]["图片"] = "talent.png"
