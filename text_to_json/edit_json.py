@@ -40,6 +40,17 @@ def sortedList(alist):
         new.append(i[1])
     return new
 
+def version_sort(version_json,version_list):
+    rejson={}
+    for i in range(len(version_list)):
+        for j in range(len(version_list[i])):
+            if j > 0:
+                log_name = version_list[i][0] + '/' + version_list[i][j]
+            else:
+                log_name = version_list[i][j]
+            if log_name in version_json:
+                rejson[log_name]=version_json[log_name]
+    return rejson
 
 edit_source = {
     '英雄': ['英雄'],

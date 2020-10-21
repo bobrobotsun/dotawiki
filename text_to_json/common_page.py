@@ -551,47 +551,96 @@ def create_navboxhero(json_base):
     return retxt
 
 
-def create_2nd_logs(json_base, log_base, name, limit=10):
+def create_miniimage_with_link(json_base):
+    if '迷你图片' in json_base and json_base['迷你图片'] != '':
+        retxt = '[[file:' + json_base['迷你图片'] + '|x24px|link=]] [[' + json_base['页面名'] + ']]'
+    else:
+        retxt = '[[' + json_base['页面名'] + ']]'
+    return retxt
+
+
+def create_navboxunit(json_base):
+    lists = ['', '', '', '', '', '']
+    for i, v in json_base['非英雄单位'].items():
+        if v["远古单位"]["1"]["1"] == 1:
+            if len(lists[0]) > 0:
+                lists[0] += '&nbsp;{{!}}&nbsp;'
+            lists[0] += create_miniimage_with_link(v)
+        elif v["英雄级单位"]["1"]["1"] == 1:
+            if len(lists[1]) > 0:
+                lists[1] += '&nbsp;{{!}}&nbsp;'
+            lists[1] += create_miniimage_with_link(v)
+        elif v["中立生物"]["1"]["1"] == 1:
+            if len(lists[2]) > 0:
+                lists[2] += '&nbsp;{{!}}&nbsp;'
+            lists[2] += create_miniimage_with_link(v)
+        elif v["召唤物"]["1"]["1"] == 1:
+            if len(lists[3]) > 0:
+                lists[3] += '&nbsp;{{!}}&nbsp;'
+            lists[3] += create_miniimage_with_link(v)
+        elif "关联类型" in v and v["关联类型"] == '守卫':
+            if len(lists[4]) > 0:
+                lists[4] += '&nbsp;{{!}}&nbsp;'
+            lists[4] += create_miniimage_with_link(v)
+        elif v["类型"] == '士兵':
+            if len(lists[5]) > 0:
+                lists[5] += '&nbsp;{{!}}&nbsp;'
+            lists[5] += create_miniimage_with_link(v)
+    retxt = '|group1=远古生物|list1=' + lists[0] \
+            + '|group2=英雄级单位|list2=' + lists[1] \
+            + '|group3=中立生物|list3=' + lists[2] \
+            + '|group4=召唤生物|list4=' + lists[3] \
+            + '|group5=守卫|list5=' + lists[4] \
+            + '|group6=士兵|list6=' + lists[5]
+    return retxt
+
+
+def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
     now = 0
     retxt = ''
-    list = reversed(log_base.keys())
-    for i in list:
-        if i in log_base and limit == 0 or limit >= now:
-            current_ul = 0
-            for j, w in log_base[i].items():
-                if isinstance(w, dict):
-                    for k, x in w.items():
-                        showit = False
-                        for l in range(2, len(x)):
-                            if x[0] == name:
-                                showit = True
-                            else:
-                                for m in range(len(x[l]['目标'])):
-                                    showit = showit and x[l]['目标'][m] == name
-                            if showit:
-                                now += 1
-                                if current_ul == 0:
-                                    if limit > 0:
-                                        retxt += '<h4>[[' + i + ']]</h4>'
-                                    else:
-                                        retxt += '<h3>[[' + i + ']]\t<small>' + log_base[i]['更新日期'] + '</small></h3>'
-                                if x[l]['序列级数'] > current_ul:
-                                    for m in range(x[l]['序列级数'] - current_ul):
-                                        retxt += '<ul>'
-                                    current_ul = x[l]['序列级数']
-                                elif x[l]['序列级数'] < current_ul:
-                                    for m in range(current_ul - x[l]['序列级数']):
-                                        retxt += '</ul>'
-                                    current_ul = x[l]['序列级数']
-                                retxt += '<li>' + x[l]['文字'] + '</li>'
-            for m in range(current_ul):
-                retxt += '</ul>'
+    for i in range(len(log_list) - 1, -1, -1):
+        for j in range(len(log_list[i]) - 1, -1, -1):
+            if j > 0:
+                log_name = log_list[i][0] + '/' + log_list[i][j]
+            else:
+                log_name = log_list[i][j]
+            if log_name in log_base and (limit == 0 or limit >= now):
+                v = log_base[log_name]
+                current_ul = 0
+                for j, w in v.items():
+                    if isinstance(w, dict):
+                        for k, x in w.items():
+                            showit = False
+                            for l in range(2, len(x)):
+                                if x[0] == name:
+                                    showit = True
+                                else:
+                                    for m in range(len(x[l]['目标'])):
+                                        showit = showit and x[l]['目标'][m] == name
+                                if showit:
+                                    now += 1
+                                    if current_ul == 0:
+                                        if limit > 0:
+                                            retxt += '<h4>[[' + log_name + ']]</h4>'
+                                        else:
+                                            retxt += '<h3>[[' + log_name + ']]\t<small>' + v['更新日期'] + '</small></h3>'
+                                    if x[l]['序列级数'] > current_ul:
+                                        for m in range(x[l]['序列级数'] - current_ul):
+                                            retxt += '<ul>'
+                                        current_ul = x[l]['序列级数']
+                                    elif x[l]['序列级数'] < current_ul:
+                                        for m in range(current_ul - x[l]['序列级数']):
+                                            retxt += '</ul>'
+                                        current_ul = x[l]['序列级数']
+                                    retxt += '<li>' + x[l]['文字'] + '</li>'
+                for m in range(current_ul):
+                    retxt += '</ul>'
     if limit > 0:
         retxt += '<b>[[' + name + '/版本改动|完整的更新内容请点此处查看……]]</b>'
     return retxt
 
 
-def create_page_hero(json_base, log_base, hero):
+def create_page_hero(json_base, log_base, log_list, hero):
     db = json_base['英雄'][hero]
     retxt = '__NOTOC__<div style="float:left;">' \
             + '<div class="bg-primary" style="margin-left:0px;margin-top:1em;display:block;height:48px;">' \
@@ -644,7 +693,7 @@ def create_page_hero(json_base, log_base, hero):
         else:
             break
     retxt += '<h2>历史更新</h2>' \
-             + create_2nd_logs(json_base, log_base, db["页面名"], 10) \
+             + create_2nd_logs(json_base, log_base, log_list, db["页面名"], 10) \
              + '<h2>饰品</h2>' \
              + '[[data:' + db["中文名"] + '/equipment|点击进入查看饰品信息]]' \
              + '{{navbox|title=DotA中的英雄|name=navboxhero|basestyle=max-width:800px;text-align:center;line-height:2em;' \
@@ -667,11 +716,56 @@ def create_page_hero(json_base, log_base, hero):
     return rere
 
 
-def uploadpage_hero(seesion, json_base, log_base, csrf_token,):
-    retxt = create_page_hero(json_base, log_base, '斯温')
-    page_name = 'dota:robot4'
-
-    upload_data = {'action': 'edit', 'title': page_name, 'text': retxt, 'format': 'json',
-                   'token': csrf_token}
-    upload_info = seesion.post(target_url, data=upload_data)
-    return analyse_upload_json(page_name, upload_info)
+def create_page_unit(json_base, log_base, log_list, unit):
+    db = json_base['非英雄单位'][unit]
+    retxt = '__NOTOC__<div>{{#invoke:unit data|unitinfobox|' + db["页面名"] + '}}' + db["页面名"] + '是DOTA2中的一种'
+    if db["远古单位"]["1"]["1"] == 1:
+        retxt += '远古[[分类:远古单位]]'
+    if db["英雄级单位"]["1"]["1"] == 1:
+        retxt += '[[英雄级单位|英雄级]]单位[[分类:英雄级单位]][[分类:召唤物]]'
+    if db["召唤物"]["1"]["1"] == 1:
+        retxt += '召唤物[[分类:召唤物]]'
+    if db["中立生物"]["1"]["1"] == 1:
+        retxt += '[[中立生物]][[分类:中立生物]]'
+    if "关联类型" in db and db["关联类型"] == '守卫':
+        retxt += '[[守卫]][[分类:守卫]][[分类:召唤物]]'
+    if "简介" in db and db["简介"] != '':
+        retxt += '<br/>' + db["简介"]
+    if db["中立生物"]["1"]["1"] == 1:
+        # 这里有个东西，是关于野怪营地的东西，目前还没办法改动
+        retxt += '<h2>营地</h2>{{#arraymap:{{#ask:[[Creep type::' + db['页面名'] + ']]|link=none}}|,|@@@|[[{{#ask:[[has subobject::@@@]]|?name|mainlabel=-|headers=hide}}]]}}'
+    if db["召唤物"]["1"]["1"] == 1 or db["英雄级单位"]["1"]["1"] == 1 or db["关联类型"] == '守卫':
+        retxt += '<h2>召唤源技能</h2>'
+        for i, v in db['源技能'].items():
+            if v in json_base['技能']:
+                sdb = json_base['技能'][v]
+                retxt += '<br/><div>[[' + v + ']]<br/>:[[file:' + sdb['图片'] + '|64px|link=' + sdb['页面名'] + '|left]]' + sdb['描述'] + '<br/><br/></div>'
+    retxt += '</div>'
+    if db["类型"] == '士兵':
+        retxt += '[[分类:士兵]]'
+    ii = 0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in db['技能']:
+            retxt += create_page_ability(json_base['技能'][db['技能'][i]])
+        else:
+            break
+    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, db["页面名"], 10) \
+             + '<div>{{navbox|title=DotA中的非英雄单位|name=navbox minion' + create_navboxunit(json_base) + '}}</div>[[分类:非英雄单位]]'
+    rere = ''
+    nums = 0
+    for i in range(len(retxt)):
+        if retxt[i] == '<':
+            if retxt[i + 1] == '/':
+                nums -= 1
+            elif retxt[i + 1] == 'b' and retxt[i + 2] == 'r':
+                nums += 0
+            else:
+                if retxt[i + 1] == 't' or retxt[i + 1] == 'd' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
+                    rere += '\n'
+                    for j in range(nums):
+                        rere += '\t'
+                nums += 1
+        rere += retxt[i]
+    return rere

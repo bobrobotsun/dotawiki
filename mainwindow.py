@@ -612,6 +612,7 @@ class Main(QMainWindow):
                         break
                     self.lock.release()
         self.lock.acquire()
+        print(threading.activeCount(), self.startactiveCount)
         if (threading.activeCount() <= self.startactiveCount):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
@@ -666,10 +667,6 @@ class Main(QMainWindow):
         制作一个默认的单位统称列表，具体效果见edit_json.py
         """
         self.version_default = edit_json.set_version_default(self.json_base)
-        """
-        下面是重新排序的情况
-        """
-        self.resort()
         """
         下面是修改tab的页面情况
         """
@@ -889,6 +886,10 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['树'][0].clicked.connect(self.version_edit_all_button_clicked)
         self.version_edit_all_button_default()
         self.versionlayout['版本内容']['横排版']['树'][0].doubleClicked.connect(self.version_item_double_clicked)
+        """
+        下面是重新排序的情况
+        """
+        self.resort()
 
     def resort(self):
         for i in self.text_base:
@@ -896,6 +897,7 @@ class Main(QMainWindow):
         for i in self.json_base:
             self.json_base[i] = edit_json.sortedDictValues(self.json_base[i], True)
             self.json_name[i] = edit_json.sortedList(self.json_name[i])
+        self.version_base=edit_json.version_sort(self.version_base,self.version_list['版本'])
         self.file_save_all()
 
     def file_save_all(self):
@@ -986,15 +988,17 @@ class Main(QMainWindow):
         QApplication.processEvents()
         all_upload = []
         for i in self.json_base['英雄']:
-            all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, i)])
+            all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
+            all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
+        for i in self.json_base['非英雄单位']:
+            all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
+            all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
             self.w.addtext(self.upload_page(all_upload[i][0], all_upload[i][1], True), i)
-            print(all_upload[i][1][:60])
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
-
 
     def upload_same_kind(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
@@ -1079,13 +1083,15 @@ class Main(QMainWindow):
             return [json.dumps(upload_info.json()), 0]
 
     def upload_page(self, pagename, content, bot=False):
-        download_data = {'action': 'parse','prop':'wikitext', 'page': pagename, 'format': 'json'}
+        download_data = {'action': 'parse', 'prop': 'wikitext', 'page': pagename, 'format': 'json'}
         k = 0
         while True:
             download_info = self.seesion.post(self.target_url, data=download_data)
             if download_info.status_code == 200:
                 download_content = download_info.json()
-                if content==download_content['parse']['wikitext']['*']:
+                if 'error' in download_content:
+                    break
+                elif content == download_content['parse']['wikitext']['*']:
                     return ['《' + pagename + '》通过校验，不需要修改！', 0]
                 break
             else:
