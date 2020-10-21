@@ -769,3 +769,47 @@ def create_page_unit(json_base, log_base, log_list, unit):
                 nums += 1
         rere += retxt[i]
     return rere
+
+
+def create_page_item(json_base, log_base, log_list, item):
+    db = json_base['物品'][item]
+    retxt = '__NOTOC__{{#invoke:item data|iteminfobox|' + db["页面名"] + '}}<b>' + db["页面名"] + '</b>是DOTA2中的一种[[物品]]，可以在<b>"'
+    for i, v in db['商店'].items():
+        if i != '1':
+            retxt += '、'
+        retxt = db['商店'][i] + '[[分类:' + db['商店'][i] + '物品]]'
+    retxt += '"</b>商店获得。<br/>'
+    for i, v in db['商店'].items():
+        retxt += '<br/><b>' + v + '商店</b>出售以下商品：<br/><br/>' + '<table style="font-size:16px;">'
+        for j, w in db["同商店物品"][i].items():
+            if int(j) % 4 == 1:
+                retxt += '<tr>'
+            retxt += '<td style="padding:6px;text-align:center;">[[file:' + w['图片'] + '|52px|center|link=' + w['物品名'] + ']][[' + w['物品名'] + ']]</td>'
+            if int(j) % 4 == 0 or int(j) == len(db["同商店物品"][i]):
+                retxt += '</tr>'
+        retxt += '</table>'
+    ii = 0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in db['技能']:
+            retxt += create_page_ability(json_base['技能'][db['技能'][i]])
+        else:
+            break
+    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, db["页面名"], 10) + '[[分类:物品]]'
+    rere = ''
+    nums = 0
+    for i in range(len(retxt)):
+        if retxt[i] == '<':
+            if retxt[i + 1] == '/':
+                nums -= 1
+            elif retxt[i + 1] == 'b' and retxt[i + 2] == 'r':
+                nums += 0
+            else:
+                if retxt[i + 1] == 't' or retxt[i + 1] == 'd' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
+                    rere += '\n'
+                    for j in range(nums):
+                        rere += '\t'
+                nums += 1
+        rere += retxt[i]
+    return rere

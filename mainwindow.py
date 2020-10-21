@@ -549,8 +549,8 @@ class Main(QMainWindow):
                     else:
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
-            self.startactiveCount = threading.activeCount() + 1
-            for i in range(10):
+            self.startactiveCount = threading.activeCount()
+            for i in range(20):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
         except FileNotFoundError:
@@ -601,7 +601,7 @@ class Main(QMainWindow):
                         self.current_num[0] += 1
                         break
                     finally:
-                        time.sleep(0.05)
+                        time.sleep(0.02)
                         self.lock.release()
                 else:
                     self.local.k += 1
@@ -612,19 +612,12 @@ class Main(QMainWindow):
                         break
                     self.lock.release()
         self.lock.acquire()
-        print(threading.activeCount(), self.startactiveCount)
-        if (threading.activeCount() <= self.startactiveCount):
+        if (threading.activeCount() <= self.startactiveCount+1):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            QMessageBox.information(self.progress, '下载完毕', "已为您下载合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
+            self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口',0])
         self.lock.release()
 
-    def download_json_thread_finished(self):
-        print(threading.activeCount() - self.startactiveCount)
-        if (threading.activeCount() <= self.startactiveCount):
-            self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
-            self.fix_window_with_json_data()
-            QMessageBox.information(self.progress, '下载完毕', "已为您下载合成数据，并已保存。", QMessageBox.Yes, QMessageBox.Yes)
 
     def fix_window_with_json_data(self):
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
@@ -992,6 +985,9 @@ class Main(QMainWindow):
             all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
         for i in self.json_base['非英雄单位']:
             all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
+            all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
+        for i in self.json_base['物品']:
+            all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
             all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
