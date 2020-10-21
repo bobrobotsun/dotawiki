@@ -11,8 +11,8 @@ def analyse_upload_json(text, upload_info):
         if 'nochange' in upload_info.json()['edit']:
             retxt = '《' + text + '》没有修改'
         elif 'oldrevid' in upload_info.json()['edit']:
-            retxt = '《' + text + '》修改' + upload_info.json()['edit']['oldrevid'] + '为' + upload_info.json()['edit'][
-                'newrevid']
+            retxt = '《' + text + '》修改' + str(upload_info.json()['edit']['oldrevid']) + '为' + str(upload_info.json()['edit'][
+                'newrevid'])
         else:
             retxt = '《' + text + '》修改成功'
     else:
@@ -43,11 +43,11 @@ def create_upgrade_cast_text(numjsons,k):
                             retext += str(numjson[i][str(j)])
                     except ValueError:
                         retext += str(numjson[i][str(j)])
-                    if '即时生效' in numjson[i] and numjson[i]['即时生效']['代码'] != 0:
-                        retext += numjson[i]['即时生效']['图片']['图片']
                 else:
                     break
                 j += 1
+            if '即时生效' in numjson[i] and numjson[i]['即时生效']['代码'] != 0:
+                retext += numjson[i]['即时生效']['图片']['图片']
         return retext
     else:
         return ''
