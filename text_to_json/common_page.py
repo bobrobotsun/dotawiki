@@ -512,6 +512,168 @@ def create_page_ability(db):
     return retxt
 
 
+def get_unit_value(array, post=''):
+    if isinstance(array, dict):
+        retxt = ''
+        for i, v in array.items():
+            if i != '1':
+                retxt += '/'
+            retxt += v + post
+        return retxt
+    else:
+        return '无信息'
+
+
+
+def get_unit_upgrade_double(db1, db2, combine='~', post=''):
+    retxt = ''
+    for ii in range(1, 5):
+        i = str(ii)
+        if i in db1:
+            if ii > 1:
+                retxt += '<br/>'
+                for j, w in db1[i]['升级来源'].items():
+                    retxt += '[[file:' + w["图片"] + '|16px|link=' + w["名称"] + ']]'
+            jj = 0
+            while True:
+                jj += 1
+                j = str(jj)
+                if j in db1[i]:
+                    if jj > 1:
+                        retxt += '/'
+                    retxt += str(db1[i][j]) + post
+                else:
+                    break
+            retxt += combine
+            jj = 0
+            while True:
+                jj += 1
+                j = str(jj)
+                if j in db2[i]:
+                    if jj > 1:
+                        retxt += '/'
+                    retxt += str(db2[i][j]) + post
+                else:
+                    break
+    return retxt
+
+
+def create_infobox_unit(db):
+    label = 'style="border:1px solid white;padding:0px 8px;background:#000;text-align:right;"'
+    data = 'style="border:1px solid white;padding:0px 8px;background:#000;text-align:left;"'
+    retxt = '<table class="infobox" style="text-align:center;background:#222;width:300px;color:#fff;margin-top:12px;margin-right:12px;"><tr class="infobox-title">' \
+            + '<th colspan=2 style="background:#000;padding:8px 16px 0 16px;text-align:center;"><span style="font-size:36px;">' \
+            + get_unit_value(db["中文名"]) + '</span><br/><span style="font-size:24px;text-align:center;">' + get_unit_value(db["英文名"]) + '</span></th></tr>'
+    if db["图片"] != '':
+        retxt += '<tr><td colspan=2 style="background:#fff">[[file:' + db["图片"] + '|200px|center|link=' + db["页面名"] + ']]</td></tr>'
+    retxt += '<tr><td ' + label + '>是否远古单位</td><td ' + data + '>'
+    if create_upgrade_text(db, "远古单位") == 1:
+        retxt += '是'
+    else:
+        retxt += '否'
+    retxt += '</td></tr><tr><td ' + label + '>是否英雄级单位</td><td ' + data + '>'
+    if create_upgrade_text(db, "英雄级单位") == 1:
+        retxt += '是'
+    else:
+        retxt += '否'
+    retxt += '</td></tr><tr><td ' + label + '>等级</td><td ' + data + '>' + create_upgrade_text(db, "等级") \
+             + '</td></tr><tr><td ' + label + '>奖励金钱</td><td ' + data + '>' + get_unit_upgrade_double(db['金钱下限'], db['金钱上限']) \
+             + '</td></tr><tr><td ' + label + '>奖励经验</td><td ' + data + '>' + create_upgrade_text(db, "经验") \
+             + '</td></tr><tr><td ' + label + '>远近程</td><td ' + data + '>' + create_upgrade_text(db, "近战远程") \
+             + '</td></tr><tr><td ' + label + '>攻击警觉范围</td><td ' + data + '>' + create_upgrade_text(db, "警戒范围") \
+             + '</td></tr><tr><td ' + label + '>生命值</td><td ' + data + '>' + create_upgrade_text(db, "生命值") \
+             + '</td></tr><tr><td ' + label + '>魔法值</td><td ' + data + '>' + create_upgrade_text(db, "魔法值") \
+             + '</td></tr><tr><td ' + label + '>生命恢复</td><td ' + data + '>' + create_upgrade_text(db, "生命恢复") \
+             + '</td></tr><tr><td ' + label + '>魔法恢复</td><td ' + data + '>' + create_upgrade_text(db, "魔法恢复") \
+             + '</td></tr><tr><td ' + label + '>攻击力<br/>（攻击类型）</td><td ' + data + '>' + get_unit_upgrade_double(db['攻击下限'], db['攻击上限'], '~') + '<br/>（' + create_upgrade_text(db, "攻击类型") \
+             + '）</td></tr><tr><td ' + label + '>攻击距离+不中断距离</td><td ' + data + '>' + create_upgrade_text(db, "攻击距离") \
+             + '+' + create_upgrade_text(db, "攻击距离缓冲") \
+             + '</td></tr><tr><td ' + label + '>攻击前摇</td><td ' + data + '>' + create_upgrade_text(db, "攻击前摇") \
+             + '</td></tr><tr><td ' + label + '>弹道速度</td><td ' + data + '>' + create_upgrade_text(db, "弹道速度") \
+             + '</td></tr><tr><td ' + label + '>基础攻击间隔</td><td ' + data + '>' + create_upgrade_text(db, "攻击间隔") \
+             + '</td></tr><tr><td ' + label + '>护甲<br/>（护甲类型）</td><td ' + data + '>' + create_upgrade_text(db, "护甲") \
+             + '<br/>（' + create_upgrade_text(db, "护甲类型") \
+             + '）</td></tr><tr><td ' + label + '>转身速率</td><td ' + data + '>' + create_upgrade_text(db, "转身速率") \
+             + '</td></tr><tr><td ' + label + '>移动速度</td><td ' + data + '>' + create_upgrade_text(db, "移动速度") \
+             + '</td></tr><tr><td ' + label + '>魔法抗性</td><td ' + data + '>' + create_upgrade_text(db, "魔法抗性", lambda x:'%') \
+             + '</td></tr><tr><td ' + label + '>移动类型</td><td ' + data + '>' + create_upgrade_text(db, "移动方式") \
+             + '</td></tr><tr><td ' + label + '>跟随距离</td><td ' + data + '>' + create_upgrade_text(db, "跟随距离") \
+             + '</td></tr><tr><td ' + label + '>白天视野/夜晚视野</td><td ' + data + '>' + create_upgrade_text(db, "白天视野") \
+             + '|' + create_upgrade_text(db, "夜晚视野") \
+             + '</td></tr><tr><td ' + label + '>碰撞体积</td><td ' + data + '>' + create_upgrade_text(db, "碰撞体积") \
+             + '</td></tr><tr><td ' + label + '>模型大小</td><td ' + data + '>' + create_upgrade_text(db, "模型比例") \
+             + '</td></tr><tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel">\'\'\' [[data:' + db["页面名"] \
+             + '|<i class="fa fa-database" aria-hidden="true"></i>]] [[data:' + db["页面名"] + '.json|J]] [[' + db["页面名"] + '|P]]\'\'\'</div></td></tr></table>'
+    return retxt
+
+
+def get_item_value(db):
+    if isinstance(db, dict):
+        return db['1']
+    else:
+        return db
+
+
+def create_infobox_item(db):
+    common_tag = ['<tr><td colspan=2 style="background:#ccc;', '</td></tr>']
+    common_pro = {'共享': ['color:#a03030;"><i class="fa fa-times" aria-hidden="true"></i>不可以给队友共享', ';color:#229944;"><i class="fa fa-check" aria-hidden="true"></i>可以给队友共享'],
+                  '可拆分': ['color:#a03030;"><i class="fa fa-times" aria-hidden="true"></i>合成10秒后不可拆分', ';color:#229944;"><i class="fa fa-check" aria-hidden="true"></i>永久可以拆分']}
+    normal_tag = ['<tr><td colspan=2 style="background:#ddd;color:#000;margin:6px;font-size:1em;">', '</td></tr>']
+    normal_pro = {'全属性': '[[属性|全属性]]', '主属性百分比': '%[[属性|主属性]]', '次级属性': '[[属性|次级属性]]',
+                  '力量': '[[file:Strength_Icon.png|24px]][[力量]]', '敏捷': '[[file:Agility_Icon.png|24px]][[敏捷]]', '智力': '[[file:Intelligence_Icon.png|24px]][[智力]]',
+                  '生命值': '[[生命值]]', '魔法值': '[[魔法值]]', '生命恢复': '[[生命恢复速率]]', '魔法恢复': '[[魔法恢复速率]]', '百分比最大生命恢复': '%[[百分比最大生命恢复]]', '百分比最大魔法恢复': '%[[百分比最大魔法恢复]]',
+                  '攻击力': '[[攻击力]]', '近战攻击力': '[[攻击力]]（近战）', '远程攻击力': '[[攻击力]]（远程）',
+                  '攻击距离': '[[攻击距离]]', '近战攻击距离': '[[攻击距离]]（近战）', '远程攻击距离': '[[攻击距离]]（远程）', '攻击吸血': '%[[攻击吸血]]', '技能吸血': '%[[技能吸血]]',
+                  '护甲': '[[护甲]]', '魔法抗性': '%[[魔法抗性]]', '技能增强': '%[[技能增强]]', '闪避': '%[[闪避]]', '攻击速度': '[[攻击速度]]', '定值移速': '[[移动速度]]', '百分比移速': '%[[移动速度]]',
+                  '魔法损耗': '%魔法消耗/损失降低', '状态抗性': '%[[状态抗性]]', '吸血增强': '%[[吸血增强]]', '技能吸血增强': '%[[技能吸血增强]]', '恢复增强': '%[[恢复增强]]', '魔法恢复增强': '%[[魔法恢复增强]]',
+                  '治疗增强': '%[[治疗增强]]', '魔法获取增强': '%[[魔法获取增强]]',
+                  '施法距离': '[[施法距离]]', '白天视野': '[[白天视野]]', '夜晚视野': '[[夜晚视野]]', '金钱': '[[金钱]]/分钟',
+                  '百分比转身速率': '%[[转身速率]]', '百分比弹道速度': '%[[弹道速度]]', '百分比攻击力': '%[[攻击力]]', '状态抗性降低': '%[[状态抗性]]降低', '基础攻击间隔': '[[基础攻击间隔]]'
+                  }
+    nega_tag = {'<tr><td colspan=2 style="background:#ddd;color:#000;margin:6px;font-size:1em;">', '</td></tr>'}
+    nega_pro = {'负护甲': '[[护甲]]', '负魔法值': '[[魔法值]]'}
+    retxt = '<table class="infobox" style="text-align:center;background:#fff;width:300px;color:#fff;"><tr class="infobox-title">' + '<th colspan=2 style="background: #a03030;padding: 0.5em 1em;;text-align:center;">' + '<span style="font-size:125%">' + \
+            db["中文名"] + '</span><div style="text-align:center;">' + db["英文名"] + '</div>' + '</th></tr>'
+    if db["图片"] != '':
+        retxt += '<tr><td colspan=2 style="background:#222">[[file:' + db["图片"] + '|100px|center|link=' + db["页面名"] \
+                 + ']]</td></tr><tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] + '</td></tr>' \
+                 + '<tr><td colspan="2" style="border-bottom-width:0px;text-align:center;background:#c38a1c;padding:8px;font-size:16px;font-weight:bold;color:#fff;">[[file:Gold symbol.png|30px|link=]]&nbsp;' \
+                 + str(db['价格']['1']) + ''
+    if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
+        retxt += '<span style="margin-left:1em;">[[file:items recipe.png|24px|link=]]&nbsp;' + str(db['卷轴价格']['1']) + '</span>'
+    retxt += '</td></tr>'
+    for i, v in common_pro.items():
+        if i in db:
+            retxt += common_tag[0] + v[get_item_value(db[i])] + common_tag[1]
+        else:
+            retxt += common_tag[0] + v[0] + common_tag[1]
+    for i, v in normal_pro.items():
+        if i in db:
+            retxt += normal_tag[0] + '+' + str(db[i]['1']) + v + normal_tag[1]
+    for i, v in nega_pro.items():
+        if i in db:
+            retxt += normal_tag[0] + '-' + str(db[i]['1']) + v + normal_tag[1]
+    if '升级' in db:
+        retxt += '<tr><td colspan=2 style="background:#a03030;padding:4px;text-align:center;">' + '可合成</td></tr><tr><td colspan=2 style="background:#222;padding:6px;">'
+        for i, v in db['升级'].items():
+            if int(i) % 4 == 1 and int(i) > 1:
+                retxt += '<br/><br/>'
+            retxt += ' [[file:' + v["图片"] + '|48px|link=' + v["物品名"] + ']] '
+        retxt += '</td></tr>'
+    if '组件' in db:
+        retxt += '<tr><td colspan=2 style="background:#a03030;padding:4px;text-align:center;">' + '配方</td></tr><tr><td colspan=2 style="background:#222;padding:6px;">'
+        for i, v in db['组件'].items():
+            if int(i) % 4 == 1 and int(i) > 1:
+                retxt += '<br/><br/>'
+            retxt += ' [[file:' + v["图片"] + '|48px|link=' + v["物品名"] + ']] '
+            if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
+                retxt += ' [[file:items recipe.png|48px|link=]] '
+        retxt += '</td></tr>'
+    retxt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel" style="padding-left:0.25em">\'\'\' [[' + db["页面名"] + '|P]]  [[data:' + db[
+        "页面名"] + '.json|J]] \'\'\'</div><div style="float:right;color:#000;padding-right:0.25em">' + db['代码名'] + '</div></td></tr></table>'
+    return retxt
+
+
 def create_role_set(role, level):
     retxt = '<div style="margin:auto;display:inline-block" title="' + str(level) + '级' + str(role) + '">[[file:'
     if role == '核心':
@@ -718,7 +880,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
 
 def create_page_unit(json_base, log_base, log_list, unit):
     db = json_base['非英雄单位'][unit]
-    retxt = '__NOTOC__<div>{{#invoke:unit data|unitinfobox|' + db["页面名"] + '}}' + db["页面名"] + '是DOTA2中的一种'
+    retxt = '__NOTOC__<div>' + create_infobox_unit(json_base['非英雄单位'][unit]) + db["页面名"] + '是DOTA2中的一种'
     if db["远古单位"]["1"]["1"] == 1:
         retxt += '远古[[分类:远古单位]]'
     if db["英雄级单位"]["1"]["1"] == 1:
@@ -773,11 +935,11 @@ def create_page_unit(json_base, log_base, log_list, unit):
 
 def create_page_item(json_base, log_base, log_list, item):
     db = json_base['物品'][item]
-    retxt = '__NOTOC__{{#invoke:item data|iteminfobox|' + db["页面名"] + '}}<b>' + db["页面名"] + '</b>是DOTA2中的一种[[物品]]，可以在<b>"'
+    retxt = '__NOTOC__' + create_infobox_item(json_base['物品'][item]) + '<b>' + db["页面名"] + '</b>是DOTA2中的一种[[物品]]，可以在<b>"'
     for i, v in db['商店'].items():
         if i != '1':
             retxt += '、'
-        retxt = db['商店'][i] + '[[分类:' + db['商店'][i] + '物品]]'
+        retxt += db['商店'][i] + '[[分类:' + db['商店'][i] + '物品]]'
     retxt += '"</b>商店获得。<br/>'
     for i, v in db['商店'].items():
         retxt += '<br/><b>' + v + '商店</b>出售以下商品：<br/><br/>' + '<table style="font-size:16px;">'

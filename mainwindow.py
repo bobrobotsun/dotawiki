@@ -638,8 +638,6 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传基础文件'].triggered.connect(self.upload_basic_json)
         self.ml['高级功能']['上传'] = self.ml['高级功能'][0].addAction('上传')
         self.ml['高级功能']['上传'].triggered.connect(lambda: self.upload_all())
-        self.ml['高级功能']['上传统一页面'] = self.ml['高级功能'][0].addAction('上传统一页面')
-        self.ml['高级功能']['上传统一页面'].triggered.connect(lambda: self.upload_common_page())
         self.ml['高级功能']['测试窗口'] = self.ml['高级功能'][0].addAction('测试用，看见了不要点，没用')
         self.ml['高级功能']['测试窗口'].triggered.connect(self.test_inputwindow)
         self.ml['高级功能'][0].addSeparator()
@@ -656,6 +654,15 @@ class Main(QMainWindow):
         self.ml['高级功能'][0].addSeparator()
         self.ml['高级功能']['上传所有同单位文件'] = self.ml['高级功能'][0].addAction('上传所有同单位文件')
         self.ml['高级功能']['上传所有同单位文件'].triggered.connect(lambda: self.upload_same_kind())
+        self.ml['高级功能'][0].addSeparator()
+        self.ml['高级功能']['上传统一页面'] = self.ml['高级功能'][0].addAction('上传统一页面')
+        self.ml['高级功能']['上传统一页面'].triggered.connect(lambda: self.upload_common_page())
+        self.ml['高级功能']['上传《英雄》页面'] = self.ml['高级功能'][0].addAction('上传《英雄》页面')
+        self.ml['高级功能']['上传《英雄》页面'].triggered.connect(lambda: self.upload_common_page('英雄'))
+        self.ml['高级功能']['上传《非英雄单位》页面'] = self.ml['高级功能'][0].addAction('上传《非英雄单位》页面')
+        self.ml['高级功能']['上传《非英雄单位》页面'].triggered.connect(lambda: self.upload_common_page('非英雄单位'))
+        self.ml['高级功能']['上传《物品》页面'] = self.ml['高级功能'][0].addAction('上传《物品》页面')
+        self.ml['高级功能']['上传《物品》页面'].triggered.connect(lambda: self.upload_common_page('物品'))
         """
         制作一个默认的单位统称列表，具体效果见edit_json.py
         """
@@ -973,22 +980,25 @@ class Main(QMainWindow):
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
-    def upload_common_page(self):
+    def upload_common_page(self, chosen=''):
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传统一制作页面中……')
         QApplication.processEvents()
         all_upload = []
-        for i in self.json_base['英雄']:
-            all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
-            all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
-        for i in self.json_base['非英雄单位']:
-            all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
-            all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
-        for i in self.json_base['物品']:
-            all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
-            all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
+        if chosen=='' or chosen=='英雄':
+            for i in self.json_base['英雄']:
+                all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
+        if chosen=='' or chosen=='非英雄单位':
+            for i in self.json_base['非英雄单位']:
+                all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
+        if chosen=='' or chosen=='物品':
+            for i in self.json_base['物品']:
+                all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
