@@ -640,6 +640,14 @@ class Main(QMainWindow):
     def create_icon_by_local_image(self,image_name):
         return QIcon(os.path.join('material_lib', image_name))
 
+    #通过技能源的名字，查找所有的引用了这个技能源的技能
+    def find_the_ability_by_the_ability_source(self,ability_source):
+        rere=[]
+        for i in self.json_base['技能']:
+            if self.json_base['技能'][i]['数据来源']==ability_source:
+                rere.append(i)
+        return rere
+
     def fix_window_with_json_data(self):
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
         for i in names:
@@ -648,8 +656,28 @@ class Main(QMainWindow):
             for j in self.json_base[i]:
                 temp=QListWidgetItem()
                 temp.setText(j)
-                if '迷你图片' in self.json_base[i][j]:
-                    temp.setIcon(self.create_icon_by_local_image('Talentb.png' if self.json_base[i][j]['迷你图片']=='Talent.png' else self.json_base[i][j]['迷你图片']))
+                image_name=''
+                if i=='技能源':
+                    ability=self.find_the_ability_by_the_ability_source(j)
+                    if len(ability)==0:
+                        image_name='DOTA2.jpg'
+                    elif len(ability)==1:
+                        if self.json_base['技能'][ability[0]]['迷你图片']=='Talent.png' and self.json_base['技能'][ability[0]]['技能归属'] in self.json_base['英雄']:
+                            image_name = self.json_base['英雄'][self.json_base['技能'][ability[0]]['技能归属']]['迷你图片']
+                        else:
+                            image_name = self.json_base['技能'][ability[0]]['迷你图片']
+                    else:
+                        if self.json_base['技能'][ability[0]]['迷你图片']=='Talent.png':
+                            image_name='Talentb.png'
+                        else:
+                            image_name=self.json_base['技能'][ability[0]]['迷你图片']
+                else:
+                    if self.json_base[i][j]['迷你图片']=='Talent.png':
+                        image_name=self.json_base['英雄'][self.json_base[i][j]['技能归属']]['迷你图片']
+                    else:
+                        image_name = self.json_base[i][j]['迷你图片']
+                if image_name!='':
+                    temp.setIcon(self.create_icon_by_local_image(image_name))
                 self.mainlayout['列表'][i]['布局']['列表'].addItem(temp)
 
     # 以下是拥有bot权限的用户在开启软件后才能使用的内容
@@ -822,6 +850,8 @@ class Main(QMainWindow):
         self.mainlayout['列表']['非英雄单位']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('非英雄单位'))
         self.mainlayout['列表']['技能']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('技能'))
         self.mainlayout['列表']['技能源']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('技能源'))
+        for i in self.json_base:
+            self.mainlayout['列表'][i]['布局']['列表'].doubleClicked.connect(lambda:self.centralWidget().setCurrentIndex(1))
         """
         以下是版本更新的内容
         """
