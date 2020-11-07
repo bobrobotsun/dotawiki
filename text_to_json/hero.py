@@ -2,6 +2,7 @@ import json
 import hashlib
 import re
 import copy
+from text_to_json.WikiError import editerror
 
 # 查询数据范围
 def findtb(source, start, end, tb, brace=0):

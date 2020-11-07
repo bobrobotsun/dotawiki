@@ -18,10 +18,12 @@ import copy
 import vpk
 import re
 import sys
+import hashlib
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from text_to_json import hero, ability, item, unit, edit_json, dota_menus, page, common_page
+from text_to_json.WikiError import editerror
 import win32con
 import win32clipboard as wincld
 
@@ -38,9 +40,11 @@ class Main(QMainWindow):
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
+        self.image_url = 'https://huiji-public.huijistatic.com/dota/uploads'
         self.seesion = requests.session()
         self.get_login_token_data = {'action': 'query', 'meta': 'tokens', 'type': 'login', 'format': 'json'}
-        self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'https://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
+        self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'https://www.huijiwiki.com/', 'rememberMe': 1,
+                           'format': 'json'}
         self.get_csrf_token_data = {'action': 'query', 'meta': 'tokens', 'format': 'json'}
         self.logout_data = {'action': 'logout', 'format': 'json'}
         # 菜单栏
@@ -69,7 +73,8 @@ class Main(QMainWindow):
         # 设定软件的图标
         self.setWindowIcon(self.icon)
         # 设定窗口大小、位置至0.8倍屏幕长宽，且边缘为0.1倍长宽
-        self.setGeometry(self.screen_size[0] * 0.05, self.screen_size[1] * 0.1, self.screen_size[0] * 0.9, self.screen_size[1] * 0.8)
+        self.setGeometry(self.screen_size[0] * 0.05, self.screen_size[1] * 0.1, self.screen_size[0] * 0.9,
+                         self.screen_size[1] * 0.8)
         # 创建一个菜单栏
         self.create_menubar()
         self.main_layout()
@@ -152,7 +157,9 @@ class Main(QMainWindow):
         login_info = self.seesion.post(self.target_url, data=self.login_data)
         # 判断登录效果
         if login_info.json()["clientlogin"]["status"] == "FAIL":
-            messageBox = QMessageBox(QMessageBox.Critical, "登录失败", login_info.json()["clientlogin"]["message"] + "\n请问是否重新登录？", QMessageBox.NoButton, self)
+            messageBox = QMessageBox(QMessageBox.Critical, "登录失败",
+                                     login_info.json()["clientlogin"]["message"] + "\n请问是否重新登录？", QMessageBox.NoButton,
+                                     self)
             buttonY = messageBox.addButton('重新登录', QMessageBox.YesRole)
             buttonN = messageBox.addButton('放弃登录', QMessageBox.YesRole)
             messageBox.exec_()
@@ -164,7 +171,8 @@ class Main(QMainWindow):
                 if window:
                     kwargs['window'].close()
         else:
-            self.csrf_token = self.seesion.post(self.target_url, data=self.get_csrf_token_data).json()['query']['tokens']['csrftoken']
+            self.csrf_token = \
+                self.seesion.post(self.target_url, data=self.get_csrf_token_data).json()['query']['tokens']['csrftoken']
             self.login_success(True, username=login_info.json()["clientlogin"]["username"], password=password['密码'])
             if window:
                 kwargs['window'].close()
@@ -183,7 +191,8 @@ class Main(QMainWindow):
         passtext.setEchoMode(3)
         # 按钮
         yesbutton = QPushButton('确认登录', inputwindow)
-        yesbutton.clicked.connect(lambda: self.login(password={'用户名': nametext.text(), '密码': passtext.text()}, window=inputwindow))
+        yesbutton.clicked.connect(
+            lambda: self.login(password={'用户名': nametext.text(), '密码': passtext.text()}, window=inputwindow))
         nobutton = QPushButton('暂不登录', inputwindow)
         nobutton.clicked.connect(inputwindow.close)
 
@@ -364,7 +373,8 @@ class Main(QMainWindow):
             self.json_name = json.loads(basefile.read())
             basefile.close()
         except FileNotFoundError:
-            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton, self)
+            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton,
+                                     self)
             button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
             button2 = messageBox.addButton('没有网络，没法下载', QMessageBox.NoRole)
             messageBox.exec_()
@@ -398,7 +408,9 @@ class Main(QMainWindow):
             if folders[i] in os.listdir(nowaddress):
                 nowaddress = os.path.join(nowaddress, folders[i])
             else:
-                messageBox = QMessageBox(QMessageBox.Critical, '错误的路径', '您选择的路径下的' + nowaddress + '没有发现文件夹' + folders[i] + '\n请问是否重新重新选择Steam的安装路径？', QMessageBox.NoButton, self)
+                messageBox = QMessageBox(QMessageBox.Critical, '错误的路径',
+                                         '您选择的路径下的' + nowaddress + '没有发现文件夹' + folders[i] + '\n请问是否重新重新选择Steam的安装路径？',
+                                         QMessageBox.NoButton, self)
                 button1 = messageBox.addButton('重新选择路径', QMessageBox.ResetRole)
                 button2 = messageBox.addButton('选择从网上下载', QMessageBox.YesRole)
                 button3 = messageBox.addButton('放弃加载，另寻出路', QMessageBox.NoRole)
@@ -441,7 +453,8 @@ class Main(QMainWindow):
             messagebox.setStandardButtons(QMessageBox.Ok)
             messagebox.exec_()
         else:
-            messagebox = QMessageBox(QMessageBox.Critical, '错误的路径', '路径错误，没有发现任何有效文件，请重新选择路径！', QMessageBox.NoButton, self)
+            messagebox = QMessageBox(QMessageBox.Critical, '错误的路径', '路径错误，没有发现任何有效文件，请重新选择路径！', QMessageBox.NoButton,
+                                     self)
             messagebox.setStandardButtons(QMessageBox.Ok)
             messagebox.button(QMessageBox.Ok).animateClick(1000)
             messagebox.exec_()
@@ -467,8 +480,11 @@ class Main(QMainWindow):
 
     def download_json_name(self):
         for i in self.json_name:
-            temp = self.seesion.post(self.target_url, data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|' + i + '}}', 'contentmodel': 'wikitext', 'prop': 'text',
-                                                            'disablelimitreport': 'false', 'format': 'json'}).json()['parse']['text']['*']
+            temp = self.seesion.post(self.target_url,
+                                     data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|' + i + '}}',
+                                           'contentmodel': 'wikitext', 'prop': 'text',
+                                           'disablelimitreport': 'false', 'format': 'json'}).json()['parse']['text'][
+                '*']
             texttemp = re.sub('<.*?>', '', temp)[:-1]
             tempjson = json.loads(texttemp)
             self.json_name.update(tempjson)
@@ -486,7 +502,8 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'mech.json'), json.dumps(self.mech))
 
     def download_and_upload_wiki_menu(self):
-        wiki_result = self.seesion.post(self.target_url, data={'action': 'jsondata', 'title': '机制.json', 'format': 'json'}).json()
+        wiki_result = self.seesion.post(self.target_url,
+                                        data={'action': 'jsondata', 'title': '机制.json', 'format': 'json'}).json()
         wiki_menu = dota_menus.menu_init(wiki_result['jsondata'])
         for i in self.json_base['英雄']:
             wiki_menu['单位']['英雄'].append(i)
@@ -534,7 +551,8 @@ class Main(QMainWindow):
             for i in self.json_name:
                 total_num += len(self.json_name[i])
             self.progress = upload_text('开始下载json')
-            self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+            self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,
+                                      self.screen_size[1] * 0.7)
             self.progress.setWindowIcon(self.icon)
             self.progress.setWindowTitle('下载json中……')
             self.current_num = [0, 0]
@@ -573,7 +591,8 @@ class Main(QMainWindow):
                 print(self.download_json_list[self.local.current_num], '：分配出现错误，原因为：' + str(xx))
             finally:
                 self.lock.release()
-            self.local.download_data = {'action': 'jsondata', 'title': self.download_json_list[self.local.current_num][2], 'format': 'json'}
+            self.local.download_data = {'action': 'jsondata',
+                                        'title': self.download_json_list[self.local.current_num][2], 'format': 'json'}
             self.local.seesion = self.seesion
             self.local.target_url = self.target_url
             self.local.k = 0
@@ -612,12 +631,14 @@ class Main(QMainWindow):
                         break
                     self.lock.release()
         self.lock.acquire()
-        if (threading.activeCount() <= self.startactiveCount+1):
+        if (threading.activeCount() <= self.startactiveCount + 1):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口',0])
+            self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口', 0])
         self.lock.release()
 
+    def create_icon_by_local_image(self,image_name):
+        return QIcon(os.path.join('material_lib', image_name))
 
     def fix_window_with_json_data(self):
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
@@ -625,7 +646,11 @@ class Main(QMainWindow):
             self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
             self.mainlayout['列表'][i]['布局']['列表'].clear()
             for j in self.json_base[i]:
-                self.mainlayout['列表'][i]['布局']['列表'].addItem(j)
+                temp=QListWidgetItem()
+                temp.setText(j)
+                if '迷你图片' in self.json_base[i][j]:
+                    temp.setIcon(self.create_icon_by_local_image('Talentb.png' if self.json_base[i][j]['迷你图片']=='Talent.png' else self.json_base[i][j]['迷你图片']))
+                self.mainlayout['列表'][i]['布局']['列表'].addItem(temp)
 
     # 以下是拥有bot权限的用户在开启软件后才能使用的内容
 
@@ -663,6 +688,13 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传《非英雄单位》页面'].triggered.connect(lambda: self.upload_common_page('非英雄单位'))
         self.ml['高级功能']['上传《物品》页面'] = self.ml['高级功能'][0].addAction('上传《物品》页面')
         self.ml['高级功能']['上传《物品》页面'].triggered.connect(lambda: self.upload_common_page('物品'))
+        """
+        下载上传的内容
+        """
+        self.ml['图片处理'] = {0: self.ml[0].addMenu('图片处理')}
+        self.ml['图片处理']['下载图片'] = self.ml['图片处理'][0].addAction('下载图片')
+        self.ml['图片处理']['下载图片'].triggered.connect(lambda: self.download_images())
+
         """
         制作一个默认的单位统称列表，具体效果见edit_json.py
         """
@@ -785,6 +817,11 @@ class Main(QMainWindow):
         self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
         self.editlayout['修改核心']['竖布局']['树'][0].doubleClicked.connect(self.tree_item_double_clicked)
         self.editlayout['基础数据']['竖布局']['树'][0].doubleClicked.connect(lambda: self.copy_text_from_tree(0))
+        self.mainlayout['列表']['英雄']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('英雄'))
+        self.mainlayout['列表']['物品']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('物品'))
+        self.mainlayout['列表']['非英雄单位']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('非英雄单位'))
+        self.mainlayout['列表']['技能']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('技能'))
+        self.mainlayout['列表']['技能源']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('技能源'))
         """
         以下是版本更新的内容
         """
@@ -897,7 +934,7 @@ class Main(QMainWindow):
         for i in self.json_base:
             self.json_base[i] = edit_json.sortedDictValues(self.json_base[i], True)
             self.json_name[i] = edit_json.sortedList(self.json_name[i])
-        self.version_base=edit_json.version_sort(self.version_base,self.version_list['版本'])
+        self.version_base = edit_json.version_sort(self.version_base, self.version_list['版本'])
         self.file_save_all()
 
     def file_save_all(self):
@@ -906,44 +943,49 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
 
     def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
-        self.resort()
-        hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
-        item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
+        try:
+            self.resort()
+            hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
+            item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
 
-        info += ability.autoget_talent_source(self.json_base, self.text_base['英雄'])
-        ability.get_source_to_data(self.json_base, self.upgrade_base, self.version)
-        unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version)
+            info += ability.autoget_talent_source(self.json_base, self.text_base['英雄'])
+            ability.get_source_to_data(self.json_base, self.upgrade_base, self.version)
+            unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version)
 
-        ability.input_upgrade(self.json_base, self.upgrade_base)
+            ability.input_upgrade(self.json_base, self.upgrade_base)
 
-        unit.complete_upgrade(self.json_base["非英雄单位"], self.text_base)
-        ability.complete_upgrade(self.json_base["技能"], self.text_base)
+            unit.complete_upgrade(self.json_base["非英雄单位"], self.text_base)
+            ability.complete_upgrade(self.json_base["技能"], self.text_base)
 
-        ability.complete_mech(self.json_base["技能"], self.mech)
+            ability.complete_mech(self.json_base["技能"], self.mech)
 
-        for i in self.json_base["技能"]:
-            ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i)
+            for i in self.json_base["技能"]:
+                ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i)
 
-        ability.confirm_upgrade_info(self.json_base['技能'])
+            ability.confirm_upgrade_info(self.json_base['技能'])
 
-        # 增加拥有技能
-        ability_own = {}
-        for i in self.json_base["技能"]:
-            if self.json_base["技能"][i]['技能归属'] in ability_own:
-                ability_own[self.json_base["技能"][i]['技能归属']].append([self.json_base["技能"][i]['页面名'], self.json_base["技能"][i]['技能排序']])
-            else:
-                ability_own[self.json_base["技能"][i]['技能归属']] = [[self.json_base["技能"][i]['页面名'], self.json_base["技能"][i]['技能排序']]]
-        for i in ability_own:
-            ability_own[i].sort(key=lambda x: x[1])
-        for i in ['英雄', '非英雄单位', '物品']:
-            for j in self.json_base[i]:
-                self.json_base[i][j]['技能'] = {}
-                if self.json_base[i][j]['页面名'] in ability_own:
-                    for k in range(len(ability_own[self.json_base[i][j]['页面名']])):
-                        self.json_base[i][j]['技能'][str(k + 1)] = ability_own[self.json_base[i][j]['页面名']][k][0]
-
-        self.resort()
-        QMessageBox.information(self, "已完成", info)
+            # 增加拥有技能
+            ability_own = {}
+            for i in self.json_base["技能"]:
+                if self.json_base["技能"][i]['技能归属'] in ability_own:
+                    ability_own[self.json_base["技能"][i]['技能归属']].append(
+                        [self.json_base["技能"][i]['页面名'], self.json_base["技能"][i]['技能排序']])
+                else:
+                    ability_own[self.json_base["技能"][i]['技能归属']] = [
+                        [self.json_base["技能"][i]['页面名'], self.json_base["技能"][i]['技能排序']]]
+            for i in ability_own:
+                ability_own[i].sort(key=lambda x: x[1])
+            for i in ['英雄', '非英雄单位', '物品']:
+                for j in self.json_base[i]:
+                    self.json_base[i][j]['技能'] = {}
+                    if self.json_base[i][j]['页面名'] in ability_own:
+                        for k in range(len(ability_own[self.json_base[i][j]['页面名']])):
+                            self.json_base[i][j]['技能'][str(k + 1)] = ability_own[self.json_base[i][j]['页面名']][k][0]
+            self.resort()
+        except editerror as err:
+            QMessageBox.critical(self, err.get_error_info())
+        else:
+            QMessageBox.information(self, "已完成", info)
 
     def upload_basic_json(self):
         self.upload_json('text_base.json', self.text_base)
@@ -952,7 +994,8 @@ class Main(QMainWindow):
 
     def upload_all(self, chosen=''):
         self.w = upload_text('开始上传数据')
-        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,
+                           self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传json中……')
         all_upload = []
@@ -982,22 +1025,28 @@ class Main(QMainWindow):
 
     def upload_common_page(self, chosen=''):
         self.w = upload_text('开始上传数据')
-        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,
+                           self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传统一制作页面中……')
         QApplication.processEvents()
         all_upload = []
-        if chosen=='' or chosen=='英雄':
+        if chosen == '' or chosen == '英雄':
             for i in self.json_base['英雄']:
-                all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
-        if chosen=='' or chosen=='非英雄单位':
+                all_upload.append(
+                    [i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base,
+                                                                            self.version_list['版本'], i, 0)])
+        if chosen == '' or chosen == '非英雄单位':
             for i in self.json_base['非英雄单位']:
-                all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
-        if chosen=='' or chosen=='物品':
+                all_upload.append(
+                    [i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base,
+                                                                            self.version_list['版本'], i, 0)])
+        if chosen == '' or chosen == '物品':
             for i in self.json_base['物品']:
-                all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_upload.append(
+                    [i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
                 all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
@@ -1005,6 +1054,55 @@ class Main(QMainWindow):
             self.w.addtext(self.upload_page(all_upload[i][0], all_upload[i][1], True), i)
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+
+    def get_the_wiki_image_with_hashmd5(self, image_name):
+        hashmd5 = hashlib.md5(image_name.encode("utf-8")).hexdigest()
+        return '/'.join([self.image_url, hashmd5[0], hashmd5[0:2], image_name])
+
+    def download_one_image(self, owner_name, image_name):
+        k = 0
+        while True:
+            download_info = self.seesion.get(self.get_the_wiki_image_with_hashmd5(image_name))
+            if download_info.status_code == 200:
+                with open(os.path.join('material_lib', image_name), "wb") as f:
+                    f.write(download_info.content)
+                return ['《' + owner_name + '》' + image_name + '》下载成功！', 1]
+            elif download_info.status_code == 404:
+                return ['《' + owner_name + '》' + image_name + '》名称有误，下载失败！', 0]
+            else:
+                k += 1
+                time.sleep(0.2)
+                if k >= 5:
+                    return ['《' + owner_name + '》' + image_name + '》下载失败！错误原因为' + download_info.reason, 0]
+
+    def download_images(self, chosen=''):
+        self.w = upload_text('开始下载图片')
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,
+                           self.screen_size[1] * 0.7)
+        self.w.setWindowIcon(self.icon)
+        self.w.setWindowTitle('下载图片中……')
+        QApplication.processEvents()
+        all_upload = []
+        all_upload.append(['天赋','Talentb.png'])
+        if chosen in self.json_base:
+            for i in self.json_base[chosen]:
+                if '图片' in self.json_base[chosen][i] and self.json_base[chosen][i]['图片'] != '':
+                    all_upload.append([i, self.json_base[chosen][i]['图片']])
+                if '迷你图片' in self.json_base[chosen][i] and self.json_base[chosen][i]['迷你图片'] != '':
+                    all_upload.append([i, self.json_base[chosen][i]['迷你图片']])
+        else:
+            for i in self.json_base:
+                for j in self.json_base[i]:
+                    if '图片' in self.json_base[i][j] and self.json_base[i][j]['图片'] != '':
+                        all_upload.append([j, self.json_base[i][j]['图片']])
+                    if '迷你图片' in self.json_base[i][j] and self.json_base[i][j]['迷你图片'] != '':
+                        all_upload.append([j, self.json_base[i][j]['迷你图片']])
+        total_num = len(all_upload)
+        self.w.confirm_numbers(total_num)
+        for i in range(total_num):
+            self.w.addtext(self.download_one_image(all_upload[i][0], all_upload[i][1]), i)
+            QApplication.processEvents()
+        QMessageBox.information(self.w, '下载完毕', "您已下载完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
     def upload_same_kind(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
@@ -1020,7 +1118,8 @@ class Main(QMainWindow):
         else:
             target_name.append(selected_name)
         self.w = upload_text('开始上传数据')
-        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,
+                           self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传json中……')
         QApplication.processEvents()
@@ -1145,7 +1244,8 @@ class Main(QMainWindow):
                     else:
                         bool = bool and d1[i] == d2[i]
                 else:
-                    if (isinstance(d1[i], int) or isinstance(d1[i], float)) and (isinstance(d2[i], int) or isinstance(d2[i], float)):
+                    if (isinstance(d1[i], int) or isinstance(d1[i], float)) and (
+                            isinstance(d2[i], int) or isinstance(d2[i], float)):
                         if float(d1[i]) == float(d2[i]):
                             continue
                         else:
@@ -1168,7 +1268,8 @@ class Main(QMainWindow):
                     else:
                         bool = bool and d1[i] == d2[i]
                 else:
-                    if isinstance(d1[i], int) or isinstance(d1[i], float) and isinstance(d2[i], int) or isinstance(d2[i], float):
+                    if isinstance(d1[i], int) or isinstance(d1[i], float) and isinstance(d2[i], int) or isinstance(
+                            d2[i], float):
                         if float(d1[i]) == float(d2[i]):
                             continue
                         else:
@@ -1216,7 +1317,8 @@ class Main(QMainWindow):
     def edit_target_selected_changed(self, target_name=''):
         if target_name != '':
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(target_name)
-        selected = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        selected = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
+                    self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         if len(edit_json.edit_source[selected[0]]) > 0:
             if selected[0] == '非英雄单位':
                 target = self.json_base[selected[0]][selected[1]]['代码名']["1"]
@@ -1236,9 +1338,16 @@ class Main(QMainWindow):
         self.editlayout['修改核心']['竖布局']['树'] = {0: self.editlayout['修改核心']['竖布局']['树'][0]}
         self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
         self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 300)
-        self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]], self.json_base[selected[0]][selected[1]])
+        self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]],
+                                  self.json_base[selected[0]][selected[1]])
         self.edit_json_expand_all()
         self.self_edit_button_default()
+
+    def choose_mainlayout_change_edit_target(self,target_base=''):
+        self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(target_base)
+        self.edit_category_selected_changed()
+        target_name=self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()
+        self.edit_target_selected_changed(target_name)
 
     def complex_dict_to_tree(self, tdict, edict, sdict):
         for i in edict:
@@ -1312,12 +1421,19 @@ class Main(QMainWindow):
     def combine_text_to_tree(self, tdict, sdict):
         tdict['混合文字'] = {0: TreeItemEdit(tdict[0], '混合文字')}
         tdict['混合文字'][0].set_type('combine_tree')
-        tdict['混合文字'][0].set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 3, False]}, 1, 1, False]}, 1, 0, False])
+        tdict['混合文字'][0].set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''],
+                                                                                      "list": ['text', '', 0, 3,
+                                                                                               False]}, 1, 1, False]},
+                                       1, 0, False])
         for i in sdict['混合文字']:
             if isinstance(sdict['混合文字'][i], dict):
                 tdict['混合文字'][i] = {0: TreeItemEdit(tdict['混合文字'][0], i)}
                 tdict['混合文字'][i][0].set_type('tree')
-                self.complex_dict_to_tree(tdict['混合文字'][i], {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 3, False]}, 1, 1, False]},
+                self.complex_dict_to_tree(tdict['混合文字'][i], {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''],
+                                                                                                   "list": ['text', '',
+                                                                                                            0, 3,
+                                                                                                            False]}, 1,
+                                                                                          1, False]},
                                           sdict['混合文字'][i])
                 tdict['混合文字'][i][0].islist = True
                 tdict['混合文字'][i][0].setExpanded(True)
@@ -1401,7 +1517,8 @@ class Main(QMainWindow):
             self.edit_target_selected_changed()
 
     def json_edit_download(self):
-        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
+              self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         if ss[0] == '技能源':
             self.json_base[ss[0]][ss[1]] = self.download_json(ss[1] + '/源.json')
         else:
@@ -1411,10 +1528,12 @@ class Main(QMainWindow):
         QMessageBox.information(self, '更新完毕', '更新成功！您成功从wiki下载到' + ss[1] + '的信息。')
 
     def json_edit_delete(self):
-        warning = QMessageBox.warning(self, '删除', '您正试图删除一个库，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        warning = QMessageBox.warning(self, '删除', '您正试图删除一个库，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No,
+                                      QMessageBox.No)
         if warning == QMessageBox.Yes:
             self.update_json_name(self.download_json('json_name.json'))
-            ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+            ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
+                  self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             self.json_base[ss[0]][ss[1]]['应用'] = 0
             if ss[0] == '技能源':
                 self.upload_json(ss[1] + '/源.json', self.json_base[ss[0]][ss[1]])
@@ -1430,9 +1549,11 @@ class Main(QMainWindow):
             QMessageBox.information(self, '删除完毕', '删除成功！您将不会再看到这个库。')
 
     def json_edit_change_name(self):
-        warning = QMessageBox.warning(self, '改名', '您正改变库的名字，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        warning = QMessageBox.warning(self, '改名', '您正改变库的名字，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No,
+                                      QMessageBox.No)
         if warning == QMessageBox.Yes:
-            ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+            ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
+                  self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:')
             if ok:
                 self.update_json_name(self.download_json('json_name.json'))
@@ -1454,7 +1575,8 @@ class Main(QMainWindow):
                 QMessageBox.information(self, '改名完毕', '库【' + ss[1] + '】已经被改名为【' + text + '】\n请记得保存后上传')
 
     def json_edit_save(self):
-        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
+              self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
@@ -1462,7 +1584,8 @@ class Main(QMainWindow):
         self.edit_target_selected_changed()
 
     def json_edit_save_and_upload(self):
-        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(), self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
+        ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
+              self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
@@ -1502,10 +1625,13 @@ class Main(QMainWindow):
 
         self.editlayout['竖布局']['增加新次级条目'].setEnabled(sender.israndom and sender.itemtype == 'tree')
         self.editlayout['竖布局']['删除该次级条目'].setEnabled(sender.israndom and parent.israndom)
-        self.editlayout['竖布局']['转换为混合文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() == 0 and not sender.israndom)
-        self.editlayout['竖布局']['转换为普通文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() > 0 and not sender.israndom)
+        self.editlayout['竖布局']['转换为混合文字'].setEnabled(
+            sender.itemtype == 'text' and sender.childCount() == 0 and not sender.israndom)
+        self.editlayout['竖布局']['转换为普通文字'].setEnabled(
+            sender.itemtype == 'text' and sender.childCount() > 0 and not sender.israndom)
 
-        self.editlayout['竖布局']['传统目标设定'].setEnabled(sender.text(0) == '不分类' or sender.text(0) == '英雄' or sender.text(0) == '非英雄')
+        self.editlayout['竖布局']['传统目标设定'].setEnabled(
+            sender.text(0) == '不分类' or sender.text(0) == '英雄' or sender.text(0) == '非英雄')
 
     def tree_item_double_clicked(self):
         sender = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -1616,7 +1742,9 @@ class Main(QMainWindow):
         item.delete_value()
         temp = TreeItemEdit(item, '混合文字')
         temp.set_type('combine_tree')
-        temp.set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 4, False]}, 1, 1, False]}, 1, 0, False])
+        temp.set_kid_list(['tree', {"后缀": ['text', ''],
+                                    "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 4, False]}, 1, 1,
+                                             False]}, 1, 0, False])
         self.tree_item_clicked()
         item.setExpanded(True)
 
@@ -1749,7 +1877,8 @@ class Main(QMainWindow):
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
 
     def add_version_list(self, next=0):
-        index = self.versionlayout['版本列表']['横排版']['列表'].indexOfTopLevelItem(self.versionlayout['版本列表']['横排版']['列表'].currentItem())
+        index = self.versionlayout['版本列表']['横排版']['列表'].indexOfTopLevelItem(
+            self.versionlayout['版本列表']['横排版']['列表'].currentItem())
         if index == -1:
             if next == 0:
                 index = 0
@@ -1767,7 +1896,8 @@ class Main(QMainWindow):
             for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
                 self.version_list['版本'].append([self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0)])
                 for j in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).childCount()):
-                    self.version_list['版本'][i].append(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
+                    self.version_list['版本'][i].append(
+                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
 
     def add_junior_version_list(self):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
@@ -1780,7 +1910,8 @@ class Main(QMainWindow):
             for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
                 self.version_list['版本'].append([self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).text(0)])
                 for j in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).childCount()):
-                    self.version_list['版本'][i].append(self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
+                    self.version_list['版本'][i].append(
+                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j).text(0))
             item.setExpanded(True)
 
     def check_version_content(self):
@@ -1795,7 +1926,8 @@ class Main(QMainWindow):
             self.version_tree_expand_toplevelitem()
             self.version_edit_all_button_default()
         else:
-            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "您没有这个版本更新的库，请问您准备从哪里获取？", QMessageBox.NoButton, self)
+            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "您没有这个版本更新的库，请问您准备从哪里获取？", QMessageBox.NoButton,
+                                     self)
             button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
             button2 = messageBox.addButton('造个新的', QMessageBox.AcceptRole)
             button3 = messageBox.addButton('不创建', QMessageBox.NoRole)
@@ -1816,7 +1948,8 @@ class Main(QMainWindow):
         download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
         download_info = self.seesion.post(self.target_url, data=download_data)
         if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
-            messageBox = QMessageBox(QMessageBox.Critical, "下载失败", "网络上没有这个版本更新的库，请问是否自行创建？", QMessageBox.NoButton, self)
+            messageBox = QMessageBox(QMessageBox.Critical, "下载失败", "网络上没有这个版本更新的库，请问是否自行创建？", QMessageBox.NoButton,
+                                     self)
             button1 = messageBox.addButton('自行新建', QMessageBox.YesRole)
             button2 = messageBox.addButton('不创建', QMessageBox.NoRole)
             messageBox.exec_()
@@ -1831,7 +1964,8 @@ class Main(QMainWindow):
 
     def download_all_versions(self):
         self.w = upload_text('开始上传数据')
-        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,
+                           self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传json中……')
         self.w.confirm_numbers(len(self.version_list['版本']))
@@ -1852,7 +1986,8 @@ class Main(QMainWindow):
                     if j == 0:
                         self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).setBackground(0, self.green)
                     else:
-                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j - 1).setBackground(0, self.green)
+                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j - 1).setBackground(0,
+                                                                                                           self.green)
                     self.w.addtext([title + '版本json下载保存成功。', 1], i)
                     QApplication.processEvents()
                     time.sleep(0.1)
@@ -1917,7 +2052,9 @@ class Main(QMainWindow):
                 try:
                     re[str(i)][index]['序列级数'] = int(item0.itemvalue)
                 except ValueError:
-                    QMessageBox.critical(self, '错误的序列级数', '您的【' + item1.text(0) + '】中的【' + item1.child(j).text(0) + '】的第' + str(j) + '个序列级数不为正整数，请修改！')
+                    QMessageBox.critical(self, '错误的序列级数',
+                                         '您的【' + item1.text(0) + '】中的【' + item1.child(j).text(0) + '】的第' + str(
+                                             j) + '个序列级数不为正整数，请修改！')
                     while True:
                         text, ok = MoInputWindow.getInt(self, "序列级数", '请输入一个正整数，否则会报错')
                         if ok:
@@ -1926,7 +2063,8 @@ class Main(QMainWindow):
                 if re[str(i)][index]['文字'][2:5] == '级天赋':
                     temp = item1.text(0) + re[str(i)][index]['文字'][:5]
                     re[str(i)][index]['目标'].append(temp)
-                    re[str(i)][index]['文字'] = re[str(i)][index]['文字'].replace(re[str(i)][index]['文字'][:5], '{{A|' + temp + '}}')
+                    re[str(i)][index]['文字'] = re[str(i)][index]['文字'].replace(re[str(i)][index]['文字'][:5],
+                                                                              '{{A|' + temp + '}}')
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
                     re[str(i)][index]['目标'].append(item4.text(1))
@@ -2101,7 +2239,8 @@ class Main(QMainWindow):
             item.setBackground(1, self.green)
             item.setExpanded(True)
         elif item.background(1) == self.green:
-            clickb = QMessageBox.critical(self, '禁用大分类', '您正试图禁用【' + item.text(0) + '】分类！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            clickb = QMessageBox.critical(self, '禁用大分类', '您正试图禁用【' + item.text(0) + '】分类！',
+                                          QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if clickb == QMessageBox.Yes:
                 while item.childCount() > 0:
                     item.removeChild(item.child(0))
@@ -2124,7 +2263,8 @@ class Main(QMainWindow):
     def version_button_tree2_change_name(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         parent = item.parent()
-        text, ok = MoInputWindow.getText(self, '小分类改名', '你现在正试图将【' + parent.text(0) + '】的【' + item.text(0) + '】的名字改为:', item.text(0))
+        text, ok = MoInputWindow.getText(self, '小分类改名', '你现在正试图将【' + parent.text(0) + '】的【' + item.text(0) + '】的名字改为:',
+                                         item.text(0))
         if ok:
             item.setText(0, text)
 
@@ -2227,7 +2367,8 @@ class upload_text(QWidget):
         self.success[content[1]] += 1
         txts = '【' + QTime.currentTime().toString() + '】'
         if num > -1:
-            txts += '【' + str(num + 1) + '[' + str(self.success[1]) + ']/' + str(self.maxmax) + ',' + '{:.2%}'.format((num + 1) / self.maxmax) + '[' + '{:.2%}'.format(
+            txts += '【' + str(num + 1) + '[' + str(self.success[1]) + ']/' + str(self.maxmax) + ',' + '{:.2%}'.format(
+                (num + 1) / self.maxmax) + '[' + '{:.2%}'.format(
                 self.success[1] / self.maxmax) + ']】'
         if threads != '':
             txts += '【' + threads + '】'
@@ -2315,7 +2456,8 @@ class MoInputWindow(QDialog):
     def getText(parent=None, title='输入文字', tip_str='输入', default_text=''):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
-        dialog.setGeometry(dialog.screen_size[0] * 0.3, dialog.screen_size[1] * 0.3, dialog.screen_size[0] * 0.4, dialog.screen_size[1] * 0.4)
+        dialog.setGeometry(dialog.screen_size[0] * 0.3, dialog.screen_size[1] * 0.3, dialog.screen_size[0] * 0.4,
+                           dialog.screen_size[1] * 0.4)
         dialog.s = QLabel(dialog)
         dialog.s.setText(tip_str + '：')
         dialog.layout["输入区域"]["0"].addWidget(dialog.s)
@@ -2331,7 +2473,8 @@ class MoInputWindow(QDialog):
     def getNumber(parent=None, title='输入数字', tip_str='输入', default_text=0):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
-        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1, dialog.screen_size[1] * 0.1)
+        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1,
+                           dialog.screen_size[1] * 0.1)
         dialog.s = QLabel(dialog)
         dialog.s.setText(tip_str + '：')
         dialog.layout["输入区域"]["0"].addWidget(dialog.s)
@@ -2358,7 +2501,8 @@ class MoInputWindow(QDialog):
     def getInt(parent=None, title='输入整数', tip_str='输入', default_text=0):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
-        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1, dialog.screen_size[1] * 0.1)
+        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1,
+                           dialog.screen_size[1] * 0.1)
         dialog.s = QLabel(dialog)
         dialog.s.setText(tip_str + '：')
         dialog.layout["输入区域"]["0"].addWidget(dialog.s)
@@ -2382,7 +2526,8 @@ class MoInputWindow(QDialog):
     def getItem(parent=None, title='做选择', tip_str='您将选择', iterable=[]):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
-        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1, dialog.screen_size[1] * 0.1)
+        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1,
+                           dialog.screen_size[1] * 0.1)
         dialog.s = QLabel(dialog)
         dialog.s.setText(tip_str + '：')
         dialog.layout["输入区域"]["0"].addWidget(dialog.s)
@@ -2404,7 +2549,8 @@ class MoInputWindow(QDialog):
     def get_item_and_content(parent=None, title='选择后输入内容', tip_str='选择并输入', iterable=[], style=[], check=True):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
-        dialog.setGeometry(dialog.screen_size[0] * 0.4, dialog.screen_size[1] * 0.4, dialog.screen_size[0] * 0.2, dialog.screen_size[1] * 0.2)
+        dialog.setGeometry(dialog.screen_size[0] * 0.4, dialog.screen_size[1] * 0.4, dialog.screen_size[0] * 0.2,
+                           dialog.screen_size[1] * 0.2)
         dialog.s = QLabel(dialog)
         dialog.s.setText(tip_str + '：')
         dialog.layout["输入区域"]["0"].addWidget(dialog.s)

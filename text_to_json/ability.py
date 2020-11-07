@@ -4,6 +4,7 @@ import copy
 import math
 import hashlib
 import re
+from text_to_json.WikiError import editerror
 
 
 # 将数字转化为文字，取消小数点和无用末尾0
@@ -68,17 +69,11 @@ def get_source_to_data(all_json, upgrade_json, version):
         all_json['技能源'][i]['应用'] = 1
         all_json['技能源'][i]['分类'] = '技能源'
         unit_dic = all_json['技能源'][i]
-        for j in unit_dic['属性']:
-            if "0" in unit_dic['属性'][j]['代码'] and unit_dic['属性'][j]['代码']["0"] == '不存在' or "1" in unit_dic['属性'][j][
-                '代码'] and unit_dic['属性'][j]['代码']["1"] == '不存在':
-                unit_dic['属性'][j]['代码'] = {"0": "手填", "1": "无"}
         for j in unit_dic['升级']:
             for k in unit_dic['升级'][j]:
-                if '值' in unit_dic['升级'][j][k] and '代码' in unit_dic['升级'][j][k]['值'] and isinstance(
-                        unit_dic['升级'][j][k]['值']['代码'], dict) and (
-                        "0" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码'][
-                    "0"] == '不存在' or "1" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码'][
-                            "1"] == '不存在'):
+                if '值' in unit_dic['升级'][j][k] and '代码' in unit_dic['升级'][j][k]['值'] and isinstance(unit_dic['升级'][j][k]['值']['代码'], dict) and (
+                        "0" in unit_dic['升级'][j][k]['值']['代码'] and unit_dic['升级'][j][k]['值']['代码']["0"] == '不存在' or "1" in unit_dic['升级'][j][k]['值']['代码'] and
+                        unit_dic['升级'][j][k]['值']['代码']["1"] == '不存在'):
                     unit_dic['升级'][j][k]['值']['代码'] = {"0": "手填", "1": "无"}
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
@@ -207,7 +202,7 @@ def input_upgrade(all_json, upgrade_json):
                     temp["2"][k] = copy.deepcopy(upgrade_json[i]["A杖"][j]["值"][k])
             else:
                 temp["2"] = upgrade_json[i]["A杖"][j]["值"]
-            temp["2"]["升级来源"] = {"1": {"名称": '阿哈利姆神杖','图片':'agha.png'}}
+            temp["2"]["升级来源"] = {"1": {"名称": '阿哈利姆神杖', '图片': 'agha.png'}}
         for j in upgrade_json[i]["技能"]:
             if "代码" in upgrade_json[i]["技能"][j]["值"] and isinstance(upgrade_json[i]["技能"][j]["值"]["代码"], dict):
                 if "1" in upgrade_json[i]["技能"][j]["值"]["代码"] and upgrade_json[i]["技能"][j]["值"]["代码"]["1"] == "":
@@ -226,7 +221,7 @@ def input_upgrade(all_json, upgrade_json):
                         temp = temp[upgrade_json[i]["技能"][j]["目标"][str(k)]]
                 else:
                     break
-            ind="3"
+            ind = "3"
             if "0" in upgrade_json[i]["技能"][j]["目标"] and upgrade_json[i]["技能"][j]["目标"]["0"] == "替换":
                 if "3" not in temp:
                     temp["3"] = copy.deepcopy(temp["1"])
@@ -234,7 +229,7 @@ def input_upgrade(all_json, upgrade_json):
                     temp["3"][k] = copy.deepcopy(upgrade_json[i]["技能"][j]["值"][k])
             else:
                 if "3" in temp:
-                    ind="2"
+                    ind = "2"
                 temp[ind] = upgrade_json[i]["技能"][j]["值"]
             temp[ind]["升级来源"] = {"1": {"名称": i}}
             if all_json["技能"][i]["次级分类"] == "天赋技能":
@@ -340,7 +335,7 @@ def complete_upgrade(all_json, base_txt):
     for i in all_json:
         for j in all_json[i]["属性"]:
             if fulfil(all_json[i]["属性"][j], all_json[i]):
-                one_upgrade(all_json[i]["属性"][j], base_txt)
+                one_upgrade(all_json[i]["属性"][j], base_txt, i, '第' + str(j) + '个【属性】')
         for j in all_json[i]["冷却时间"]:
             if '名称' not in all_json[i]["冷却时间"][j]:
                 all_json[i]["冷却时间"][j]['名称'] = ''
@@ -351,7 +346,7 @@ def complete_upgrade(all_json, base_txt):
                 all_json[i]["冷却时间"][j]['名称'] = all_json[i]["冷却时间"][j]['3']['名称']
                 all_json[i]["冷却时间"][j]['3'].pop('名称')
             if fulfil(all_json[i]["冷却时间"][j], all_json[i]):
-                one_upgrade(all_json[i]["冷却时间"][j], base_txt)
+                one_upgrade(all_json[i]["冷却时间"][j], base_txt, i, '第' + str(j) + '个【冷却时间】')
         for j in all_json[i]["魔法消耗"]:
             if '名称' not in all_json[i]["魔法消耗"][j]:
                 all_json[i]["魔法消耗"][j]['名称'] = ''
@@ -364,13 +359,13 @@ def complete_upgrade(all_json, base_txt):
                         all_json[i]["魔法消耗"][j]['名称'] = all_json[i]["魔法消耗"][j][k]['3']['名称']
                         all_json[i]["魔法消耗"][j][k]['3'].pop('名称')
                     if fulfil(all_json[i]["魔法消耗"][j][k], all_json[i]):
-                        one_upgrade(all_json[i]["魔法消耗"][j][k], base_txt)
+                        one_upgrade(all_json[i]["魔法消耗"][j][k], base_txt, i, '第' + str(j) + '个【魔法消耗】')
         for j in all_json[i]["施法前摇"]:
             fulfil(all_json[i]["施法前摇"][j], all_json[i])
-            one_upgrade(all_json[i]["施法前摇"][j], base_txt)
+            one_upgrade(all_json[i]["施法前摇"][j], base_txt, i, '第' + str(j) + '个【施法前摇】')
         for j in all_json[i]["施法后摇"]:
             fulfil(all_json[i]["施法后摇"][j], all_json[i])
-            one_upgrade(all_json[i]["施法后摇"][j], base_txt)
+            one_upgrade(all_json[i]["施法后摇"][j], base_txt, i, '第' + str(j) + '个【施法后摇】')
 
 
 def fulfil(arr, json, namebool=False):
@@ -389,7 +384,7 @@ def fulfil(arr, json, namebool=False):
     return True
 
 
-def one_upgrade(json, base_txt):
+def one_upgrade(json, base_txt, name, target):
     inbool = ["2" in json, "3" in json]
     inbool.append(inbool[0] and inbool[1])
     getvalue = [[], [], [], []]
@@ -410,24 +405,31 @@ def one_upgrade(json, base_txt):
                         break
             elif json["1"]["代码"]["0"] == "高等级":
                 levels = int(json["1"]["代码"]["4"])
-                for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
-                    if int(k) < levels:
-                        getvalue[0].append(0)
-                    else:
-                        getvalue[0].append(
-                            base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+                if json["1"]["代码"]["3"] in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]]:
+                    for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
+                        if int(k) < levels:
+                            getvalue[0].append(0)
+                        else:
+                            getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+                else:
+                    raise (editerror('技能源', name, target + '没有找到数据库中《' + json["1"]["代码"]["1"] + '→' + json["1"]["代码"]["2"] + '》' + json["1"]["代码"]["3"] + '的内容'))
             elif json["1"]["代码"]["0"] == "有限等级":
                 levels = int(json["1"]["代码"]["4"])
-                for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
-                    if int(k) <= levels:
-                        getvalue[0].append(
-                            base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+                if json["1"]["代码"]["3"] in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]]:
+                    for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
+                        if int(k) <= levels:
+                            getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+                else:
+                    raise (editerror('技能源', name, target + '没有找到《' + json["1"]["代码"]["1"] + '→' + json["1"]["代码"]["2"] + '》数据库中' + json["1"]["代码"]["3"] + '的内容'))
             elif json["1"]["代码"]["0"] == "不存在":
                 return
         else:
             if json["1"]["代码"]["1"] in base_txt:
-                for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
-                    getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+                if json["1"]["代码"]["3"] in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]]:
+                    for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]]:
+                        getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
+                else:
+                    raise (editerror('技能源', name, target + '没有找到《' + json["1"]["代码"]["1"] + '→' + json["1"]["代码"]["2"] + '》数据库中' + json["1"]["代码"]["3"] + '的内容'))
             else:
                 getvalue[0].append(json["1"]["代码"]["1"])
         if json["1"]["修正"]["1"] == "":
@@ -444,8 +446,11 @@ def one_upgrade(json, base_txt):
                     else:
                         break
             except ValueError:
-                for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]]:
-                    getvalue[1].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]][k])
+                if json["1"]["修正"]["2"] in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]]:
+                    for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]]:
+                        getvalue[1].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]][k])
+                else:
+                    raise (editerror('技能源', name, target + '没有找到《' + json["1"]["代码"]["1"] + '→' + json["1"]["代码"]["2"] + '》数据库中' + json["1"]["修正"]["2"] + '的内容'))
     else:
         getvalue[0].append(0)
         inbool.append(False)
@@ -470,8 +475,11 @@ def one_upgrade(json, base_txt):
                 else:
                     break
         else:
-            for k in base_txt[json["2"]["代码"]["1"]][json["2"]["代码"]["2"]][json["2"]["代码"]["3"]]:
-                getvalue[2].append(base_txt[json["2"]["代码"]["1"]][json["2"]["代码"]["2"]][json["2"]["代码"]["3"]][k])
+            if json["2"]["代码"]["3"] in base_txt[json["2"]["代码"]["1"]][json["2"]["代码"]["2"]]:
+                for k in base_txt[json["2"]["代码"]["1"]][json["2"]["代码"]["2"]][json["2"]["代码"]["3"]]:
+                    getvalue[2].append(base_txt[json["2"]["代码"]["1"]][json["2"]["代码"]["2"]][json["2"]["代码"]["3"]][k])
+            else:
+                raise (editerror('技能源', name, target + '没有找到《' + json["2"]["代码"]["1"] + '→' + json["2"]["代码"]["2"] + '》数据库中' + json["2"]["代码"]["3"] + '的内容'))
         caloprate[1].append(json["2"]["修正"]["1"])
     if inbool[1]:
         if "0" in json["3"]["代码"] and json["3"]["代码"]["0"] == "手填":
@@ -534,9 +542,9 @@ def one_upgrade(json, base_txt):
         for k in range(len(calvalue[3])):
             json["4"][str(k + 1)] = calvalue[3][k]
         json["4"]["升级来源"] = copy.deepcopy(json["2"]["升级来源"])
-        l=len(json["4"]["升级来源"])
+        l = len(json["4"]["升级来源"])
         for k in json["3"]["升级来源"]:
-            json["4"]["升级来源"][str(l+int(k))]=copy.deepcopy(json["3"]["升级来源"][k])
+            json["4"]["升级来源"][str(l + int(k))] = copy.deepcopy(json["3"]["升级来源"][k])
 
 
 def cut_the_same_to_one(lists):
@@ -745,7 +753,7 @@ def mech_others(json, mech):
                     json["冷却时间"][i][j]["类型"]["图片"] = mech["冷却时间"][str(json["冷却时间"][i][j]["类型"]["代码"])]["图片"]
     for i in json["施法前摇"]:
         for j in json["施法前摇"][i]:
-            if j!='名称':
+            if j != '名称':
                 if str(json["施法前摇"][i][j]["即时生效"]["代码"]) in mech["即时生效"]:
                     json["施法前摇"][i][j]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i][j]["即时生效"]["代码"])]
 
@@ -1171,5 +1179,5 @@ abilitypro_num = [["a_cast_range", "AbilityCastRange"]
     , ["a_charges_restore_time", "AbilityChargeRestoreTime"]]
 abilitypro_bool = [["immediate", "DOTA_ABILITY_BEHAVIOR_IMMEDIATE"]
     , ["ignore_channel", "DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"]]
-ability_trait_level = [["中文名", "英文名", "代码", "传说", "描述", "天赋代码", "A杖信息", "注释"], ["效果", "属性","施法前摇","施法后摇", "冷却时间"], ["魔法消耗"]
+ability_trait_level = [["中文名", "英文名", "代码", "传说", "描述", "天赋代码", "A杖信息", "注释"], ["效果", "属性", "施法前摇", "施法后摇", "冷却时间"], ["魔法消耗"]
     , ['技能免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域']]

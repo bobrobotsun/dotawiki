@@ -1,8 +1,7 @@
 import json
-import os
 import copy
-import hashlib
 import math
+from text_to_json.WikiError import editerror
 
 
 # 查询数据范围
