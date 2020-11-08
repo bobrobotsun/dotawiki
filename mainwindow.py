@@ -82,6 +82,7 @@ class Main(QMainWindow):
         self.show()
         self.load_data()
         self.check_test()
+        self.fix_window_with_json_data()
         # 设定窗口状态栏
         # self.statusBar().showMessage('准备完毕')
 
@@ -360,7 +361,6 @@ class Main(QMainWindow):
             basefile = open(os.path.join('database', 'json_base.json'), mode="r", encoding="utf-8")
             self.json_base = json.loads(basefile.read())
             basefile.close()
-            self.fix_window_with_json_data()
         except FileNotFoundError:
             messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载合成数据？", QMessageBox.NoButton, self)
             button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
@@ -649,6 +649,7 @@ class Main(QMainWindow):
         return rere
 
     def fix_window_with_json_data(self):
+        self.resort()
         names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
         for i in names:
             self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
@@ -974,7 +975,6 @@ class Main(QMainWindow):
 
     def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
         try:
-            self.resort()
             hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
             item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
 
@@ -988,12 +988,10 @@ class Main(QMainWindow):
             ability.complete_upgrade(self.json_base["技能"], self.text_base)
 
             ability.complete_mech(self.json_base["技能"], self.mech)
-
             for i in self.json_base["技能"]:
                 ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i)
 
             ability.confirm_upgrade_info(self.json_base['技能'])
-
             # 增加拥有技能
             ability_own = {}
             for i in self.json_base["技能"]:
@@ -1011,7 +1009,6 @@ class Main(QMainWindow):
                     if self.json_base[i][j]['页面名'] in ability_own:
                         for k in range(len(ability_own[self.json_base[i][j]['页面名']])):
                             self.json_base[i][j]['技能'][str(k + 1)] = ability_own[self.json_base[i][j]['页面名']][k][0]
-            self.resort()
         except editerror as err:
             QMessageBox.critical(self, err.get_error_info())
         else:

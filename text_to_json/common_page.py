@@ -1,4 +1,5 @@
 import re
+import math
 
 target_url = 'https://dota.huijiwiki.com/w/api.php'
 
@@ -21,8 +22,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
         numjson = numjsons[k]
         retext = ''
         ii = 0
-        while True:
-            ii += 1
+        for ii in range(1,5):
             i = str(ii)
             if i in numjson:
                 if ii > 1:
@@ -40,15 +40,13 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
                             if float(int(numjson[i][j])) == float(numjson[i][j]):
                                 retext += str(int(numjson[i][j]))
                             else:
-                                retext += str(numjson[i][j])
+                                retext += str(round(numjson[i][j],4))
                             retext += post_each(numjsons[k])
                         except ValueError:
                             retext += str(numjson[i][j])
                     else:
                         break
                 retext += post_group(numjson)
-            else:
-                break
         return retext
     else:
         return ''

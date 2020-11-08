@@ -4,6 +4,7 @@ import copy
 import math
 import hashlib
 import re
+import time
 from text_to_json.WikiError import editerror
 
 
@@ -111,10 +112,6 @@ def get_source_to_data(all_json, upgrade_json, version):
         else:
             unit_dic["图片"] = "Spellicons_" + temp1["代码"] + ".png"
             unit_dic["迷你图片"] = "Spellicons_" + temp1["代码"] + ".png"
-        if '图片地址' in unit_dic:
-            unit_dic.pop('图片地址')
-        if '迷你图片地址' in unit_dic:
-            unit_dic.pop('迷你图片地址')
         for i in temp1:
             if i in ability_trait_level[0]:
                 unit_dic[i] = temp1[i]
