@@ -637,14 +637,14 @@ class Main(QMainWindow):
             self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口', 0])
         self.lock.release()
 
-    def create_icon_by_local_image(self,image_name):
+    def create_icon_by_local_image(self, image_name):
         return QIcon(os.path.join('material_lib', image_name))
 
-    #通过技能源的名字，查找所有的引用了这个技能源的技能
-    def find_the_ability_by_the_ability_source(self,ability_source):
-        rere=[]
+    # 通过技能源的名字，查找所有的引用了这个技能源的技能
+    def find_the_ability_by_the_ability_source(self, ability_source):
+        rere = []
         for i in self.json_base['技能']:
-            if self.json_base['技能'][i]['数据来源']==ability_source:
+            if self.json_base['技能'][i]['数据来源'] == ability_source:
                 rere.append(i)
         return rere
 
@@ -654,29 +654,29 @@ class Main(QMainWindow):
             self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
             self.mainlayout['列表'][i]['布局']['列表'].clear()
             for j in self.json_base[i]:
-                temp=QListWidgetItem()
+                temp = QListWidgetItem()
                 temp.setText(j)
-                image_name=''
-                if i=='技能源':
-                    ability=self.find_the_ability_by_the_ability_source(j)
-                    if len(ability)==0:
-                        image_name='DOTA2.jpg'
-                    elif len(ability)==1:
-                        if self.json_base['技能'][ability[0]]['迷你图片']=='Talent.png' and self.json_base['技能'][ability[0]]['技能归属'] in self.json_base['英雄']:
+                image_name = ''
+                if i == '技能源':
+                    ability = self.find_the_ability_by_the_ability_source(j)
+                    if len(ability) == 0:
+                        image_name = 'DOTA2.jpg'
+                    elif len(ability) == 1:
+                        if self.json_base['技能'][ability[0]]['迷你图片'] == 'Talent.png' and self.json_base['技能'][ability[0]]['技能归属'] in self.json_base['英雄']:
                             image_name = self.json_base['英雄'][self.json_base['技能'][ability[0]]['技能归属']]['迷你图片']
                         else:
                             image_name = self.json_base['技能'][ability[0]]['迷你图片']
                     else:
-                        if self.json_base['技能'][ability[0]]['迷你图片']=='Talent.png':
-                            image_name='Talentb.png'
+                        if self.json_base['技能'][ability[0]]['迷你图片'] == 'Talent.png':
+                            image_name = 'Talentb.png'
                         else:
-                            image_name=self.json_base['技能'][ability[0]]['迷你图片']
+                            image_name = self.json_base['技能'][ability[0]]['迷你图片']
                 else:
-                    if self.json_base[i][j]['迷你图片']=='Talent.png':
-                        image_name=self.json_base['英雄'][self.json_base[i][j]['技能归属']]['迷你图片']
+                    if self.json_base[i][j]['迷你图片'] == 'Talent.png':
+                        image_name = self.json_base['英雄'][self.json_base[i][j]['技能归属']]['迷你图片']
                     else:
                         image_name = self.json_base[i][j]['迷你图片']
-                if image_name!='':
+                if image_name != '':
                     temp.setIcon(self.create_icon_by_local_image(image_name))
                 self.mainlayout['列表'][i]['布局']['列表'].addItem(temp)
 
@@ -845,13 +845,13 @@ class Main(QMainWindow):
         self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
         self.editlayout['修改核心']['竖布局']['树'][0].doubleClicked.connect(self.tree_item_double_clicked)
         self.editlayout['基础数据']['竖布局']['树'][0].doubleClicked.connect(lambda: self.copy_text_from_tree(0))
-        self.mainlayout['列表']['英雄']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('英雄'))
-        self.mainlayout['列表']['物品']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('物品'))
-        self.mainlayout['列表']['非英雄单位']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('非英雄单位'))
-        self.mainlayout['列表']['技能']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('技能'))
-        self.mainlayout['列表']['技能源']['布局']['列表'].clicked.connect(lambda:self.choose_mainlayout_change_edit_target('技能源'))
+        self.mainlayout['列表']['英雄']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('英雄'))
+        self.mainlayout['列表']['物品']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('物品'))
+        self.mainlayout['列表']['非英雄单位']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('非英雄单位'))
+        self.mainlayout['列表']['技能']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('技能'))
+        self.mainlayout['列表']['技能源']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('技能源'))
         for i in self.json_base:
-            self.mainlayout['列表'][i]['布局']['列表'].doubleClicked.connect(lambda:self.centralWidget().setCurrentIndex(1))
+            self.mainlayout['列表'][i]['布局']['列表'].doubleClicked.connect(lambda: self.centralWidget().setCurrentIndex(1))
         """
         以下是版本更新的内容
         """
@@ -1063,20 +1063,15 @@ class Main(QMainWindow):
         all_upload = []
         if chosen == '' or chosen == '英雄':
             for i in self.json_base['英雄']:
-                all_upload.append(
-                    [i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base,
-                                                                            self.version_list['版本'], i, 0)])
+                all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
         if chosen == '' or chosen == '非英雄单位':
             for i in self.json_base['非英雄单位']:
-                all_upload.append(
-                    [i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base,
-                                                                            self.version_list['版本'], i, 0)])
+                all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
         if chosen == '' or chosen == '物品':
             for i in self.json_base['物品']:
-                all_upload.append(
-                    [i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
                 all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
@@ -1113,7 +1108,7 @@ class Main(QMainWindow):
         self.w.setWindowTitle('下载图片中……')
         QApplication.processEvents()
         all_upload = []
-        all_upload.append(['天赋','Talentb.png'])
+        all_upload.append(['天赋', 'Talentb.png'])
         if chosen in self.json_base:
             for i in self.json_base[chosen]:
                 if '图片' in self.json_base[chosen][i] and self.json_base[chosen][i]['图片'] != '':
@@ -1139,7 +1134,7 @@ class Main(QMainWindow):
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
         target_name = []
         if selected == '技能':
-            target_name = self.json_base[selected][selected_name]['技能归属']
+            target_name.append(self.json_base[selected][selected_name]['技能归属'])
         elif selected == '技能源':
             skill_name = selected_name
             for i in self.json_base['技能']:
@@ -1154,6 +1149,7 @@ class Main(QMainWindow):
         self.w.setWindowTitle('上传json中……')
         QApplication.processEvents()
         all_upload = []
+        all_page = []
         if len(target_name) == 0:
             if selected == '技能源':
                 all_upload.append([selected_name + '/源.json', self.json_base[selected][selected_name]])
@@ -1167,10 +1163,22 @@ class Main(QMainWindow):
                         j = self.json_base['技能'][i]['数据来源']
                         if j in self.json_base['技能源']:
                             all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
-        total_num = len(all_upload)
+                if k in self.json_base['英雄']:
+                    all_page.append([k, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], k)])
+                    all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], k, 0)])
+                elif k in self.json_base['物品']:
+                    all_page.append([k, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], k)])
+                    all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], k, 0)])
+                elif k in self.json_base['非英雄单位']:
+                    all_page.append([k, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], k)])
+                    all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], k, 0)])
+        total_num = len(all_upload)+len(all_page)
         self.w.confirm_numbers(total_num)
-        for i in range(total_num):
+        for i in range(len(all_upload)):
             self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1], True), i)
+            QApplication.processEvents()
+        for i in range(len(all_page)):
+            self.w.addtext(self.upload_page(all_page[i][0], all_page[i][1], True), i+len(all_upload))
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
@@ -1373,10 +1381,10 @@ class Main(QMainWindow):
         self.edit_json_expand_all()
         self.self_edit_button_default()
 
-    def choose_mainlayout_change_edit_target(self,target_base=''):
+    def choose_mainlayout_change_edit_target(self, target_base=''):
         self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(target_base)
         self.edit_category_selected_changed()
-        target_name=self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()
+        target_name = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()
         self.edit_target_selected_changed(target_name)
 
     def complex_dict_to_tree(self, tdict, edict, sdict):
