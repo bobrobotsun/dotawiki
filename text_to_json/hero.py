@@ -116,6 +116,7 @@ def fulfill_hero_json(base_txt, all_json, version):
             all_json[i]["应用"] = 1
             all_json[i]['图片'] = 'Heroes_' + all_json[i]["代码名"] + '.png'
             all_json[i]['迷你图片'] = 'Miniheroes_' + all_json[i]["代码名"] + '.png'
+            all_json[i]['攻击后摇']=float(all_json[i]['攻击后摇'])
             if '图片地址' in all_json[i]:
                 all_json[i].pop('图片地址')
             if '迷你图片地址' in all_json[i]:
@@ -130,6 +131,9 @@ def fulfill_hero_json(base_txt, all_json, version):
                     all_json[i][j[0]] = {"代码": j[1]}
                     for k in base_txt["英雄"][all_json[i]["代码名"]][j[1]]:
                         all_json[i][j[0]][k] = base_txt["英雄"][all_json[i]["代码名"]][j[1]][k]
+            all_json[i]['前摇冷却']=round(all_json[i]['攻击间隔']['1']-all_json[i]['攻击前摇']['1'],3)
+            all_json[i]['总前后摇']=round(all_json[i]['攻击前摇']['1']+all_json[i]['攻击后摇'],3)
+            all_json[i]['后摇空闲']=round(all_json[i]['攻击间隔']['1']-all_json[i]['总前后摇'],3)
 
 
 def create_file(all_json):
