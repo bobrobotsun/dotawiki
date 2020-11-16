@@ -591,8 +591,7 @@ class Main(QMainWindow):
                 print(self.download_json_list[self.local.current_num], '：分配出现错误，原因为：' + str(xx))
             finally:
                 self.lock.release()
-            self.local.download_data = {'action': 'jsondata',
-                                        'title': self.download_json_list[self.local.current_num][2], 'format': 'json'}
+            self.local.download_data = {'action': 'jsondata', 'title': self.download_json_list[self.local.current_num][2], 'format': 'json'}
             self.local.seesion = self.seesion
             self.local.target_url = self.target_url
             self.local.k = 0
@@ -620,7 +619,7 @@ class Main(QMainWindow):
                         self.current_num[0] += 1
                         break
                     finally:
-                        time.sleep(0.02)
+                        time.sleep(0.05)
                         self.lock.release()
                 else:
                     self.local.k += 1
@@ -1169,13 +1168,13 @@ class Main(QMainWindow):
                 elif k in self.json_base['非英雄单位']:
                     all_page.append([k, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], k)])
                     all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], k, 0)])
-        total_num = len(all_upload)+len(all_page)
+        total_num = len(all_upload) + len(all_page)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
             self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1], True), i)
             QApplication.processEvents()
         for i in range(len(all_page)):
-            self.w.addtext(self.upload_page(all_page[i][0], all_page[i][1], True), i+len(all_upload))
+            self.w.addtext(self.upload_page(all_page[i][0], all_page[i][1], True), i + len(all_upload))
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
