@@ -619,7 +619,7 @@ class Main(QMainWindow):
                         self.current_num[0] += 1
                         break
                     finally:
-                        time.sleep(0.05)
+                        time.sleep(0.03)
                         self.lock.release()
                 else:
                     self.local.k += 1
