@@ -1,5 +1,6 @@
 import json
 import hashlib
+import re
 from text_to_json.WikiError import editerror
 
 # 查询数据范围
@@ -115,6 +116,13 @@ def finditemspecial(source, data, tb):
             else:
                 return
 
+def get_dota_data_from_vpk(base_txt,ffile):
+    this_string = ffile.read().decode('utf8')
+    alltext = re.finditer('"DOTA_Tooltip_ability_item_(.*?)_Lore".*?"(.*?)"', this_string)
+    for i in alltext:
+        name=i.group(1)
+        if name in base_txt:
+            base_txt[name]['lore']={'1':i.group(2)}
 
 def get_hero_data_from_txt(base_txt, ffile):
     source_string = ffile.read().decode('utf8')
@@ -142,6 +150,7 @@ def fulfill_item_json(base_txt, all_json, version):
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
         all_json[ii]["应用"] = 1
+        all_json[ii]["传说"] = base_txt["物品"][all_json[ii]['代码名']]['lore']['1'] if 'lore' in base_txt["物品"][all_json[ii]['代码名']] else all_json[ii]["传说"]
         if all_json[ii]['图片']=='':
             all_json[ii]['图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
         if all_json[ii]['迷你图片']=='':

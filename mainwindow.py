@@ -445,8 +445,11 @@ class Main(QMainWindow):
             if has_text[2][2]:
                 unit.get_hero_data_from_txt(self.text_base['非英雄单位'], os.path.join(address, has_text[1][2]))
             pak1 = vpk.open(address.replace('scripts\\npc', "pak01_dir.vpk"))
-            pakfile = pak1.get_file("scripts/npc/items.txt")
-            item.get_hero_data_from_txt(self.text_base['物品'], pakfile)
+            hero.get_lore_data_from_vpk(self.text_base['英雄'],pak1.get_file("resource/localization/hero_lore_schinese.txt"))
+            hero.get_dota_data_from_vpk(self.text_base['英雄'],pak1.get_file("resource/localization/dota_schinese.txt"))
+            ability.get_dota_data_from_vpk(self.text_base['技能'],pak1.get_file("resource/localization/abilities_schinese.txt"))
+            item.get_hero_data_from_txt(self.text_base['物品'], pak1.get_file("scripts/npc/items.txt"))
+            item.get_dota_data_from_vpk(self.text_base['物品'], pak1.get_file("resource/localization/abilities_schinese.txt"))
             self.file_save(os.path.join('database', 'dota2_address.json'), address)
             self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
             messagebox = QMessageBox(QMessageBox.Information, '文件抓取', ttt, QMessageBox.NoButton, self)
@@ -977,6 +980,7 @@ class Main(QMainWindow):
             hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
             item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
 
+            ability.fulfill_vpk_data(self.json_base,self.text_base)
             info += ability.autoget_talent_source(self.json_base, self.text_base['英雄'])
             ability.get_source_to_data(self.json_base, self.upgrade_base, self.version)
             unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version)

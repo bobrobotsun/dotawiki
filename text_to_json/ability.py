@@ -15,6 +15,13 @@ def better_float_to_text(x):
     else:
         return str(x)
 
+def get_dota_data_from_vpk(base_txt,ffile):
+    this_string = ffile.read().decode('utf8')
+    alltext = re.finditer('"DOTA_Tooltip_ability_(.*?)_Lore".*?"(.*?)"', this_string)
+    for i in alltext:
+        name=i.group(1)
+        if name in base_txt:
+            base_txt[name]['lore']={'1':i.group(2)}
 
 def get_hero_data_from_txt(base_txt, address):
     this_file = open(address, mode="r")
@@ -64,6 +71,10 @@ def cal_ability_source_index(json, base, i):
            '25级右天赋': -2}
     return base[json['英雄'][i[:-6]]['代码名']]['ability'][arr[i[-6:]]]
 
+def fulfill_vpk_data(json,base):
+    for i in json['技能源']:
+        if json['技能源'][i]['代码'] in base['技能'] and 'lore' in base['技能'][json['技能源'][i]['代码']]:
+            json['技能源'][i]['传说']=base['技能'][json['技能源'][i]['代码']]['lore']['1']
 
 def get_source_to_data(all_json, upgrade_json, version):
     for i in all_json['技能源']:

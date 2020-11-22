@@ -64,6 +64,21 @@ def findheropro(source, data, tb, pro, inherit=True, number=True, splitit=False)
                     data[pro[1]] = {"1": source[j + 1:k]}
     return
 
+def get_lore_data_from_vpk(base_txt,ffile):
+    this_string = ffile.read().decode('utf8')
+    alltext = re.finditer('"npc_dota_hero_(.*?)_bio".*?"((.|\n)*?)"', this_string)
+    for i in alltext:
+        name=i.group(1)
+        if name in base_txt:
+            base_txt[name]['lore']={'1':i.group(2)}
+
+def get_dota_data_from_vpk(base_txt,ffile):
+    this_string = ffile.read().decode('utf8')
+    alltext = re.finditer('"npc_dota_hero_(.*?)_hype".*?"(.*?)"', this_string)
+    for i in alltext:
+        name=i.group(1)
+        if name in base_txt:
+            base_txt[name]['hype']={'1':i.group(2)}
 
 def get_hero_data_from_txt(base_txt, source_address):
     this_file = open(source_address, mode="r")
@@ -117,6 +132,8 @@ def fulfill_hero_json(base_txt, all_json, version):
             all_json[i]['图片'] = 'Heroes_' + all_json[i]["代码名"] + '.png'
             all_json[i]['迷你图片'] = 'Miniheroes_' + all_json[i]["代码名"] + '.png'
             all_json[i]['攻击后摇']=float(all_json[i]['攻击后摇'])
+            all_json[i]['背景']=base_txt["英雄"][all_json[i]["代码名"]]['lore']['1']
+            all_json[i]['简介']=base_txt["英雄"][all_json[i]["代码名"]]['hype']['1']
             if '图片地址' in all_json[i]:
                 all_json[i].pop('图片地址')
             if '迷你图片地址' in all_json[i]:
