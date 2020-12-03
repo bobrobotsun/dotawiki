@@ -123,7 +123,7 @@ def get_hero_data_from_txt(base_txt, source_address):
                         i += 1
 
 
-def fulfill_hero_json(base_txt, all_json, version):
+def fulfill_hero_json(base_txt, all_json, version,name_base):
     for i in all_json:
         if all_json[i]["代码名"] in base_txt["英雄"]:
             all_json[i]["分类"] = "英雄"
@@ -151,6 +151,12 @@ def fulfill_hero_json(base_txt, all_json, version):
             all_json[i]['前摇冷却']=round(all_json[i]['攻击间隔']['1']-all_json[i]['攻击前摇']['1'],3)
             all_json[i]['总前后摇']=round(all_json[i]['攻击前摇']['1']+all_json[i]['攻击后摇'],3)
             all_json[i]['后摇空闲']=round(all_json[i]['攻击间隔']['1']-all_json[i]['总前后摇'],3)
+            all_json[i]['曾用名']=[]
+            for namei in name_base:
+                if namei!='原生':
+                    for namej in name_base[namei]:
+                        if name_base[namei][namej]['页面名']==all_json[i]['页面名']:
+                            all_json[i]['曾用名'].append(namej)
 
 
 def create_file(all_json):

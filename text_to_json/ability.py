@@ -76,7 +76,7 @@ def fulfill_vpk_data(json,base):
         if json['技能源'][i]['代码'] in base['技能'] and 'lore' in base['技能'][json['技能源'][i]['代码']]:
             json['技能源'][i]['传说']=base['技能'][json['技能源'][i]['代码']]['lore']['1']
 
-def get_source_to_data(all_json, upgrade_json, version):
+def get_source_to_data(all_json, upgrade_json, version,name_base):
     for i in all_json['技能源']:
         all_json['技能源'][i]['应用'] = 1
         all_json['技能源'][i]['分类'] = '技能源'
@@ -92,6 +92,12 @@ def get_source_to_data(all_json, upgrade_json, version):
         unit_dic["分类"] = "技能"
         unit_dic["版本"] = version
         unit_dic["应用"] = 1
+        unit_dic['曾用名'] = []
+        for namei in name_base:
+            if namei != '原生':
+                for namej in name_base[namei]:
+                    if name_base[namei][namej]['页面名'] == unit_dic['页面名']:
+                        unit_dic['曾用名'].append(namej)
         if unit_dic["技能排序"] == "":
             if unit_dic["默认按键"] == "Q":
                 unit_dic["技能排序"] = "d"

@@ -43,8 +43,7 @@ class Main(QMainWindow):
         self.image_url = 'https://huiji-public.huijistatic.com/dota/uploads'
         self.seesion = requests.session()
         self.get_login_token_data = {'action': 'query', 'meta': 'tokens', 'type': 'login', 'format': 'json'}
-        self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'https://www.huijiwiki.com/', 'rememberMe': 1,
-                           'format': 'json'}
+        self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'https://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
         self.get_csrf_token_data = {'action': 'query', 'meta': 'tokens', 'format': 'json'}
         self.logout_data = {'action': 'logout', 'format': 'json'}
         # 菜单栏
@@ -68,6 +67,8 @@ class Main(QMainWindow):
         # 版本更新的内容
         self.version_list = {}
         self.version_base = {}
+        # 曾用名的内容
+        self.name_base = {'历史': {}, '原生': {}, '衍生': {}}
 
     def initUI(self):
         # 设定软件的图标
@@ -149,34 +150,48 @@ class Main(QMainWindow):
         else:
             window = False
             kwargs['window'] = self
-        # 获取登录令牌
-        login_token = self.seesion.post(self.target_url, data=self.get_login_token_data)
-        # 使用登录令牌登录
+        tryi = 0
+        while True:
+            # 获取登录令牌
+            login_token = self.seesion.post(self.target_url, data=self.get_login_token_data)
+            # 使用登录令牌登录
+            if login_token.status_code == 200:
+                login_token_json = login_token.json()
+                self.login_data['logintoken'] = login_token_json['query']['tokens']['logintoken']
+                break
+            else:
+                tryi += 1
+                time.sleep(1)
+                if tryi % 10 == 0:
+                    QMessageBox.critical(self, '登录遭遇阻碍', '暂时登录失败，已尝试' + str(tryi) + '次！')
         self.login_data['username'] = password['用户名']
         self.login_data['password'] = password['密码']
-        self.login_data['logintoken'] = login_token.json()['query']['tokens']['logintoken']
-        login_info = self.seesion.post(self.target_url, data=self.login_data)
-        # 判断登录效果
-        if login_info.json()["clientlogin"]["status"] == "FAIL":
-            messageBox = QMessageBox(QMessageBox.Critical, "登录失败",
-                                     login_info.json()["clientlogin"]["message"] + "\n请问是否重新登录？", QMessageBox.NoButton,
-                                     self)
-            buttonY = messageBox.addButton('重新登录', QMessageBox.YesRole)
-            buttonN = messageBox.addButton('放弃登录', QMessageBox.YesRole)
-            messageBox.exec_()
-            if messageBox.clickedButton() == buttonY:
-                if not window:
-                    self.new_login_window()
-                    self.login_success(False)
+        tryi = 0
+        while True:
+            login_info = self.seesion.post(self.target_url, data=self.login_data)
+            # 判断登录效果
+            if login_info.status_code != 200 or login_info.json()["clientlogin"]["status"] == "FAIL":
+                tryi += 1
+                time.sleep(1)
+                if tryi > 100:
+                    messageBox = QMessageBox(QMessageBox.Critical, "登录失败", "请问是否重新登录？", QMessageBox.NoButton, self)
+                    buttonY = messageBox.addButton('重新登录', QMessageBox.YesRole)
+                    buttonN = messageBox.addButton('放弃登录', QMessageBox.YesRole)
+                    messageBox.exec_()
+                    if messageBox.clickedButton() == buttonY:
+                        if not window:
+                            self.new_login_window()
+                            self.login_success(False)
+                    else:
+                        if window:
+                            kwargs['window'].close()
+                    break
             else:
+                self.csrf_token = self.seesion.post(self.target_url, data=self.get_csrf_token_data).json()['query']['tokens']['csrftoken']
+                self.login_success(True, username=login_info.json()["clientlogin"]["username"], password=password['密码'])
                 if window:
                     kwargs['window'].close()
-        else:
-            self.csrf_token = \
-                self.seesion.post(self.target_url, data=self.get_csrf_token_data).json()['query']['tokens']['csrftoken']
-            self.login_success(True, username=login_info.json()["clientlogin"]["username"], password=password['密码'])
-            if window:
-                kwargs['window'].close()
+                break
 
     # 通过一个新的窗口，进行登录
     def new_login_window(self):
@@ -192,8 +207,7 @@ class Main(QMainWindow):
         passtext.setEchoMode(3)
         # 按钮
         yesbutton = QPushButton('确认登录', inputwindow)
-        yesbutton.clicked.connect(
-            lambda: self.login(password={'用户名': nametext.text(), '密码': passtext.text()}, window=inputwindow))
+        yesbutton.clicked.connect(lambda: self.login(password={'用户名': nametext.text(), '密码': passtext.text()}, window=inputwindow))
         nobutton = QPushButton('暂不登录', inputwindow)
         nobutton.clicked.connect(inputwindow.close)
 
@@ -391,6 +405,17 @@ class Main(QMainWindow):
             messageBox.exec_()
             if messageBox.clickedButton() == button1:
                 self.download_mech()
+        try:
+            basefile = open(os.path.join('database', 'name_base.json'), mode="r", encoding="utf-8")
+            self.name_base = json.loads(basefile.read())
+            basefile.close()
+        except FileNotFoundError:
+            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载曾用名？", QMessageBox.NoButton, self)
+            button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
+            button2 = messageBox.addButton('没有网络，没法下载', QMessageBox.NoRole)
+            messageBox.exec_()
+            if messageBox.clickedButton() == button1:
+                self.download_name_base()
 
     def get_data_from_text(self):
         try:
@@ -445,9 +470,9 @@ class Main(QMainWindow):
             if has_text[2][2]:
                 unit.get_hero_data_from_txt(self.text_base['非英雄单位'], os.path.join(address, has_text[1][2]))
             pak1 = vpk.open(address.replace('scripts\\npc', "pak01_dir.vpk"))
-            hero.get_lore_data_from_vpk(self.text_base['英雄'],pak1.get_file("resource/localization/hero_lore_schinese.txt"))
-            hero.get_dota_data_from_vpk(self.text_base['英雄'],pak1.get_file("resource/localization/dota_schinese.txt"))
-            ability.get_dota_data_from_vpk(self.text_base['技能'],pak1.get_file("resource/localization/abilities_schinese.txt"))
+            hero.get_lore_data_from_vpk(self.text_base['英雄'], pak1.get_file("resource/localization/hero_lore_schinese.txt"))
+            hero.get_dota_data_from_vpk(self.text_base['英雄'], pak1.get_file("resource/localization/dota_schinese.txt"))
+            ability.get_dota_data_from_vpk(self.text_base['技能'], pak1.get_file("resource/localization/abilities_schinese.txt"))
             item.get_hero_data_from_txt(self.text_base['物品'], pak1.get_file("scripts/npc/items.txt"))
             item.get_dota_data_from_vpk(self.text_base['物品'], pak1.get_file("resource/localization/abilities_schinese.txt"))
             self.file_save(os.path.join('database', 'dota2_address.json'), address)
@@ -484,15 +509,17 @@ class Main(QMainWindow):
     def download_json_name(self):
         for i in self.json_name:
             temp = self.seesion.post(self.target_url,
-                                     data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|' + i + '}}',
-                                           'contentmodel': 'wikitext', 'prop': 'text',
-                                           'disablelimitreport': 'false', 'format': 'json'}).json()['parse']['text'][
-                '*']
+                                     data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|' + i + '}}', 'contentmodel': 'wikitext', 'prop': 'text',
+                                           'disablelimitreport': 'false', 'format': 'json'}).json()['parse']['text']['*']
             texttemp = re.sub('<.*?>', '', temp)[:-1]
             tempjson = json.loads(texttemp)
             self.json_name.update(tempjson)
         print(self.json_name)
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
+
+    def download_name_base(self):
+        self.name_base = self.download_json('name_base.json')
+        self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
 
     def update_json_name(self, list):
         for i in list:
@@ -542,7 +569,7 @@ class Main(QMainWindow):
     def download_and_upload_single_pages(self):
         info_txt = ''
         info_txt += page.ability_cast_point_and_backswing(self.seesion, self.json_base, self.csrf_token)
-        info_txt += common_page.page_hero(self.seesion, self.json_base, self.version_base, self.csrf_token)
+        info_txt += page.armor_physic_resistance_page148237(self.seesion, self.csrf_token)
         QMessageBox.information(self, '更改完毕', info_txt, QMessageBox.Yes, QMessageBox.Yes)
 
     def download_json_base(self):
@@ -957,6 +984,107 @@ class Main(QMainWindow):
         self.version_edit_all_button_default()
         self.versionlayout['版本内容']['横排版']['树'][0].doubleClicked.connect(self.version_item_double_clicked)
         """
+        记录曾用名和链接，以及对应页面名+图片的内容
+        """
+        self.nameWidget = QWidget(self)
+        self.centralWidget().addTab(self.nameWidget, '曾用名')
+        self.namelayout = {0: QHBoxLayout()}
+        self.nameWidget.setLayout(self.namelayout[0])
+
+        self.namelayout['按钮区域'] = {0: QVBoxLayout(self)}
+        self.namelayout[0].addLayout(self.namelayout['按钮区域'][0])
+        self.namelayout['按钮区域']['下载'] = QPushButton('下载', self)
+        self.namelayout['按钮区域'][0].addWidget(self.namelayout['按钮区域']['下载'])
+        self.namelayout['按钮区域']['下载'].clicked.connect(self.download_name_base)
+        self.namelayout['按钮区域']['保存'] = QPushButton('保存', self)
+        self.namelayout['按钮区域'][0].addWidget(self.namelayout['按钮区域']['保存'])
+        self.namelayout['按钮区域']['保存'].clicked.connect(self.name_save_name_json)
+        self.namelayout['按钮区域']['保存并上传'] = QPushButton('保存并上传', self)
+        self.namelayout['按钮区域'][0].addWidget(self.namelayout['按钮区域']['保存并上传'])
+        self.namelayout['按钮区域']['保存并上传'].clicked.connect(self.name_save_and_upload_name_json)
+        self.namelayout['按钮区域'][0].addStretch(1)
+        self.namelayout['按钮区域']['删除该条目'] = QPushButton('删除该条目', self)
+        self.namelayout['按钮区域'][0].addWidget(self.namelayout['按钮区域']['删除该条目'])
+        self.namelayout['按钮区域']['删除该条目'].clicked.connect(self.name_delete_one_old_name)
+        self.namelayout['按钮区域']['删除该条目'].setEnabled(False)
+        self.namelayout['按钮区域'][0].addStretch(1)
+
+        self.namelayout['历史曾用名'] = {0: QGroupBox('历史曾用名', self)}
+        self.namelayout[0].addWidget(self.namelayout['历史曾用名'][0], 3)
+        self.namelayout['历史曾用名']['布局'] = {0: QGridLayout(self)}
+        self.namelayout['历史曾用名'][0].setLayout(self.namelayout['历史曾用名']['布局'][0])
+        self.namelayout['历史曾用名']['布局']['树'] = {0: QTreeWidget(self)}
+        self.namelayout['历史曾用名']['布局'][0].addWidget(self.namelayout['历史曾用名']['布局']['树'][0])
+        self.namelayout['历史曾用名']['布局']['树'][0].setHeaderLabels(['名称', '指向页面'])
+        self.namelayout['历史曾用名']['布局']['树'][0].setColumnWidth(0, 150)
+        self.namelayout['历史曾用名']['布局']['树'][0].clicked.connect(self.name_history_names_tree_widget_clicked)
+
+        self.namelayout['编辑区'] = {0: QGroupBox('编辑区', self)}
+        self.namelayout[0].addWidget(self.namelayout['编辑区'][0], 3)
+        self.namelayout['编辑区']['布局'] = {0: QVBoxLayout(self)}
+        self.namelayout['编辑区'][0].setLayout(self.namelayout['编辑区']['布局'][0])
+        self.namelayout['编辑区']['布局']['新建对照'] = {0: QGroupBox('新建对照', self)}
+        self.namelayout['编辑区']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['新建对照'][0])
+        self.namelayout['编辑区']['布局']['新建对照']['布局'] = {0: QGridLayout(self)}
+        self.namelayout['编辑区']['布局']['新建对照'][0].setLayout(self.namelayout['编辑区']['布局']['新建对照']['布局'][0])
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['名称'] = QLabel('名称', self)
+        self.namelayout['编辑区']['布局']['新建对照']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['新建对照']['布局']['名称'], 0, 0)
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['名称输入'] = QLineEdit(self)
+        self.namelayout['编辑区']['布局']['新建对照']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['新建对照']['布局']['名称输入'], 0, 1, 1, 3)
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['指向页面'] = QLabel('指向页面', self)
+        self.namelayout['编辑区']['布局']['新建对照']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['新建对照']['布局']['指向页面'], 1, 0)
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['指向页面输入'] = QLineEdit(self)
+        self.namelayout['编辑区']['布局']['新建对照']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['新建对照']['布局']['指向页面输入'], 1, 1, 1, 3)
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['确认保存'] = QPushButton('确认保存', self)
+        self.namelayout['编辑区']['布局']['新建对照']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['新建对照']['布局']['确认保存'], 2, 0)
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['确认保存'].clicked.connect(self.name_create_new_name_save)
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['重置'] = QPushButton('重置', self)
+        self.namelayout['编辑区']['布局']['新建对照']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['新建对照']['布局']['重置'], 2, 2)
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['重置'].clicked.connect(self.name_create_new_name_reset)
+
+        self.namelayout['编辑区']['布局']['现存修正'] = {0: QGroupBox('现存修正', self)}
+        self.namelayout['编辑区']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['现存修正'][0])
+        self.namelayout['编辑区']['布局']['现存修正']['布局'] = {0: QGridLayout(self)}
+        self.namelayout['编辑区']['布局']['现存修正'][0].setLayout(self.namelayout['编辑区']['布局']['现存修正']['布局'][0])
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['名称'] = QLabel('名称', self)
+        self.namelayout['编辑区']['布局']['现存修正']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['现存修正']['布局']['名称'], 0, 0)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['名称输入'] = QLineEdit(self)
+        self.namelayout['编辑区']['布局']['现存修正']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['现存修正']['布局']['名称输入'], 0, 1, 1, 3)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['名称输入'].setFocusPolicy(Qt.NoFocus)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['指向页面'] = QLabel('指向页面', self)
+        self.namelayout['编辑区']['布局']['现存修正']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['现存修正']['布局']['指向页面'], 1, 0)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['指向页面输入'] = QLineEdit(self)
+        self.namelayout['编辑区']['布局']['现存修正']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['现存修正']['布局']['指向页面输入'], 1, 1, 1, 3)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['确认保存'] = QPushButton('确认保存', self)
+        self.namelayout['编辑区']['布局']['现存修正']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['现存修正']['布局']['确认保存'], 2, 0)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['确认保存'].setEnabled(False)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['确认保存'].clicked.connect(self.name_change_old_name_save)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['重置'] = QPushButton('重置', self)
+        self.namelayout['编辑区']['布局']['现存修正']['布局'][0].addWidget(self.namelayout['编辑区']['布局']['现存修正']['布局']['重置'], 2, 2)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['重置'].setEnabled(False)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['重置'].clicked.connect(self.name_change_old_name_reset)
+
+        self.namelayout['原生页面'] = {0: QGroupBox('原生页面', self)}
+        self.namelayout[0].addWidget(self.namelayout['原生页面'][0], 2)
+        self.namelayout['原生页面']['布局'] = {0: QGridLayout(self)}
+        self.namelayout['原生页面'][0].setLayout(self.namelayout['原生页面']['布局'][0])
+        self.namelayout['原生页面']['布局']['树'] = {0: QTreeWidget(self)}
+        self.namelayout['原生页面']['布局'][0].addWidget(self.namelayout['原生页面']['布局']['树'][0])
+        self.namelayout['原生页面']['布局']['树'][0].setHeaderLabels(['名称页面'])
+        self.namelayout['原生页面']['布局']['树'][0].setColumnWidth(0, 200)
+        self.namelayout['原生页面']['布局']['树'][0].clicked.connect(self.name_origin_names_tree_widget_clicked)
+
+        self.namelayout['衍生页面'] = {0: QGroupBox('衍生页面', self)}
+        self.namelayout[0].addWidget(self.namelayout['衍生页面'][0], 3)
+        self.namelayout['衍生页面']['布局'] = {0: QGridLayout(self)}
+        self.namelayout['衍生页面'][0].setLayout(self.namelayout['衍生页面']['布局'][0])
+        self.namelayout['衍生页面']['布局']['树'] = {0: QTreeWidget(self)}
+        self.namelayout['衍生页面']['布局'][0].addWidget(self.namelayout['衍生页面']['布局']['树'][0])
+        self.namelayout['衍生页面']['布局']['树'][0].setHeaderLabels(['名称', '指向页面'])
+        self.namelayout['衍生页面']['布局']['树'][0].setColumnWidth(0, 200)
+        """"""
+        self.name_initial_name_base()
+        """
         下面是重新排序的情况
         """
         self.resort()
@@ -974,16 +1102,17 @@ class Main(QMainWindow):
         self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
         self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
+        self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
 
     def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
         try:
-            hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version)
-            item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version)
+            hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version, self.name_base)
+            item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version, self.name_base)
 
-            ability.fulfill_vpk_data(self.json_base,self.text_base)
+            ability.fulfill_vpk_data(self.json_base, self.text_base)
             info += ability.autoget_talent_source(self.json_base, self.text_base['英雄'])
-            ability.get_source_to_data(self.json_base, self.upgrade_base, self.version)
-            unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version)
+            ability.get_source_to_data(self.json_base, self.upgrade_base, self.version, self.name_base)
+            unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version, self.name_base)
 
             ability.input_upgrade(self.json_base, self.upgrade_base)
 
@@ -1012,6 +1141,7 @@ class Main(QMainWindow):
                     if self.json_base[i][j]['页面名'] in ability_own:
                         for k in range(len(ability_own[self.json_base[i][j]['页面名']])):
                             self.json_base[i][j]['技能'][str(k + 1)] = ability_own[self.json_base[i][j]['页面名']][k][0]
+            self.resort()
         except editerror as err:
             QMessageBox.critical(self, err.get_error_info())
         else:
@@ -1020,18 +1150,18 @@ class Main(QMainWindow):
     def upload_basic_json(self):
         self.upload_json('text_base.json', self.text_base)
         self.upload_json('json_name.json', self.json_name)
+        self.upload_json('name_base.json', self.name_base)
         QMessageBox.information(self, "上传完成", '已经上传完毕基础文件')
 
     def upload_all(self, chosen=''):
         self.w = upload_text('开始上传数据')
-        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,
-                           self.screen_size[1] * 0.7)
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传json中……')
         all_upload = []
         all_upload.append(['版本.json', {'版本': self.version}])
-        all_upload.append(['text_base.json', self.text_base])
         all_upload.append(['json_name.json', self.json_name])
+        all_upload.append(['name_base.json', self.name_base])
         if chosen == '':
             for i in self.json_base:
                 for j in self.json_base[i]:
@@ -1064,15 +1194,19 @@ class Main(QMainWindow):
         if chosen == '' or chosen == '英雄':
             for i in self.json_base['英雄']:
                 all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
+                all_upload.append(
+                    [i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i]), 0)])
         if chosen == '' or chosen == '非英雄单位':
             for i in self.json_base['非英雄单位']:
                 all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
+                all_upload.append([i + '/版本改动',
+                                   common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][i]),
+                                                               0)])
         if chosen == '' or chosen == '物品':
             for i in self.json_base['物品']:
                 all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], i, 0)])
+                all_upload.append(
+                    [i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][i]), 0)])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
@@ -1165,13 +1299,19 @@ class Main(QMainWindow):
                             all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
                 if k in self.json_base['英雄']:
                     all_page.append([k, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], k, 0)])
+                    all_page.append([k + '/版本改动',
+                                     common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][k]),
+                                                                 0)])
                 elif k in self.json_base['物品']:
                     all_page.append([k, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], k, 0)])
+                    all_page.append([k + '/版本改动',
+                                     common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][k]),
+                                                                 0)])
                 elif k in self.json_base['非英雄单位']:
                     all_page.append([k, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], k, 0)])
+                    all_page.append([k + '/版本改动',
+                                     common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][k]),
+                                                                 0)])
         total_num = len(all_upload) + len(all_page)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
@@ -1253,9 +1393,9 @@ class Main(QMainWindow):
                 break
             else:
                 k += 1
-                time.sleep(0.2)
-                if k >= 5:
-                    return ['《' + pagename + '》上传失败，请之后重新上传！', 10000]
+                time.sleep(1)
+                if k >= 10:
+                    return ['《' + pagename + '》上传失败，请之后重新上传！', 0]
         if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
             if 'nochange' in upload_info.json()['edit']:
                 return ['没有修改《' + pagename + '》', 0]
@@ -1376,8 +1516,7 @@ class Main(QMainWindow):
         self.editlayout['修改核心']['竖布局']['树'] = {0: self.editlayout['修改核心']['竖布局']['树'][0]}
         self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
         self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 300)
-        self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]],
-                                  self.json_base[selected[0]][selected[1]])
+        self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]], self.json_base[selected[0]][selected[1]])
         self.edit_json_expand_all()
         self.self_edit_button_default()
 
@@ -2068,6 +2207,7 @@ class Main(QMainWindow):
             for i in range(item.childCount()):
                 self.version_base[title]['次级版本'].append(item.text(0) + '/' + item.child(i).text(0))
         self.upload_json(title + '.json', self.version_base[title])
+        self.upload_page(title, '{{版本更新}}')
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         if bool:
             self.complex_json_to_version_tree()
@@ -2293,16 +2433,21 @@ class Main(QMainWindow):
             new.setText(0, text)
             new.itemtype = 'tree2'
             item.setExpanded(True)
+            for i in range(item.childCount() - 1):
+                tempi = item.child(i)
+                if tempi.childCount() > 1:
+                    tempj = tempi.child(tempi.childCount() - 1)
+                    if tempj.child(1).text(0) == '文字' and tempj.child(1).text(1) == '':
+                        tempi.removeChild(tempj)
+                tempi.setExpanded(False)
             self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new)
             self.version_button_tree2_add_tree_list()
-            new.setExpanded(False)
-            self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
+            new.setExpanded(True)
 
     def version_button_tree2_change_name(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         parent = item.parent()
-        text, ok = MoInputWindow.getText(self, '小分类改名', '你现在正试图将【' + parent.text(0) + '】的【' + item.text(0) + '】的名字改为:',
-                                         item.text(0))
+        text, ok = MoInputWindow.getText(self, '小分类改名', '你现在正试图将【' + parent.text(0) + '】的【' + item.text(0) + '】的名字改为:', item.text(0))
         if ok:
             item.setText(0, text)
 
@@ -2381,6 +2526,146 @@ class Main(QMainWindow):
         for i in range(item.childCount()):
             item.child(i).setExpanded(True)
             self.expand_all_childs(item.child(i))
+
+    def name_initial_name_base(self):
+        self.name_base['原生'] = {}
+        self.name_base['衍生'] = {}
+        self.name_base['历史'] = edit_json.sortedDictValues(self.name_base['历史'], True)
+        for i in self.name_base['历史']:
+            self.name_base['历史'][i]['图片'] = ''
+            self.name_base['历史'][i]['迷你图片'] = ''
+            for j in self.name_base['历史']:
+                if j == self.name_base['历史'][i]['页面名']:
+                    self.name_base['历史'][i]['页面名'] = self.name_base['历史'][j]['页面名']
+        i = '英雄'
+        for j in self.json_base[i]:
+            self.name_base['原生'][j] = {'页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']}
+            for k in self.name_base['历史']:
+                if j == self.name_base['历史'][k]['页面名']:
+                    self.name_base['历史'][k] = {'页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']}
+                    for l in ['10', '15', '20', '25']:
+                        tname = j + l + '级左天赋'
+                        self.name_base['衍生'][k + l + '级天赋'] = {'页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']}
+        for i in ['物品', '非英雄单位', '技能']:
+            for j in self.json_base[i]:
+                self.name_base['原生'][j] = {'页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']}
+                for k in self.name_base['历史']:
+                    if j == self.name_base['历史'][k]['页面名']:
+                        self.name_base['历史'][k] = {'页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']}
+        i = '英雄'
+        for j in self.json_base[i]:
+            for k in ['10', '15', '20', '25']:
+                tname = j + k + '级左天赋'
+                zyname = j + k + '级天赋'
+                self.name_base['衍生'][zyname] = {'页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']}
+        self.show_name_base_in_widget()
+
+    def show_name_base_in_widget(self):
+        self.namelayout['历史曾用名']['布局']['树'][0].clear()
+        self.namelayout['原生页面']['布局']['树'][0].clear()
+        for i in self.name_base['历史']:
+            child = QTreeWidgetItem(self.namelayout['历史曾用名']['布局']['树'][0])
+            child.setText(0, i)
+            child.setText(1, self.name_base['历史'][i]['页面名'])
+            if self.name_base['历史'][i]['迷你图片'] != '':
+                child.setIcon(1, self.create_icon_by_local_image(self.name_base['历史'][i]['迷你图片']))
+        for i in self.name_base['原生']:
+            child = QTreeWidgetItem(self.namelayout['原生页面']['布局']['树'][0])
+            child.setText(0, self.name_base['原生'][i]['页面名'])
+            if self.name_base['原生'][i]['迷你图片'] != '':
+                child.setIcon(0, self.create_icon_by_local_image(
+                    self.name_base['原生'][i]['迷你图片'] if self.name_base['原生'][i]['迷你图片'] != 'Talent.png' else self.name_base['原生'][i]['图片']))
+        for i in self.name_base['衍生']:
+            child = QTreeWidgetItem(self.namelayout['衍生页面']['布局']['树'][0])
+            child.setText(0, i)
+            child.setText(1, self.name_base['衍生'][i]['页面名'])
+            if self.name_base['衍生'][i]['迷你图片'] != '':
+                child.setIcon(1, self.create_icon_by_local_image(
+                    self.name_base['衍生'][i]['迷你图片'] if self.name_base['衍生'][i]['迷你图片'] != 'Talent.png' else self.name_base['衍生'][i]['图片']))
+
+    def name_create_new_name_save(self):
+        name = self.namelayout['编辑区']['布局']['新建对照']['布局']['名称输入'].text()
+        page_name = self.namelayout['编辑区']['布局']['新建对照']['布局']['指向页面输入'].text()
+        if name == '':
+            QMessageBox.critical(self, '输入缺失', '您没有输入名称！')
+        elif page_name == '':
+            QMessageBox.critical(self, '输入缺失', '您没有输入指向页面！')
+        else:
+            if name in self.name_base['历史']:
+                for i in range(self.namelayout['历史曾用名']['布局']['树'][0].topLevelItemCount()):
+                    child = self.namelayout['历史曾用名']['布局']['树'][0].topLevelItem(i)
+                    if child.text(0) == name:
+                        self.namelayout['历史曾用名']['布局']['树'][0].setCurrentItem(child)
+                QMessageBox.critical(self, '错误的输入', '您输入的名称已经定位了【' + self.name_base['历史'][name]['页面名'] + '】。请检查输入是否正确？')
+            else:
+                self.name_base['历史'][name] = {'页面名': page_name}
+                self.name_initial_name_base()
+                for i in range(self.namelayout['原生页面']['布局']['树'][0].topLevelItemCount()):
+                    child = self.namelayout['原生页面']['布局']['树'][0].topLevelItem(i)
+                    if child.text(0) == page_name:
+                        self.namelayout['原生页面']['布局']['树'][0].setCurrentItem(child)
+                QMessageBox.information(self, '添加成功', '您已经成功添加【' + name + '】→【' + page_name + '】')
+
+    def name_create_new_name_reset(self):
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['名称输入'].setText('')
+        if self.namelayout['原生页面']['布局']['树'][0].currentItem() == None:
+            self.namelayout['编辑区']['布局']['新建对照']['布局']['指向页面输入'].setText('')
+        else:
+            self.namelayout['编辑区']['布局']['新建对照']['布局']['指向页面输入'].setText(self.namelayout['原生页面']['布局']['树'][0].currentItem().text(0))
+
+    def name_change_old_name_save(self):
+        name = self.namelayout['编辑区']['布局']['现存修正']['布局']['名称输入'].text()
+        page_name = self.namelayout['编辑区']['布局']['现存修正']['布局']['指向页面输入'].text()
+        if name == '':
+            QMessageBox.critical(self, '输入缺失', '您还没有选择待修改项！')
+        elif page_name == '':
+            QMessageBox.critical(self, '输入缺失', '您没有输入指向页面！')
+        else:
+            self.name_base['历史'][name] = {'页面名': page_name}
+            self.name_initial_name_base()
+            for i in range(self.namelayout['现存修正']['布局']['树'][0].topLevelItemCount()):
+                child = self.namelayout['现存修正']['布局']['树'][0].topLevelItem(i)
+                if child.text(0) == page_name:
+                    self.namelayout['现存修正']['布局']['树'][0].setCurrentItem(child)
+            QMessageBox.information(self, '添加成功', '您已经成功修改【' + name + '】→【' + page_name + '】')
+
+    def name_change_old_name_reset(self):
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['指向页面输入'].setText('')
+        if self.namelayout['历史曾用名']['布局']['树'][0].currentItem() == None:
+            self.namelayout['编辑区']['布局']['现存修正']['布局']['名称输入'].setText('')
+        else:
+            self.namelayout['编辑区']['布局']['现存修正']['布局']['名称输入'].setText(self.namelayout['历史曾用名']['布局']['树'][0].currentItem().text(0))
+
+    def name_history_names_tree_widget_clicked(self):
+        child = self.namelayout['历史曾用名']['布局']['树'][0].currentItem()
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['名称输入'].setText(child.text(0))
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['确认保存'].setEnabled(True)
+        self.namelayout['编辑区']['布局']['现存修正']['布局']['重置'].setEnabled(True)
+        self.namelayout['按钮区域']['删除该条目'].setEnabled(True)
+
+    def name_origin_names_tree_widget_clicked(self):
+        child = self.namelayout['原生页面']['布局']['树'][0].currentItem()
+        self.namelayout['编辑区']['布局']['新建对照']['布局']['指向页面输入'].setText(child.text(0))
+
+    def name_save_name_json(self):
+        self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
+        QMessageBox.information(self, "上传完成", '已经保存name_base')
+
+    def name_save_and_upload_name_json(self):
+        self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
+        self.upload_json('name_base.json', self.name_base)
+        QMessageBox.information(self, "上传完成", '已经保存并上传name_base')
+
+    def name_delete_one_old_name(self):
+        child = self.namelayout['历史曾用名']['布局']['树'][0].currentItem()
+        if child == None:
+            QMessageBox.critical(self, '错误', '您还没有点选需要删除的曾用名！')
+        else:
+            name = child.text(0)
+            page_name = child.text(1)
+            self.name_base.pop(name)
+            self.name_initial_name_base()
+            QMessageBox.information(self, "删除完成", '已经删除对应的【' + name + '】→【' + page_name + '】')
 
     def test_inputwindow(self):
         print(MoInputWindow.get_item_and_content(self, [1, 2, 3, 4, 5, 6, 7, 8, 9, 0], ['int', 'number']))

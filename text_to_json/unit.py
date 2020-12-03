@@ -74,21 +74,23 @@ def get_hero_data_from_txt(base_txt, address):
             break
 
 
-def fulfill_unit_json(base_txt, all_json, version):
+def fulfill_unit_json(base_txt, all_json, version,name_base):
     for i in all_json:
         all_json[i]["分类"] = "非英雄单位"
         all_json[i]["版本"] = version
         all_json[i]["应用"] = 1
+        all_json[i]['曾用名'] = []
+        for namei in name_base:
+            if namei != '原生':
+                for namej in name_base[namei]:
+                    if name_base[namei][namej]['页面名'] == all_json[i]['页面名']:
+                        all_json[i]['曾用名'].append(namej)
         if len(all_json[i]['图片']) > 1:
             all_json[i]['图片'] = all_json[i]['图片'][0].upper() + all_json[i]['图片'][1:]
             all_json[i]['图片'] = all_json[i]['图片'].replace(' ', '_')
         if len(all_json[i]['迷你图片']) > 1:
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'][0].upper() + all_json[i]['迷你图片'][1:]
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'].replace(' ', '_')
-        if '图片地址' in all_json[i]:
-            all_json[i].pop('图片地址')
-        if '迷你图片地址' in all_json[i]:
-            all_json[i].pop('迷你图片地址')
 
         for j in unitpro_txt + unitpro_num:
             popit = []

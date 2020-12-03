@@ -145,7 +145,7 @@ def get_hero_data_from_txt(base_txt, ffile):
             break
 
 
-def fulfill_item_json(base_txt, all_json, version):
+def fulfill_item_json(base_txt, all_json, version,name_base):
     for ii in all_json:
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
@@ -159,12 +159,12 @@ def fulfill_item_json(base_txt, all_json, version):
             all_json[ii].pop('图片地址')
         if '迷你图片地址' in all_json[ii]:
             all_json[ii].pop('迷你图片地址')
-        md5 = hashlib.md5()
-        md5.update(all_json[ii]['图片'].encode('utf-8'))
-        all_json[ii]['图片地址'] = md5.hexdigest()
-        md5 = hashlib.md5()
-        md5.update(all_json[ii]['迷你图片'].encode('utf-8'))
-        all_json[ii]['迷你图片地址'] = md5.hexdigest()
+        all_json[ii]['曾用名'] = []
+        for namei in name_base:
+            if namei != '原生':
+                for namej in name_base[namei]:
+                    if name_base[namei][namej]['页面名'] == all_json[ii]['页面名']:
+                        all_json[ii]['曾用名'].append(namej)
         if '升级' in all_json[ii]:
             all_json[ii].pop('升级')
         for i in item_for_item:

@@ -17,12 +17,32 @@ def analyse_upload_json(text, upload_info):
         return ['《' + text + '》修改失败', 0]
 
 
+# 获得所有该单位的名字和曾用名的list
+def all_the_names(db):
+    relist = [db['页面名']]
+    if '曾用名' in db:
+        for i in db['曾用名']:
+            relist.append(i)
+    return relist
+
+
+def number_to_string(number, rr=4):
+    i = number
+    try:
+        if float(int(i)) == float(i):
+            return str(int(i))
+        else:
+            return str(round(i, rr))
+    except ValueError:
+        return str(i)
+
+
 def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x: ''):
     if k in numjsons:
         numjson = numjsons[k]
         retext = ''
         ii = 0
-        for ii in range(1,5):
+        for ii in range(1, 5):
             i = str(ii)
             if i in numjson:
                 if ii > 1:
@@ -36,14 +56,8 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
                     if j in numjson[i]:
                         if jj > 1:
                             retext += "/"
-                        try:
-                            if float(int(numjson[i][j])) == float(numjson[i][j]):
-                                retext += str(int(numjson[i][j]))
-                            else:
-                                retext += str(round(numjson[i][j],4))
-                            retext += post_each(numjsons[k])
-                        except ValueError:
-                            retext += str(numjson[i][j])
+                        retext += number_to_string(numjson[i][j])
+                        retext += post_each(numjsons[k])
                     else:
                         break
                 retext += post_group(numjson)
@@ -223,9 +237,8 @@ def create_upgrade_cooldown(arr):
             bool = [False, False, False]
             for j in range(2, 5):
                 bool[j - 2] = str(j) in v
-            retxt += '<div style="padding:0.5em 0.5em 0em 1em;cursor:help;" title="' + v[
-                '名称'] + '"><span style="cursor:help;" title="' \
-                     + v['1']['类型']['值'] + '">[[file:' + v['1']['类型']['图片'] + '|16px|link=]]</span> '
+            retxt += '<div style="padding:0.5em 0.5em 0em 1em;cursor:help;" title="' + v['名称'] + '"><span style="cursor:help;" title="' + v['1']['类型']['值'] + '">[[file:' + \
+                     v['1']['类型']['图片'] + '|16px|link=]]</span> '
             jj = 0
             while True:
                 jj += 1
@@ -233,7 +246,7 @@ def create_upgrade_cooldown(arr):
                 if j in v['1']:
                     if jj > 1:
                         retxt += '/'
-                    retxt += str(v['1'][j])
+                    retxt += number_to_string(v['1'][j])
                 else:
                     break
             if bool[0] or bool[1]:
@@ -250,8 +263,7 @@ def create_upgrade_cooldown(arr):
                                 retxt += '[[file:' + x['图片'] + '|x18px|link=' + x['名称'] + ']]'
                             else:
                                 break
-                        retxt += '<span style="cursor:help;" title="' + v[j]['类型']['值'] + '">[[file:' \
-                                 + v[j]['类型']['图片'] + '|16px|link=]]</span>'
+                        retxt += '<span style="cursor:help;" title="' + v[j]['类型']['值'] + '">[[file:' + v[j]['类型']['图片'] + '|16px|link=]]</span>'
                         kk = 0
                         while True:
                             kk += 1
@@ -260,7 +272,7 @@ def create_upgrade_cooldown(arr):
                                 x = v[j][k]
                                 if kk > 1:
                                     retxt += '/'
-                                retxt += str(x)
+                                retxt += number_to_string(x)
                             else:
                                 break
                 retxt += ')'
@@ -271,7 +283,7 @@ def create_upgrade_cooldown(arr):
 
 
 def create_upgrade_buff(json_dict):
-    buff_mech = {'技能免疫', '状态抗性', '无敌'}
+    buff_mech = ['技能免疫', '状态抗性', '无敌']
     retxt = '<div style="paddin:0.5em;"><table>'
     for i in range(1, 5):
         if str(i) in json_dict:
@@ -279,32 +291,27 @@ def create_upgrade_buff(json_dict):
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
                     retxt += '[[file:' + re.sub(r'talent.png', lambda x: 'talentb.png',
-                                                json_dict[str(i)]['升级来源'][j]['图片']) + '|x22px|link=' + \
-                             json_dict["名称"] + ']] '
+                                                json_dict[str(i)]['升级来源'][j]['图片']) + '|x22px|link=' + json_dict["名称"] + ']] '
             retxt += '</td><td style="padding:0.25em>'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
-                retxt += '<span style="cursor:help;" title="' + json_dict[str(i)]['值'] + '">[[file:' + \
-                         json_dict[str(i)]['图片'] + '|x22px|link=]]</span> '
+                retxt += '<span style="cursor:help;" title="' + json_dict[str(i)]['值'] + '">[[file:' + json_dict[str(i)]['图片'] + '|x22px|link=]]</span> '
             for j in buff_mech:
                 if json_dict[str(i)][j]['代码'] != 0:
-                    retxt += '<span style="cursor:help;" title="' + json_dict[str(i)][j]['简述'] + '">[[file:' + \
-                             json_dict[str(i)][j]['图片'] + '|x22px|link=]]</span> '
+                    retxt += '<span style="cursor:help;" title="' + json_dict[str(i)][j]['简述'] + '">[[file:' + json_dict[str(i)][j]['图片'] + '|x22px|link=]]</span> '
             retxt += json_dict['名称'] + ' '
             if json_dict[str(i)]['驱散']['代码'] != 0:
-                retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + \
-                         json_dict[str(i)]['驱散']['简述'] + '">' + json_dict[str(i)]['驱散']['值'] + '</span>'
+                retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + json_dict[str(i)]['驱散']['简述'] + '">' + \
+                         json_dict[str(i)]['驱散']['值'] + '</span>'
             for j in json_dict[str(i)]['叠加']:
                 if json_dict[str(i)]['叠加'][j]['代码1'] != 0:
-                    retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + \
-                             json_dict[str(i)]['叠加'][j]['来源'] + '来源' + json_dict[str(i)]['叠加'][j]['方式'] + '">' + \
-                             json_dict[str(i)]['叠加'][j]['方式'] + '</span>'
+                    retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + json_dict[str(i)]['叠加'][j]['来源'] + '来源' + \
+                             json_dict[str(i)]['叠加'][j]['方式'] + '">' + json_dict[str(i)]['叠加'][j]['方式'] + '</span>'
             for j in json_dict[str(i)]['标记']:
                 if json_dict[str(i)]['标记'][j]['代码'] != 0:
-                    retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + \
-                             json_dict[str(i)]['标记'][j]['值'] + '</span>'
+                    retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'
             if json_dict[str(i)]['生效从属']['代码'] > 1:
-                retxt += '<span class="ability_indicator" style="background:#009688;color:white;" title="' + \
-                         json_dict[str(i)]['生效从属']['简述'] + '">' + json_dict[str(i)]['生效从属']['值'] + '</span>'
+                retxt += '<span class="ability_indicator" style="background:#009688;color:white;" title="' + json_dict[str(i)]['生效从属']['简述'] + '">' + json_dict[str(i)]['生效从属'][
+                    '值'] + '</span>'
             for j in json_dict[str(i)]['生效目标']:
                 if len(json_dict[str(i)]['生效目标'][j]) > 0:
                     target_dict = json_dict[str(i)]['生效目标'][j]
@@ -348,7 +355,6 @@ def create_upgrade_buff(json_dict):
                         else:
                             break
                     retxt += '</span>'
-
             jj = 0
             while True:
                 jj += 1
@@ -363,12 +369,21 @@ def create_upgrade_buff(json_dict):
                 else:
                     break
             retxt += '</td></tr>'
+            jj = 0
+            while True:
+                jj += 1
+                j = str(jj)
+                if j in json_dict[str(i)]:
+                    if json_dict[str(i)][j]['简述'] != '':
+                        retxt += '<tr><td></td><td>' + json_dict[str(i)][j]['名称'] + '：' + json_dict[str(i)][j]['简述'] + '</td></tr>'
+                else:
+                    break
     retxt += '</table></div>'
     return retxt
 
 
 def create_upgrade_mech(json_dict):
-    mech_mech = {'技能窃取', '即时攻击'}
+    mech_mech = ['技能窃取', '即时攻击']
     retxt = '<div style="paddin:0.5em;"><table>'
     for ii in range(1, 5):
         i = str(ii)
@@ -522,7 +537,6 @@ def get_unit_value(array, post=''):
         return '无信息'
 
 
-
 def get_unit_upgrade_double(db1, db2, combine='~', post=''):
     retxt = ''
     for ii in range(1, 5):
@@ -539,7 +553,7 @@ def get_unit_upgrade_double(db1, db2, combine='~', post=''):
                 if j in db1[i]:
                     if jj > 1:
                         retxt += '/'
-                    retxt += str(db1[i][j]) + post
+                    retxt += number_to_string(db1[i][j]) + post
                 else:
                     break
             retxt += combine
@@ -550,7 +564,7 @@ def get_unit_upgrade_double(db1, db2, combine='~', post=''):
                 if j in db2[i]:
                     if jj > 1:
                         retxt += '/'
-                    retxt += str(db2[i][j]) + post
+                    retxt += number_to_string(db2[i][j]) + post
                 else:
                     break
     return retxt
@@ -583,7 +597,8 @@ def create_infobox_unit(db):
              + '</td></tr><tr><td ' + label + '>魔法值</td><td ' + data + '>' + create_upgrade_text(db, "魔法值") \
              + '</td></tr><tr><td ' + label + '>生命恢复</td><td ' + data + '>' + create_upgrade_text(db, "生命恢复") \
              + '</td></tr><tr><td ' + label + '>魔法恢复</td><td ' + data + '>' + create_upgrade_text(db, "魔法恢复") \
-             + '</td></tr><tr><td ' + label + '>攻击力<br/>（攻击类型）</td><td ' + data + '>' + get_unit_upgrade_double(db['攻击下限'], db['攻击上限'], '~') + '<br/>（' + create_upgrade_text(db, "攻击类型") \
+             + '</td></tr><tr><td ' + label + '>攻击力<br/>（攻击类型）</td><td ' + data + '>' + get_unit_upgrade_double(db['攻击下限'], db['攻击上限'], '~') + '<br/>（' + create_upgrade_text(db,
+                                                                                                                                                                              "攻击类型") \
              + '）</td></tr><tr><td ' + label + '>攻击距离+不中断距离</td><td ' + data + '>' + create_upgrade_text(db, "攻击距离") \
              + '+' + create_upgrade_text(db, "攻击距离缓冲") \
              + '</td></tr><tr><td ' + label + '>攻击前摇</td><td ' + data + '>' + create_upgrade_text(db, "攻击前摇") \
@@ -593,7 +608,7 @@ def create_infobox_unit(db):
              + '<br/>（' + create_upgrade_text(db, "护甲类型") \
              + '）</td></tr><tr><td ' + label + '>转身速率</td><td ' + data + '>' + create_upgrade_text(db, "转身速率") \
              + '</td></tr><tr><td ' + label + '>移动速度</td><td ' + data + '>' + create_upgrade_text(db, "移动速度") \
-             + '</td></tr><tr><td ' + label + '>魔法抗性</td><td ' + data + '>' + create_upgrade_text(db, "魔法抗性", lambda x:'%') \
+             + '</td></tr><tr><td ' + label + '>魔法抗性</td><td ' + data + '>' + create_upgrade_text(db, "魔法抗性", lambda x: '%') \
              + '</td></tr><tr><td ' + label + '>移动类型</td><td ' + data + '>' + create_upgrade_text(db, "移动方式") \
              + '</td></tr><tr><td ' + label + '>跟随距离</td><td ' + data + '>' + create_upgrade_text(db, "跟随距离") \
              + '</td></tr><tr><td ' + label + '>白天视野/夜晚视野</td><td ' + data + '>' + create_upgrade_text(db, "白天视野") \
@@ -636,9 +651,9 @@ def create_infobox_item(db):
         retxt += '<tr><td colspan=2 style="background:#222">[[file:' + db["图片"] + '|100px|center|link=' + db["页面名"] \
                  + ']]</td></tr><tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] + '</td></tr>' \
                  + '<tr><td colspan="2" style="border-bottom-width:0px;text-align:center;background:#c38a1c;padding:8px;font-size:16px;font-weight:bold;color:#fff;">[[file:Gold symbol.png|30px|link=]]&nbsp;' \
-                 + str(db['价格']['1']) + ''
+                 + number_to_string(db['价格']['1']) + ''
     if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
-        retxt += '<span style="margin-left:1em;">[[file:items recipe.png|24px|link=]]&nbsp;' + str(db['卷轴价格']['1']) + '</span>'
+        retxt += '<span style="margin-left:1em;">[[file:items recipe.png|24px|link=]]&nbsp;' + number_to_string(db['卷轴价格']['1']) + '</span>'
     retxt += '</td></tr>'
     for i, v in common_pro.items():
         if i in db:
@@ -647,10 +662,10 @@ def create_infobox_item(db):
             retxt += common_tag[0] + v[0] + common_tag[1]
     for i, v in normal_pro.items():
         if i in db:
-            retxt += normal_tag[0] + '+' + str(db[i]['1']) + v + normal_tag[1]
+            retxt += normal_tag[0] + '+' + number_to_string(db[i]['1']) + v + normal_tag[1]
     for i, v in nega_pro.items():
         if i in db:
-            retxt += normal_tag[0] + '-' + str(db[i]['1']) + v + normal_tag[1]
+            retxt += normal_tag[0] + '-' + number_to_string(db[i]['1']) + v + normal_tag[1]
     if '升级' in db:
         retxt += '<tr><td colspan=2 style="background:#a03030;padding:4px;text-align:center;">' + '可合成</td></tr><tr><td colspan=2 style="background:#222;padding:6px;">'
         for i, v in db['升级'].items():
@@ -664,8 +679,8 @@ def create_infobox_item(db):
             if int(i) % 4 == 1 and int(i) > 1:
                 retxt += '<br/><br/>'
             retxt += ' [[file:' + v["图片"] + '|48px|link=' + v["物品名"] + ']] '
-            if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
-                retxt += ' [[file:items recipe.png|48px|link=]] '
+        if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
+            retxt += ' [[file:items recipe.png|48px|link=]] '
         retxt += '</td></tr>'
     retxt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel" style="padding-left:0.25em">\'\'\' [[' + db["页面名"] + '|P]]  [[data:' + db[
         "页面名"] + '.json|J]] \'\'\'</div><div style="float:right;color:#000;padding-right:0.25em">' + db['代码名'] + '</div></td></tr></table>'
@@ -673,7 +688,7 @@ def create_infobox_item(db):
 
 
 def create_role_set(role, level):
-    retxt = '<div style="margin:auto;display:inline-block" title="' + str(level) + '级' + str(role) + '">[[file:'
+    retxt = '<div style="margin:auto;display:inline-block" title="' + number_to_string(level) + '级' + number_to_string(role) + '">[[file:'
     if role == '核心':
         retxt += 'carry'
     elif role == '爆发':
@@ -772,11 +787,11 @@ def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
                         for k, x in w.items():
                             showit = False
                             for l in range(2, len(x)):
-                                if x[0] == name:
+                                if x[0] != '' and x[0] in name:
                                     showit = True
                                 else:
                                     for m in range(len(x[l]['目标'])):
-                                        showit = showit and x[l]['目标'][m] == name
+                                        showit = showit and x[l]['目标'][m] in name
                                 if showit:
                                     now += 1
                                     if current_ul == 0:
@@ -796,7 +811,7 @@ def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
                 for m in range(current_ul):
                     retxt += '</ul>'
     if limit > 0:
-        retxt += '<b>[[' + name + '/版本改动|完整的更新内容请点此处查看……]]</b>'
+        retxt += '<b>[[' + name[0] + '/版本改动|完整的更新内容请点此处查看……]]</b>'
     return retxt
 
 
@@ -853,7 +868,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
         else:
             break
     retxt += '<h2>历史更新</h2>' \
-             + create_2nd_logs(json_base, log_base, log_list, db["页面名"], 10) \
+             + create_2nd_logs(json_base, log_base, log_list, all_the_names(db), 10) \
              + '<h2>饰品</h2>' \
              + '[[data:' + db["中文名"] + '/equipment|点击进入查看饰品信息]]' \
              + '{{navbox|title=DotA中的英雄|name=navboxhero|basestyle=max-width:800px;text-align:center;line-height:2em;' \
@@ -911,7 +926,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
             retxt += create_page_ability(json_base['技能'][db['技能'][i]])
         else:
             break
-    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, db["页面名"], 10) \
+    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db), 10) \
              + '<div>{{navbox|title=DotA中的非英雄单位|name=navbox minion' + create_navboxunit(json_base) + '}}</div>[[分类:非英雄单位]]'
     rere = ''
     nums = 0
@@ -956,7 +971,7 @@ def create_page_item(json_base, log_base, log_list, item):
             retxt += create_page_ability(json_base['技能'][db['技能'][i]])
         else:
             break
-    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, db["页面名"], 10) + '[[分类:物品]]'
+    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db), 10) + '[[分类:物品]]'
     rere = ''
     nums = 0
     for i in range(len(retxt)):
