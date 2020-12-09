@@ -52,6 +52,19 @@ def version_sort(version_json,version_list):
                 rejson[log_name]=version_json[log_name]
     return rejson
 
+def one_version_name_sort(version_json):
+    keys = []
+    new = {}
+    p = Pinyin()
+    for i in version_json:
+        if i!='0':
+            keys.append([p.get_pinyin(version_json[i][0]), i])
+    keys = sorted(keys, key=lambda x: x[0])
+    new['0']=version_json['0']
+    for i in range(len(keys)):
+        new[str(i+1)] = version_json[keys[i][1]]
+    return new
+
 edit_source = {
     '英雄': ['英雄'],
     '物品': ['物品'],

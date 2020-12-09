@@ -42,6 +42,7 @@ class Main(QMainWindow):
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
         self.image_url = 'https://huiji-public.huijistatic.com/dota/uploads'
         self.seesion = requests.session()
+        self.header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36 Edg/87.0.664.55'}
         self.get_login_token_data = {'action': 'query', 'meta': 'tokens', 'type': 'login', 'format': 'json'}
         self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'https://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
         self.get_csrf_token_data = {'action': 'query', 'meta': 'tokens', 'format': 'json'}
@@ -74,8 +75,7 @@ class Main(QMainWindow):
         # 设定软件的图标
         self.setWindowIcon(self.icon)
         # 设定窗口大小、位置至0.8倍屏幕长宽，且边缘为0.1倍长宽
-        self.setGeometry(self.screen_size[0] * 0.05, self.screen_size[1] * 0.1, self.screen_size[0] * 0.9,
-                         self.screen_size[1] * 0.8)
+        self.setGeometry(self.screen_size[0] * 0.05, self.screen_size[1] * 0.1, self.screen_size[0] * 0.9, self.screen_size[1] * 0.8)
         # 创建一个菜单栏
         self.create_menubar()
         self.main_layout()
@@ -153,7 +153,7 @@ class Main(QMainWindow):
         tryi = 0
         while True:
             # 获取登录令牌
-            login_token = self.seesion.post(self.target_url, data=self.get_login_token_data)
+            login_token = self.seesion.post(self.target_url, data=self.get_login_token_data, headers=self.header)
             # 使用登录令牌登录
             if login_token.status_code == 200:
                 login_token_json = login_token.json()
@@ -162,13 +162,12 @@ class Main(QMainWindow):
             else:
                 tryi += 1
                 time.sleep(1)
-                if tryi % 10 == 0:
-                    QMessageBox.critical(self, '登录遭遇阻碍', '暂时登录失败，已尝试' + str(tryi) + '次！')
+                QMessageBox.critical(self, '登录遭遇阻碍', '暂时登录失败，已尝试' + str(tryi) + '次！错误代码：' + str(login_token.status_code))
         self.login_data['username'] = password['用户名']
         self.login_data['password'] = password['密码']
         tryi = 0
         while True:
-            login_info = self.seesion.post(self.target_url, data=self.login_data)
+            login_info = self.seesion.post(self.target_url, data=self.login_data, headers=self.header)
             # 判断登录效果
             if login_info.status_code != 200 or login_info.json()["clientlogin"]["status"] == "FAIL":
                 tryi += 1
@@ -187,7 +186,7 @@ class Main(QMainWindow):
                             kwargs['window'].close()
                     break
             else:
-                self.csrf_token = self.seesion.post(self.target_url, data=self.get_csrf_token_data).json()['query']['tokens']['csrftoken']
+                self.csrf_token = self.seesion.post(self.target_url, data=self.get_csrf_token_data, headers=self.header).json()['query']['tokens']['csrftoken']
                 self.login_success(True, username=login_info.json()["clientlogin"]["username"], password=password['密码'])
                 if window:
                     kwargs['window'].close()
@@ -231,7 +230,7 @@ class Main(QMainWindow):
 
     # 登出
     def logout(self):
-        logout_info = self.seesion.post(self.target_url, data=self.logout_data)
+        logout_info = self.seesion.post(self.target_url, data=self.logout_data, headers=self.header)
         self.login_success(False)
 
     # 登出
@@ -498,7 +497,7 @@ class Main(QMainWindow):
         if pagename[-5:] != '.json':
             pagename += '.json'
         download_data = {'action': 'jsondata', 'title': pagename, 'format': 'json'}
-        download_info = self.seesion.post(self.target_url, data=download_data)
+        download_info = self.seesion.post(self.target_url, data=download_data, headers=self.header)
         time.sleep(0.01)
         return download_info.json()['jsondata']
 
@@ -508,14 +507,14 @@ class Main(QMainWindow):
 
     def download_json_name(self):
         for i in self.json_name:
-            temp = self.seesion.post(self.target_url,
+            temp = self.seesion.post(self.target_url, headers=self.header,
                                      data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|' + i + '}}', 'contentmodel': 'wikitext', 'prop': 'text',
                                            'disablelimitreport': 'false', 'format': 'json'}).json()['parse']['text']['*']
             texttemp = re.sub('<.*?>', '', temp)[:-1]
             tempjson = json.loads(texttemp)
             self.json_name.update(tempjson)
-        print(self.json_name)
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
+        QMessageBox.information(self, '下载完成', '请继续操作')
 
     def download_name_base(self):
         self.name_base = self.download_json('name_base.json')
@@ -530,9 +529,10 @@ class Main(QMainWindow):
     def download_mech(self):
         self.mech = self.download_json('机制检索.json')
         self.file_save(os.path.join('database', 'mech.json'), json.dumps(self.mech))
+        QMessageBox.information(self, '下载完成', '请继续操作')
 
     def download_and_upload_wiki_menu(self):
-        wiki_result = self.seesion.post(self.target_url,
+        wiki_result = self.seesion.post(self.target_url, headers=self.header,
                                         data={'action': 'jsondata', 'title': '机制.json', 'format': 'json'}).json()
         wiki_menu = dota_menus.menu_init(wiki_result['jsondata'])
         for i in self.json_base['英雄']:
@@ -626,7 +626,7 @@ class Main(QMainWindow):
             self.local.target_url = self.target_url
             self.local.k = 0
             while True:
-                self.local.download_info = self.local.seesion.post(self.local.target_url, data=self.local.download_data)
+                self.local.download_info = self.local.seesion.post(self.local.target_url, headers=self.header, data=self.local.download_data)
                 self.lock.acquire()
                 if self.local.download_info.status_code == 200:
                     try:
@@ -649,7 +649,7 @@ class Main(QMainWindow):
                         self.current_num[0] += 1
                         break
                     finally:
-                        time.sleep(0.03)
+                        time.sleep(0.05)
                         self.lock.release()
                 else:
                     self.local.k += 1
@@ -921,6 +921,10 @@ class Main(QMainWindow):
         self.versionlayout['版本列表']['横排版']['竖排版']['软件内更新'] = QPushButton('软件内更新', self)
         self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['软件内更新'])
         self.versionlayout['版本列表']['横排版']['竖排版']['软件内更新'].clicked.connect(self.version_edit_loop_update)
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(1)
+        self.versionlayout['版本列表']['横排版']['竖排版']['群体整理后上传'] = QPushButton('群体整理后上传', self)
+        self.versionlayout['版本列表']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本列表']['横排版']['竖排版']['群体整理后上传'])
+        self.versionlayout['版本列表']['横排版']['竖排版']['群体整理后上传'].clicked.connect(self.update_and_upload_all_version)
         self.versionlayout['版本列表']['横排版']['竖排版'][0].addStretch(5)
 
         self.versionlayout['版本内容'] = {0: QGroupBox('版本内容', self)}
@@ -939,6 +943,9 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['下载'] = QPushButton('下载', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['下载'])
         self.versionlayout['版本内容']['横排版']['竖排版']['下载'].clicked.connect(self.download_one_version)
+        self.versionlayout['版本内容']['横排版']['竖排版']['保存'] = QPushButton('保存', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['保存'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['保存'].clicked.connect(self.save_one_version)
         self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'] = QPushButton('保存并上传', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'])
         self.versionlayout['版本内容']['横排版']['竖排版']['保存并上传'].clicked.connect(lambda: self.upload_one_version(True))
@@ -1151,6 +1158,7 @@ class Main(QMainWindow):
         self.upload_json('text_base.json', self.text_base)
         self.upload_json('json_name.json', self.json_name)
         self.upload_json('name_base.json', self.name_base)
+        self.upload_json('图片链接.json', self.name_create_tree_list_name())
         QMessageBox.information(self, "上传完成", '已经上传完毕基础文件')
 
     def upload_all(self, chosen=''):
@@ -1221,7 +1229,7 @@ class Main(QMainWindow):
     def download_one_image(self, owner_name, image_name):
         k = 0
         while True:
-            download_info = self.seesion.get(self.get_the_wiki_image_with_hashmd5(image_name))
+            download_info = self.seesion.post(self.get_the_wiki_image_with_hashmd5(image_name), headers=self.header)
             if download_info.status_code == 200:
                 with open(os.path.join('material_lib', image_name), "wb") as f:
                     f.write(download_info.content)
@@ -1327,7 +1335,7 @@ class Main(QMainWindow):
         download_data = {'action': 'jsondata', 'title': pagename, 'format': 'json'}
         k = 0
         while True:
-            download_info = self.seesion.post(self.target_url, data=download_data)
+            download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
             if download_info.status_code == 200:
                 download_content = download_info.json()
                 if 'jsondata' in download_content and self.check_dict_equal(download_content['jsondata'], content):
@@ -1345,7 +1353,7 @@ class Main(QMainWindow):
             upload_data['bot'] = 1
         k = 0
         while True:
-            upload_info = self.seesion.post(self.target_url, data=upload_data)
+            upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
             if upload_info.status_code == 200:
                 upload_info_json = upload_info.json()
                 break
@@ -1369,7 +1377,7 @@ class Main(QMainWindow):
         download_data = {'action': 'parse', 'prop': 'wikitext', 'page': pagename, 'format': 'json'}
         k = 0
         while True:
-            download_info = self.seesion.post(self.target_url, data=download_data)
+            download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
             if download_info.status_code == 200:
                 download_content = download_info.json()
                 if 'error' in download_content:
@@ -1387,7 +1395,7 @@ class Main(QMainWindow):
             upload_data['bot'] = 1
         k = 0
         while True:
-            upload_info = self.seesion.post(self.target_url, data=upload_data)
+            upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
             if upload_info.status_code == 200:
                 upload_info_json = upload_info.json()
                 break
@@ -2123,7 +2131,7 @@ class Main(QMainWindow):
             text = item.text(0)
             title = item.parent().text(0) + '/' + text
         download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
-        download_info = self.seesion.post(self.target_url, data=download_data)
+        download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
         if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
             messageBox = QMessageBox(QMessageBox.Critical, "下载失败", "网络上没有这个版本更新的库，请问是否自行创建？", QMessageBox.NoButton,
                                      self)
@@ -2152,22 +2160,34 @@ class Main(QMainWindow):
                     title = self.version_list['版本'][i][j]
                 else:
                     title = self.version_list['版本'][i][0] + '/' + self.version_list['版本'][i][j]
-                download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
-                download_info = self.seesion.post(self.target_url, data=download_data)
-                if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
-                    self.w.addtext([self.version_list['版本'][i][j] + '版本json不存在。', 0], i)
-                    QApplication.processEvents()
-                    time.sleep(0.1)
-                else:
-                    self.version_base[title] = download_info.json()['jsondata']
-                    if j == 0:
-                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).setBackground(0, self.green)
+                k = 0
+                while True:
+                    download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
+                    download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
+                    if download_info.status_code == 200:
+                        try:
+                            download_info_json = download_info.json()
+                            if 'error' in download_info_json and download_info_json['error']['code'] == 'invalidtitle':
+                                self.w.addtext([self.version_list['版本'][i][j] + '版本json不存在。', 0], i)
+                            else:
+                                self.version_base[title] = download_info_json['jsondata']
+                                if j == 0:
+                                    self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).setBackground(0, self.green)
+                                else:
+                                    self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j - 1).setBackground(0, self.green)
+                                self.w.addtext([title + '版本json下载保存成功。', 1], i)
+                            time.sleep(0.1)
+                            QApplication.processEvents()
+                            break
+                        except:
+                            k += 1
+                            self.w.addtext([title + '版本json下载暂时出现了失败。已尝试' + k + '次，正在重新尝试', 2], i)
                     else:
-                        self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j - 1).setBackground(0,
-                                                                                                           self.green)
-                    self.w.addtext([title + '版本json下载保存成功。', 1], i)
-                    QApplication.processEvents()
-                    time.sleep(0.1)
+                        k += 1
+                        self.w.addtext([title + '版本json下载暂时出现了失败。已尝试' + k + '次，正在重新尝试', 2], i)
+                        if k > 10:
+                            self.w.addtext([title + '版本json下载失败。请重新检查网络后重新下载', 0], i)
+                            break
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         QMessageBox.information(self, '下载成功', '所有版本号已经下载并保存完毕。')
 
@@ -2189,7 +2209,7 @@ class Main(QMainWindow):
                         time.sleep(0.1)
                         QApplication.processEvents()
 
-    def upload_one_version(self, bool=True):
+    def version_save_the_version(self):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
         if item.parent() == None:
             title = item.text(0)
@@ -2201,51 +2221,96 @@ class Main(QMainWindow):
             if items.itemtype == 'text':
                 self.version_base[title][items.text(0)] = items.text(1)
             elif items.background(1) == self.green:
-                self.version_base[title][items.text(0)] = self.version_tree_to_json(items)
+                self.version_base[title][items.text(0)] = edit_json.one_version_name_sort(self.version_tree_to_json(items))
         if item.parent() == None:
             self.version_base[title]['次级版本'] = []
             for i in range(item.childCount()):
                 self.version_base[title]['次级版本'].append(item.text(0) + '/' + item.child(i).text(0))
-        self.upload_json(title + '.json', self.version_base[title])
-        self.upload_page(title, '{{版本更新}}')
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
-        if bool:
+        return title
+
+    def save_one_version(self):
+        self.version_save_the_version()
+        self.complex_json_to_version_tree()
+        QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
+
+    def upload_one_version(self, bools=True):
+        title = self.version_save_the_version()
+        self.upload_json(title + '.json', self.version_base[title])
+        self.upload_page(title, common_page.create_page_logs(title, self.version_base[title], self.version_list['版本'], self.name_create_tree_list_name()))
+        if bools:
             self.complex_json_to_version_tree()
-            QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
+        QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
+
+    def update_and_upload_all_version(self):
+        self.w = upload_text('开始上传数据')
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+        self.w.setWindowIcon(self.icon)
+        self.w.setWindowTitle('上传version中……')
+        QApplication.processEvents()
+        all_upload = []
+        all_upload_page=[]
+        name_upload_base = self.name_create_tree_list_name()
+        for i in self.version_base:
+            for j in self.version_base[i]:
+                if isinstance(self.version_base[i][j], dict):
+                    self.version_base[i][j] = edit_json.one_version_name_sort(self.version_base[i][j])
+            all_upload.append([i + '.json', self.version_base[i]])
+            if i in self.version_base:
+                all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'], name_upload_base)])
+        num1 = len(all_upload)
+        num2=len(all_upload_page)
+        self.w.confirm_numbers(num1+num2)
+        for i in range(num1):
+            self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1], True), i)
+            QApplication.processEvents()
+        for i in range(num2):
+            self.w.addtext(self.upload_page(all_upload_page[i][0], all_upload_page[i][1], True), i+num1)
+            QApplication.processEvents()
+        self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+        QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
     def version_tree_to_json(self, item):
         re = {}
         for i in range(item.childCount()):
+            ii = str(len(re))
             item1 = item.child(i)
             if i == 0:
-                re[str(i)] = ['', '']
+                re[ii] = ['', '']
             else:
-                re[str(i)] = [item1.text(0), item1.text(1)]
+                repeat = False
+                for j in range(1, len(re)):
+                    if item1.text(0) == item.child(j).text(0):
+                        ii = str(j)
+                        repeat = True
+                        break
+                if not repeat:
+                    re[ii] = [item1.text(0), item1.text(1)]
             for j in range(item1.childCount()):
                 item2 = item1.child(j).child(1)
                 item3 = item1.child(j).child(2)
-                index = len(re[str(i)])
-                re[str(i)].append({'序列级数': 1, '文字': [], '目标': []})
+                index = len(re[ii])
+                while True:
+                    if index > 2 and re[ii][index - 1]['文字'] == '':
+                        index -= 1
+                        re[ii].pop(index)
+                    else:
+                        break
+                re[ii].append({'序列级数': 1, '文字': '', '目标': []})
                 item0 = item1.child(j).child(0)
                 try:
-                    re[str(i)][index]['序列级数'] = int(item0.itemvalue)
+                    re[ii][index]['序列级数'] = int(item0.itemvalue)
                 except ValueError:
-                    QMessageBox.critical(self, '错误的序列级数',
-                                         '您的【' + item1.text(0) + '】中的【' + item1.child(j).text(0) + '】的第' + str(
-                                             j) + '个序列级数不为正整数，请修改！')
+                    QMessageBox.critical(self, '错误的序列级数', '您的【' + item1.text(0) + '】中的【' + item1.child(j).text(0) + '】的第' + str(j) + '个序列级数不为正整数，请修改！')
                     while True:
                         text, ok = MoInputWindow.getInt(self, "序列级数", '请输入一个正整数，否则会报错')
                         if ok:
-                            re[str(i)][index]['序列级数'] = text
-                re[str(i)][index]['文字'] = item2.text(1)
-                if re[str(i)][index]['文字'][2:5] == '级天赋':
-                    temp = item1.text(0) + re[str(i)][index]['文字'][:5]
-                    re[str(i)][index]['目标'].append(temp)
-                    re[str(i)][index]['文字'] = re[str(i)][index]['文字'].replace(re[str(i)][index]['文字'][:5],
-                                                                              '{{A|' + temp + '}}')
+                            re[ii][index]['序列级数'] = text
+                            break
+                re[ii][index]['文字'] = item2.text(1)
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
-                    re[str(i)][index]['目标'].append(item4.text(1))
+                    re[ii][index]['目标'].append(item4.text(1))
         return re
 
     def create_one_version(self):
@@ -2367,7 +2432,13 @@ class Main(QMainWindow):
 
     def version_item_double_clicked(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
-        if item.hasvalue:
+        if item.background(1) == self.green:
+            self.version_button_tree1_add_tree2()
+            item.setExpanded(False)
+        elif item.background(1) == self.red:
+            self.version_button_tree1()
+            item.setExpanded(False)
+        elif item.hasvalue:
             self.version_edit_change_value()
 
     def version_edit_change_value(self):
@@ -2417,8 +2488,7 @@ class Main(QMainWindow):
             item.setBackground(1, self.green)
             item.setExpanded(True)
         elif item.background(1) == self.green:
-            clickb = QMessageBox.critical(self, '禁用大分类', '您正试图禁用【' + item.text(0) + '】分类！',
-                                          QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            clickb = QMessageBox.critical(self, '禁用大分类', '您正试图禁用【' + item.text(0) + '】分类！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if clickb == QMessageBox.Yes:
                 while item.childCount() > 0:
                     item.removeChild(item.child(0))
@@ -2435,11 +2505,9 @@ class Main(QMainWindow):
             item.setExpanded(True)
             for i in range(item.childCount() - 1):
                 tempi = item.child(i)
-                if tempi.childCount() > 1:
-                    tempj = tempi.child(tempi.childCount() - 1)
-                    if tempj.child(1).text(0) == '文字' and tempj.child(1).text(1) == '':
-                        tempi.removeChild(tempj)
                 tempi.setExpanded(False)
+            item.removeChild(new)
+            item.insertChild(1, new)
             self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new)
             self.version_button_tree2_add_tree_list()
             new.setExpanded(True)
@@ -2654,6 +2722,7 @@ class Main(QMainWindow):
     def name_save_and_upload_name_json(self):
         self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
         self.upload_json('name_base.json', self.name_base)
+        self.upload_json('图片链接.json', self.name_create_tree_list_name())
         QMessageBox.information(self, "上传完成", '已经保存并上传name_base')
 
     def name_delete_one_old_name(self):
@@ -2667,6 +2736,13 @@ class Main(QMainWindow):
             self.name_initial_name_base()
             QMessageBox.information(self, "删除完成", '已经删除对应的【' + name + '】→【' + page_name + '】')
 
+    def name_create_tree_list_name(self):
+        redict = {}
+        for i in self.name_base:
+            for j in self.name_base[i]:
+                redict[j] = [self.name_base[i][j]['页面名'], self.name_base[i][j]['图片'], self.name_base[i][j]['迷你图片']]
+        return redict
+
     def test_inputwindow(self):
         print(MoInputWindow.get_item_and_content(self, [1, 2, 3, 4, 5, 6, 7, 8, 9, 0], ['int', 'number']))
 
@@ -2678,7 +2754,7 @@ class upload_text(QWidget):
         self.l = QVBoxLayout()
         self.l.addWidget(self.b)
         self.setLayout(self.l)
-        self.success = [0, 0]
+        self.success = [0, 0, 0]
         thread = threading.Thread(target=self.addtext, args=([first_txt, 0],))
         thread.start()
         self.show()
@@ -2731,6 +2807,7 @@ class TreeItemEdit(QTreeWidgetItem):
         self.haslist = True
         self.listtype = copy.deepcopy(l)
         self.listtype[3] = 0
+
 
 
 class VersionItemEdit(QTreeWidgetItem):

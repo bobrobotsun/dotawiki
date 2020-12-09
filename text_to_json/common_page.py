@@ -770,6 +770,85 @@ def create_navboxunit(json_base):
     return retxt
 
 
+def create_page_logs(title, log_base, log_list, name_base):
+    retxt = '<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;"><tr><th colspan=2>' + title + '</th></tr>' + '<tr><td>游戏本体</td><td>' + \
+            log_base['游戏本体'] + '</td></tr>' + '<tr><td>更新日期</td><td>' + log_base['更新日期'] + '</td></tr>'
+    if log_base['地图作者'] != '':
+        retxt += '<tr><td>作者</td><td>' + log_base['地图作者'] + '</td></tr>'
+    junior = False
+    bools = False
+    index_of_upgrade = -1
+    for i in range(len(log_list)):
+        v = log_list[i]
+        for j in range(len(v)):
+            w = v[j]
+            if title == w:
+                index_of_upgrade = i
+                bools = True
+                break
+            if title == v[0] + '/' + w:
+                index_of_upgrade = i
+                junior = True
+                bools = True
+                break
+        if bools:
+            break
+    if index_of_upgrade == -1:
+        return '请前往[[data:版本更新.json]]添加当前版本号，以方便确认其前后版本。'
+    else:
+        if not junior:
+            if index_of_upgrade == 0:
+                retxt += '<tr><td colspan=2>当前版本为可考的最古老版本</td></tr>'
+            else:
+                retxt += '<tr><td>上一版本</td><td>[[' + log_list[index_of_upgrade - 1][0] + ']]</td></tr>'
+            if index_of_upgrade == len(log_list)-1:
+                retxt += '<tr><td colspan=2>当前版本为最新版本</td></tr>'
+            else:
+                retxt += '<tr><td>下一版本</td><td>[[' + log_list[index_of_upgrade + 1][0] + ']]</td></tr>'
+    if '次级版本' in log_base and len(log_base['次级版本']) > 0:
+        retxt += '<tr><td>小更新</td><td>'
+        for i in range(len(log_base['次级版本'])):
+            if i > 0:
+                retxt += '<br/>'
+            retxt += '[[' + log_base['次级版本'][i] + ']]'
+    if '官网链接' in log_base and log_base['官网链接'] != ''and log_base['官网链接'] != '-':
+        retxt += '<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
+    retxt += '<tr><td colspan=2 style="text-align:right;font-size:85%">[[data:' + title + '.json|<i class="fa fa-database" aria-hidden="true"></i>]]</td></tr></table>'
+    table_name = ['英雄', "物品", "中立生物", "建筑", "兵线", "通用", "其他内容"]
+    for i in range(len(table_name)):
+        if table_name[i] in log_base:
+            v = log_base[table_name[i]]
+            if isinstance(v, dict) and '0' in v:
+                retxt += '<h2>' + table_name[i] + '</h2>'
+                for j, w in v.items():
+                    if w[0] != '':
+                        retxt += '<h3>'
+                        if w[1] != '':
+                            retxt += '[[file:' + w[1] + '|x36px|link=]][[' + w[0] + ']]</h3>'
+                        else:
+                            if w[0] in name_base:
+                                retxt += '[[file:' + name_base[w[0]][2] + '|x36px|link=]][[' + name_base[w[0]][0] + '|' + w[0] + ']]</h3>'
+                            else:
+                                retxt += w[0] + '</h3>'
+                    current_ul = 0
+                    for k in range(2, len(w)):
+                        x = w[k]
+                        if x['文字'] != '':
+                            if x['序列级数'] > current_ul:
+                                for l in range(int(x['序列级数']) - current_ul):
+                                    retxt += '<ul>'
+                                current_ul = int(x['序列级数'])
+                            elif x['序列级数'] < current_ul:
+                                for l in range(current_ul - int(x['序列级数'])):
+                                    retxt += '</ul>'
+                                current_ul = int(x['序列级数'])
+                            retxt += '<li>' + x['文字'] + '</li>'
+                    for l in range(current_ul):
+                        retxt += '</ul>'
+    retxt += '[[分类:版本更新]]'
+    return retxt
+
+
 def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
     now = 0
     retxt = ''
@@ -792,6 +871,7 @@ def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
                                 else:
                                     for m in range(len(x[l]['目标'])):
                                         showit = showit and x[l]['目标'][m] in name
+                                showit = showit and x[l]['文字'] != ''
                                 if showit:
                                     now += 1
                                     if current_ul == 0:

@@ -2,7 +2,7 @@ import json,math
 from text_to_json import edit_json
 
 target_url = 'https://dota.huijiwiki.com/w/api.php'
-
+headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36 Edg/87.0.664.55'}
 
 def analyse_upload_json(text, upload_info):
     upload_info_json = upload_info.json()
@@ -78,7 +78,7 @@ def ability_cast_point_and_backswing(seesion, json_base, csrf_token):
     retxt += '</table>'
     upload_data = {'action': 'edit', 'title': '施法前摇和后摇', 'text': retxt, 'format': 'json',
                    'token': csrf_token}
-    upload_info = seesion.post(target_url, data=upload_data)
+    upload_info = seesion.post(target_url,headers=headers, data=upload_data)
     return analyse_upload_json('施法前摇和后摇', upload_info)
 
 def calculate_armor_number_to_physical_resistance_percentage(armor):
@@ -114,5 +114,5 @@ def armor_physic_resistance_page148237(seesion, csrf_token):
         retxt+='</tr>'
     retxt+='</table>{{reflist}}'
     upload_data = {'action': 'edit', 'title': '护甲/物理抗性表格', 'text': retxt, 'format': 'json','token': csrf_token}
-    upload_info = seesion.post(target_url, data=upload_data)
+    upload_info = seesion.post(target_url,headers=headers, data=upload_data)
     return analyse_upload_json('护甲/物理抗性表格', upload_info)
