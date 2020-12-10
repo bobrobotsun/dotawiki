@@ -65,6 +65,28 @@ def one_version_name_sort(version_json):
         new[str(i+1)] = version_json[keys[i][1]]
     return new
 
+def special_sort_dict_by_pinyin(version_json,sortfun=lambda x,y:x[y]):
+    keys = []
+    new = {}
+    p = Pinyin()
+    for i in version_json:
+        keys.append([p.get_pinyin(sortfun(version_json,i)), i])
+    keys = sorted(keys, key=lambda x: x[0])
+    for i in keys:
+        new[i[1]] = version_json[i[1]]
+    return new
+
+def special_sort_list_by_pinyin(version_json,sortfun=lambda x,y:x[y]):
+    keys = []
+    new = []
+    p = Pinyin()
+    for i in range(len(version_json)):
+        keys.append([p.get_pinyin(sortfun(version_json,i)), i])
+    keys = sorted(keys, key=lambda x: x[0])
+    for i in keys:
+        new.append(version_json[i[1]])
+    return new
+
 edit_source = {
     '英雄': ['英雄'],
     '物品': ['物品'],

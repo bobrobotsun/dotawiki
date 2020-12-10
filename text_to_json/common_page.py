@@ -801,7 +801,7 @@ def create_page_logs(title, log_base, log_list, name_base):
                 retxt += '<tr><td colspan=2>当前版本为可考的最古老版本</td></tr>'
             else:
                 retxt += '<tr><td>上一版本</td><td>[[' + log_list[index_of_upgrade - 1][0] + ']]</td></tr>'
-            if index_of_upgrade == len(log_list)-1:
+            if index_of_upgrade == len(log_list) - 1:
                 retxt += '<tr><td colspan=2>当前版本为最新版本</td></tr>'
             else:
                 retxt += '<tr><td>下一版本</td><td>[[' + log_list[index_of_upgrade + 1][0] + ']]</td></tr>'
@@ -811,7 +811,7 @@ def create_page_logs(title, log_base, log_list, name_base):
             if i > 0:
                 retxt += '<br/>'
             retxt += '[[' + log_base['次级版本'][i] + ']]'
-    if '官网链接' in log_base and log_base['官网链接'] != ''and log_base['官网链接'] != '-':
+    if '官网链接' in log_base and log_base['官网链接'] != '' and log_base['官网链接'] != '-':
         retxt += '<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
     retxt += '<tr><td colspan=2 style="text-align:right;font-size:85%">[[data:' + title + '.json|<i class="fa fa-database" aria-hidden="true"></i>]]</td></tr></table>'
     table_name = ['英雄', "物品", "中立生物", "建筑", "兵线", "通用", "其他内容"]
@@ -824,10 +824,13 @@ def create_page_logs(title, log_base, log_list, name_base):
                     if w[0] != '':
                         retxt += '<h3>'
                         if w[1] != '':
-                            retxt += '[[file:' + w[1] + '|x36px|link=]][[' + w[0] + ']]</h3>'
+                            retxt += '[[file:' + w[1] + '|x36px|link=' + w[0] + ']][[' + w[0] + ']]</h3>'
                         else:
                             if w[0] in name_base:
-                                retxt += '[[file:' + name_base[w[0]][2] + '|x36px|link=]][[' + name_base[w[0]][0] + '|' + w[0] + ']]</h3>'
+                                for k in name_base[w[0]]:
+                                    if k[2] != '':
+                                        retxt += '[[file:' + k[2] + '|x36px|link=' + k[0] + ']]'
+                                retxt += '[[' + name_base[w[0]][0][0] + '|' + w[0] + ']]</h3>'
                             else:
                                 retxt += w[0] + '</h3>'
                     current_ul = 0

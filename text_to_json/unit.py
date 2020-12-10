@@ -81,10 +81,10 @@ def fulfill_unit_json(base_txt, all_json, version,name_base):
         all_json[i]["应用"] = 1
         all_json[i]['曾用名'] = []
         for namei in name_base:
-            if namei != '原生':
+            if namei != all_json[i]['页面名']:
                 for namej in name_base[namei]:
-                    if name_base[namei][namej]['页面名'] == all_json[i]['页面名']:
-                        all_json[i]['曾用名'].append(namej)
+                    if namej[0] == all_json[i]['页面名']:
+                        all_json[i]['曾用名'].append(namei)
         if len(all_json[i]['图片']) > 1:
             all_json[i]['图片'] = all_json[i]['图片'][0].upper() + all_json[i]['图片'][1:]
             all_json[i]['图片'] = all_json[i]['图片'].replace(' ', '_')

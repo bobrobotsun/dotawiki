@@ -153,10 +153,10 @@ def fulfill_hero_json(base_txt, all_json, version,name_base):
             all_json[i]['后摇空闲']=round(all_json[i]['攻击间隔']['1']-all_json[i]['总前后摇'],3)
             all_json[i]['曾用名']=[]
             for namei in name_base:
-                if namei!='原生':
+                if namei!=all_json[i]['页面名']:
                     for namej in name_base[namei]:
-                        if name_base[namei][namej]['页面名']==all_json[i]['页面名']:
-                            all_json[i]['曾用名'].append(namej)
+                        if namej[0]==all_json[i]['页面名']:
+                            all_json[i]['曾用名'].append(namei)
 
 
 def create_file(all_json):

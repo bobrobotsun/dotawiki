@@ -94,10 +94,10 @@ def get_source_to_data(all_json, upgrade_json, version,name_base):
         unit_dic["应用"] = 1
         unit_dic['曾用名'] = []
         for namei in name_base:
-            if namei != '原生':
+            if namei != unit_dic['页面名']:
                 for namej in name_base[namei]:
-                    if name_base[namei][namej]['页面名'] == unit_dic['页面名']:
-                        unit_dic['曾用名'].append(namej)
+                    if namej[0] == unit_dic['页面名']:
+                        unit_dic['曾用名'].append(namei)
         if unit_dic["技能排序"] == "":
             if unit_dic["默认按键"] == "Q":
                 unit_dic["技能排序"] = "d"
