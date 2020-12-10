@@ -375,7 +375,7 @@ def create_upgrade_buff(json_dict):
                 j = str(jj)
                 if j in json_dict[str(i)]:
                     if json_dict[str(i)][j]['简述'] != '':
-                        retxt += '<tr><td></td><td>' + json_dict[str(i)][j]['名称'] + '：' + json_dict[str(i)][j]['简述'] + '</td></tr>'
+                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)][j]['名称'] + '</span>：' + json_dict[str(i)][j]['简述'] + '</td></tr>'
                 else:
                     break
     retxt += '</table></div>'
@@ -383,7 +383,6 @@ def create_upgrade_buff(json_dict):
 
 
 def create_upgrade_mech(json_dict):
-    mech_mech = ['技能窃取', '即时攻击']
     retxt = '<div style="paddin:0.5em;"><table>'
     for ii in range(1, 5):
         i = str(ii)
@@ -391,22 +390,18 @@ def create_upgrade_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '[[file:' + re.sub(r'talent.png', lambda x: 'talentb.png',
-                                                json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + \
-                             json_dict[i]['升级来源'][j]["名称"] + ']] '
-            retxt += '</td><td style="padding:0.25em><span style="cursor:help;">[[file:' + json_dict[i][
-                '图片'] + '|x22px|link=]]</span> (' + json_dict[i]['值'] + ') '
-            for j in mech_mech:
-                if j in json_dict[i]:
-                    kk = 0
-                    while True:
-                        kk += 1
-                        k = str(kk)
-                        if k in json_dict[i][j]:
-                            if json_dict[i][j][k]['代码'] != 0:
-                                retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + \
-                                         json_dict[i][j][k]['简述'] + '">' + json_dict[i][j][k]['值'] + '</span> '
+                    retxt += '[[file:' + re.sub(r'talent.png', lambda x: 'talentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
+            retxt += '</td><td style="padding:0.25em><span style="cursor:help;">[[file:' + json_dict[i]['图片'] + '|x22px|link=]]</span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
+            kk = 0
+            while True:
+                kk += 1
+                k = str(kk)
+                if k in json_dict[i]:
+                    if int(json_dict[i][k]['代码']) != 0:
+                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i][k]['值'] + '</span>：' +json_dict[i][k]['简述'] + '</td></tr>'
+                else:
+                    break
     retxt += '</table></div>'
     return retxt
 
@@ -467,8 +462,7 @@ def create_page_ability(db):
                 v1 = v['名称']
             else:
                 v1 = '名字没了'
-            retxt += '<div style="padding:0.5em 0.5em 0em 1em">' + v1 + '：' + create_upgrade_text(db["属性"],
-                                                                                                  i) + '</div>'
+            retxt += '<div style="padding:0.5em 0.5em 0em 1em">' + v1 + '：' + create_upgrade_text(db["属性"], i) + '</div>'
         else:
             break
     retxt += create_upgrade_manacost(db['魔法消耗']) + create_upgrade_cooldown(db['冷却时间'])
