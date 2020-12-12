@@ -81,6 +81,8 @@ def get_source_to_data(all_json, upgrade_json, version,name_base):
         all_json['技能源'][i]['应用'] = 1
         all_json['技能源'][i]['分类'] = '技能源'
         unit_dic = all_json['技能源'][i]
+        if '独立机制' not in unit_dic:
+            unit_dic['独立机制']={}
         for j in unit_dic['升级']:
             for k in unit_dic['升级'][j]:
                 if '值' in unit_dic['升级'][j][k] and '代码' in unit_dic['升级'][j][k]['值'] and isinstance(unit_dic['升级'][j][k]['值']['代码'], dict) and (
@@ -1194,4 +1196,4 @@ abilitypro_num = [["a_cast_range", "AbilityCastRange"]
 abilitypro_bool = [["immediate", "DOTA_ABILITY_BEHAVIOR_IMMEDIATE"]
     , ["ignore_channel", "DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"]]
 ability_trait_level = [["中文名", "英文名", "代码", "传说", "描述", "天赋代码", "A杖信息", "注释"], ["效果", "属性", "施法前摇", "施法后摇", "冷却时间"], ["魔法消耗"]
-    , ['技能免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域']]
+    , ['技能免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域','独立机制']]

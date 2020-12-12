@@ -405,6 +405,19 @@ def create_upgrade_mech(json_dict):
     retxt += '</table></div>'
     return retxt
 
+def create_independent_mech(json_dict):
+    retxt = '<div style="paddin:0.5em;"><table>'
+    for ii in range(1, 5):
+        i = str(ii)
+        if i in json_dict:
+            retxt += '<tr><td>'
+            if ii > 1:
+                for j in json_dict[i]['升级来源']:
+                    retxt += '[[file:' + re.sub(r'talent.png', lambda x: 'talentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
+            retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' +json_dict[i]['简述'] + '</td></tr>'
+    retxt += '</table></div>'
+    return retxt
+
 
 def create_page_ability(db):
     retxt = '<div style="display-block;clear:both;overflow: hidden;margin-bottom:1em;background-color: #d1d1d1;">' \
@@ -493,6 +506,15 @@ def create_page_ability(db):
                 retxt += create_upgrade_mech(w)
             else:
                 break
+    ii=0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in db['独立机制']:
+            v = db['独立机制'][i]
+            retxt += create_independent_mech(v)
+        else:
+            break
     retxt += '<div>'
     uls = 0
     if db['注释'] != '':
@@ -979,6 +1001,8 @@ def create_page_unit(json_base, log_base, log_list, unit):
         retxt += '召唤物[[分类:召唤物]]'
     if db["中立生物"]["1"]["1"] == 1:
         retxt += '[[中立生物]][[分类:中立生物]]'
+    if db["类型"] == '建筑物':
+        retxt += '[[建筑物]][[分类:建筑物]]'
     if "关联类型" in db and db["关联类型"] == '守卫':
         retxt += '[[守卫]][[分类:守卫]][[分类:召唤物]]'
     if "简介" in db and db["简介"] != '':

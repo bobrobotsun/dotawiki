@@ -348,6 +348,7 @@ edit = {
                                             '代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "视野": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "真实视域": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
+        "独立机制":['tree', {"list": ['tree', {'机制名': ['text', ''], '简述': ['text', '']}, 1, 0, True]}],
         "施法前摇": ['tree', {'list': ['tree', {'名称': ['text', ''],'代码': ['tree', {'list': ['text', '', 0, 4, False]}],
                                             '修正': ['tree', {'list': ['text', '', 1, 1, False]}],
                                             '即时生效': ['tree', {'代码': ['int', 0]}]}, 1, 0, True]}],
