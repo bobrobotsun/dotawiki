@@ -375,7 +375,8 @@ def create_upgrade_buff(json_dict):
                 j = str(jj)
                 if j in json_dict[str(i)]:
                     if json_dict[str(i)][j]['简述'] != '':
-                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)][j]['名称'] + '</span>：' + json_dict[str(i)][j]['简述'] + '</td></tr>'
+                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)][j]['名称'] + '</span>：' + \
+                                 json_dict[str(i)][j]['简述'] + '</td></tr>'
                 else:
                     break
     retxt += '</table></div>'
@@ -399,11 +400,13 @@ def create_upgrade_mech(json_dict):
                 k = str(kk)
                 if k in json_dict[i]:
                     if int(json_dict[i][k]['代码']) != 0:
-                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i][k]['值'] + '</span>：' +json_dict[i][k]['简述'] + '</td></tr>'
+                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i][k]['值'] + '</span>：' + json_dict[i][k][
+                            '简述'] + '</td></tr>'
                 else:
                     break
     retxt += '</table></div>'
     return retxt
+
 
 def create_independent_mech(json_dict):
     retxt = '<div style="paddin:0.5em;"><table>'
@@ -414,7 +417,7 @@ def create_independent_mech(json_dict):
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
                     retxt += '[[file:' + re.sub(r'talent.png', lambda x: 'talentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
-            retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' +json_dict[i]['简述'] + '</td></tr>'
+            retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
     retxt += '</table></div>'
     return retxt
 
@@ -506,7 +509,7 @@ def create_page_ability(db):
                 retxt += create_upgrade_mech(w)
             else:
                 break
-    ii=0
+    ii = 0
     while True:
         ii += 1
         i = str(ii)
@@ -787,10 +790,10 @@ def create_navboxunit(json_base):
 
 
 def create_page_logs(title, log_base, log_list, name_base):
-    retxt = '<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;"><tr><th colspan=2>' + title + '</th></tr>' + '<tr><td>游戏本体</td><td>' + \
-            log_base['游戏本体'] + '</td></tr>' + '<tr><td>更新日期</td><td>' + log_base['更新日期'] + '</td></tr>'
+    retxt = '<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;">\n<tr><th colspan=2>' + title + '</th></tr>' + '\n<tr><td>游戏本体</td><td>' + \
+            log_base['游戏本体'] + '</td></tr>' + '\n<tr><td>更新日期</td><td>' + log_base['更新日期'] + '</td></tr>'
     if log_base['地图作者'] != '':
-        retxt += '<tr><td>作者</td><td>' + log_base['地图作者'] + '</td></tr>'
+        retxt += '\n<tr><td>作者</td><td>' + log_base['地图作者'] + '</td></tr>'
     junior = False
     bools = False
     index_of_upgrade = -1
@@ -814,57 +817,80 @@ def create_page_logs(title, log_base, log_list, name_base):
     else:
         if not junior:
             if index_of_upgrade == 0:
-                retxt += '<tr><td colspan=2>当前版本为可考的最古老版本</td></tr>'
+                retxt += '\n<tr><td colspan=2>当前版本为可考的最古老版本</td></tr>'
             else:
-                retxt += '<tr><td>上一版本</td><td>[[' + log_list[index_of_upgrade - 1][0] + ']]</td></tr>'
+                retxt += '\n<tr><td>上一版本</td><td>[[' + log_list[index_of_upgrade - 1][0] + ']]</td></tr>'
             if index_of_upgrade == len(log_list) - 1:
-                retxt += '<tr><td colspan=2>当前版本为最新版本</td></tr>'
+                retxt += '\n<tr><td colspan=2>当前版本为最新版本</td></tr>'
             else:
-                retxt += '<tr><td>下一版本</td><td>[[' + log_list[index_of_upgrade + 1][0] + ']]</td></tr>'
+                retxt += '\n<tr><td>下一版本</td><td>[[' + log_list[index_of_upgrade + 1][0] + ']]</td></tr>'
     if '次级版本' in log_base and len(log_base['次级版本']) > 0:
-        retxt += '<tr><td>小更新</td><td>'
+        retxt += '\n<tr><td>小更新</td><td>'
         for i in range(len(log_base['次级版本'])):
             if i > 0:
                 retxt += '<br/>'
             retxt += '[[' + log_base['次级版本'][i] + ']]'
     if '官网链接' in log_base and log_base['官网链接'] != '' and log_base['官网链接'] != '-':
-        retxt += '<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
-    retxt += '<tr><td colspan=2 style="text-align:right;font-size:85%">[[data:' + title + '.json|<i class="fa fa-database" aria-hidden="true"></i>]]</td></tr></table>'
+        retxt += '\n<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
+    retxt += '\n<tr><td colspan=2 style="text-align:right;font-size:85%">[[data:' + title + '.json|<i class="fa fa-database" aria-hidden="true"></i>]]</td></tr></table>'
     table_name = ['英雄', "物品", "中立生物", "建筑", "兵线", "通用", "其他内容"]
     for i in range(len(table_name)):
         if table_name[i] in log_base:
             v = log_base[table_name[i]]
             if isinstance(v, dict) and '0' in v:
-                retxt += '<h2>' + table_name[i] + '</h2>'
+                if table_name[i]=='其他内容':
+                    titles='=='
+                else:
+                    titles='==='
+                    retxt += '\n==' + table_name[i] + '=='
                 for j, w in v.items():
                     if w[0] != '':
-                        retxt += '<h3>'
+                        retxt += '\n'+titles
                         if w[1] != '':
-                            retxt += '[[file:' + w[1] + '|x36px|link=' + w[0] + ']][[' + w[0] + ']]</h3>'
+                            retxt += '[[file:' + w[1] + '|x36px|link=' + w[0] + ']][[' + w[0] + ']]'+titles
                         else:
                             if w[0] in name_base:
                                 for k in name_base[w[0]]:
                                     if k[2] != '':
                                         retxt += '[[file:' + k[2] + '|x36px|link=' + k[0] + ']]'
-                                retxt += '[[' + name_base[w[0]][0][0] + '|' + w[0] + ']]</h3>'
+                                retxt += '[[' + name_base[w[0]][0][0] + '|' + w[0] + ']]'+titles
                             else:
-                                retxt += w[0] + '</h3>'
+                                retxt += w[0] +titles
                     current_ul = 0
                     for k in range(2, len(w)):
                         x = w[k]
                         if x['文字'] != '':
                             if x['序列级数'] > current_ul:
-                                for l in range(int(x['序列级数']) - current_ul):
+                                allul=int(x['序列级数']) - current_ul
+                                for l in range(allul):
+                                    retxt += '\n'
+                                    for tnumber in range(current_ul):
+                                        retxt += '\t'
                                     retxt += '<ul>'
-                                current_ul = int(x['序列级数'])
+                                    current_ul+=1
                             elif x['序列级数'] < current_ul:
-                                for l in range(current_ul - int(x['序列级数'])):
+                                allul=current_ul - int(x['序列级数'])
+                                for l in range(allul):
+                                    current_ul-=1
+                                    retxt += '\n'
+                                    for tnumber in range(current_ul):
+                                        retxt += '\t'
                                     retxt += '</ul>'
-                                current_ul = int(x['序列级数'])
-                            retxt += '<li>' + x['文字'] + '</li>'
-                    for l in range(current_ul):
+                            if current_ul == 0:
+                                retxt += '\n' + x['文字'] + '\n'
+                            else:
+                                retxt += '\n'
+                                for tnumber in range(current_ul):
+                                    retxt += '\t'
+                                retxt += '<li>' + x['文字'] + '</li>'
+                    allul=current_ul
+                    for l in range(allul):
+                        current_ul -= 1
+                        retxt += '\n'
+                        for tnumber in range(current_ul):
+                            retxt += '\t'
                         retxt += '</ul>'
-    retxt += '[[分类:版本更新]]'
+    retxt += '\n[[分类:版本更新]]'
     return retxt
 
 
@@ -1059,7 +1085,7 @@ def create_page_item(json_base, log_base, log_list, item):
         retxt += '<br/><b>' + v + '商店</b>出售以下商品：<br/><br/>' + '<table style="font-size:16px;">'
         for j, w in db["同商店物品"][i].items():
             if int(j) % 4 == 1:
-                retxt += '<tr>'
+                retxt += '\n<tr>'
             retxt += '<td style="padding:6px;text-align:center;">[[file:' + w['图片'] + '|52px|center|link=' + w['物品名'] + ']][[' + w['物品名'] + ']]</td>'
             if int(j) % 4 == 0 or int(j) == len(db["同商店物品"][i]):
                 retxt += '</tr>'

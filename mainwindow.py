@@ -2224,7 +2224,10 @@ class Main(QMainWindow):
             if items.itemtype == 'text':
                 self.version_base[title][items.text(0)] = items.text(1)
             elif items.background(1) == self.green:
-                self.version_base[title][items.text(0)] = edit_json.one_version_name_sort(self.version_tree_to_json(items))
+                if items.text(0)=='其他内容':
+                    self.version_base[title][items.text(0)] = self.version_tree_to_json(items)
+                else:
+                    self.version_base[title][items.text(0)] = edit_json.one_version_name_sort(self.version_tree_to_json(items))
         if item.parent() == None:
             self.version_base[title]['次级版本'] = []
             for i in range(item.childCount()):
@@ -2413,8 +2416,8 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].setEnabled(item.itemtype == 'tree2')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(item.itemtype == 'tree2')
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(item.itemtype == 'tree2')
-        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(item.itemtype == 'tree_list')
-        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].setEnabled(item.itemtype == 'tree_list')
+        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(item.itemtype == 'tree2' or item.itemtype == 'tree_list')
+        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].setEnabled(item.itemtype == 'tree2' or item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(item.itemtype == 'list')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].setEnabled(item.itemtype == 'list_text')
@@ -2488,6 +2491,8 @@ class Main(QMainWindow):
             new = VersionItemEdit(item)
             new.setText(0, '0')
             new.itemtype = 'tree2'
+            self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new)
+            self.version_button_tree2_add_tree_list()
             item.setBackground(1, self.green)
             item.setExpanded(True)
         elif item.background(1) == self.green:
@@ -2531,9 +2536,10 @@ class Main(QMainWindow):
         parent.removeChild(item)
         targetind = max(0, min(index + move_step, counts - 1))
         parent.insertChild(targetind, item)
-        for i in range(0, counts):
-            parent.child(i).setText(0, str(i + 1))
-        item.setExpanded(True)
+        if item.itemtype == 'tree_list':
+            for i in range(0, counts):
+                parent.child(i).setText(0, str(i + 1))
+            item.setExpanded(True)
         tree.setCurrentItem(item)
         self.version_edit_all_button_clicked()
         self.expand_all_childs(item)
