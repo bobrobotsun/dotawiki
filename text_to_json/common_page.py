@@ -42,7 +42,8 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
         numjson = numjsons[k]
         retext = ''
         ii = 0
-        for ii in range(1, 5):
+        while True:
+            ii+=1
             i = str(ii)
             if i in numjson:
                 if ii > 1:
@@ -61,6 +62,8 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
                     else:
                         break
                 retext += post_group(numjson)
+            else:
+                break
         return retext
     else:
         return ''
@@ -68,7 +71,9 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
 
 def create_upgrade_cast_style(db):
     retxt = ''
-    for ii in range(1, 5):
+    ii=0
+    while True:
+        ii+=1
         i = str(ii)
         if i in db:
             retxt += '<div style="padding:0.25em 0.5em;text-align:center;">'
@@ -93,17 +98,22 @@ def create_upgrade_cast_style(db):
                 else:
                     break
             retxt += '</div>'
+        else:
+            break
     return retxt
 
 
 def create_upgrade_cast_target(db):
     retxt = ''
-    for h in range(1, 5):
-        if str(h) in db:
-            arr = db[str(h)]
+    hh=0
+    while True:
+        hh+=1
+        h=str(hh)
+        if h in db:
+            arr = db[h]
             retxt += '<div style="padding:0.25em 0.5em;text-align:center;">' \
                      + '<table align="center"><tr><td style="padding:0.25em">'
-            if h > 1:
+            if hh > 1:
                 retxt += '<td>'
                 ii = 0
                 while True:
@@ -172,6 +182,8 @@ def create_upgrade_cast_target(db):
                 else:
                     break
             retxt += '</tr></table></div>'
+        else:
+            break
     return retxt
 
 
@@ -234,9 +246,6 @@ def create_upgrade_cooldown(arr):
         i = str(ii)
         if i in arr:
             v = arr[i]
-            bool = [False, False, False]
-            for j in range(2, 5):
-                bool[j - 2] = str(j) in v
             retxt += '<div style="padding:0.5em 0.5em 0em 1em;cursor:help;" title="' + v['名称'] + '"><span style="cursor:help;" title="' + v['1']['类型']['值'] + '">[[file:' + \
                      v['1']['类型']['图片'] + '|16px|link=]]</span> '
             jj = 0
@@ -249,11 +258,13 @@ def create_upgrade_cooldown(arr):
                     retxt += number_to_string(v['1'][j])
                 else:
                     break
-            if bool[0] or bool[1]:
+            if '2' in v:
                 retxt += '('
-                for jj in range(2, 5):
-                    j = str(jj)
-                    if bool[jj - 2]:
+                jj=1
+                while True:
+                    jj+=1
+                    j=str(jj)
+                    if j in v:
                         kk = 0
                         while True:
                             kk += 1
@@ -275,6 +286,8 @@ def create_upgrade_cooldown(arr):
                                 retxt += number_to_string(x)
                             else:
                                 break
+                    else:
+                        break
                 retxt += ')'
             retxt += '</div>'
         else:
@@ -285,7 +298,9 @@ def create_upgrade_cooldown(arr):
 def create_upgrade_buff(json_dict):
     buff_mech = ['技能免疫', '状态抗性', '无敌']
     retxt = '<div style="paddin:0.5em;"><table>'
-    for i in range(1, 5):
+    i=0
+    while True:
+        i+=1
         if str(i) in json_dict:
             retxt += '<tr><td>'
             if i > 1:
@@ -379,13 +394,17 @@ def create_upgrade_buff(json_dict):
                                  json_dict[str(i)][j]['简述'] + '</td></tr>'
                 else:
                     break
+        else:
+            break
     retxt += '</table></div>'
     return retxt
 
 
 def create_upgrade_mech(json_dict):
     retxt = '<div style="paddin:0.5em;"><table>'
-    for ii in range(1, 5):
+    ii=0
+    while True:
+        ii+=1
         i = str(ii)
         if i in json_dict and json_dict[i]['代码'] != 0:
             retxt += '<tr><td>'
@@ -404,13 +423,17 @@ def create_upgrade_mech(json_dict):
                             '简述'] + '</td></tr>'
                 else:
                     break
+        else:
+            break
     retxt += '</table></div>'
     return retxt
 
 
 def create_independent_mech(json_dict):
     retxt = '<div style="paddin:0.5em;"><table>'
-    for ii in range(1, 5):
+    ii=0
+    while True:
+        ii+=1
         i = str(ii)
         if i in json_dict:
             retxt += '<tr><td>'
@@ -418,6 +441,8 @@ def create_independent_mech(json_dict):
                 for j in json_dict[i]['升级来源']:
                     retxt += '[[file:' + re.sub(r'talent.png', lambda x: 'talentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
+        else:
+            break
     retxt += '</table></div>'
     return retxt
 
@@ -558,7 +583,9 @@ def get_unit_value(array, post=''):
 
 def get_unit_upgrade_double(db1, db2, combine='~', post=''):
     retxt = ''
-    for ii in range(1, 5):
+    ii=0
+    while True:
+        ii+=1
         i = str(ii)
         if i in db1:
             if ii > 1:
@@ -586,6 +613,8 @@ def get_unit_upgrade_double(db1, db2, combine='~', post=''):
                     retxt += number_to_string(db2[i][j]) + post
                 else:
                     break
+        else:
+            break
     return retxt
 
 
