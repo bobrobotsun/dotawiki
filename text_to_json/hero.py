@@ -83,9 +83,10 @@ def get_dota_data_from_vpk(base_txt,ffile):
 def get_hero_data_from_txt(base_txt, source_address):
     this_file = open(source_address, mode="r")
     this_string = this_file.read()
-    alltext = re.finditer('\n\t"(.*?)"\n\t\{(.|\n)*?\n\t\}', this_string)
+    alltext = re.finditer('"npc_dota_hero_(.*?)"\n\t\{(.|\n)*?\n\t\}', this_string)
     for i in alltext:
-        name = i.group(1)[14:]
+        print(i.group(1))
+        name = i.group(1)
         if name=='base':
             base_txt[name]=copy.deepcopy(hero_default)
         else:
