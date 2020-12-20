@@ -186,7 +186,7 @@ def fulfill_item_json(base_txt, all_json, version,name_base):
                 hecheng = str(all_json[ii]["合成"])
             if ('recipe_' + all_json[ii]["代码名"]) in base_txt["物品"] and len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"])>=int(hecheng):
                 all_json[ii]["组件"] = {}
-                if base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"] != 0:
+                if "ItemCost" in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]] and base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"] != 0:
                     if all_json[ii]["商店"]["1"][:2] == '中立':
                         all_json[ii]["价格"] = {'代码': 'ItemCost',
                                               '1': base_txt["物品"][all_json[ii]["代码名"]]['ItemCost']["1"] - base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]['ItemCost']["1"]}
@@ -218,7 +218,7 @@ def fulfill_item_json(base_txt, all_json, version,name_base):
         if "组件" in all_json[i]:
             for j in all_json[i]["组件"]:
                 for k in all_json:
-                    if all_json[i]["组件"][j] == all_json[k]["代码名"]:
+                    if len(all_json[i]["组件"][j])>=len(all_json[k]["代码名"]) and all_json[i]["组件"][j][:len(all_json[k]["代码名"])] == all_json[k]["代码名"]:
                         all_json[i]["组件"][j] = {"物品名": all_json[k]["页面名"], "图片": all_json[k]["图片"]}
     # 接下来把所有的升级放在这儿
     for i in all_json:

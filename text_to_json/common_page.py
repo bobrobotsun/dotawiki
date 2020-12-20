@@ -607,34 +607,31 @@ def create_infobox_unit(db):
         retxt += '是'
     else:
         retxt += '否'
-    retxt += '</td></tr><tr><td ' + label + '>等级</td><td ' + data + '>' + create_upgrade_text(db, "等级") \
-             + '</td></tr><tr><td ' + label + '>奖励金钱</td><td ' + data + '>' + get_unit_upgrade_double(db['金钱下限'], db['金钱上限']) \
-             + '</td></tr><tr><td ' + label + '>奖励经验</td><td ' + data + '>' + create_upgrade_text(db, "经验") \
-             + '</td></tr><tr><td ' + label + '>远近程</td><td ' + data + '>' + create_upgrade_text(db, "近战远程") \
-             + '</td></tr><tr><td ' + label + '>攻击警觉范围</td><td ' + data + '>' + create_upgrade_text(db, "警戒范围") \
-             + '</td></tr><tr><td ' + label + '>生命值</td><td ' + data + '>' + create_upgrade_text(db, "生命值") \
-             + '</td></tr><tr><td ' + label + '>魔法值</td><td ' + data + '>' + create_upgrade_text(db, "魔法值") \
-             + '</td></tr><tr><td ' + label + '>生命恢复</td><td ' + data + '>' + create_upgrade_text(db, "生命恢复") \
-             + '</td></tr><tr><td ' + label + '>魔法恢复</td><td ' + data + '>' + create_upgrade_text(db, "魔法恢复") \
-             + '</td></tr><tr><td ' + label + '>攻击力<br/>（攻击类型）</td><td ' + data + '>' + get_unit_upgrade_double(db['攻击下限'], db['攻击上限'], '~') + '<br/>（' + create_upgrade_text(db,
-                                                                                                                                                                              "攻击类型") \
-             + '）</td></tr><tr><td ' + label + '>攻击距离+不中断距离</td><td ' + data + '>' + create_upgrade_text(db, "攻击距离") \
-             + '+' + create_upgrade_text(db, "攻击距离缓冲") \
-             + '</td></tr><tr><td ' + label + '>攻击前摇</td><td ' + data + '>' + create_upgrade_text(db, "攻击前摇") \
-             + '</td></tr><tr><td ' + label + '>弹道速度</td><td ' + data + '>' + create_upgrade_text(db, "弹道速度") \
-             + '</td></tr><tr><td ' + label + '>基础攻击间隔</td><td ' + data + '>' + create_upgrade_text(db, "攻击间隔") \
-             + '</td></tr><tr><td ' + label + '>护甲<br/>（护甲类型）</td><td ' + data + '>' + create_upgrade_text(db, "护甲") \
-             + '<br/>（' + create_upgrade_text(db, "护甲类型") \
-             + '）</td></tr><tr><td ' + label + '>转身速率</td><td ' + data + '>' + create_upgrade_text(db, "转身速率") \
-             + '</td></tr><tr><td ' + label + '>移动速度</td><td ' + data + '>' + create_upgrade_text(db, "移动速度") \
-             + '</td></tr><tr><td ' + label + '>魔法抗性</td><td ' + data + '>' + create_upgrade_text(db, "魔法抗性", lambda x: '%') \
-             + '</td></tr><tr><td ' + label + '>移动类型</td><td ' + data + '>' + create_upgrade_text(db, "移动方式") \
-             + '</td></tr><tr><td ' + label + '>跟随距离</td><td ' + data + '>' + create_upgrade_text(db, "跟随距离") \
-             + '</td></tr><tr><td ' + label + '>白天视野/夜晚视野</td><td ' + data + '>' + create_upgrade_text(db, "白天视野") \
-             + '|' + create_upgrade_text(db, "夜晚视野") \
-             + '</td></tr><tr><td ' + label + '>碰撞体积</td><td ' + data + '>' + create_upgrade_text(db, "碰撞体积") \
-             + '</td></tr><tr><td ' + label + '>模型大小</td><td ' + data + '>' + create_upgrade_text(db, "模型比例") \
-             + '</td></tr><tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel">\'\'\' [[data:' + db["页面名"] \
+    retxt += '</td></tr>'
+    show_in_infobox = [['等级', [['等级']]], ['奖励金钱', [['金钱下限', '金钱上限']]], ['奖励经验', [['经验']]], ['远近程', [['近战远程']]], ['攻击警觉范围', [['警戒范围']]], ['生命值', [['生命值']]]
+        , ['魔法值', [['魔法值']]], ['生命恢复', [['生命恢复']]], ['魔法恢复', [['魔法恢复']]], ['攻击力<br/>（攻击类型）', [['攻击下限', '攻击上限']], '<br/>（', [['攻击类型']], '）']
+        , ['攻击距离+不中断距离', [['攻击距离']], '+', [['攻击距离缓冲']]], ['攻击前摇', [['攻击前摇']]], ['弹道速度', [['弹道速度']]], ['基础攻击间隔', [['攻击间隔']]]
+        , ['护甲<br/>（护甲类型）', [['护甲']], '<br/>（', [['护甲类型']], '）'], ['转身速率', [['转身速率']]], ['移动速度', [['移动速度']]], ['魔法抗性', [['魔法抗性'], lambda x: '%']]
+        , ['移动类型', [['移动方式']]], ['跟随距离', [['跟随距离']]], ['白天视野/夜晚视野', [['白天视野']], '|', [['夜晚视野']]], ['碰撞体积', [['碰撞体积']]], ['模型大小', [['模型比例']]]]
+    for i in show_in_infobox:
+        if len(db[i[1][0][0]]) > 0:
+            retxt += '<tr><td ' + label + '>' + i[0] + '</td><td ' + data + '>'
+            for j in range(1, len(i)):
+                if j % 2 == 1:
+                    if len(i[j][0]) == 1:
+                        if len(i[j]) == 1:
+                            retxt += create_upgrade_text(db, i[j][0][0])
+                        else:
+                            retxt += create_upgrade_text(db, i[j][0][0], i[j][1])
+                    else:
+                        if len(i[j]) == 1:
+                            retxt += get_unit_upgrade_double(db[i[j][0][0]], db[i[j][0][1]])
+                        else:
+                            retxt += get_unit_upgrade_double(db[i[j][0][0]], db[i[j][0][1]], i[j][1])
+                else:
+                    retxt += i[j]
+            retxt += '</td></tr>'
+    retxt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel">\'\'\' [[data:' + db["页面名"] \
              + '|<i class="fa fa-database" aria-hidden="true"></i>]] [[data:' + db["页面名"] + '.json|J]] [[' + db["页面名"] + '|P]]\'\'\'</div></td></tr></table>'
     return retxt
 
@@ -833,45 +830,45 @@ def create_page_logs(title, log_base, log_list, name_base):
     if '官网链接' in log_base and log_base['官网链接'] != '' and log_base['官网链接'] != '-':
         retxt += '\n<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
     retxt += '\n<tr><td colspan=2 style="text-align:right;font-size:85%">[[data:' + title + '.json|<i class="fa fa-database" aria-hidden="true"></i>]]</td></tr></table>'
-    table_name = ['英雄', "物品", "中立生物", "建筑", "兵线", "通用", "其他内容"]
+    table_name = ["其他内容", '英雄', "物品", "中立生物", "建筑", "兵线", "通用"]
     for i in range(len(table_name)):
         if table_name[i] in log_base:
             v = log_base[table_name[i]]
             if isinstance(v, dict) and '0' in v:
-                if table_name[i]=='其他内容':
-                    titles='=='
+                if table_name[i] == '其他内容':
+                    titles = '=='
                 else:
-                    titles='==='
+                    titles = '==='
                     retxt += '\n==' + table_name[i] + '=='
                 for j, w in v.items():
                     if w[0] != '':
-                        retxt += '\n'+titles
+                        retxt += '\n' + titles
                         if w[1] != '':
-                            retxt += '[[file:' + w[1] + '|x36px|link=' + w[0] + ']][[' + w[0] + ']]'+titles
+                            retxt += '[[file:' + w[1] + '|x36px|link=' + w[0] + ']][[' + w[0] + ']]' + titles
                         else:
                             if w[0] in name_base:
                                 for k in name_base[w[0]]:
                                     if k[2] != '':
                                         retxt += '[[file:' + k[2] + '|x36px|link=' + k[0] + ']]'
-                                retxt += '[[' + name_base[w[0]][0][0] + '|' + w[0] + ']]'+titles
+                                retxt += '[[' + name_base[w[0]][0][0] + '|' + w[0] + ']]' + titles
                             else:
-                                retxt += w[0] +titles
+                                retxt += w[0] + titles
                     current_ul = 0
                     for k in range(2, len(w)):
                         x = w[k]
                         if x['文字'] != '':
                             if x['序列级数'] > current_ul:
-                                allul=int(x['序列级数']) - current_ul
+                                allul = int(x['序列级数']) - current_ul
                                 for l in range(allul):
                                     retxt += '\n'
                                     for tnumber in range(current_ul):
                                         retxt += '\t'
                                     retxt += '<ul>'
-                                    current_ul+=1
+                                    current_ul += 1
                             elif x['序列级数'] < current_ul:
-                                allul=current_ul - int(x['序列级数'])
+                                allul = current_ul - int(x['序列级数'])
                                 for l in range(allul):
-                                    current_ul-=1
+                                    current_ul -= 1
                                     retxt += '\n'
                                     for tnumber in range(current_ul):
                                         retxt += '\t'
@@ -883,7 +880,7 @@ def create_page_logs(title, log_base, log_list, name_base):
                                 for tnumber in range(current_ul):
                                     retxt += '\t'
                                 retxt += '<li>' + x['文字'] + '</li>'
-                    allul=current_ul
+                    allul = current_ul
                     for l in range(allul):
                         current_ul -= 1
                         retxt += '\n'
@@ -1029,8 +1026,11 @@ def create_page_unit(json_base, log_base, log_list, unit):
         retxt += '[[中立生物]][[分类:中立生物]]'
     if db["类型"] == '建筑物':
         retxt += '[[建筑物]][[分类:建筑物]]'
-    if "关联类型" in db and db["关联类型"] == '守卫':
-        retxt += '[[守卫]][[分类:守卫]][[分类:召唤物]]'
+    if "关联类型" in db:
+        if db["关联类型"] == '守卫':
+            retxt += '[[守卫]][[分类:守卫]][[分类:召唤物]]'
+        else:
+            retxt += db["关联类型"]
     if "简介" in db and db["简介"] != '':
         retxt += '<br/>' + db["简介"]
     if db["中立生物"]["1"]["1"] == 1:

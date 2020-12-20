@@ -36,7 +36,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.27d'
+        self.version = '7.28'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -1131,7 +1131,12 @@ class Main(QMainWindow):
 
             ability.complete_mech(self.json_base["技能"], self.mech)
             for i in self.json_base["技能"]:
-                ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i)
+                target=[]
+                if '数据来源' in self.json_base["技能"][i] and self.json_base["技能"][i]['数据来源'] in self.json_base["技能源"]:
+                    target=[self.json_base["技能"][i]['数据来源']]
+                else:
+                    raise (editerror('技能', i, "你没有书写数据来源，请立刻书写"))
+                ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i,target)
 
             ability.confirm_upgrade_info(self.json_base['技能'])
             # 增加拥有技能
@@ -1153,7 +1158,11 @@ class Main(QMainWindow):
                             self.json_base[i][j]['技能'][str(k + 1)] = ability_own[self.json_base[i][j]['页面名']][k][0]
             self.resort()
         except editerror as err:
-            QMessageBox.critical(self, err.get_error_info())
+            self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
+            self.edit_category_selected_changed()
+            self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
+            self.edit_target_selected_changed()
+            QMessageBox.critical(self.parent(),'发现错误', err.get_error_info())
         else:
             QMessageBox.information(self, "已完成", info)
 
