@@ -122,17 +122,16 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
             all_json['技能源'][i].pop('A杖信息')
         if '魔晶信息' not in all_json['技能源'][i]:
             all_json['技能源'][i]['魔晶信息'] = ''
-        temp1=all_json['技能源'][i]['升级']
-        if 'A杖' in temp1:
-            if '神杖' not in temp1 or len(temp1['神杖']) == 0:
-                temp1['神杖'] = temp1['A杖']
-            temp1.pop('A杖')
-        if '混合' in temp1:
-            temp1.pop('混合')
-        if '魔晶' not in temp1:
-            temp1['魔晶'] = ''
-        all_json['技能源'][i]['升级']=temp1
-        unit_dic = all_json['技能源'][i]
+        # temp1=all_json['技能源'][i]['升级']
+        # if 'A杖' in temp1:
+        #     if '神杖' not in temp1 or len(temp1['神杖']) == 0:
+        #         temp1['神杖'] = temp1['A杖']
+        #     temp1.pop('A杖')
+        # if '混合' in temp1:
+        #     temp1.pop('混合')
+        # if '魔晶' not in temp1:
+        #     temp1['魔晶'] = ''
+        # all_json['技能源'][i]['升级']=temp1
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"
@@ -210,14 +209,6 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 for j in temp1[i]:
                     unit_dic[i][j] = group_source(temp1[i][j])
             elif i == "升级":
-                if 'A杖' in temp1[i]:
-                    if '神杖' not in temp1[i] or len(temp1[i]['神杖'])==0:
-                        temp1[i]['神杖'] = temp1[i]['A杖']
-                    temp1[i].pop('A杖')
-                if '混合' in temp1[i]:
-                    temp1[i].pop('混合')
-                if '魔晶' not in temp1[i]:
-                    temp1[i]['魔晶'] = ''
                 if "神杖" in temp1[i] and len(temp1[i]["神杖"]) > 0 or "技能" in temp1[i] and len(
                         temp1[i]["技能"]) > 0 or "魔晶" in temp1[i] and len(temp1[i]["魔晶"]) > 0:
                     upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])

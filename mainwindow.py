@@ -480,8 +480,7 @@ class Main(QMainWindow):
             messagebox.setStandardButtons(QMessageBox.Ok)
             messagebox.exec_()
         else:
-            messagebox = QMessageBox(QMessageBox.Critical, '错误的路径', '路径错误，没有发现任何有效文件，请重新选择路径！', QMessageBox.NoButton,
-                                     self)
+            messagebox = QMessageBox(QMessageBox.Critical, '错误的路径', '路径错误，没有发现任何有效文件，请重新选择路径！', QMessageBox.NoButton, self)
             messagebox.setStandardButtons(QMessageBox.Ok)
             messagebox.button(QMessageBox.Ok).animateClick(1000)
             messagebox.exec_()
@@ -1114,7 +1113,7 @@ class Main(QMainWindow):
 
     def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
         try:
-            name_dict_list=self.name_create_tree_list_name()
+            name_dict_list = self.name_create_tree_list_name()
 
             hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version, name_dict_list)
             item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version, name_dict_list)
@@ -1131,12 +1130,12 @@ class Main(QMainWindow):
 
             ability.complete_mech(self.json_base["技能"], self.mech)
             for i in self.json_base["技能"]:
-                target=[]
+                target = []
                 if '数据来源' in self.json_base["技能"][i] and self.json_base["技能"][i]['数据来源'] in self.json_base["技能源"]:
-                    target=[self.json_base["技能"][i]['数据来源']]
+                    target = [self.json_base["技能"][i]['数据来源']]
                 else:
                     raise (editerror('技能', i, "你没有书写数据来源，请立刻书写"))
-                ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i,target)
+                ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target)
 
             ability.confirm_upgrade_info(self.json_base['技能'])
             # 增加拥有技能
@@ -1162,7 +1161,7 @@ class Main(QMainWindow):
             self.edit_category_selected_changed()
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
-            QMessageBox.critical(self.parent(),'发现错误', err.get_error_info())
+            QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
         else:
             QMessageBox.information(self, "已完成", info)
 
@@ -1350,7 +1349,7 @@ class Main(QMainWindow):
             download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
             if download_info.status_code == 200:
                 download_content = download_info.json()
-                if 'jsondata' in download_content and self.check_dict_equal(download_content['jsondata'], content):
+                if 'jsondata' in download_content and download_content['jsondata']== content:
                     return ['《' + pagename + '》通过校验，不需要修改！', 0]
                 break
             else:
@@ -1433,6 +1432,29 @@ class Main(QMainWindow):
         temp.update(d1)
         temp.update(d2)
         for i in temp:
+            if i in d1 and i in d2:
+                if type(d1[i]) == type(d2[i]):
+                    if isinstance(d1[i], dict):
+                        bool = bool and self.check_dict_equal(d1[i], d2[i])
+                    elif isinstance(d1[i], list):
+                        bool = bool and self.check_list_equal(d1[i], d2[i])
+                    else:
+                        bool = bool and d1[i] == d2[i]
+                else:
+                    if (isinstance(d1[i], int) or isinstance(d1[i], float)) and (
+                            isinstance(d2[i], int) or isinstance(d2[i], float)):
+                        if float(d1[i]) == float(d2[i]):
+                            continue
+                        else:
+                            bool = False
+            else:
+                bool = False
+            if not bool:
+                break
+        temp2 = {}
+        temp2.update(d2)
+        temp2.update(d1)
+        for i in temp2:
             if i in d1 and i in d2:
                 if type(d1[i]) == type(d2[i]):
                     if isinstance(d1[i], dict):
@@ -2233,7 +2255,7 @@ class Main(QMainWindow):
             if items.itemtype == 'text':
                 self.version_base[title][items.text(0)] = items.text(1)
             elif items.background(1) == self.green:
-                if items.text(0)=='其他内容':
+                if items.text(0) == '其他内容':
                     self.version_base[title][items.text(0)] = self.version_tree_to_json(items)
                 else:
                     self.version_base[title][items.text(0)] = edit_json.one_version_name_sort(self.version_tree_to_json(items))
@@ -2614,7 +2636,7 @@ class Main(QMainWindow):
             self.expand_all_childs(item.child(i))
 
     def name_initial_name_base(self):
-        if isinstance(self.name_base['历史'],dict):
+        if isinstance(self.name_base['历史'], dict):
             temp = []
             for i, v in self.name_base['历史'].items():
                 tempi = {'名称': i}
@@ -2623,7 +2645,7 @@ class Main(QMainWindow):
             self.name_base['历史'] = copy.deepcopy(temp)
         self.name_base['原生'] = []
         self.name_base['衍生'] = []
-        self.name_base['历史'] = edit_json.special_sort_list_by_pinyin(self.name_base['历史'], lambda x,y:x[y]['名称'])
+        self.name_base['历史'] = edit_json.special_sort_list_by_pinyin(self.name_base['历史'], lambda x, y: x[y]['名称'])
         for i in range(len(self.name_base['历史'])):
             self.name_base['历史'][i]['图片'] = ''
             self.name_base['历史'][i]['迷你图片'] = ''
@@ -2683,7 +2705,7 @@ class Main(QMainWindow):
         elif page_name == '':
             QMessageBox.critical(self, '输入缺失', '您没有输入指向页面！')
         else:
-            self.name_base['历史'].append({'名称':name,'页面名': page_name})
+            self.name_base['历史'].append({'名称': name, '页面名': page_name})
             self.name_initial_name_base()
             for i in range(self.namelayout['原生页面']['布局']['树'][0].topLevelItemCount()):
                 child = self.namelayout['原生页面']['布局']['树'][0].topLevelItem(i)
@@ -2706,8 +2728,8 @@ class Main(QMainWindow):
         elif page_name == '':
             QMessageBox.critical(self, '输入缺失', '您没有输入指向页面！')
         else:
-            targeti=self.namelayout['现存修正']['布局']['树'][0].currentIndex()
-            self.name_base['历史'][targeti]={'名称':name,'页面名': page_name}
+            targeti = self.namelayout['现存修正']['布局']['树'][0].currentIndex()
+            self.name_base['历史'][targeti] = {'名称': name, '页面名': page_name}
             self.name_initial_name_base()
             for i in range(self.namelayout['现存修正']['布局']['树'][0].topLevelItemCount()):
                 child = self.namelayout['现存修正']['布局']['树'][0].topLevelItem(i)
@@ -2739,7 +2761,7 @@ class Main(QMainWindow):
 
     def name_save_and_upload_name_json(self):
         self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
-        name_base_up={'历史':self.name_base['历史']}
+        name_base_up = {'历史': self.name_base['历史']}
         self.upload_json('name_base.json', name_base_up)
         self.upload_json('图片链接.json', self.name_create_tree_list_name())
         QMessageBox.information(self, "上传完成", '已经保存并上传name_base')
@@ -2747,7 +2769,7 @@ class Main(QMainWindow):
     def name_delete_one_old_name(self):
         targeti = self.namelayout['历史曾用名']['布局']['树'][0].currentIndex().row()
         child = self.namelayout['历史曾用名']['布局']['树'][0].currentItem()
-        if child ==None:
+        if child == None:
             QMessageBox.critical(self, '错误', '您还没有点选需要删除的曾用名！')
         else:
             name = child.text(0)

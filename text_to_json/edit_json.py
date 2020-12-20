@@ -484,14 +484,15 @@ def set_version_default(base):
     }
     for i in base['英雄']:
         v['全英雄'].append(i)
-        if base['英雄'][i]['主属性']['1'] == '力量':
-            v['力量英雄'].append(i)
-        elif base['英雄'][i]['主属性']['1'] == '敏捷':
-            v['敏捷英雄'].append(i)
-        elif base['英雄'][i]['主属性']['1'] == '智力':
-            v['智力英雄'].append(i)
-        if base['英雄'][i]['近战远程']['1'] == '远程':
-            v['近战英雄'].append(i)
-        elif base['英雄'][i]['近战远程']['1'] == '远程':
-            v['远程英雄'].append(i)
+        if '主属性' in base['英雄'][i]:
+            if base['英雄'][i]['主属性']['1'] == '力量':
+                v['力量英雄'].append(i)
+            elif base['英雄'][i]['主属性']['1'] == '敏捷':
+                v['敏捷英雄'].append(i)
+            elif base['英雄'][i]['主属性']['1'] == '智力':
+                v['智力英雄'].append(i)
+            if base['英雄'][i]['近战远程']['1'] == '远程':
+                v['近战英雄'].append(i)
+            elif base['英雄'][i]['近战远程']['1'] == '远程':
+                v['远程英雄'].append(i)
     return v
