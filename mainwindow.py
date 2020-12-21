@@ -2654,26 +2654,30 @@ class Main(QMainWindow):
                     self.name_base['历史'][i]['页面名'] = self.name_base['历史'][j]['页面名']
         i = '英雄'
         for j in self.json_base[i]:
-            self.name_base['原生'].append({'名称': j, '页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
-            for k in range(len(self.name_base['历史'])):
-                if j == self.name_base['历史'][k]['页面名']:
-                    self.name_base['历史'][k].update({'图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
-                    for l in ['10', '15', '20', '25']:
-                        oname = self.name_base['历史'][k]['名称'] + l + '级天赋'
-                        tname = j + l + '级左天赋'
-                        self.name_base['衍生'].append({'名称': oname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']})
-        for i in ['物品', '非英雄单位', '技能']:
-            for j in self.json_base[i]:
+            if '图片' in self.json_base[i][j] and '迷你图片' in self.json_base[i][j]:
                 self.name_base['原生'].append({'名称': j, '页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
                 for k in range(len(self.name_base['历史'])):
                     if j == self.name_base['历史'][k]['页面名']:
                         self.name_base['历史'][k].update({'图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
+                        for l in ['10', '15', '20', '25']:
+                            oname = self.name_base['历史'][k]['名称'] + l + '级天赋'
+                            tname = j + l + '级左天赋'
+                            if tname in self.json_base['技能'] and '图片' in self.json_base['技能'][tname] and '迷你图片' in self.json_base['技能'][tname]:
+                                self.name_base['衍生'].append({'名称': oname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']})
+        for i in ['物品', '非英雄单位', '技能']:
+            for j in self.json_base[i]:
+                if '图片' in self.json_base[i][j] and '迷你图片' in self.json_base[i][j]:
+                    self.name_base['原生'].append({'名称': j, '页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
+                    for k in range(len(self.name_base['历史'])):
+                        if j == self.name_base['历史'][k]['页面名']:
+                            self.name_base['历史'][k].update({'图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
         i = '英雄'
         for j in self.json_base[i]:
             for k in ['10', '15', '20', '25']:
                 tname = j + k + '级左天赋'
                 zyname = j + k + '级天赋'
-                self.name_base['衍生'].append({'名称': zyname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']})
+                if tname in self.json_base['技能'] and '图片' in self.json_base['技能'][tname] and '迷你图片' in self.json_base['技能'][tname]:
+                    self.name_base['衍生'].append({'名称': zyname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']})
         self.show_name_base_in_widget()
 
     def show_name_base_in_widget(self):
