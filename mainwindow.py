@@ -36,7 +36,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.28'
+        self.version = '7.28a'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
@@ -2289,6 +2289,14 @@ class Main(QMainWindow):
                     for j in range(items.childCount()):
                         items2=items.child(j)
                         self.version_base[title][items.text(0)][items2.text(0)] = edit_json.one_version_name_sort(self.version_tree_to_json(items2))
+                temp1=copy.deepcopy(self.version_base[title][items.text(0)])
+                if '无标题' not in self.version_base[title][items.text(0)]:
+                    temp1['无标题'] = {'0': ['', '', {'序列级数': 1, '文字': '', '目标': []}]}
+                else:
+                    temp1['无标题'] = self.version_base[title][items.text(0)]['无标题']
+                    self.version_base[title][items.text(0)].pop('无标题')
+                temp1.update(self.version_base[title][items.text(0)])
+                self.version_base[title][items.text(0)]=copy.deepcopy(temp1)
         if item.parent() == None:
             self.version_base[title]['次级版本'] = []
             for i in range(item.childCount()):
@@ -2524,6 +2532,7 @@ class Main(QMainWindow):
             item.setExpanded(False)
         elif item.itemtype == 'tree2':
             self.version_button_tree2_add_tree3()
+            item.setExpanded(False)
         elif item.hasvalue:
             self.version_edit_change_value()
 
@@ -2540,6 +2549,7 @@ class Main(QMainWindow):
             text = re.sub(r'(?<!\\)[<《](.+?)(?<!\\)[>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
             text = re.sub(r'\{\{A\|([0-9]+?)\}\}', lambda x: '{{A|' + hero_text + x.group(1) + '级天赋}}', text)
             text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
+            text = re.sub(r'{{{(.+?)[:：](.+?)}}}', lambda x: self.version_input_text_template_simple_txt(x.group(1),x.group(2)), text)
             item.set_value(text)
             if item.parent() != None:
                 iparent = item.parent()
@@ -2558,12 +2568,20 @@ class Main(QMainWindow):
                             new = VersionItemEdit(iparent.child(icount - 1))
                             new.itemtype = 'list_text'
                             new.set_value(i[4:-2])
+
                 if item.parent() != None and item.parent().parent() != None:
                     ipp = item.parent().parent()
-                    if ipp.itemtype == 'tree2' and ipp.child(ipp.childCount() - 1).child(1).text(1) != '':
+                    if ipp.itemtype == 'tree3' and ipp.child(ipp.childCount() - 1).child(1).text(1) != '':
                         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(ipp)
                         self.version_button_tree3_add_tree_list()
                         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
+
+    def version_input_text_template_simple_txt(self,trait,name):
+        rere=''
+        for i in [['英雄','H'],['非英雄单位','H'],['物品','I'],['技能','A']]:
+            if name in self.json_base[i[0]] and trait in self.json_base[i[0]][name] and isinstance(self.json_base[i[0]][name][trait],str):
+                return '{{'+i[1]+'|'+name+'}}：'+self.json_base[i[0]][name][trait]
+        return '{{{'+trait+'：'+name+'}}}'
 
     def version_button_tree1(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
@@ -2697,8 +2715,11 @@ class Main(QMainWindow):
                 item.setExpanded(True)
             elif item.background(1) == self.green:
                 item.setExpanded(True)
-            for j in range(item.childCount()):
-                self.expand_all_childs(item.child(j))
+                for j in range(item.childCount()):
+                    item.child(j).setExpanded(True)
+                    for k in range(item.child(j).childCount()):
+                        item.child(j).child(k).setExpanded(False)
+                        self.expand_all_childs(item.child(j).child(k))
 
     def expand_all_childs(self, item):
         for i in range(item.childCount()):
