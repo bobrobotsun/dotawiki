@@ -85,7 +85,6 @@ def get_hero_data_from_txt(base_txt, source_address):
     this_string = this_file.read()
     alltext = re.finditer('"npc_dota_hero_(.*?)"\n\t\{(.|\n)*?\n\t\}', this_string)
     for i in alltext:
-        print(i.group(1))
         name = i.group(1)
         if name=='base':
             base_txt[name]=copy.deepcopy(hero_default)

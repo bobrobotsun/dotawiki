@@ -305,7 +305,7 @@ def create_upgrade_buff(json_dict):
             retxt += '<tr><td>'
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
-                    retxt += '[[file:' + re.sub(r'talent.png', lambda x: 'talentb.png',
+                    retxt += '[[file:' + re.sub(r'alent.png', lambda x: 'alentb.png',
                                                 json_dict[str(i)]['升级来源'][j]['图片']) + '|x22px|link=' + json_dict["名称"] + ']] '
             retxt += '</td><td style="padding:0.25em>'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
@@ -395,7 +395,8 @@ def create_upgrade_buff(json_dict):
                 else:
                     break
         else:
-            break
+            if i>1:
+                break
     retxt += '</table></div>'
     return retxt
 
@@ -410,7 +411,7 @@ def create_upgrade_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '[[file:' + re.sub(r'talent.png', lambda x: 'talentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
+                    retxt += '[[file:' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
             retxt += '</td><td style="padding:0.25em><span style="cursor:help;">[[file:' + json_dict[i]['图片'] + '|x22px|link=]]</span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
             kk = 0
@@ -424,7 +425,8 @@ def create_upgrade_mech(json_dict):
                 else:
                     break
         else:
-            break
+            if ii>1:
+                break
     retxt += '</table></div>'
     return retxt
 
@@ -439,10 +441,11 @@ def create_independent_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '[[file:' + re.sub(r'talent.png', lambda x: 'talentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
+                    retxt += '[[file:' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
         else:
-            break
+            if ii>1:
+                break
     retxt += '</table></div>'
     return retxt
 
@@ -454,7 +457,7 @@ def create_page_ability(db):
             + '<div class="bg-primary" style="font-size:100%;background:'
     if db["次级分类"] == "终极技能":
         retxt += '#6c3d83'
-    elif db["次级分类"] == "A杖技能":
+    elif db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
         retxt += '#105aa7'
     else:
         retxt += '#803024'
@@ -477,8 +480,10 @@ def create_page_ability(db):
     retxt += '<div>[[file:' + db["图片"] + '|160px|center|link=' + db['页面名'] + ']]</div>'
     if db['描述'] != '':
         retxt += '<div style="background:#111133;padding:1em;">' + db['描述'] + '</div>'
-    if db['A杖信息'] != '':
-        retxt += '<div style="background:#222266;padding:0.5em;">[[file:agha.png|x18px|link=]]：' + db['A杖信息'] + '</div>'
+    if db['神杖信息'] != '':
+        retxt += '<div style="background:#222266;padding:0.5em;">[[file:agha.png|x18px|link=]]：' + db['神杖信息'] + '</div>'
+    if db['魔晶信息'] != '':
+        retxt += '<div style="background:#222266;padding:0.5em;">[[file:shard.png|x18px|link=]]：' + db['魔晶信息'] + '</div>'
     if '技能升级信息' in db and '1' in db['技能升级信息']:
         retxt += '<div style="background:#222266;padding:0.25em;">'
         ii = 0
@@ -510,7 +515,7 @@ def create_page_ability(db):
     if db['传说'] != '':
         retxt += '<div style="font-size:75%;padding:1em;border-top:1px solid #777;margin-top:1em;color:#bbb">「 ' + db[
             "传说"] + ' 」</div>'
-    if db["次级分类"] == "A杖技能":
+    if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
         retxt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
     retxt += '</div>' \
              + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
@@ -859,63 +864,66 @@ def create_page_logs(title, log_base, log_list, name_base):
     if '官网链接' in log_base and log_base['官网链接'] != '' and log_base['官网链接'] != '-':
         retxt += '\n<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
     retxt += '\n<tr><td colspan=2 style="text-align:right;font-size:85%">[[data:' + title + '.json|<i class="fa fa-database" aria-hidden="true"></i>]]</td></tr></table>'
-    table_name = ["其他内容", '英雄', "物品", "中立生物", "建筑", "兵线", "通用"]
+    table_name = ["开头", '英雄', "物品", "中立生物", "建筑", "兵线", "通用", "结尾"]
     for i in range(len(table_name)):
         if table_name[i] in log_base:
             v = log_base[table_name[i]]
-            if isinstance(v, dict) and '0' in v:
-                if table_name[i] == '其他内容':
+            if isinstance(v, dict) and '无标题' in v:
+                if table_name[i] == '开头' or table_name[i] == '结尾':
                     titles = '=='
                 else:
                     titles = '==='
                     retxt += '\n==' + table_name[i] + '=='
-                for j, w in v.items():
-                    if w[0] != '':
-                        retxt += '\n' + titles
-                        if w[1] != '':
-                            retxt += '[[file:' + w[1] + '|x36px|link=' + w[0] + ']][[' + w[0] + ']]' + titles
-                        else:
-                            if w[0] in name_base:
-                                for k in name_base[w[0]]:
-                                    if k[2] != '':
-                                        retxt += '[[file:' + k[2] + '|x36px|link=' + k[0] + ']]'
-                                retxt += '[[' + name_base[w[0]][0][0] + '|' + w[0] + ']]' + titles
+                for j0, w0 in v.items():
+                    if j0!='无标题':
+                        retxt += '\n' +titles+ j0 +titles
+                    for j,w in w0.items():
+                        if w[0] != '':
+                            retxt += '\n===='
+                            if w[1] != '':
+                                retxt += '[[file:' + w[1] + '|x36px|link=' + w[0] + ']][[' + w[0] + ']]===='
                             else:
-                                retxt += w[0] + titles
-                    current_ul = 0
-                    for k in range(2, len(w)):
-                        x = w[k]
-                        if x['文字'] != '':
-                            if x['序列级数'] > current_ul:
-                                allul = int(x['序列级数']) - current_ul
-                                for l in range(allul):
+                                if w[0] in name_base:
+                                    for k in name_base[w[0]]:
+                                        if k[2] != '':
+                                            retxt += '[[file:' + k[2] + '|x36px|link=' + k[0] + ']]'
+                                    retxt += '[[' + name_base[w[0]][0][0] + '|' + w[0] + ']]===='
+                                else:
+                                    retxt += w[0] + '===='
+                        current_ul = 0
+                        for k in range(2, len(w)):
+                            x = w[k]
+                            if x['文字'] != '':
+                                if x['序列级数'] > current_ul:
+                                    allul = int(x['序列级数']) - current_ul
+                                    for l in range(allul):
+                                        retxt += '\n'
+                                        for tnumber in range(current_ul):
+                                            retxt += '\t'
+                                        retxt += '<ul>'
+                                        current_ul += 1
+                                elif x['序列级数'] < current_ul:
+                                    allul = current_ul - int(x['序列级数'])
+                                    for l in range(allul):
+                                        current_ul -= 1
+                                        retxt += '\n'
+                                        for tnumber in range(current_ul):
+                                            retxt += '\t'
+                                        retxt += '</ul>'
+                                if current_ul == 0:
+                                    retxt += '\n' + x['文字'] + '\n'
+                                else:
                                     retxt += '\n'
                                     for tnumber in range(current_ul):
                                         retxt += '\t'
-                                    retxt += '<ul>'
-                                    current_ul += 1
-                            elif x['序列级数'] < current_ul:
-                                allul = current_ul - int(x['序列级数'])
-                                for l in range(allul):
-                                    current_ul -= 1
-                                    retxt += '\n'
-                                    for tnumber in range(current_ul):
-                                        retxt += '\t'
-                                    retxt += '</ul>'
-                            if current_ul == 0:
-                                retxt += '\n' + x['文字'] + '\n'
-                            else:
-                                retxt += '\n'
-                                for tnumber in range(current_ul):
-                                    retxt += '\t'
-                                retxt += '<li>' + x['文字'] + '</li>'
-                    allul = current_ul
-                    for l in range(allul):
-                        current_ul -= 1
-                        retxt += '\n'
-                        for tnumber in range(current_ul):
-                            retxt += '\t'
-                        retxt += '</ul>'
+                                    retxt += '<li>' + x['文字'] + '</li>'
+                        allul = current_ul
+                        for l in range(allul):
+                            current_ul -= 1
+                            retxt += '\n'
+                            for tnumber in range(current_ul):
+                                retxt += '\t'
+                            retxt += '</ul>'
     retxt += '\n[[分类:版本更新]]'
     return retxt
 
@@ -934,31 +942,32 @@ def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
                 current_ul = 0
                 for j, w in v.items():
                     if isinstance(w, dict):
-                        for k, x in w.items():
-                            showit = False
-                            for l in range(2, len(x)):
-                                if x[0] != '' and x[0] in name:
-                                    showit = True
-                                else:
-                                    for m in range(len(x[l]['目标'])):
-                                        showit = showit and x[l]['目标'][m] in name
-                                showit = showit and x[l]['文字'] != ''
-                                if showit:
-                                    now += 1
-                                    if current_ul == 0:
-                                        if limit > 0:
-                                            retxt += '<h4>[[' + log_name + ']]</h4>'
-                                        else:
-                                            retxt += '<h3>[[' + log_name + ']]\t<small>' + v['更新日期'] + '</small></h3>'
-                                    if x[l]['序列级数'] > current_ul:
-                                        for m in range(x[l]['序列级数'] - current_ul):
-                                            retxt += '<ul>'
-                                        current_ul = x[l]['序列级数']
-                                    elif x[l]['序列级数'] < current_ul:
-                                        for m in range(current_ul - x[l]['序列级数']):
-                                            retxt += '</ul>'
-                                        current_ul = x[l]['序列级数']
-                                    retxt += '<li>' + x[l]['文字'] + '</li>'
+                        for j2, w2 in w.items():
+                            for k,x in w2.items():
+                                showit = False
+                                for l in range(2, len(x)):
+                                    if x[0] != '' and x[0] in name:
+                                        showit = True
+                                    else:
+                                        for m in range(len(x[l]['目标'])):
+                                            showit = showit and x[l]['目标'][m] in name
+                                    showit = showit and x[l]['文字'] != ''
+                                    if showit:
+                                        now += 1
+                                        if current_ul == 0:
+                                            if limit > 0:
+                                                retxt += '<h4>[[' + log_name + ']]</h4>'
+                                            else:
+                                                retxt += '<h3>[[' + log_name + ']]\t<small>' + v['更新日期'] + '</small></h3>'
+                                        if x[l]['序列级数'] > current_ul:
+                                            for m in range(x[l]['序列级数'] - current_ul):
+                                                retxt += '<ul>'
+                                            current_ul = x[l]['序列级数']
+                                        elif x[l]['序列级数'] < current_ul:
+                                            for m in range(current_ul - x[l]['序列级数']):
+                                                retxt += '</ul>'
+                                            current_ul = x[l]['序列级数']
+                                        retxt += '<li>' + x[l]['文字'] + '</li>'
                 for m in range(current_ul):
                     retxt += '</ul>'
     if limit > 0:

@@ -421,7 +421,7 @@ class Main(QMainWindow):
             basefile = open(os.path.join('database', 'dota2_address.json'), mode="r", encoding="utf-8")
             address = basefile.read()
             basefile.close()
-            self.catch_file_from_dota2(address)
+            self.catch_file_from_dota2(address,False)
         except FileNotFoundError:
             self.find_dota2_folder()
 
@@ -446,7 +446,7 @@ class Main(QMainWindow):
                 return
         self.catch_file_from_dota2(nowaddress)
 
-    def catch_file_from_dota2(self, address):
+    def catch_file_from_dota2(self, address,bools=True):
         has_text = [['英雄', '技能', '非英雄单位', '物品'],
                     ['npc_heroes.txt', 'npc_abilities.txt', 'npc_units.txt', 'items.txt'],
                     [False, False, False]]
@@ -479,6 +479,8 @@ class Main(QMainWindow):
             messagebox = QMessageBox(QMessageBox.Information, '文件抓取', ttt, QMessageBox.NoButton, self)
             messagebox.setStandardButtons(QMessageBox.Ok)
             messagebox.exec_()
+            if bools:
+                self.edit_category_selected_changed()
         else:
             messagebox = QMessageBox(QMessageBox.Critical, '错误的路径', '路径错误，没有发现任何有效文件，请重新选择路径！', QMessageBox.NoButton, self)
             messagebox.setStandardButtons(QMessageBox.Ok)
@@ -678,37 +680,54 @@ class Main(QMainWindow):
         return rere
 
     def fix_window_with_json_data(self):
-        self.resort()
-        names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
-        for i in names:
-            self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
-            self.mainlayout['列表'][i]['布局']['列表'].clear()
-            for j in self.json_base[i]:
-                temp = QListWidgetItem()
-                temp.setText(j)
-                image_name = ''
-                if i == '技能源':
-                    ability = self.find_the_ability_by_the_ability_source(j)
-                    if len(ability) == 0:
-                        image_name = 'DOTA2.jpg'
-                    elif len(ability) == 1:
-                        if self.json_base['技能'][ability[0]]['迷你图片'] == 'Talent.png' and self.json_base['技能'][ability[0]]['技能归属'] in self.json_base['英雄']:
-                            image_name = self.json_base['英雄'][self.json_base['技能'][ability[0]]['技能归属']]['迷你图片']
+        try:
+            self.resort()
+            names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
+            for i in names:
+                self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
+                self.mainlayout['列表'][i]['布局']['列表'].clear()
+                for j in self.json_base[i]:
+                    temp = QListWidgetItem()
+                    temp.setText(j)
+                    image_name = ''
+                    if i == '技能源':
+                        ability = self.find_the_ability_by_the_ability_source(j)
+                        if len(ability) == 0:
+                            image_name = 'DOTA2.jpg'
+                        elif len(ability) == 1:
+                            if '迷你图片' in self.json_base['技能'][ability[0]]:
+                                if self.json_base['技能'][ability[0]]['迷你图片'] == 'Talent.png' and self.json_base['技能'][ability[0]]['技能归属'] in self.json_base['英雄']:
+                                    image_name = self.json_base['英雄'][self.json_base['技能'][ability[0]]['技能归属']]['迷你图片']
+                                else:
+                                    image_name = self.json_base['技能'][ability[0]]['迷你图片']
+                            else:
+                                raise (editerror('技能', ability[0], '没有找到迷你图片'))
                         else:
-                            image_name = self.json_base['技能'][ability[0]]['迷你图片']
+                            if '迷你图片' in self.json_base['技能'][ability[0]]:
+                                if self.json_base['技能'][ability[0]]['迷你图片'] == 'Talent.png':
+                                    image_name = 'Talentb.png'
+                                else:
+                                    image_name = self.json_base['技能'][ability[0]]['迷你图片']
+                            else:
+                                raise (editerror('技能', ability[0], '没有找到迷你图片'))
                     else:
-                        if self.json_base['技能'][ability[0]]['迷你图片'] == 'Talent.png':
-                            image_name = 'Talentb.png'
+                        if '迷你图片' in self.json_base[i][j]:
+                            if self.json_base[i][j]['迷你图片'] == 'Talent.png':
+                                image_name = self.json_base['英雄'][self.json_base[i][j]['技能归属']]['迷你图片']
+                            else:
+                                image_name = self.json_base[i][j]['迷你图片']
                         else:
-                            image_name = self.json_base['技能'][ability[0]]['迷你图片']
-                else:
-                    if self.json_base[i][j]['迷你图片'] == 'Talent.png':
-                        image_name = self.json_base['英雄'][self.json_base[i][j]['技能归属']]['迷你图片']
-                    else:
-                        image_name = self.json_base[i][j]['迷你图片']
-                if image_name != '':
-                    temp.setIcon(self.create_icon_by_local_image(image_name))
-                self.mainlayout['列表'][i]['布局']['列表'].addItem(temp)
+                            raise (editerror(i, j, '没有找到迷你图片'))
+                    if image_name != '':
+                        temp.setIcon(self.create_icon_by_local_image(image_name))
+                    self.mainlayout['列表'][i]['布局']['列表'].addItem(temp)
+        except editerror as err:
+            self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
+            self.edit_category_selected_changed()
+            self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
+            self.edit_target_selected_changed()
+            QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
+
 
     # 以下是拥有bot权限的用户在开启软件后才能使用的内容
 
@@ -956,18 +975,24 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['大分类'] = QPushButton('大分类', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['大分类'])
         self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].clicked.connect(self.version_button_tree1)
+        self.versionlayout['版本内容']['横排版']['竖排版']['加中标题'] = QPushButton('加中标题', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加中标题'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['加中标题'].clicked.connect(self.version_button_tree1_add_tree2)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除中标题'] = QPushButton('删除中标题', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除中标题'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除中标题'].clicked.connect(self.version_button_delete_tree_item)
         self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'] = QPushButton('加小分类', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].clicked.connect(self.version_button_tree1_add_tree2)
-        self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'] = QPushButton('小分类改名', self)
-        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].clicked.connect(self.version_button_tree2_change_name)
+        self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].clicked.connect(self.version_button_tree2_add_tree3)
+        self.versionlayout['版本内容']['横排版']['竖排版']['标题分类改名'] = QPushButton('标题分类改名', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['标题分类改名'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['标题分类改名'].clicked.connect(self.version_button_tree2_change_name)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'] = QPushButton('删除小分类', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'])
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].clicked.connect(self.version_button_delete_tree_item)
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'] = QPushButton('加一条新条目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].clicked.connect(self.version_button_tree2_add_tree_list)
+        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].clicked.connect(self.version_button_tree3_add_tree_list)
         self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'] = QPushButton('向上移动题目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'])
         self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].clicked.connect(lambda: self.version_button_move_list_item(-1))
@@ -2255,10 +2280,15 @@ class Main(QMainWindow):
             if items.itemtype == 'text':
                 self.version_base[title][items.text(0)] = items.text(1)
             elif items.background(1) == self.green:
-                if items.text(0) == '其他内容':
-                    self.version_base[title][items.text(0)] = self.version_tree_to_json(items)
+                self.version_base[title][items.text(0)]={}
+                if items.text(0) == '开头' or items.text(0) == '结尾':
+                    for j in range(items.childCount()):
+                        items2=items.child(j)
+                        self.version_base[title][items.text(0)][items2.text(0)] = self.version_tree_to_json(items2)
                 else:
-                    self.version_base[title][items.text(0)] = edit_json.one_version_name_sort(self.version_tree_to_json(items))
+                    for j in range(items.childCount()):
+                        items2=items.child(j)
+                        self.version_base[title][items.text(0)][items2.text(0)] = edit_json.one_version_name_sort(self.version_tree_to_json(items2))
         if item.parent() == None:
             self.version_base[title]['次级版本'] = []
             for i in range(item.childCount()):
@@ -2291,10 +2321,20 @@ class Main(QMainWindow):
         for i in self.version_base:
             for j in self.version_base[i]:
                 if isinstance(self.version_base[i][j], dict):
-                    self.version_base[i][j] = edit_json.one_version_name_sort(self.version_base[i][j])
-            all_upload.append([i + '.json', self.version_base[i]])
-            if i in self.version_base:
-                all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'], name_upload_base)])
+                    temp1= {}
+                    if '无标题' not in self.version_base[i][j]:
+                        temp1['无标题']={'0':['','',{'序列级数':1,'文字':'','目标':[]}]}
+                    else:
+                        temp1['无标题']=self.version_base[i][j]['无标题']
+                        self.version_base[i][j].pop('无标题')
+                    for k in self.version_base[i][j]:
+                        if j=='开头' or j=='结尾':
+                            temp1[k]=self.version_base[i][j][k]
+                        else:
+                            temp1[k]=edit_json.one_version_name_sort(self.version_base[i][j][k])
+                    self.version_base[i][j] = copy.deepcopy(temp1)
+            all_upload.append([i+'.json',self.version_base[i]])
+            all_upload_page.append([i,common_page.create_page_logs(i,self.version_base[i],self.version_list['版本'],name_upload_base)])
         num1 = len(all_upload)
         num2 = len(all_upload_page)
         self.w.confirm_numbers(num1 + num2)
@@ -2386,7 +2426,7 @@ class Main(QMainWindow):
                 else:
                     new1.set_value(self.version_base[title][i])
             elif edit_json.version[i][0] == 'tree':
-                if i in self.version_base[title] and '0' in self.version_base[title][i]:
+                if i in self.version_base[title] and '无标题' in self.version_base[title][i]:
                     new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
                     new1.itemtype = 'tree1'
                     new1.setText(0, i)
@@ -2394,34 +2434,37 @@ class Main(QMainWindow):
                     for j in self.version_base[title][i]:
                         new2 = VersionItemEdit(new1)
                         new2.itemtype = 'tree2'
-                        if self.version_base[title][i][j][0] == '':
-                            new2.setText(0, '无标题')
-                        else:
-                            new2.setText(0, self.version_base[title][i][j][0])
-                        new2.set_value(self.version_base[title][i][j][1])
-                        for k in range(len(self.version_base[title][i][j])):
-                            if k > 1:
-                                new3 = VersionItemEdit(new2)
-                                new3.itemtype = 'tree_list'
-                                new3.setText(0, str(k - 1))
-                                new0 = VersionItemEdit(new3)
-                                new0.itemtype = 'text'
-                                new0.setText(0, '序列级数')
-                                if '序列级数' in self.version_base[title][i][j][k]:
-                                    new0.set_value(self.version_base[title][i][j][k]['序列级数'])
-                                else:
-                                    new0.set_value(1)
+                        new2.setText(0, j)
+                        for k in self.version_base[title][i][j]:
+                            new3 = VersionItemEdit(new2)
+                            new3.itemtype = 'tree3'
+                            if self.version_base[title][i][j][k][0] == '':
+                                new3.setText(0, '无标题')
+                            else:
+                                new3.setText(0, self.version_base[title][i][j][k][0])
+                            new3.setText(1,self.version_base[title][i][j][k][1])
+                            for l in range(2,len(self.version_base[title][i][j][k])):
                                 new4 = VersionItemEdit(new3)
-                                new4.itemtype = 'text'
-                                new4.setText(0, '文字')
-                                new4.set_value(self.version_base[title][i][j][k]['文字'])
-                                new5 = VersionItemEdit(new3)
-                                new5.itemtype = 'list'
-                                new5.setText(0, '目标')
-                                for l in self.version_base[title][i][j][k]['目标']:
-                                    new6 = VersionItemEdit(new5)
-                                    new6.itemtype = 'list_text'
-                                    new6.set_value(l)
+                                new4.itemtype = 'tree_list'
+                                new4.setText(0, str(l - 1))
+                                new5 = VersionItemEdit(new4)
+                                new5.itemtype = 'text'
+                                new5.setText(0, '序列级数')
+                                if '序列级数' in self.version_base[title][i][j][k][l]:
+                                    new5.set_value(self.version_base[title][i][j][k][l]['序列级数'])
+                                else:
+                                    new5.set_value(1)
+                                new6 = VersionItemEdit(new4)
+                                new6.itemtype = 'text'
+                                new6.setText(0, '文字')
+                                new6.set_value(self.version_base[title][i][j][k][l]['文字'])
+                                new7 = VersionItemEdit(new4)
+                                new7.itemtype = 'list'
+                                new7.setText(0, '目标')
+                                for m in self.version_base[title][i][j][k][l]['目标']:
+                                    new8 = VersionItemEdit(new7)
+                                    new8.itemtype = 'list_text'
+                                    new8.set_value(m)
                 else:
                     new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
                     new1.itemtype = 'tree1'
@@ -2435,20 +2478,22 @@ class Main(QMainWindow):
         if item.itemtype == 'tree1':
             if item.background(1) == self.red:
                 self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('启用大分类')
-                self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
+                self.versionlayout['版本内容']['横排版']['竖排版']['加中标题'].setEnabled(False)
             elif item.background(1) == self.green:
                 self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('禁用大分类')
-                self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(True)
+                self.versionlayout['版本内容']['横排版']['竖排版']['加中标题'].setEnabled(True)
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(True)
         else:
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('大分类')
             self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(False)
-            self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
-        self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].setEnabled(item.itemtype == 'tree2')
-        self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(item.itemtype == 'tree2')
-        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(item.itemtype == 'tree2')
-        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(item.itemtype == 'tree2' or item.itemtype == 'tree_list')
-        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].setEnabled(item.itemtype == 'tree2' or item.itemtype == 'tree_list')
+            self.versionlayout['版本内容']['横排版']['竖排版']['加中标题'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除中标题'].setEnabled(item.itemtype == 'tree2')
+        self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(item.itemtype == 'tree2')
+        self.versionlayout['版本内容']['横排版']['竖排版']['标题分类改名'].setEnabled(item.itemtype == 'tree2' or item.itemtype == 'tree3')
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(item.itemtype == 'tree3')
+        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(item.itemtype == 'tree3')
+        self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(item.itemtype == 'tree2' or item.itemtype == 'tree3' or item.itemtype == 'tree_list')
+        self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].setEnabled(item.itemtype == 'tree2' or item.itemtype == 'tree3' or item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(item.itemtype == 'list')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].setEnabled(item.itemtype == 'list_text')
@@ -2457,8 +2502,10 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setText('大分类')
         self.versionlayout['版本内容']['横排版']['竖排版']['大分类'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['加中标题'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['删除中标题'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['加小分类'].setEnabled(False)
-        self.versionlayout['版本内容']['横排版']['竖排版']['小分类改名'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['标题分类改名'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(False)
@@ -2475,6 +2522,8 @@ class Main(QMainWindow):
         elif item.background(1) == self.red:
             self.version_button_tree1()
             item.setExpanded(False)
+        elif item.itemtype == 'tree2':
+            self.version_button_tree2_add_tree3()
         elif item.hasvalue:
             self.version_edit_change_value()
 
@@ -2513,17 +2562,20 @@ class Main(QMainWindow):
                     ipp = item.parent().parent()
                     if ipp.itemtype == 'tree2' and ipp.child(ipp.childCount() - 1).child(1).text(1) != '':
                         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(ipp)
-                        self.version_button_tree2_add_tree_list()
+                        self.version_button_tree3_add_tree_list()
                         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
 
     def version_button_tree1(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         if item.background(1) == self.red:
             new = VersionItemEdit(item)
-            new.setText(0, '0')
+            new.setText(0, '无标题')
             new.itemtype = 'tree2'
-            self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new)
-            self.version_button_tree2_add_tree_list()
+            new2=VersionItemEdit(new)
+            new2.setText(0, '无标题')
+            new2.itemtype = 'tree3'
+            self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new2)
+            self.version_button_tree3_add_tree_list()
             item.setBackground(1, self.green)
             item.setExpanded(True)
         elif item.background(1) == self.green:
@@ -2536,11 +2588,29 @@ class Main(QMainWindow):
 
     def version_button_tree1_add_tree2(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
-        text, ok = MoInputWindow.getText(self, '新增一个小分类', '请输入你想要增加的分类名称:')
+        text, ok = MoInputWindow.getText(self, '新增一个中标题', '请输入你想要增加的标题名称:')
         if ok:
             new = VersionItemEdit(item)
             new.setText(0, text)
             new.itemtype = 'tree2'
+            new2=VersionItemEdit(new)
+            new2.setText(0, '无标题')
+            new2.itemtype = 'tree3'
+            item.setExpanded(True)
+            for i in range(item.childCount() - 1):
+                tempi = item.child(i)
+                tempi.setExpanded(False)
+            self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new2)
+            self.version_button_tree3_add_tree_list()
+            new.setExpanded(True)
+
+    def version_button_tree2_add_tree3(self):
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        text, ok = MoInputWindow.getText(self, '新增一个小分类', '请输入你想要增加的分类名称:')
+        if ok:
+            new = VersionItemEdit(item)
+            new.setText(0, text)
+            new.itemtype = 'tree3'
             item.setExpanded(True)
             for i in range(item.childCount() - 1):
                 tempi = item.child(i)
@@ -2548,13 +2618,13 @@ class Main(QMainWindow):
             item.removeChild(new)
             item.insertChild(1, new)
             self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(new)
-            self.version_button_tree2_add_tree_list()
+            self.version_button_tree3_add_tree_list()
             new.setExpanded(True)
 
     def version_button_tree2_change_name(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         parent = item.parent()
-        text, ok = MoInputWindow.getText(self, '小分类改名', '你现在正试图将【' + parent.text(0) + '】的【' + item.text(0) + '】的名字改为:', item.text(0))
+        text, ok = MoInputWindow.getText(self, '改名', '你现在正试图将【' + parent.text(0) + '】的【' + item.text(0) + '】的名字改为:', item.text(0))
         if ok:
             item.setText(0, text)
 
@@ -2582,7 +2652,7 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(parent)
         self.version_edit_all_button_clicked()
 
-    def version_button_tree2_add_tree_list(self):
+    def version_button_tree3_add_tree_list(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         new3 = VersionItemEdit(item)
         new3.itemtype = 'tree_list'
