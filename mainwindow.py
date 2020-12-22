@@ -1138,6 +1138,7 @@ class Main(QMainWindow):
 
     def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
         try:
+            self.upgrade_base={}
             name_dict_list = self.name_create_tree_list_name()
 
             hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version, name_dict_list)
