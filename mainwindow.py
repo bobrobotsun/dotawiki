@@ -17,7 +17,7 @@ import threading
 import copy
 import vpk
 import re
-import sys
+import math
 import hashlib
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -498,9 +498,16 @@ class Main(QMainWindow):
         if pagename[-5:] != '.json':
             pagename += '.json'
         download_data = {'action': 'jsondata', 'title': pagename, 'format': 'json'}
-        download_info = self.seesion.post(self.target_url, data=download_data, headers=self.header)
-        time.sleep(0.01)
-        return download_info.json()['jsondata']
+        warn=0
+        while True:
+            download_info = self.seesion.post(self.target_url, data=download_data, headers=self.header)
+            if download_info.status_code==200:
+                return download_info.json()['jsondata']
+            else:
+                warn+=1
+                time.sleep(1)
+
+
 
     def download_text_base(self):
         self.text_base = self.download_json('text_base.json')
@@ -1398,7 +1405,7 @@ class Main(QMainWindow):
                 k += 1
                 time.sleep(0.2)
                 if k >= 5:
-                    return ['《' + pagename + '》上传失败，请之后重新上传！', 10000]
+                    return ['《' + pagename + '》上传失败，请之后重新上传！', 0]
         if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
             if 'nochange' in upload_info.json()['edit']:
                 return ['没有修改《' + pagename + '》', 0]
@@ -1585,6 +1592,8 @@ class Main(QMainWindow):
         self.editlayout['修改核心']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
         self.editlayout['修改核心']['竖布局']['树'][0].setColumnWidth(0, 300)
         self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]], self.json_base[selected[0]][selected[1]])
+        if selected[0]=='物品':
+            self.item_dict_to_extra_tree(self.editlayout['修改核心']['竖布局']['树'],self.json_base[selected[0]][selected[1]])
         self.edit_json_expand_all()
         self.self_edit_button_default()
 
@@ -1662,6 +1671,35 @@ class Main(QMainWindow):
                     tdict[i].set_value(sdict[i])
                     tdict[i].islist = True
                 index += 1
+
+    def item_dict_to_extra_tree(self,tdict,sdict):
+        tempmenu=TreeItemEdit(tdict[0],'物品属性')
+        tempmenu.set_type('list')
+        tempmenu.set_kid_list(['tree', {'名称': ['text', ''],'代码': ['text', ''],'后缀': ['text', ''],'展示前缀': ['text', ''],'展示后缀': ['text', '']},1,0,False])
+        for ii in sdict:
+            if isinstance(sdict[ii],dict) and '代码' in sdict[ii] and '后缀' in sdict[ii] and '展示前缀' in sdict[ii] and '展示后缀' in sdict[ii]:
+                i = str(tempmenu.listtype[2])
+                tempmenu.listtype[2] += 1
+                tempmenu.listtype[3] += 1
+                new0=TreeItemEdit(tempmenu,str(i))
+                new0.set_type('tree')
+                new0.islist = True
+                new1=TreeItemEdit(new0,'名称')
+                new1.set_type('text')
+                new1.set_value(ii)
+                new2=TreeItemEdit(new0,'代码')
+                new2.set_type('text')
+                new2.set_value(sdict[ii]['代码'])
+                new3=TreeItemEdit(new0,'后缀')
+                new3.set_type('text')
+                new3.set_value(sdict[ii]['后缀'])
+                new4=TreeItemEdit(new0,'展示前缀')
+                new4.set_type('text')
+                new4.set_value(sdict[ii]['展示前缀'])
+                new5=TreeItemEdit(new0,'展示后缀')
+                new5.set_type('text')
+                new5.set_value(sdict[ii]['展示后缀'])
+                new0.setExpanded(True)
 
     def combine_text_to_tree(self, tdict, sdict):
         tdict['混合文字'] = {0: TreeItemEdit(tdict[0], '混合文字')}
@@ -1915,6 +1953,7 @@ class Main(QMainWindow):
             item.set_value(text)
 
     def json_edit_add_list(self):
+        category=self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
         i = str(item.listtype[2])
         item.listtype[2] += 1
@@ -1940,6 +1979,18 @@ class Main(QMainWindow):
                 temp.set_type(item.listtype[0])
                 temp.set_value(sdict[i])
                 temp.islist = True
+        if category=='物品' and item.text(0)=='物品属性':
+            choose = ['默认']
+            for i in edit_json.edit_adition['物品属性']:
+                choose.append(i)
+            text1, ok1 = MoInputWindow.getItem(self, "增加新目标", '目标类型', choose)
+            if ok1:
+                if text1 in edit_json.edit_adition['物品属性']:
+                    temp[0].child(0).setText(1,text1)
+                    temp[0].child(1).setText(1,edit_json.edit_adition['物品属性'][text1]['代码'])
+                    temp[0].child(2).setText(1,edit_json.edit_adition['物品属性'][text1]['后缀'])
+                    temp[0].child(3).setText(1,edit_json.edit_adition['物品属性'][text1]['展示前缀'])
+                    temp[0].child(4).setText(1,edit_json.edit_adition['物品属性'][text1]['展示后缀'])
         item.setExpanded(True)
 
     def json_edit_move_list_item(self, move_step=1):
@@ -2045,8 +2096,15 @@ class Main(QMainWindow):
             self.complex_dict_to_tree(tdict, edit_json.edit_default_target, edit_json.edit_default_category[text])
 
     def read_tree_to_json(self, tree, sdict):
+        category = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         for i in range(tree.topLevelItemCount()):
-            self.read_tree_item_to_json(tree.topLevelItem(i), sdict)
+            tli=tree.topLevelItem(i)
+            if category=='物品' and tli.text(0)=='物品属性':
+                for j in range(tli.childCount()):
+                    jc=tli.child(j)
+                    sdict[jc.child(0).text(1)]={'代码': jc.child(1).text(1), '后缀': jc.child(2).text(1), '展示前缀': jc.child(3).text(1), '展示后缀': jc.child(4).text(1)}
+            else:
+                self.read_tree_item_to_json(tli, sdict)
 
     def read_tree_item_to_json(self, item, sdict):
         if item.childCount() > 0:
@@ -3071,16 +3129,21 @@ class MoInputWindow(QDialog):
     def getItem(parent=None, title='做选择', tip_str='您将选择', iterable=[]):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
-        dialog.setGeometry(dialog.screen_size[0] * 0.45, dialog.screen_size[1] * 0.45, dialog.screen_size[0] * 0.1,
-                           dialog.screen_size[1] * 0.1)
+        lenth=math.floor(math.sqrt(len(iterable)/3))
+        dialog.setGeometry(dialog.screen_size[0] * (0.5-0.05*lenth), dialog.screen_size[1] * (0.5-0.05*lenth), dialog.screen_size[0] * 0.1*lenth,
+                           dialog.screen_size[1] * 0.1*lenth)
         dialog.s = QLabel(dialog)
         dialog.s.setText(tip_str + '：')
         dialog.layout["输入区域"]["0"].addWidget(dialog.s)
+        dialog.g=QGridLayout(dialog)
+        dialog.layout["输入区域"]["0"].addLayout(dialog.g)
         selects = []
         for i in range(len(iterable)):
             selects.append(QRadioButton(dialog))
             selects[i].setText(str(iterable[i]))
-            dialog.layout["输入区域"]["0"].addWidget(selects[i])
+            xx=math.floor(i/lenth)
+            yy=i-xx*lenth
+            dialog.g.addWidget(selects[i],xx,yy)
         selects[0].setChecked(True)
         result = dialog.exec_()
         re = ''

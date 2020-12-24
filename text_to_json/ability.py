@@ -120,21 +120,6 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
     for i in all_json['技能源']:
         all_json['技能源'][i]['应用'] = 1
         all_json['技能源'][i]['分类'] = '技能源'
-        if 'A杖信息' in all_json['技能源'][i]:
-            all_json['技能源'][i]['神杖信息'] = all_json['技能源'][i]['A杖信息']
-            all_json['技能源'][i].pop('A杖信息')
-        if '魔晶信息' not in all_json['技能源'][i]:
-            all_json['技能源'][i]['魔晶信息'] = ''
-        temp1 = all_json['技能源'][i]['升级']
-        if 'A杖' in temp1:
-            if '神杖' not in temp1 or len(temp1['神杖']) == 0:
-                temp1['神杖'] = temp1['A杖']
-            temp1.pop('A杖')
-        if '混合' in temp1:
-            temp1.pop('混合')
-        if '魔晶' not in temp1:
-            temp1['魔晶'] = ''
-        all_json['技能源'][i]['升级'] = temp1
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"

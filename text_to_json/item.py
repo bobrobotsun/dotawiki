@@ -1,6 +1,8 @@
 import json
 import hashlib
 import re
+import math
+from text_to_json import edit_json
 from text_to_json.WikiError import editerror
 
 # 查询数据范围
@@ -176,6 +178,23 @@ def fulfill_item_json(base_txt, all_json, version,name_base):
                     all_json[ii][i]["1"] = base_txt["物品"][all_json[ii]["代码名"]][all_json[ii][i]["代码"]][str(all_json[ii]['等级'])]
                 else:
                     all_json[ii][i]["1"] = base_txt["物品"][all_json[ii]["代码名"]][all_json[ii][i]["代码"]]["1"]
+        for i in all_json[ii]:
+            if i in edit_json.edit_adition['物品属性']:
+                if '前缀' in all_json[ii][i]:
+                    all_json[ii][i].pop('前缀')
+                if '展示名' in all_json[ii][i]:
+                    all_json[ii][i].pop('展示名')
+                all_json[ii][i]['展示前缀']=edit_json.edit_adition['物品属性'][i]['展示前缀']
+                all_json[ii][i]['后缀']=edit_json.edit_adition['物品属性'][i]['后缀']
+                all_json[ii][i]['展示后缀']=edit_json.edit_adition['物品属性'][i]['展示后缀']
+                if i=='会耗竭的':
+                    all_json[ii][i]['1']='不会因0充能而消失' if int(all_json[ii][i]['1'])==1 else '充能为0时会消失'
+                elif i=='首次购买时间':
+                    ttime=int(all_json[ii][i]['1'])-90
+                    all_json[ii][i]['1']=str(math.floor(ttime/60))+'：'+str(math.floor(ttime % 60)).zfill(2)
+                elif i=='商店补货时间':
+                    ttime=int(all_json[ii][i]['1'])
+                    all_json[ii][i]['1']=str(math.floor(ttime/60))+'：'+str(math.floor(ttime % 60)).zfill(2)
         if all_json[ii]["商店"]["1"][:2] == '中立':
             all_json[ii]["价格"]["1"] = '中立生物掉落'
         # 以下是确认物品的组件、卷轴情况
