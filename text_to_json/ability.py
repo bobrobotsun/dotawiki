@@ -148,64 +148,67 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 unit_dic["技能排序"] = "j"
             else:
                 unit_dic["技能排序"] = "z"
-        temp1 = copy.deepcopy(all_json['技能源'][unit_dic["数据来源"]])
-        if unit_dic["次级分类"] == "天赋技能":
-            unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
-            unit_dic["迷你图片"] = 'Talent.png'
-        elif unit_dic["次级分类"] == "物品技能":
-            if unit_dic["技能归属"] in all_json["物品"]:
-                unit_dic["图片"] = all_json["物品"][unit_dic["技能归属"]]["图片"]
-                unit_dic["迷你图片"] = all_json["物品"][unit_dic["技能归属"]]["迷你图片"]
+        if unit_dic["数据来源"] in all_json['技能源']:
+            temp1 = copy.deepcopy(all_json['技能源'][unit_dic["数据来源"]])
+            if unit_dic["次级分类"] == "天赋技能":
+                unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
+                unit_dic["迷你图片"] = 'Talent.png'
+            elif unit_dic["次级分类"] == "物品技能":
+                if unit_dic["技能归属"] in all_json["物品"]:
+                    unit_dic["图片"] = all_json["物品"][unit_dic["技能归属"]]["图片"]
+                    unit_dic["迷你图片"] = all_json["物品"][unit_dic["技能归属"]]["迷你图片"]
+                else:
+                    unit_dic["图片"] = "Items_" + temp1["代码"] + ".png"
+                    unit_dic["迷你图片"] = "Items_" + temp1["代码"] + ".png"
             else:
-                unit_dic["图片"] = "Items_" + temp1["代码"] + ".png"
-                unit_dic["迷你图片"] = "Items_" + temp1["代码"] + ".png"
+                unit_dic["图片"] = "Spellicons_" + temp1["代码"] + ".png"
+                unit_dic["迷你图片"] = "Spellicons_" + temp1["代码"] + ".png"
+            for i in temp1:
+                if i in ability_trait_level[0]:
+                    unit_dic[i] = temp1[i]
+                elif i in ability_trait_level[1]:
+                    unit_dic[i] = {}
+                    j = 0
+                    while True:
+                        j += 1
+                        if str(j) in temp1[i]:
+                            unit_dic[i][str(j)] = group_source(temp1[i][str(j)])
+                        else:
+                            break
+                elif i in ability_trait_level[2]:
+                    unit_dic[i] = {}
+                    j = 0
+                    while True:
+                        j += 1
+                        if str(j) in temp1[i]:
+                            unit_dic[i][str(j)] = {}
+                            k = 0
+                            while True:
+                                k += 1
+                                if str(k) in temp1[i][str(j)]:
+                                    unit_dic[i][str(j)][str(k)] = group_source(temp1[i][str(j)][str(k)])
+                                else:
+                                    break
+                            if '名称' in temp1[i][str(j)]:
+                                unit_dic[i][str(j)]['名称'] = temp1[i][str(j)]['名称']
+                        else:
+                            break
+                elif i in ability_trait_level[3]:
+                    unit_dic[i] = {}
+                    for j in temp1[i]:
+                        unit_dic[i][j] = group_source(temp1[i][j])
+                elif i == "升级":
+                    if "神杖" in temp1[i] and len(temp1[i]["神杖"]) > 0 or "技能" in temp1[i] and len(
+                            temp1[i]["技能"]) > 0 or "魔晶" in temp1[i] and len(temp1[i]["魔晶"]) > 0:
+                        upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
+                elif i == "页面名" or i == '应用' or i == '分类':
+                    continue
+                else:
+                    unit_dic[i] = group_source(temp1[i])
+            unit_dic["技能升级信息"] = {}
+            all_json["技能"][unit_dic["页面名"]] = copy.deepcopy(unit_dic)
         else:
-            unit_dic["图片"] = "Spellicons_" + temp1["代码"] + ".png"
-            unit_dic["迷你图片"] = "Spellicons_" + temp1["代码"] + ".png"
-        for i in temp1:
-            if i in ability_trait_level[0]:
-                unit_dic[i] = temp1[i]
-            elif i in ability_trait_level[1]:
-                unit_dic[i] = {}
-                j = 0
-                while True:
-                    j += 1
-                    if str(j) in temp1[i]:
-                        unit_dic[i][str(j)] = group_source(temp1[i][str(j)])
-                    else:
-                        break
-            elif i in ability_trait_level[2]:
-                unit_dic[i] = {}
-                j = 0
-                while True:
-                    j += 1
-                    if str(j) in temp1[i]:
-                        unit_dic[i][str(j)] = {}
-                        k = 0
-                        while True:
-                            k += 1
-                            if str(k) in temp1[i][str(j)]:
-                                unit_dic[i][str(j)][str(k)] = group_source(temp1[i][str(j)][str(k)])
-                            else:
-                                break
-                        if '名称' in temp1[i][str(j)]:
-                            unit_dic[i][str(j)]['名称'] = temp1[i][str(j)]['名称']
-                    else:
-                        break
-            elif i in ability_trait_level[3]:
-                unit_dic[i] = {}
-                for j in temp1[i]:
-                    unit_dic[i][j] = group_source(temp1[i][j])
-            elif i == "升级":
-                if "神杖" in temp1[i] and len(temp1[i]["神杖"]) > 0 or "技能" in temp1[i] and len(
-                        temp1[i]["技能"]) > 0 or "魔晶" in temp1[i] and len(temp1[i]["魔晶"]) > 0:
-                    upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
-            elif i == "页面名" or i == '应用' or i == '分类':
-                continue
-            else:
-                unit_dic[i] = group_source(temp1[i])
-        unit_dic["技能升级信息"] = {}
-        all_json["技能"][unit_dic["页面名"]] = copy.deepcopy(unit_dic)
+            raise (editerror('技能', ijk, '没有在【技能源】中搜索到' + unit_dic["数据来源"]))
 
 
 def group_source(a):
@@ -473,20 +476,20 @@ def one_upgrade(json, base_txt, name, target):
                 nowcheck = [-1 * int(caloprate[ii][0]), ii - 1]
         if nowcheck[0] < 0:
             for j in range(len(calvalue)):
-                if j >> nowcheck[1]:
-                    calvalue[j]=array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][1:])
+                if j >> nowcheck[1] & 1:
+                    calvalue[j] = array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][1:])
             caloprate[nowcheck[1] + 1] = ''
         else:
             break
     for ii in range(2, extra + 2):
         if len(caloprate[ii]) > 0 and not caloprate[ii][-1].isnumeric():
             for j in range(len(calvalue)):
-                if j >> (ii - 2):
-                    calvalue[j]=array_cal(calvalue[j], getvalue[ii], caloprate[ii])
+                if j >> (ii - 2) & 1:
+                    calvalue[j] = array_cal(calvalue[j], getvalue[ii], caloprate[ii])
             caloprate[ii] = ''
     if len(caloprate[1]) > 0:
         for j in range(len(calvalue)):
-            calvalue[j]=array_cal(calvalue[j], getvalue[1], caloprate[1])
+            calvalue[j] = array_cal(calvalue[j], getvalue[1], caloprate[1])
     while True:
         nowcheck = [0, 0]
         for ii in range(2, extra + 2):
@@ -494,8 +497,8 @@ def one_upgrade(json, base_txt, name, target):
                 nowcheck = [-1 * int(caloprate[ii][-1]), ii - 1]
         if nowcheck[0] < 0:
             for j in range(len(calvalue)):
-                if j >> nowcheck[1]:
-                    calvalue[j]=array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][:-1])
+                if j >> nowcheck[1] & 1:
+                    calvalue[j] = array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][:-1])
             caloprate[nowcheck[1] + 1] = ''
         else:
             break
@@ -516,7 +519,7 @@ def one_upgrade(json, base_txt, name, target):
         if bitsum_list[result_to_show_index[i]] > 1:
             json[str(i + 1)]["升级来源"] = {}
             for j in range(extra):
-                if result_to_show_index[i] >> j:
+                if result_to_show_index[i] >> j & 1:
                     for l in json[str(result_to_show_index[j + 1] + 1)]:
                         if not l.isdigit() and l != '代码' and l != '修正' and l != '升级来源':
                             json[str(i + 1)][l] = json[str(result_to_show_index[j + 1] + 1)][l]
@@ -605,6 +608,7 @@ def array_cal(arr1, arr2, opp):
         elif opp[0] == '=' and opp[-1] == '/':
             arr1[i] = float(opp[1:-1]) / temp
     return arr1
+
 
 def complete_mech(all_json, mech_json):
     for i in all_json:
@@ -1128,7 +1132,7 @@ def expand_value_source_list_with_another_source_dict(l, d, s):
         tempd.append({i: d[i]})
     for i in range(lenexd):
         for j in range(lend):
-            if i >> j:
+            if i >> j & 1:
                 exd[i].update(tempd[j])
     exl = []  # len=0，之后会append到lenexl
     for i in l:
@@ -1144,7 +1148,7 @@ def expand_value_source_list_with_another_source_dict(l, d, s):
         temps.append({i: s[i]})
     for i in range(lenexs):
         for j in range(lens):
-            if i >> j:
+            if i >> j & 1:
                 exs[i].update(temps[j])
     bitsum_list = [all_bit_sum(i) for i in range(lenexs)]
     sorteds = []

@@ -1350,16 +1350,19 @@ class Main(QMainWindow):
                         if j in self.json_base['技能源']:
                             all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
                 if k in self.json_base['英雄']:
+                    all_upload.append([k + '.json', self.json_base['英雄'][k]])
                     all_page.append([k, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], k)])
                     all_page.append([k + '/版本改动',
                                      common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][k]),
                                                                  0)])
                 elif k in self.json_base['物品']:
+                    all_upload.append([k + '.json', self.json_base['物品'][k]])
                     all_page.append([k, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], k)])
                     all_page.append([k + '/版本改动',
                                      common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][k]),
                                                                  0)])
                 elif k in self.json_base['非英雄单位']:
+                    all_upload.append([k + '.json', self.json_base['非英雄单位'][k]])
                     all_page.append([k, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], k)])
                     all_page.append([k + '/版本改动',
                                      common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][k]),
@@ -1786,14 +1789,12 @@ class Main(QMainWindow):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         text, ok = MoInputWindow.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:')
         if ok:
-            self.update_json_name(self.download_json('json_name.json'))
             self.json_name[selected].append(text)
             self.json_base[selected][text] = {}
             for i in edit_json.edit[selected]:
                 self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
             self.json_base[selected][text]['页面名'] = text
             self.resort()
-            self.upload_json('json_name.json', self.json_name)
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
             self.edit_category_selected_changed()
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
@@ -1825,10 +1826,8 @@ class Main(QMainWindow):
             self.json_base[ss[0]].pop(ss[1])
             self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
             self.resort()
-            self.upload_json('json_name.json', self.json_name)
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
             self.edit_category_selected_changed()
-            self.upload_json('json_name.json', self.json_name)
             QMessageBox.information(self, '删除完毕', '删除成功！您将不会再看到这个库。')
 
     def json_edit_change_name(self):

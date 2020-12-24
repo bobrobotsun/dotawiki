@@ -693,10 +693,11 @@ def create_infobox_item(db):
         retxt += '<span style="margin-left:1em;">[[file:items recipe.png|24px|link=]]&nbsp;' + number_to_string(db['卷轴价格']['1']) + '</span>'
     retxt += '</td></tr>'
     for i, v in common_pro.items():
-        if i in db:
-            retxt += common_tag[0] + v[get_item_value(db[i])] + common_tag[1]
-        else:
-            retxt += common_tag[0] + v[0] + common_tag[1]
+        if i!='可拆分' or '组件' in db:
+            if i in db:
+                retxt += common_tag[0] + v[get_item_value(db[i])] + common_tag[1]
+            else:
+                retxt += common_tag[0] + v[0] + common_tag[1]
     for i, v in db.items():
         if isinstance(v,dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
             retxt += normal_tag[0] + v['展示前缀'] + number_to_string(v['1']) + v['后缀']+ v['展示后缀']+ normal_tag[1]
