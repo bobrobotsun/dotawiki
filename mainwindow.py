@@ -3128,7 +3128,7 @@ class MoInputWindow(QDialog):
     def getItem(parent=None, title='做选择', tip_str='您将选择', iterable=[]):
         dialog = MoInputWindow(parent)
         dialog.setWindowTitle(title)
-        lenth=math.floor(math.sqrt(len(iterable)/3))
+        lenth=max(1,math.floor(math.sqrt(len(iterable)/3)))
         dialog.setGeometry(dialog.screen_size[0] * (0.5-0.05*lenth), dialog.screen_size[1] * (0.5-0.05*lenth), dialog.screen_size[0] * 0.1*lenth,
                            dialog.screen_size[1] * 0.1*lenth)
         dialog.s = QLabel(dialog)
