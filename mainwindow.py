@@ -386,8 +386,7 @@ class Main(QMainWindow):
             self.json_name = json.loads(basefile.read())
             basefile.close()
         except FileNotFoundError:
-            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton,
-                                     self)
+            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载合成数据列表？", QMessageBox.NoButton,self)
             button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
             button2 = messageBox.addButton('没有网络，没法下载', QMessageBox.NoRole)
             messageBox.exec_()
@@ -669,7 +668,7 @@ class Main(QMainWindow):
                         break
                     self.lock.release()
         self.lock.acquire()
-        if (threading.activeCount() <= self.startactiveCount + 1):
+        if (threading.activeCount() <= self.startactiveCount):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
             self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口', 0])
@@ -1273,7 +1272,7 @@ class Main(QMainWindow):
     def download_one_image(self, owner_name, image_name):
         k = 0
         while True:
-            download_info = self.seesion.post(self.get_the_wiki_image_with_hashmd5(image_name), headers=self.header)
+            download_info = self.seesion.get(self.get_the_wiki_image_with_hashmd5(image_name))
             if download_info.status_code == 200:
                 with open(os.path.join('material_lib', image_name), "wb") as f:
                     f.write(download_info.content)

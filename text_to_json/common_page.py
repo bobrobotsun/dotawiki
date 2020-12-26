@@ -58,7 +58,8 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
                         if jj > 1:
                             retext += "/"
                         retext += number_to_string(numjson[i][j])
-                        retext += post_each(numjsons[k])
+                        if retext[-1].isnumeric():
+                            retext += post_each(numjsons[k])
                     else:
                         break
                 retext += post_group(numjson)
@@ -125,12 +126,9 @@ def create_upgrade_cast_target(db):
                     else:
                         break
             retxt += '</td>'
-            ii = 0
-            while True:
-                ii += 1
-                i = str(ii)
-                if i in arr:
-                    v = arr[i]
+            for i in arr:
+                v = arr[i]
+                if len(v)>0:
                     bool = True
                     if len(v) == 0:
                         bool = False
@@ -148,13 +146,13 @@ def create_upgrade_cast_target(db):
                             jj += 1
                             j = str(jj)
                             if j in v:
-                                w = arr[j]
+                                w = v[j]
                                 kk = 0
                                 while True:
                                     kk += 1
                                     k = str(kk)
                                     if k in w:
-                                        x = arr[k]
+                                        x = w[k]
                                         retxt += '<span class="ability_indicator" style="cursor:help;background:' + w[
                                             "颜色"] + ';color:white;" title="(' + w["值"] + ')'
                                         ll = 0
@@ -162,7 +160,7 @@ def create_upgrade_cast_target(db):
                                             ll += 1
                                             l = str(ll)
                                             if l in x:
-                                                y = arr[l]
+                                                y = x[l]
                                                 if ll > 1:
                                                     retxt += ','
                                                 retxt += y['值']
@@ -183,7 +181,8 @@ def create_upgrade_cast_target(db):
                     break
             retxt += '</tr></table></div>'
         else:
-            break
+            if hh>=1:
+                break
     return retxt
 
 

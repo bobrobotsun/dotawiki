@@ -476,7 +476,7 @@ def one_upgrade(json, base_txt, name, target):
                 nowcheck = [-1 * int(caloprate[ii][0]), ii - 1]
         if nowcheck[0] < 0:
             for j in range(len(calvalue)):
-                if j >> nowcheck[1] & 1:
+                if j >> (nowcheck[1]-1) & 1:
                     calvalue[j] = array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][1:])
             caloprate[nowcheck[1] + 1] = ''
         else:
@@ -497,7 +497,7 @@ def one_upgrade(json, base_txt, name, target):
                 nowcheck = [-1 * int(caloprate[ii][-1]), ii - 1]
         if nowcheck[0] < 0:
             for j in range(len(calvalue)):
-                if j >> nowcheck[1] & 1:
+                if j >> (nowcheck[1]-1) & 1:
                     calvalue[j] = array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][:-1])
             caloprate[nowcheck[1] + 1] = ''
         else:
