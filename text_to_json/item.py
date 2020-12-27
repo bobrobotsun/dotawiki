@@ -5,6 +5,7 @@ import math
 from text_to_json import edit_json
 from text_to_json.WikiError import editerror
 
+
 # 查询数据范围
 def findtb(source, start, end, tb, brace=0):
     i = j = 0
@@ -118,13 +119,15 @@ def finditemspecial(source, data, tb):
             else:
                 return
 
-def get_dota_data_from_vpk(base_txt,ffile):
+
+def get_dota_data_from_vpk(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
     alltext = re.finditer('"DOTA_Tooltip_ability_item_(.*?)_Lore".*?"(.*?)"', this_string)
     for i in alltext:
-        name=i.group(1)
+        name = i.group(1)
         if name in base_txt:
-            base_txt[name]['lore']={'1':i.group(2)}
+            base_txt[name]['lore'] = {'1': i.group(2)}
+
 
 def get_hero_data_from_txt(base_txt, ffile):
     source_string = ffile.read().decode('utf8')
@@ -147,15 +150,15 @@ def get_hero_data_from_txt(base_txt, ffile):
             break
 
 
-def fulfill_item_json(base_txt, all_json, version,name_base):
+def fulfill_item_json(base_txt, all_json, version, name_base):
     for ii in all_json:
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
         all_json[ii]["应用"] = 1
         all_json[ii]["传说"] = base_txt["物品"][all_json[ii]['代码名']]['lore']['1'] if 'lore' in base_txt["物品"][all_json[ii]['代码名']] else all_json[ii]["传说"]
-        if all_json[ii]['图片']=='':
+        if all_json[ii]['图片'] == '':
             all_json[ii]['图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
-        if all_json[ii]['迷你图片']=='':
+        if all_json[ii]['迷你图片'] == '':
             all_json[ii]['迷你图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
         if '图片地址' in all_json[ii]:
             all_json[ii].pop('图片地址')
@@ -171,7 +174,7 @@ def fulfill_item_json(base_txt, all_json, version,name_base):
             all_json[ii].pop('升级')
         for i in item_for_item:
             if item_for_item[i] in base_txt["物品"][all_json[ii]['代码名']]:
-                all_json[ii][i] = {'代码':item_for_item[i]}
+                all_json[ii][i] = {'代码': item_for_item[i]}
         for i in all_json[ii]:
             if isinstance(all_json[ii][i], dict) and '代码' in all_json[ii][i] and all_json[ii][i]["代码"] in base_txt["物品"][all_json[ii]["代码名"]]:
                 if str(all_json[ii]['等级']) in base_txt["物品"][all_json[ii]["代码名"]][all_json[ii][i]["代码"]]:
@@ -184,17 +187,17 @@ def fulfill_item_json(base_txt, all_json, version,name_base):
                     all_json[ii][i].pop('前缀')
                 if '展示名' in all_json[ii][i]:
                     all_json[ii][i].pop('展示名')
-                all_json[ii][i]['展示前缀']=edit_json.edit_adition['物品属性'][i]['展示前缀']
-                all_json[ii][i]['后缀']=edit_json.edit_adition['物品属性'][i]['后缀']
-                all_json[ii][i]['展示后缀']=edit_json.edit_adition['物品属性'][i]['展示后缀']
-                if i=='会耗竭的':
-                    all_json[ii][i]['1']='不会因0充能而消失' if int(all_json[ii][i]['1'])==1 else '充能为0时会消失'
-                elif i=='首次购买时间':
-                    ttime=int(all_json[ii][i]['1'])-90
-                    all_json[ii][i]['1']=str(math.floor(ttime/60))+'：'+str(math.floor(ttime % 60)).zfill(2)
-                elif i=='商店补货时间':
-                    ttime=int(all_json[ii][i]['1'])
-                    all_json[ii][i]['1']=str(math.floor(ttime/60))+'：'+str(math.floor(ttime % 60)).zfill(2)
+                all_json[ii][i]['展示前缀'] = edit_json.edit_adition['物品属性'][i]['展示前缀']
+                all_json[ii][i]['后缀'] = edit_json.edit_adition['物品属性'][i]['后缀']
+                all_json[ii][i]['展示后缀'] = edit_json.edit_adition['物品属性'][i]['展示后缀']
+                if i == '会耗竭的':
+                    all_json[ii][i]['1'] = '不会因0充能而消失' if int(all_json[ii][i]['1']) == 1 else '充能为0时会消失'
+                elif i == '首次购买时间':
+                    ttime = int(all_json[ii][i]['1']) - 90
+                    all_json[ii][i]['1'] = str(math.floor(ttime / 60)) + '：' + str(math.floor(ttime % 60)).zfill(2)
+                elif i == '商店补货时间':
+                    ttime = int(all_json[ii][i]['1'])
+                    all_json[ii][i]['1'] = str(math.floor(ttime / 60)) + '：' + str(math.floor(ttime % 60)).zfill(2)
         if all_json[ii]["商店"]["1"][:2] == '中立':
             all_json[ii]["价格"]["1"] = '中立生物掉落'
         # 以下是确认物品的组件、卷轴情况
@@ -203,7 +206,7 @@ def fulfill_item_json(base_txt, all_json, version,name_base):
                 hecheng = "1"
             else:
                 hecheng = str(all_json[ii]["合成"])
-            if ('recipe_' + all_json[ii]["代码名"]) in base_txt["物品"] and len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"])>=int(hecheng):
+            if ('recipe_' + all_json[ii]["代码名"]) in base_txt["物品"] and len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"]) >= int(hecheng):
                 all_json[ii]["组件"] = {}
                 if "ItemCost" in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]] and base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"] != 0:
                     if all_json[ii]["商店"]["1"][:2] == '中立':
@@ -218,11 +221,8 @@ def fulfill_item_json(base_txt, all_json, version,name_base):
                 else:
                     if base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng][str(
                             len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng]))][0:6] == 'recipe':
-                        all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1':
-                            base_txt["物品"][
-                                base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng][
-                                    str(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng]))]][
-                                "ItemCost"]["1"]}
+                        all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': base_txt["物品"][base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng][
+                            str(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng]))]]["ItemCost"]["1"]}
                         all_json[ii]["组件"] = {}
                         for j in range(len(base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng]) - 1):
                             all_json[ii]["组件"][str(j + 1)] = base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemRequirements"][hecheng][str(j + 1)]
@@ -237,7 +237,7 @@ def fulfill_item_json(base_txt, all_json, version,name_base):
         if "组件" in all_json[i]:
             for j in all_json[i]["组件"]:
                 for k in all_json:
-                    if len(all_json[i]["组件"][j])>=len(all_json[k]["代码名"]) and all_json[i]["组件"][j][:len(all_json[k]["代码名"])] == all_json[k]["代码名"]:
+                    if len(all_json[i]["组件"][j]) >= len(all_json[k]["代码名"]) and all_json[i]["组件"][j][:len(all_json[k]["代码名"])] == all_json[k]["代码名"]:
                         all_json[i]["组件"][j] = {"物品名": all_json[k]["页面名"], "图片": all_json[k]["图片"]}
     # 接下来把所有的升级放在这儿
     for i in all_json:
@@ -245,8 +245,9 @@ def fulfill_item_json(base_txt, all_json, version,name_base):
             if all_json[i]["合成"] == 0:
                 for j in base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"]:
                     for k in base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"][j]:
+                        require_code=base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"][j][k]
                         for l in all_json:
-                            if all_json[l]["代码名"] == base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"][j][k]:
+                            if len(all_json[l]["代码名"])<=len(require_code) and  require_code[:len(all_json[l]["代码名"])]==all_json[l]["代码名"]:
                                 if "升级" not in all_json[l]:
                                     all_json[l]["升级"] = {"1": {"物品名": all_json[i]["页面名"], "图片": all_json[i]["图片"]}}
                                 elif all_json[l]["升级"][str(len(all_json[l]["升级"]))]["物品名"] != i:
@@ -298,4 +299,4 @@ itempro_num = [["施法距离", "AbilityCastRange"]
     , ["可提醒队友", "ItemAlertable"]
                ]
 itempro_bool = [["即时生效", "DOTA_ABILITY_BEHAVIOR_IMMEDIATE"]]
-item_for_item = {"可提醒队友":"ItemAlertable", "可拆分":"ItemDisassembleRule"}
+item_for_item = {"可提醒队友": "ItemAlertable", "可拆分": "ItemDisassembleRule"}

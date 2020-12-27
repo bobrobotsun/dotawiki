@@ -42,7 +42,7 @@ class Main(QMainWindow):
         self.target_url = 'https://dota.huijiwiki.com/w/api.php'
         self.image_url = 'https://huiji-public.huijistatic.com/dota/uploads'
         self.seesion = requests.session()
-        self.header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36 Edg/87.0.664.55'}
+        self.header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.66'}
         self.get_login_token_data = {'action': 'query', 'meta': 'tokens', 'type': 'login', 'format': 'json'}
         self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'https://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
         self.get_csrf_token_data = {'action': 'query', 'meta': 'tokens', 'format': 'json'}
@@ -70,6 +70,8 @@ class Main(QMainWindow):
         self.version_base = {}
         # 曾用名的内容
         self.name_base = {'历史': [], '原生': [], '衍生': []}
+        #时间函数
+        self.time_point_for_iterable_sleep = time.time()
 
     def initUI(self):
         # 设定软件的图标
@@ -155,13 +157,13 @@ class Main(QMainWindow):
             # 获取登录令牌
             login_token = self.seesion.post(self.target_url, data=self.get_login_token_data, headers=self.header)
             # 使用登录令牌登录
-            if login_token.status_code == 200:
+            if login_token.status_code < 400:
                 login_token_json = login_token.json()
                 self.login_data['logintoken'] = login_token_json['query']['tokens']['logintoken']
                 break
             else:
                 tryi += 1
-                time.sleep(1)
+                self.time_point_for_iterable_sleep_by_time()
                 QMessageBox.critical(self, '登录遭遇阻碍', '暂时登录失败，已尝试' + str(tryi) + '次！错误代码：' + str(login_token.status_code))
         self.login_data['username'] = password['用户名']
         self.login_data['password'] = password['密码']
@@ -171,7 +173,7 @@ class Main(QMainWindow):
             # 判断登录效果
             if login_info.status_code != 200 or login_info.json()["clientlogin"]["status"] == "FAIL":
                 tryi += 1
-                time.sleep(1)
+                self.time_point_for_iterable_sleep_by_time()
                 if tryi > 100:
                     messageBox = QMessageBox(QMessageBox.Critical, "登录失败", "请问是否重新登录？", QMessageBox.NoButton, self)
                     buttonY = messageBox.addButton('重新登录', QMessageBox.YesRole)
@@ -504,7 +506,7 @@ class Main(QMainWindow):
                 return download_info.json()['jsondata']
             else:
                 warn+=1
-                time.sleep(1)
+                self.time_point_for_iterable_sleep_by_time()
 
 
 
@@ -617,6 +619,14 @@ class Main(QMainWindow):
             if mb.clickedButton() == button1:
                 self.download_json_name()
 
+    def time_point_for_iterable_sleep_by_time(self,pasttime=0,staytime=1):
+        if pasttime==0:
+            pasttime=self.time_point_for_iterable_sleep
+        temptime=time.time()
+        if temptime-pasttime<staytime:
+            time.sleep(staytime+pasttime-temptime)
+        return temptime
+
     def download_json_thread(self):
         while True:
             self.lock.acquire()
@@ -636,7 +646,7 @@ class Main(QMainWindow):
             while True:
                 self.local.download_info = self.local.seesion.post(self.local.target_url, headers=self.header, data=self.local.download_data)
                 self.lock.acquire()
-                if self.local.download_info.status_code == 200:
+                if self.local.download_info.status_code < 400:
                     try:
                         self.local.jsons = self.local.download_info.json()
                     except Exception as xx:
@@ -657,11 +667,13 @@ class Main(QMainWindow):
                         self.current_num[0] += 1
                         break
                     finally:
-                        time.sleep(0.05)
+                        self.time_point_for_iterable_sleep_by_time()
                         self.lock.release()
                 else:
                     self.local.k += 1
-                    time.sleep(self.local.k * 0.1)
+                    self.time_point_for_iterable_sleep_by_time()
+                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：'+self.local.download_info.status_code, 2],
+                                          self.current_num[0], threading.current_thread().name)
                     if self.local.k >= 10:
                         print(self.download_json_list[self.local.current_num], '：下载出现错误，原因为：联网失败')
                         self.lock.release()
@@ -884,12 +896,19 @@ class Main(QMainWindow):
         self.editlayout[0].addWidget(self.editlayout['额外机制'][0], 2)
         self.editlayout['额外机制']['竖布局'] = {0: QVBoxLayout()}
         self.editlayout['额外机制'][0].setLayout(self.editlayout['额外机制']['竖布局'][0])
+        self.editlayout['额外机制']['竖布局']['关联技能'] = {0: QTreeWidget(self)}
+        self.editlayout['额外机制']['竖布局'][0].addWidget(self.editlayout['额外机制']['竖布局']['关联技能'][0])
+        self.editlayout['额外机制']['竖布局']['关联技能'][0].setHeaderLabels(['大分类', '名称'])
+        self.editlayout['额外机制']['竖布局']['关联技能'][0].setColumnWidth(0, 150)
+        self.editlayout['额外机制']['竖布局']['关联技能'][0].expandAll()
+        self.editlayout['额外机制']['竖布局']['关联技能'][0].doubleClicked.connect(self.edit_target_selected_quick_changed)
         self.editlayout['额外机制']['竖布局']['树'] = {0: QTreeWidget(self)}
         self.editlayout['额外机制']['竖布局'][0].addWidget(self.editlayout['额外机制']['竖布局']['树'][0])
         self.editlayout['额外机制']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
         self.dict_to_tree(self.editlayout['额外机制']['竖布局']['树'], self.mech)
         self.editlayout['额外机制']['竖布局']['树'][0].setColumnWidth(0, 150)
-        self.editlayout['额外机制']['竖布局']['树'][0].expandAll()
+        for i in range(self.editlayout['额外机制']['竖布局']['树'][0].topLevelItemCount()):
+            self.editlayout['额外机制']['竖布局']['树'][0].topLevelItem(i).setExpanded(True)                    
 
         for i in edit_json.edit:
             self.editlayout['修改核心']['竖布局']['大分类'][0].addItem(i)
@@ -1271,9 +1290,10 @@ class Main(QMainWindow):
 
     def download_one_image(self, owner_name, image_name):
         k = 0
+        self.time_point_for_iterable_sleep = time.time()
         while True:
             download_info = self.seesion.get(self.get_the_wiki_image_with_hashmd5(image_name))
-            if download_info.status_code == 200:
+            if download_info.status_code < 400:
                 with open(os.path.join('material_lib', image_name), "wb") as f:
                     f.write(download_info.content)
                 return ['《' + owner_name + '》' + image_name + '》下载成功！', 1]
@@ -1281,7 +1301,7 @@ class Main(QMainWindow):
                 return ['《' + owner_name + '》' + image_name + '》名称有误，下载失败！', 0]
             else:
                 k += 1
-                time.sleep(0.2)
+                self.time_point_for_iterable_sleep_by_time()
                 if k >= 5:
                     return ['《' + owner_name + '》' + image_name + '》下载失败！错误原因为' + download_info.reason, 0]
 
@@ -1382,14 +1402,14 @@ class Main(QMainWindow):
         k = 0
         while True:
             download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
-            if download_info.status_code == 200:
+            if download_info.status_code < 400:
                 download_content = download_info.json()
                 if 'jsondata' in download_content and download_content['jsondata']== content:
                     return ['《' + pagename + '》通过校验，不需要修改！', 0]
                 break
             else:
                 k += 1
-                time.sleep(0.2)
+                self.time_point_for_iterable_sleep_by_time()
                 if k >= 5:
                     break
         pagename = 'Data:' + pagename
@@ -1400,12 +1420,12 @@ class Main(QMainWindow):
         k = 0
         while True:
             upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
-            if upload_info.status_code == 200:
+            if upload_info.status_code < 400:
                 upload_info_json = upload_info.json()
                 break
             else:
                 k += 1
-                time.sleep(0.2)
+                self.time_point_for_iterable_sleep_by_time()
                 if k >= 5:
                     return ['《' + pagename + '》上传失败，请之后重新上传！', 0]
         if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
@@ -1424,7 +1444,7 @@ class Main(QMainWindow):
         k = 0
         while True:
             download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
-            if download_info.status_code == 200:
+            if download_info.status_code < 400:
                 download_content = download_info.json()
                 if 'error' in download_content:
                     break
@@ -1433,7 +1453,7 @@ class Main(QMainWindow):
                 break
             else:
                 k += 1
-                time.sleep(0.2)
+                self.time_point_for_iterable_sleep_by_time()
                 if k >= 5:
                     break
         upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
@@ -1442,12 +1462,12 @@ class Main(QMainWindow):
         k = 0
         while True:
             upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
-            if upload_info.status_code == 200:
+            if upload_info.status_code < 400:
                 upload_info_json = upload_info.json()
                 break
             else:
                 k += 1
-                time.sleep(1)
+                self.time_point_for_iterable_sleep_by_time()
                 if k >= 10:
                     return ['《' + pagename + '》上传失败，请之后重新上传！', 0]
         if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
@@ -1598,6 +1618,53 @@ class Main(QMainWindow):
             self.item_dict_to_extra_tree(self.editlayout['修改核心']['竖布局']['树'],self.json_base[selected[0]][selected[1]])
         self.edit_json_expand_all()
         self.self_edit_button_default()
+        self.edit_target_selected_changed_quick_link_tree()
+
+    def edit_target_selected_changed_quick_link_tree(self):
+        selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
+        target_name = []
+        if selected == '技能':
+            if len(self.json_base[selected][selected_name]['技能归属'])>0:
+                target_name.append(self.json_base[selected][selected_name]['技能归属'])
+        elif selected == '技能源':
+            skill_name = selected_name
+            for i in self.json_base['技能']:
+                if self.json_base['技能'][i]['数据来源'] == skill_name:
+                    target_name.append(self.json_base['技能'][i]['技能归属'])
+        else:
+            target_name.append(selected_name)
+        if len(target_name) > 0:
+            self.editlayout['额外机制']['竖布局']['关联技能'][0].clear()
+            for k in target_name:
+                new0=QTreeWidgetItem(self.editlayout['额外机制']['竖布局']['关联技能'][0])
+                new0.setText(0,k)
+                new1=QTreeWidgetItem(new0)
+                for l in ['英雄','非英雄单位','物品']:
+                    if k in self.json_base[l]:
+                        new1.setText(0,l)
+                        new1.setText(1,k)
+                for i in self.json_base['技能']:
+                    if self.json_base['技能'][i]['技能归属'] == k:
+                        new2=QTreeWidgetItem(new0)
+                        new2.setText(0,'技能')
+                        new2.setText(1,i)
+                        j = self.json_base['技能'][i]['数据来源']
+                        if j in self.json_base['技能源']:
+                            new3 = QTreeWidgetItem(new0)
+                            new3.setText(0, '技能源')
+                            new3.setText(1, j)
+            self.editlayout['额外机制']['竖布局']['关联技能'][0].expandAll()
+
+    def edit_target_selected_quick_changed(self):
+        selected = self.editlayout['额外机制']['竖布局']['关联技能'][0].currentItem()
+        text0=selected.text(0)
+        text1=selected.text(1)
+        if text0 in self.json_base and text1 in self.json_base[text0]:
+            self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(text0)
+            self.edit_category_selected_changed()
+            self.edit_target_selected_changed(text1)
+
 
     def choose_mainlayout_change_edit_target(self, target_base=''):
         self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(target_base)
@@ -1707,7 +1774,7 @@ class Main(QMainWindow):
         tdict['混合文字'] = {0: TreeItemEdit(tdict[0], '混合文字')}
         tdict['混合文字'][0].set_type('combine_tree')
         tdict['混合文字'][0].set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''],
-                                                                                      "list": ['text', '', 0, 3,
+                                                                                      "list": ['text', '', 0, 4,
                                                                                                False]}, 1, 1, False]},
                                        1, 0, False])
         for i in sdict['混合文字']:
@@ -1716,7 +1783,7 @@ class Main(QMainWindow):
                 tdict['混合文字'][i][0].set_type('tree')
                 self.complex_dict_to_tree(tdict['混合文字'][i], {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''],
                                                                                                    "list": ['text', '',
-                                                                                                            0, 3,
+                                                                                                            0, 4,
                                                                                                             False]}, 1,
                                                                                           1, False]},
                                           sdict['混合文字'][i])
@@ -1888,7 +1955,7 @@ class Main(QMainWindow):
             self.json_base[ss][i] = {}
             self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss][i])
             self.file_save_all()
-            time.sleep(0.1)
+            self.time_point_for_iterable_sleep_by_time()
             QApplication.processEvents()
         self.edit_target_selected_changed()
 
@@ -2280,7 +2347,7 @@ class Main(QMainWindow):
                 while True:
                     download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
                     download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
-                    if download_info.status_code == 200:
+                    if download_info.status_code < 400:
                         try:
                             download_info_json = download_info.json()
                             if 'error' in download_info_json and download_info_json['error']['code'] == 'invalidtitle':
@@ -2292,7 +2359,7 @@ class Main(QMainWindow):
                                 else:
                                     self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j - 1).setBackground(0, self.green)
                                 self.w.addtext([title + '版本json下载保存成功。', 1], i)
-                            time.sleep(0.1)
+                            self.time_point_for_iterable_sleep_by_time()
                             QApplication.processEvents()
                             break
                         except:
@@ -2314,7 +2381,7 @@ class Main(QMainWindow):
                 self.versionlayout['版本列表']['横排版']['列表'].setCurrentItem(topitem)
                 self.check_version_content()
                 self.upload_one_version(False)
-                time.sleep(0.1)
+                self.time_point_for_iterable_sleep_by_time()
                 QApplication.processEvents()
                 for j in range(topitem.childCount()):
                     item = topitem.child(j)
@@ -2322,7 +2389,7 @@ class Main(QMainWindow):
                         self.versionlayout['版本列表']['横排版']['列表'].setCurrentItem(item)
                         self.check_version_content()
                         self.upload_one_version(False)
-                        time.sleep(0.1)
+                        self.time_point_for_iterable_sleep_by_time()
                         QApplication.processEvents()
 
     def version_save_the_version(self):
