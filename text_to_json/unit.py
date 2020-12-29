@@ -91,7 +91,6 @@ def fulfill_unit_json(base_txt, all_json, version,name_base):
         if len(all_json[i]['迷你图片']) > 1:
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'][0].upper() + all_json[i]['迷你图片'][1:]
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'].replace(' ', '_')
-
         for j in unitpro_txt + unitpro_num:
             popit = []
             for k in all_json[i][j[0]]:
@@ -112,9 +111,16 @@ def fulfill_unit_json(base_txt, all_json, version,name_base):
                         for l in all_json[i]["代码名"]:
                             all_json[i][j[0]][k][l] = base_txt["非英雄单位"][all_json[i]["代码名"][l]][j[1]]["1"]
                             bool = bool and all_json[i][j[0]][k]["1"] == all_json[i][j[0]][k][l]
+                        all_json[i][j[0]][k]['代码']['3'] = j[1]
                         if bool:
-                            all_json[i][j[0]][k]['代码'] = {"1": all_json[i][j[0]][k]["代码"]["1"], "2": all_json[i][j[0]][k]["代码"]["2"], "3": all_json[i][j[0]][k]["代码"]["3"]}
-                            all_json[i][j[0]][k]["1"]=all_json[i][j[0]][k]["1"]
+                            ll=2
+                            while True:
+                                l=str(ll)
+                                ll+=1
+                                if l in all_json[i][j[0]][k]:
+                                    all_json[i][j[0]][k].pop(l)
+                                else:
+                                    break
                     else:
                         temp_daima=all_json[i][j[0]][k]["代码"]
                         for l in base_txt[temp_daima["1"]][temp_daima["2"]][temp_daima["3"]]:

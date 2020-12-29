@@ -523,7 +523,7 @@ class Main(QMainWindow):
             tempjson = json.loads(texttemp)
             self.json_name.update(tempjson)
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
-        QMessageBox.information(self, '下载完成', '请继续操作')
+        QMessageBox.information(self, '下载合成数据完成', '请继续操作')
 
     def download_name_base(self):
         self.name_base = self.download_json('name_base.json')
@@ -539,7 +539,7 @@ class Main(QMainWindow):
     def download_mech(self):
         self.mech = self.download_json('机制检索.json')
         self.file_save(os.path.join('database', 'mech.json'), json.dumps(self.mech))
-        QMessageBox.information(self, '下载完成', '请继续操作')
+        QMessageBox.information(self, '下载机制定义完成', '请继续操作')
 
     def download_and_upload_wiki_menu(self):
         wiki_result = self.seesion.post(self.target_url, headers=self.header,
@@ -625,7 +625,7 @@ class Main(QMainWindow):
         temptime=time.time()
         if temptime-pasttime<staytime:
             time.sleep(staytime+pasttime-temptime)
-        return temptime
+        self.time_point_for_iterable_sleep=time.time()
 
     def download_json_thread(self):
         while True:
@@ -672,7 +672,7 @@ class Main(QMainWindow):
                 else:
                     self.local.k += 1
                     self.time_point_for_iterable_sleep_by_time()
-                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：'+self.local.download_info.status_code, 2],
+                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：'+str(self.local.download_info.status_code), 2],
                                           self.current_num[0], threading.current_thread().name)
                     if self.local.k >= 10:
                         print(self.download_json_list[self.local.current_num], '：下载出现错误，原因为：联网失败')

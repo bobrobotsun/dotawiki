@@ -1063,7 +1063,8 @@ def create_page_unit(json_base, log_base, log_list, unit):
         for i, v in db['源技能'].items():
             if v in json_base['技能']:
                 sdb = json_base['技能'][v]
-                retxt += '<br/><div>[[' + v + ']]<br/>:[[file:' + sdb['图片'] + '|64px|link=' + sdb['页面名'] + '|left]]' + sdb['描述'] + '<br/><br/></div>'
+                retxt += '<br/><div>[[' + v + ']]<br/>:[[file:' + sdb['图片'] + '|64px|link=' + sdb['页面名'] + '|left]]' + sdb['描述'] \
+                         +create_upgrade_manacost(sdb['魔法消耗']) + create_upgrade_cooldown(sdb['冷却时间'])+ '</div>'
     retxt += '</div>'
     if db["类型"] == '士兵':
         retxt += '[[分类:士兵]]'
