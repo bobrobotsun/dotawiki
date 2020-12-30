@@ -619,7 +619,7 @@ class Main(QMainWindow):
             if mb.clickedButton() == button1:
                 self.download_json_name()
 
-    def time_point_for_iterable_sleep_by_time(self,pasttime=0,staytime=1):
+    def time_point_for_iterable_sleep_by_time(self,staytime=1,pasttime=0):
         if pasttime==0:
             pasttime=self.time_point_for_iterable_sleep
         temptime=time.time()
@@ -667,7 +667,7 @@ class Main(QMainWindow):
                         self.current_num[0] += 1
                         break
                     finally:
-                        self.time_point_for_iterable_sleep_by_time()
+                        self.time_point_for_iterable_sleep_by_time(0.2)
                         self.lock.release()
                 else:
                     self.local.k += 1
@@ -2038,6 +2038,9 @@ class Main(QMainWindow):
                 temp[0].set_type(item.listtype[0])
                 temp[0].islist = True
                 self.complex_dict_to_tree(temp, item.listtype[1], sdict[i])
+                if item.itemtype == 'combine_tree':
+                    temp[0].child(1).child(1).set_value('升级属性')
+                    temp[0].child(1).child(4).set_value('属性')
                 temp[0].setExpanded(True)
             else:
                 temp = TreeItemEdit(item, i)
