@@ -1050,6 +1050,13 @@ def calculate_combine_txt_numbers(list1, list2, op):
                 expand1[i][0] = [expand1[i][0][-1]]
             else:
                 expand1[i][0] = [expand1[i][0][expand2[i][0][0]]]
+        elif op == 'matrix+':  # 前后两组矩阵乘，生成m*n组数值。
+            matx = copy.deepcopy(expand1[i][0])
+            maty = copy.deepcopy(expand2[i][0])
+            expand1[i][0] = []
+            for j in range(len(matx)):
+                for k in range(len(maty)):
+                    expand1[i][0].append(matx[j] + maty[k])
         elif op == 'matrix*':  # 前后两组矩阵乘，生成m*n组数值。
             matx = copy.deepcopy(expand1[i][0])
             maty = copy.deepcopy(expand2[i][0])
@@ -1073,7 +1080,9 @@ def calculate_combine_txt_numbers(list1, list2, op):
             expand1[i][0] = [rere]
         else:
             for j in range(len(expand1[i][0])):
-                if op == '+':
+                if op=='..':
+                    expand1[i][0][j]=number_to_string(expand1[i][0][j])+number_to_string(expand2[i][0][j])
+                elif op == '+':
                     expand1[i][0][j] += expand2[i][0][j]
                 elif op == '-':
                     expand1[i][0][j] -= expand2[i][0][j]
@@ -1119,6 +1128,15 @@ def calculate_combine_txt_numbers(list1, list2, op):
                     expand1[i][0][j] = expand1[i][0][j] * (1 + expand2[i][0][j]) / 2
     return expand1
 
+def number_to_string(number, rr=2):
+    i = number
+    try:
+        if float(int(i)) == float(i):
+            return str(int(i))
+        else:
+            return str(round(i, rr))
+    except ValueError:
+        return str(i)
 
 # list、dict、sort
 def expand_value_source_list_with_another_source_dict(l, d, s):

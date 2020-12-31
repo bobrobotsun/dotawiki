@@ -208,7 +208,7 @@ def create_upgrade_cast_point_backswing(arr1, arr2):
     return retxt
 
 
-def create_upgrade_manacost(arr):
+def create_upgrade_manacost(arr,outtip='div'):
     retxt = ''
     ii = 0
     while True:
@@ -216,7 +216,7 @@ def create_upgrade_manacost(arr):
         i = str(ii)
         if i in arr:
             v = arr[i]
-            retxt += '<div style="padding:0.5em 0.5em 0em 1em"><span style="cursor:help;" title="' + v[
+            retxt += '<'+outtip+' style="padding:0.5em 0.5em 0em 1em"><span style="cursor:help;" title="' + v[
                 '名称'] + '">[[file:mana cost.png|16px|link=]]</span> '
             jj = 0
             while True:
@@ -231,13 +231,13 @@ def create_upgrade_manacost(arr):
                              + '</span>'
                 else:
                     break
-            retxt += '</div>'
+            retxt += '</'+outtip+'>'
         else:
             break
     return retxt
 
 
-def create_upgrade_cooldown(arr):
+def create_upgrade_cooldown(arr,outtip='div'):
     retxt = ''
     ii = 0
     while True:
@@ -245,7 +245,7 @@ def create_upgrade_cooldown(arr):
         i = str(ii)
         if i in arr:
             v = arr[i]
-            retxt += '<div style="padding:0.5em 0.5em 0em 1em;cursor:help;" title="' + v['名称'] + '"><span style="cursor:help;" title="' + v['1']['类型']['值'] + '">[[file:' + \
+            retxt += '<'+outtip+' style="padding:0.5em 0.5em 0em 1em;cursor:help;" title="' + v['名称'] + '"><span style="cursor:help;" title="' + v['1']['类型']['值'] + '">[[file:' + \
                      v['1']['类型']['图片'] + '|16px|link=]]</span> '
             jj = 0
             while True:
@@ -288,7 +288,7 @@ def create_upgrade_cooldown(arr):
                     else:
                         break
                 retxt += ')'
-            retxt += '</div>'
+            retxt += '</'+outtip+'>'
         else:
             break
     return retxt

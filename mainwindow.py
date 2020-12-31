@@ -619,7 +619,7 @@ class Main(QMainWindow):
             if mb.clickedButton() == button1:
                 self.download_json_name()
 
-    def time_point_for_iterable_sleep_by_time(self,staytime=1,pasttime=0):
+    def time_point_for_iterable_sleep_by_time(self,staytime=1.0,pasttime=0.0):
         if pasttime==0:
             pasttime=self.time_point_for_iterable_sleep
         temptime=time.time()
@@ -1219,7 +1219,6 @@ class Main(QMainWindow):
     def upload_basic_json(self):
         self.upload_json('text_base.json', self.text_base)
         self.upload_json('json_name.json', self.json_name)
-        self.upload_json('name_base.json', self.name_base)
         self.upload_json('图片链接.json', self.name_create_tree_list_name())
         QMessageBox.information(self, "上传完成", '已经上传完毕基础文件')
 
@@ -1231,7 +1230,6 @@ class Main(QMainWindow):
         all_upload = []
         all_upload.append(['版本.json', {'版本': self.version}])
         all_upload.append(['json_name.json', self.json_name])
-        all_upload.append(['name_base.json', self.name_base])
         if chosen == '':
             for i in self.json_base:
                 for j in self.json_base[i]:
@@ -2677,6 +2675,7 @@ class Main(QMainWindow):
             text = re.sub(r'\{\{A\|([0-9]+?)\}\}', lambda x: '{{A|' + hero_text + x.group(1) + '级天赋}}', text)
             text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
             text = re.sub(r'{{{(.+?)[:：](.+?)}}}', lambda x: self.version_input_text_template_simple_txt(x.group(1),x.group(2)), text)
+            text = re.sub(r'{{{{(.+?)}}}}', lambda x: self.version_input_text_simple_introduce(x.group(1)), text)
             item.set_value(text)
             if item.parent() != None:
                 iparent = item.parent()
@@ -2704,11 +2703,56 @@ class Main(QMainWindow):
                         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
 
     def version_input_text_template_simple_txt(self,trait,name):
-        rere=''
         for i in [['英雄','H'],['非英雄单位','H'],['物品','I'],['技能','A']]:
             if name in self.json_base[i[0]] and trait in self.json_base[i[0]][name] and isinstance(self.json_base[i[0]][name][trait],str):
                 return '{{'+i[1]+'|'+name+'}}：'+self.json_base[i[0]][name][trait]
         return '{{{'+trait+'：'+name+'}}}'
+
+    def version_input_text_simple_introduce(self,name):
+        rere=''
+        if name in self.json_base['英雄']:
+            db=self.json_base['英雄'][name]
+            for i in ['主属性','近战远程','阵营']:
+                rere+=db[i]['1']+'，'
+            for i in [['力量','Strength_Icon'],['敏捷','Agility_Icon'],['智力','Intelligence_Icon']]:
+                rere+='[[file:'+i[1]+'.png|20px]]'+common_page.number_to_string(db[i[0]]['1'])+'+'+common_page.number_to_string(db[i[0]+'成长']['1'])
+            rere+='，'+common_page.number_to_string(db['生命值']['1']+db['力量']['1']*20)+'血，'+common_page.number_to_string(db['生命恢复']['1']+db['力量']['1']*0.1)+'回血，'
+            rere+=common_page.number_to_string(db['魔法值']['1']+db['智力']['1']*12)+'蓝，'+common_page.number_to_string(db['魔法恢复']['1']+db['智力']['1']*0.05)+'回蓝，'
+            rere+=common_page.number_to_string(db['攻击下限']['1']+db[db['主属性']['1']]['1'])+'~'+common_page.number_to_string(db['攻击上限']['1']+db[db['主属性']['1']]['1'])+'攻击力，'
+            rere+=common_page.number_to_string(db['护甲']['1']+round(db['敏捷']['1']/6,2))+'护甲，'+common_page.number_to_string(db['移动速度']['1'])+'移速，'
+            rere+=common_page.number_to_string(db['攻击间隔']['1'])+'基础攻击间隔，'+common_page.number_to_string(db['攻击距离']['1'])+'攻击距离。'
+        elif name in self.json_base['非英雄单位']:
+            db = self.json_base['非英雄单位'][name]
+        elif name in self.json_base['物品']:
+            db=self.json_base['物品'][name]
+            for i, v in db.items():
+                if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
+                    rere += v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀']+'，'
+            rere+='[[file:Gold symbol.png|20px|link=]]'+common_page.number_to_string(db['价格']['1'])
+            if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
+                rere += '[[file:items recipe.png|20px|link=]]&nbsp;' + common_page.number_to_string(db['卷轴价格']['1'])
+            if '可拆分' in db and '组件' in db and db['可拆分']==1:
+                rere+='，可拆分'
+            rere+='。'
+            if '组件' in db:
+                rere+='由'
+                for i, v in db['组件'].items():
+                    if int(i)>1:
+                        rere+='，'
+                    rere += '{{I|'+v["物品名"]+'}}'
+                if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
+                    rere += '，以及'+common_page.number_to_string(db['卷轴价格']['1'])+'元的卷轴'
+                rere += '合成。'
+            if '升级' in db:
+                rere+='可合成为：'
+                for i, v in db['升级'].items():
+                    if int(i)>1:
+                        rere+='，'
+                    rere += '{{I|'+v["物品名"]+'}}'
+                rere += '。'
+        elif name in self.json_base['技能']:
+            rere+='{{H|'+name+'}}：'+self.json_base['技能'][name]['描述']+common_page.create_upgrade_manacost(self.json_base['技能'][name]['魔法消耗'],'span')+common_page.create_upgrade_cooldown(self.json_base['技能'][name]['冷却时间'],'span')
+        return rere
 
     def version_button_tree1(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
