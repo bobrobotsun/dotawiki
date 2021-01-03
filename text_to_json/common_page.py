@@ -37,13 +37,13 @@ def number_to_string(number, rr=4):
         return str(i)
 
 
-def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x: ''):
+def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x,y: ''):
     if k in numjsons:
         numjson = numjsons[k]
         retext = ''
         ii = 0
         while True:
-            ii+=1
+            ii += 1
             i = str(ii)
             if i in numjson:
                 if ii > 1:
@@ -62,7 +62,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
                             retext += post_each(numjsons[k])
                     else:
                         break
-                retext += post_group(numjson)
+                retext += post_group(numjson,i)
             else:
                 break
         return retext
@@ -72,9 +72,9 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
 
 def create_upgrade_cast_style(db):
     retxt = ''
-    ii=0
+    ii = 0
     while True:
-        ii+=1
+        ii += 1
         i = str(ii)
         if i in db:
             retxt += '<div style="padding:0.25em 0.5em;text-align:center;">'
@@ -106,10 +106,10 @@ def create_upgrade_cast_style(db):
 
 def create_upgrade_cast_target(db):
     retxt = ''
-    hh=0
+    hh = 0
     while True:
-        hh+=1
-        h=str(hh)
+        hh += 1
+        h = str(hh)
         if h in db:
             arr = db[h]
             retxt += '<div style="padding:0.25em 0.5em;text-align:center;">' \
@@ -128,7 +128,7 @@ def create_upgrade_cast_target(db):
             retxt += '</td>'
             for i in arr:
                 v = arr[i]
-                if len(v)>0:
+                if len(v) > 0:
                     bool = True
                     if len(v) == 0:
                         bool = False
@@ -181,7 +181,7 @@ def create_upgrade_cast_target(db):
                     break
             retxt += '</tr></table></div>'
         else:
-            if hh>=1:
+            if hh >= 1:
                 break
     return retxt
 
@@ -200,15 +200,14 @@ def create_upgrade_cast_point_backswing(arr1, arr2):
             if i in arr2 and arr2[i]['名称'] != '':
                 retxt += '（' + arr2[i]['名称'] + '）'
             retxt += '： ' + create_upgrade_text(arr1, i, lambda x: '',
-                                                lambda x: x['1']["即时生效"]['图片']['图片'] if x['1']["即时生效"][
-                                                                                            '代码'] != 0 else '') + ' + ' \
+                                                lambda x,y: x[y]["即时生效"]['图片']['图片'] if x[y]["即时生效"]['代码'] != 0 else '') + ' + ' \
                      + create_upgrade_text(arr2, i) + '</div>'
         else:
             break
     return retxt
 
 
-def create_upgrade_manacost(arr,outtip='div'):
+def create_upgrade_manacost(arr, outtip='div'):
     retxt = ''
     ii = 0
     while True:
@@ -216,9 +215,10 @@ def create_upgrade_manacost(arr,outtip='div'):
         i = str(ii)
         if i in arr:
             v = arr[i]
-            if v['名称']!='':
-                retxt+=v['名称']
-            retxt += '<'+outtip+' style="padding:0.5em 0.5em 0em 1em">[[file:mana cost.png|16px|link=]] '
+            retxt += '<' + outtip + ' style="padding:0.5em 0.5em 0em 1em">'
+            if v['名称'] != '':
+                retxt += v['名称']
+            retxt += '[[file:mana cost.png|16px|link=]] '
             jj = 0
             while True:
                 jj += 1
@@ -232,13 +232,13 @@ def create_upgrade_manacost(arr,outtip='div'):
                              + '</span>'
                 else:
                     break
-            retxt += '</'+outtip+'>'
+            retxt += '</' + outtip + '>'
         else:
             break
     return retxt
 
 
-def create_upgrade_cooldown(arr,outtip='div'):
+def create_upgrade_cooldown(arr, outtip='div'):
     retxt = ''
     ii = 0
     while True:
@@ -246,10 +246,10 @@ def create_upgrade_cooldown(arr,outtip='div'):
         i = str(ii)
         if i in arr:
             v = arr[i]
-            if v['名称']!='':
-                retxt+=v['名称']
-            retxt += '<'+outtip+' style="padding:0.5em 0.5em 0em 1em;"><span style="cursor:help;" title="' + v['1']['类型']['值'] + '">[[file:' + \
-                     v['1']['类型']['图片'] + '|16px|link=]]</span> '
+            retxt += '<' + outtip + ' style="padding:0.5em 0.5em 0em 1em;">'
+            if v['名称'] != '':
+                retxt += v['名称']
+            retxt += '<span style="cursor:help;" title="' + v['1']['类型']['值'] + '">[[file:' + v['1']['类型']['图片'] + '|16px|link=]]</span> '
             jj = 0
             while True:
                 jj += 1
@@ -262,10 +262,10 @@ def create_upgrade_cooldown(arr,outtip='div'):
                     break
             if '2' in v:
                 retxt += '('
-                jj=1
+                jj = 1
                 while True:
-                    jj+=1
-                    j=str(jj)
+                    jj += 1
+                    j = str(jj)
                     if j in v:
                         kk = 0
                         while True:
@@ -291,7 +291,7 @@ def create_upgrade_cooldown(arr,outtip='div'):
                     else:
                         break
                 retxt += ')'
-            retxt += '</'+outtip+'>'
+            retxt += '</' + outtip + '>'
         else:
             break
     return retxt
@@ -300,9 +300,9 @@ def create_upgrade_cooldown(arr,outtip='div'):
 def create_upgrade_buff(json_dict):
     buff_mech = ['技能免疫', '状态抗性', '无敌']
     retxt = '<div style="paddin:0.5em;"><table>'
-    i=0
+    i = 0
     while True:
-        i+=1
+        i += 1
         if str(i) in json_dict:
             retxt += '<tr><td>'
             if i > 1:
@@ -397,7 +397,7 @@ def create_upgrade_buff(json_dict):
                 else:
                     break
         else:
-            if i>1:
+            if i > 1:
                 break
     retxt += '</table></div>'
     return retxt
@@ -405,9 +405,9 @@ def create_upgrade_buff(json_dict):
 
 def create_upgrade_mech(json_dict):
     retxt = '<div style="paddin:0.5em;"><table>'
-    ii=0
+    ii = 0
     while True:
-        ii+=1
+        ii += 1
         i = str(ii)
         if i in json_dict and json_dict[i]['代码'] != 0:
             retxt += '<tr><td>'
@@ -427,7 +427,7 @@ def create_upgrade_mech(json_dict):
                 else:
                     break
         else:
-            if ii>1:
+            if ii > 1:
                 break
     retxt += '</table></div>'
     return retxt
@@ -435,9 +435,9 @@ def create_upgrade_mech(json_dict):
 
 def create_independent_mech(json_dict):
     retxt = '<div style="paddin:0.5em;"><table>'
-    ii=0
+    ii = 0
     while True:
-        ii+=1
+        ii += 1
         i = str(ii)
         if i in json_dict:
             retxt += '<tr><td>'
@@ -446,7 +446,7 @@ def create_independent_mech(json_dict):
                     retxt += '[[file:' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
         else:
-            if ii>1:
+            if ii > 1:
                 break
     retxt += '</table></div>'
     return retxt
@@ -592,9 +592,9 @@ def get_unit_value(array, post=''):
 
 def get_unit_upgrade_double(db1, db2, combine='~', post=''):
     retxt = ''
-    ii=0
+    ii = 0
     while True:
-        ii+=1
+        ii += 1
         i = str(ii)
         if i in db1:
             if ii > 1:
@@ -660,7 +660,7 @@ def create_infobox_unit(db):
                         if len(i[j]) == 1:
                             retxt += create_upgrade_text(db, i[j][0][0])
                         else:
-                            retxt += create_upgrade_text(db, i[j][0][0], i[j][1])
+                            retxt += create_upgrade_text(db, i[j][0][0], lambda x:i[j][1])
                     else:
                         if len(i[j]) == 1:
                             retxt += get_unit_upgrade_double(db[i[j][0][0]], db[i[j][0][1]])
@@ -697,14 +697,14 @@ def create_infobox_item(db):
         retxt += '<span style="margin-left:1em;">[[file:items recipe.png|24px|link=]]&nbsp;' + number_to_string(db['卷轴价格']['1']) + '</span>'
     retxt += '</td></tr>'
     for i, v in common_pro.items():
-        if i!='可拆分' or '组件' in db:
+        if i != '可拆分' or '组件' in db:
             if i in db:
                 retxt += common_tag[0] + v[get_item_value(db[i])] + common_tag[1]
             else:
                 retxt += common_tag[0] + v[0] + common_tag[1]
     for i, v in db.items():
-        if isinstance(v,dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
-            retxt += normal_tag[0] + v['展示前缀'] + number_to_string(v['1']) + v['后缀']+ v['展示后缀']+ normal_tag[1]
+        if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
+            retxt += normal_tag[0] + v['展示前缀'] + number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + normal_tag[1]
     if '升级' in db:
         retxt += '<tr><td colspan=2 style="background:#a03030;padding:4px;text-align:center;">' + '可合成</td></tr><tr><td colspan=2 style="background:#222;padding:6px;">'
         for i, v in db['升级'].items():
@@ -864,9 +864,9 @@ def create_page_logs(title, log_base, log_list, name_base):
                     titles = '==='
                     retxt += '\n==' + table_name[i] + '=='
                 for j0, w0 in v.items():
-                    if j0!='无标题':
-                        retxt += '\n' +titles+ j0 +titles
-                    for j,w in w0.items():
+                    if j0 != '无标题':
+                        retxt += '\n' + titles + j0 + titles
+                    for j, w in w0.items():
                         if w[0] != '':
                             retxt += '\n===='
                             if w[1] != '':
@@ -932,7 +932,7 @@ def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
                 for j, w in v.items():
                     if isinstance(w, dict):
                         for j2, w2 in w.items():
-                            for k,x in w2.items():
+                            for k, x in w2.items():
                                 showit = False
                                 for l in range(2, len(x)):
                                     if x[0] != '' and x[0] in name:
@@ -1069,7 +1069,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
             if v in json_base['技能']:
                 sdb = json_base['技能'][v]
                 retxt += '<br/><div>[[' + v + ']]<br/>:[[file:' + sdb['图片'] + '|64px|link=' + sdb['页面名'] + '|left]]' + sdb['描述'] \
-                         +create_upgrade_manacost(sdb['魔法消耗']) + create_upgrade_cooldown(sdb['冷却时间'])+ '</div>'
+                         + create_upgrade_manacost(sdb['魔法消耗']) + create_upgrade_cooldown(sdb['冷却时间']) + '</div>'
     retxt += '</div>'
     if db["类型"] == '士兵':
         retxt += '[[分类:士兵]]'

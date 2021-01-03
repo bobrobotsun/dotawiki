@@ -667,7 +667,7 @@ class Main(QMainWindow):
                         self.current_num[0] += 1
                         break
                     finally:
-                        self.time_point_for_iterable_sleep_by_time(0.2)
+                        self.time_point_for_iterable_sleep_by_time(0.1)
                         self.lock.release()
                 else:
                     self.local.k += 1
