@@ -216,8 +216,9 @@ def create_upgrade_manacost(arr,outtip='div'):
         i = str(ii)
         if i in arr:
             v = arr[i]
-            retxt += '<'+outtip+' style="padding:0.5em 0.5em 0em 1em"><span style="cursor:help;" title="' + v[
-                '名称'] + '">[[file:mana cost.png|16px|link=]]</span> '
+            if v['名称']!='':
+                retxt+=v['名称']
+            retxt += '<'+outtip+' style="padding:0.5em 0.5em 0em 1em">[[file:mana cost.png|16px|link=]] '
             jj = 0
             while True:
                 jj += 1
@@ -245,7 +246,9 @@ def create_upgrade_cooldown(arr,outtip='div'):
         i = str(ii)
         if i in arr:
             v = arr[i]
-            retxt += '<'+outtip+' style="padding:0.5em 0.5em 0em 1em;cursor:help;" title="' + v['名称'] + '"><span style="cursor:help;" title="' + v['1']['类型']['值'] + '">[[file:' + \
+            if v['名称']!='':
+                retxt+=v['名称']
+            retxt += '<'+outtip+' style="padding:0.5em 0.5em 0em 1em;"><span style="cursor:help;" title="' + v['1']['类型']['值'] + '">[[file:' + \
                      v['1']['类型']['图片'] + '|16px|link=]]</span> '
             jj = 0
             while True:
@@ -456,7 +459,7 @@ def create_page_ability(db):
             + '<div class="bg-primary" style="font-size:100%;background:'
     if db["次级分类"] == "终极技能":
         retxt += '#6c3d83'
-    elif db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
+    elif db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能" or db["次级分类"] == "魔晶技能":
         retxt += '#105aa7'
     else:
         retxt += '#803024'
@@ -516,6 +519,8 @@ def create_page_ability(db):
             "传说"] + ' 」</div>'
     if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
         retxt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
+    if db["次级分类"] == "魔晶技能" or db["次级分类"] == "神杖技能":
+        retxt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
     retxt += '</div>' \
              + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
              + '<span style="margin-top:0px;padding-top:0px;font-size:120%"><big>\'\'\'技能详情\'\'\'</big></span><div>'
