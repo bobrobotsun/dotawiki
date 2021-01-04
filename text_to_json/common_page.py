@@ -200,7 +200,7 @@ def create_upgrade_cast_point_backswing(arr1, arr2):
             if i in arr2 and arr2[i]['名称'] != '':
                 retxt += '（' + arr2[i]['名称'] + '）'
             retxt += '： ' + create_upgrade_text(arr1, i, lambda x: '',
-                                                lambda x,y: x[y]["即时生效"]['图片']['图片'] if x[y]["即时生效"]['代码'] != 0 else '') + ' + ' \
+                                                lambda x,y: x[y]["即时生效"]['图片']['图片'] if int(x[y]["即时生效"]['代码']) != 0 else '') + ' + ' \
                      + create_upgrade_text(arr2, i) + '</div>'
         else:
             break
@@ -660,7 +660,7 @@ def create_infobox_unit(db):
                         if len(i[j]) == 1:
                             retxt += create_upgrade_text(db, i[j][0][0])
                         else:
-                            retxt += create_upgrade_text(db, i[j][0][0], lambda x:i[j][1])
+                            retxt += create_upgrade_text(db, i[j][0][0], i[j][1])
                     else:
                         if len(i[j]) == 1:
                             retxt += get_unit_upgrade_double(db[i[j][0][0]], db[i[j][0][1]])
