@@ -562,51 +562,57 @@ def array_cal(arr1, arr2, opp):
                 temp = arr2[i]
         else:
             try:
-                temp = float(arr2[0])
+                temp = float(arr2[i])
             except ValueError:
-                temp = arr2[0]
-        if opp == '=':
-            arr1[i] = temp
-        elif opp == '+':
-            arr1[i] = arr1[i] + temp
-        elif opp == '-':
-            arr1[i] = arr1[i] - temp
-        elif opp == '\\-':
-            arr1[i] = temp - arr1[i]
-        elif opp == '*':
-            arr1[i] = arr1[i] * temp
-        elif opp == '/':
-            arr1[i] = arr1[i] / temp
-        elif opp == '\\':
-            arr1[i] = temp / arr1[i]
-        elif opp == '%-':
-            arr1[i] = arr1[i] * (100 - temp) / 100
-        elif opp == '%+':
-            arr1[i] = arr1[i] * (100 + temp) / 100
-        elif opp == '-%':
-            arr1[i] = arr1[i] * (1 - temp)
-        elif opp == '+%':
-            arr1[i] = arr1[i] * (1 + temp)
-        elif opp == 'round':
-            arr1[i] = round(arr1[i], int(temp))
-        elif opp == 'ceil':
-            arr1[i] = math.ceil(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
-        elif opp == 'floor':
-            arr1[i] = math.floor(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
-        elif opp == '*round':
-            arr1[i] = round(arr1[i] * temp)
-        elif opp == '*ceil':
-            arr1[i] = math.ceil(arr1[i] * temp)
-        elif opp == '*floor':
-            arr1[i] = math.floor(arr1[i] * temp)
-        elif opp[0] == '=' and opp[-1] == '+':
-            arr1[i] = float(opp[1:-1]) + temp
-        elif opp[0] == '=' and opp[-1] == '-':
-            arr1[i] = float(opp[1:-1]) - temp
-        elif opp[0] == '=' and opp[-1] == '*':
-            arr1[i] = float(opp[1:-1]) * temp
-        elif opp[0] == '=' and opp[-1] == '/':
-            arr1[i] = float(opp[1:-1]) / temp
+                temp = arr2[i]
+        if isinstance(arr1[i],str):
+            if opp == '=':
+                arr1[i] = temp
+        else:
+            if isinstance(temp,str):
+                arr1[i] = temp
+            elif opp == '=':
+                arr1[i] = temp
+            elif opp == '+':
+                arr1[i] = arr1[i] + temp
+            elif opp == '-':
+                arr1[i] = arr1[i] - temp
+            elif opp == '\\-':
+                arr1[i] = temp - arr1[i]
+            elif opp == '*':
+                arr1[i] = arr1[i] * temp
+            elif opp == '/':
+                arr1[i] = arr1[i] / temp
+            elif opp == '\\':
+                arr1[i] = temp / arr1[i]
+            elif opp == '%-':
+                arr1[i] = arr1[i] * (100 - temp) / 100
+            elif opp == '%+':
+                arr1[i] = arr1[i] * (100 + temp) / 100
+            elif opp == '-%':
+                arr1[i] = arr1[i] * (1 - temp)
+            elif opp == '+%':
+                arr1[i] = arr1[i] * (1 + temp)
+            elif opp == 'round':
+                arr1[i] = round(arr1[i], int(temp))
+            elif opp == 'ceil':
+                arr1[i] = math.ceil(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
+            elif opp == 'floor':
+                arr1[i] = math.floor(arr1[i] * pow(10, int(temp))) / pow(10, int(temp))
+            elif opp == '*round':
+                arr1[i] = round(arr1[i] * temp)
+            elif opp == '*ceil':
+                arr1[i] = math.ceil(arr1[i] * temp)
+            elif opp == '*floor':
+                arr1[i] = math.floor(arr1[i] * temp)
+            elif opp[0] == '=' and opp[-1] == '+':
+                arr1[i] = float(opp[1:-1]) + temp
+            elif opp[0] == '=' and opp[-1] == '-':
+                arr1[i] = float(opp[1:-1]) - temp
+            elif opp[0] == '=' and opp[-1] == '*':
+                arr1[i] = float(opp[1:-1]) * temp
+            elif opp[0] == '=' and opp[-1] == '/':
+                arr1[i] = float(opp[1:-1]) / temp
     return arr1
 
 

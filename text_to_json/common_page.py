@@ -1,7 +1,7 @@
 import re
 import math
 
-target_url = 'https://dota.huijiwiki.com/w/api.php'
+target_url = 'http://dota.huijiwiki.com/w/api.php'
 
 
 def analyse_upload_json(text, upload_info):
@@ -519,7 +519,7 @@ def create_page_ability(db):
             "传说"] + ' 」</div>'
     if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
         retxt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
-    if db["次级分类"] == "魔晶技能" or db["次级分类"] == "神杖技能":
+    if db["次级分类"] == "魔晶技能":
         retxt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
     retxt += '</div>' \
              + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
@@ -874,11 +874,11 @@ def create_page_logs(title, log_base, log_list, name_base):
                             else:
                                 if w[0] in name_base:
                                     for k in name_base[w[0]]:
-                                        if k[2] != '':
-                                            retxt += '[[file:' + k[2] + '|x36px|link=' + k[0] + ']]'
+                                        if k[1] != '':
+                                            retxt += '[[file:' + k[1] + '|x36px|link=' + k[0] + ']]'
                                     retxt += '[[' + name_base[w[0]][0][0] + '|' + w[0] + ']]===='
                                 else:
-                                    retxt += w[0] + '===='
+                                    retxt += '<span class="dota_image_by_json_name" data-name="'+w[0]+'" data-img-height="36px"></span>[['+w[0] + ']]===='
                         current_ul = 0
                         for k in range(2, len(w)):
                             x = w[k]
@@ -913,6 +913,8 @@ def create_page_logs(title, log_base, log_list, name_base):
                             for tnumber in range(current_ul):
                                 retxt += '\t'
                             retxt += '</ul>'
+                        if len(w)>3:
+                            retxt+='\n<br/>'
     retxt += '\n[[分类:版本更新]]'
     return retxt
 

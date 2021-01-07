@@ -39,12 +39,12 @@ class Main(QMainWindow):
         self.version = '7.28a'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
-        self.target_url = 'https://dota.huijiwiki.com/w/api.php'
-        self.image_url = 'https://huiji-public.huijistatic.com/dota/uploads'
+        self.target_url = 'http://dota.huijiwiki.com/w/api.php'
+        self.image_url = 'http://huiji-public.huijistatic.com/dota/uploads'
         self.seesion = requests.session()
         self.header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.66'}
         self.get_login_token_data = {'action': 'query', 'meta': 'tokens', 'type': 'login', 'format': 'json'}
-        self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'https://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
+        self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'http://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
         self.get_csrf_token_data = {'action': 'query', 'meta': 'tokens', 'format': 'json'}
         self.logout_data = {'action': 'logout', 'format': 'json'}
         # 菜单栏
@@ -98,6 +98,16 @@ class Main(QMainWindow):
         # 显示到屏幕中心
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    #这是用来控制间隔时间的函数
+    def time_point_for_iterable_sleep_by_time(self,staytime=1.1,pasttime=0.0):
+        if pasttime==0:
+            pasttime=self.time_point_for_iterable_sleep
+        temptime=time.time()
+        if temptime-pasttime<staytime:
+            time.sleep(staytime+pasttime-temptime)
+        self.time_point_for_iterable_sleep=time.time()
+
 
     # 创建菜单栏
     def create_menubar(self):
@@ -501,12 +511,12 @@ class Main(QMainWindow):
         download_data = {'action': 'jsondata', 'title': pagename, 'format': 'json'}
         warn=0
         while True:
+            self.time_point_for_iterable_sleep_by_time()
             download_info = self.seesion.post(self.target_url, data=download_data, headers=self.header)
             if download_info.status_code==200:
                 return download_info.json()['jsondata']
             else:
                 warn+=1
-                self.time_point_for_iterable_sleep_by_time()
 
 
 
@@ -619,14 +629,6 @@ class Main(QMainWindow):
             if mb.clickedButton() == button1:
                 self.download_json_name()
 
-    def time_point_for_iterable_sleep_by_time(self,staytime=1.0,pasttime=0.0):
-        if pasttime==0:
-            pasttime=self.time_point_for_iterable_sleep
-        temptime=time.time()
-        if temptime-pasttime<staytime:
-            time.sleep(staytime+pasttime-temptime)
-        self.time_point_for_iterable_sleep=time.time()
-
     def download_json_thread(self):
         while True:
             self.lock.acquire()
@@ -667,15 +669,14 @@ class Main(QMainWindow):
                         self.current_num[0] += 1
                         break
                     finally:
-                        self.time_point_for_iterable_sleep_by_time(0.1)
+                        self.time_point_for_iterable_sleep_by_time()
                         self.lock.release()
                 else:
                     self.local.k += 1
                     self.time_point_for_iterable_sleep_by_time()
-                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：'+str(self.local.download_info.status_code), 2],
+                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：'+str(self.local.download_info.status_code)+'，尝试次数：'+str(self.local.k), 2],
                                           self.current_num[0], threading.current_thread().name)
                     if self.local.k >= 10:
-                        print(self.download_json_list[self.local.current_num], '：下载出现错误，原因为：联网失败')
                         self.lock.release()
                         break
                     self.lock.release()
@@ -1286,22 +1287,21 @@ class Main(QMainWindow):
         hashmd5 = hashlib.md5(image_name.encode("utf-8")).hexdigest()
         return '/'.join([self.image_url, hashmd5[0], hashmd5[0:2], image_name])
 
-    def download_one_image(self, owner_name, image_name):
+    def download_one_image(self, image_name):
         k = 0
-        self.time_point_for_iterable_sleep = time.time()
         while True:
+            self.time_point_for_iterable_sleep_by_time()
             download_info = self.seesion.get(self.get_the_wiki_image_with_hashmd5(image_name))
             if download_info.status_code < 400:
                 with open(os.path.join('material_lib', image_name), "wb") as f:
                     f.write(download_info.content)
-                return ['《' + owner_name + '》' + image_name + '》下载成功！', 1]
+                return ['《' + image_name + '》下载成功！', 1]
             elif download_info.status_code == 404:
-                return ['《' + owner_name + '》' + image_name + '》名称有误，下载失败！', 0]
+                return ['《' + image_name + '》名称有误，下载失败！', 0]
             else:
                 k += 1
-                self.time_point_for_iterable_sleep_by_time()
                 if k >= 5:
-                    return ['《' + owner_name + '》' + image_name + '》下载失败！错误原因为' + download_info.reason, 0]
+                    return ['《' + image_name + '》下载失败！错误原因为' + download_info.reason, 0]
 
     def download_images(self, chosen=''):
         self.w = upload_text('开始下载图片')
@@ -1311,24 +1311,24 @@ class Main(QMainWindow):
         self.w.setWindowTitle('下载图片中……')
         QApplication.processEvents()
         all_upload = []
-        all_upload.append(['天赋', 'Talentb.png'])
+        all_upload.append('Talentb.png')
         if chosen in self.json_base:
             for i in self.json_base[chosen]:
-                if '图片' in self.json_base[chosen][i] and self.json_base[chosen][i]['图片'] != '':
-                    all_upload.append([i, self.json_base[chosen][i]['图片']])
-                if '迷你图片' in self.json_base[chosen][i] and self.json_base[chosen][i]['迷你图片'] != '':
-                    all_upload.append([i, self.json_base[chosen][i]['迷你图片']])
+                if '图片' in self.json_base[chosen][i] and self.json_base[chosen][i]['图片'] != '' and self.json_base[chosen][i]['图片'] not in all_upload:
+                    all_upload.append(self.json_base[chosen][i]['图片'])
+                if '迷你图片' in self.json_base[chosen][i] and self.json_base[chosen][i]['迷你图片'] != '' and self.json_base[chosen][i]['迷你图片'] not in all_upload:
+                    all_upload.append(self.json_base[chosen][i]['迷你图片'])
         else:
             for i in self.json_base:
                 for j in self.json_base[i]:
-                    if '图片' in self.json_base[i][j] and self.json_base[i][j]['图片'] != '':
-                        all_upload.append([j, self.json_base[i][j]['图片']])
-                    if '迷你图片' in self.json_base[i][j] and self.json_base[i][j]['迷你图片'] != '':
-                        all_upload.append([j, self.json_base[i][j]['迷你图片']])
+                    if '图片' in self.json_base[i][j] and self.json_base[i][j]['图片'] != '' and self.json_base[i][j]['图片'] not in all_upload:
+                        all_upload.append(self.json_base[i][j]['图片'])
+                    if '迷你图片' in self.json_base[i][j] and self.json_base[i][j]['迷你图片'] != '' and self.json_base[i][j]['迷你图片'] not in all_upload:
+                        all_upload.append(self.json_base[i][j]['迷你图片'])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
-            self.w.addtext(self.download_one_image(all_upload[i][0], all_upload[i][1]), i)
+            self.w.addtext(self.download_one_image(all_upload[i]), i)
             QApplication.processEvents()
         QMessageBox.information(self.w, '下载完毕', "您已下载完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
@@ -1399,6 +1399,7 @@ class Main(QMainWindow):
         download_data = {'action': 'jsondata', 'title': pagename, 'format': 'json'}
         k = 0
         while True:
+            self.time_point_for_iterable_sleep_by_time()
             download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
             if download_info.status_code < 400:
                 download_content = download_info.json()
@@ -1417,13 +1418,13 @@ class Main(QMainWindow):
             upload_data['bot'] = 1
         k = 0
         while True:
+            self.time_point_for_iterable_sleep_by_time()
             upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
             if upload_info.status_code < 400:
                 upload_info_json = upload_info.json()
                 break
             else:
                 k += 1
-                self.time_point_for_iterable_sleep_by_time()
                 if k >= 5:
                     return ['《' + pagename + '》上传失败，请之后重新上传！', 0]
         if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
@@ -1441,6 +1442,7 @@ class Main(QMainWindow):
         download_data = {'action': 'parse', 'prop': 'wikitext', 'page': pagename, 'format': 'json'}
         k = 0
         while True:
+            self.time_point_for_iterable_sleep_by_time()
             download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
             if download_info.status_code < 400:
                 download_content = download_info.json()
@@ -1451,7 +1453,6 @@ class Main(QMainWindow):
                 break
             else:
                 k += 1
-                self.time_point_for_iterable_sleep_by_time()
                 if k >= 5:
                     break
         upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
@@ -1459,13 +1460,13 @@ class Main(QMainWindow):
             upload_data['bot'] = 1
         k = 0
         while True:
+            self.time_point_for_iterable_sleep_by_time()
             upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
             if upload_info.status_code < 400:
                 upload_info_json = upload_info.json()
                 break
             else:
                 k += 1
-                self.time_point_for_iterable_sleep_by_time()
                 if k >= 10:
                     return ['《' + pagename + '》上传失败，请之后重新上传！', 0]
         if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
@@ -2317,8 +2318,7 @@ class Main(QMainWindow):
         download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
         download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
         if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
-            messageBox = QMessageBox(QMessageBox.Critical, "下载失败", "网络上没有这个版本更新的库，请问是否自行创建？", QMessageBox.NoButton,
-                                     self)
+            messageBox = QMessageBox(QMessageBox.Critical, "下载失败", "网络上没有这个版本更新的库，请问是否自行创建？", QMessageBox.NoButton,self)
             button1 = messageBox.addButton('自行新建', QMessageBox.YesRole)
             button2 = messageBox.addButton('不创建', QMessageBox.NoRole)
             messageBox.exec_()
@@ -2346,6 +2346,7 @@ class Main(QMainWindow):
                     title = self.version_list['版本'][i][0] + '/' + self.version_list['版本'][i][j]
                 k = 0
                 while True:
+                    self.time_point_for_iterable_sleep_by_time()
                     download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
                     download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
                     if download_info.status_code < 400:
@@ -2360,7 +2361,6 @@ class Main(QMainWindow):
                                 else:
                                     self.versionlayout['版本列表']['横排版']['列表'].topLevelItem(i).child(j - 1).setBackground(0, self.green)
                                 self.w.addtext([title + '版本json下载保存成功。', 1], i)
-                            self.time_point_for_iterable_sleep_by_time()
                             QApplication.processEvents()
                             break
                         except:
@@ -2669,9 +2669,13 @@ class Main(QMainWindow):
         ori_text = re.sub(r'[\(\)（）\[\]【】<>《》]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
+            text = re.sub(r'(?<!\\)([（）]{2})', lambda x: '\\'+x.group(1)[0], text)
             text = re.sub(r'(?<!\\)[\(（](.+?)(?<!\\)[\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
             text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
             text = re.sub(r'(?<!\\)[<《](.+?)(?<!\\)[>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
+            text = re.sub(r'(?<!\|)shard(?<!\})', lambda x: '{{upgrade|shard}}', text)
+            text = re.sub(r'(?<!\|)agha(?<!\})', lambda x: '{{upgrade|agha}}', text)
+            text = re.sub(r'(?<!\|)talent(?<!\})', lambda x: '{{upgrade|talent}}', text)
             text = re.sub(r'\{\{A\|([0-9]+?)\}\}', lambda x: '{{A|' + hero_text + x.group(1) + '级天赋}}', text)
             text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
             text = re.sub(r'{{{(.+?)[:：](.+?)}}}', lambda x: self.version_input_text_template_simple_txt(x.group(1),x.group(2)), text)
@@ -2728,11 +2732,14 @@ class Main(QMainWindow):
             for i, v in db.items():
                 if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
                     rere += v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀']+'，'
-            rere+='[[file:Gold symbol.png|20px|link=]]'+common_page.number_to_string(db['价格']['1'])
+            if db['价格']['1']!='中立生物掉落':
+                rere+='[[file:Gold symbol.png|20px|link=]]'+common_page.number_to_string(db['价格']['1'])
             if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
                 rere += '[[file:items recipe.png|20px|link=]]&nbsp;' + common_page.number_to_string(db['卷轴价格']['1'])
             if '可拆分' in db and '组件' in db and db['可拆分']==1:
                 rere+='，可拆分'
+            if rere[-1]=='，':
+                rere=rere[:-1]
             rere+='。'
             if '组件' in db:
                 rere+='由'
@@ -2751,7 +2758,10 @@ class Main(QMainWindow):
                     rere += '{{I|'+v["物品名"]+'}}'
                 rere += '。'
         elif name in self.json_base['技能']:
-            rere+='{{H|'+name+'}}：'+self.json_base['技能'][name]['描述']+common_page.create_upgrade_manacost(self.json_base['技能'][name]['魔法消耗'],'span')+common_page.create_upgrade_cooldown(self.json_base['技能'][name]['冷却时间'],'span')
+            rere+='{{H|'+name+'}}：'+self.json_base['技能'][name]['描述']
+            for i in self.json_base['技能'][name]['属性']:
+                rere+=self.json_base['技能'][name]['属性'][i]['名称']+'：'+common_page.create_upgrade_text(self.json_base['技能'][name]['属性'], i)+'，'
+            rere +=common_page.create_upgrade_manacost(self.json_base['技能'][name]['魔法消耗'],'span')+common_page.create_upgrade_cooldown(self.json_base['技能'][name]['冷却时间'],'span')
         return rere
 
     def version_button_tree1(self):
