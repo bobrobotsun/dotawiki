@@ -213,7 +213,7 @@ def one_upgrade(json, base_txt, name, target):
                 nowcheck=[-1*int(caloprate[ii][0]),ii-1]
         if nowcheck[0]<0:
             for j in range(len(calvalue)):
-                if j>>nowcheck[1]:
+                if j>>(nowcheck[1]-1)&1:
                     array_cal(calvalue[j], getvalue[nowcheck[1]+1], caloprate[nowcheck[1]+1][1:])
             caloprate[nowcheck[1] + 1]=''
         else:
@@ -221,7 +221,7 @@ def one_upgrade(json, base_txt, name, target):
     for ii in range(2,extra+2):
         if len(caloprate[ii])>0 and not caloprate[ii][-1].isnumeric():
             for j in range(len(calvalue)):
-                if j>>(ii-1):
+                if j>>(ii-2)&1:
                     array_cal(calvalue[j], getvalue[ii], caloprate[ii])
             caloprate[ii] = ''
     if len(caloprate[1]) > 0:
@@ -234,7 +234,7 @@ def one_upgrade(json, base_txt, name, target):
                 nowcheck=[-1*int(caloprate[ii][-1]),ii-1]
         if nowcheck[0]<0:
             for j in range(len(calvalue)):
-                if j>>nowcheck[1]:
+                if j>>(nowcheck[1]-1) & 1:
                     array_cal(calvalue[j], getvalue[nowcheck[1]+1], caloprate[nowcheck[1]+1][:-1])
             caloprate[nowcheck[1] + 1]=''
         else:
@@ -244,7 +244,7 @@ def one_upgrade(json, base_txt, name, target):
             cut_the_same_to_one(calvalue[i])
     bitsum_list=[all_bit_sum(i) for i in range(pow(2, extra))]
     result_to_show_index=[]
-    for i in range(extra+2):
+    for i in range(extra+1):
         for j in range(len(bitsum_list)):
             if bitsum_list[j]==i:
                 result_to_show_index.append(i)
@@ -254,18 +254,19 @@ def one_upgrade(json, base_txt, name, target):
         if bitsum_list[result_to_show_index[i]]>1:
             json[str(i+1)]["升级来源"]={}
             for j in range(extra):
-                if result_to_show_index[i]>>j:
+                if result_to_show_index[i]>>j &1:
                     json[str(i + 1)]["升级来源"][str(len(json[str(i+1)]["升级来源"])+1)]=json[str(result_to_show_index[j+1]+1)]["升级来源"]['1']
 
 def all_bit_sum(i):
-    rere=0
+    rere = 0
     while True:
-        if i>0:
-            rere+=i&1
-            i=i>>1
+        if i > 0:
+            rere += i & 1
+            i = i >> 1
         else:
             break
     return rere
+
 
 def cut_the_same_to_one(lists):
     bool = True

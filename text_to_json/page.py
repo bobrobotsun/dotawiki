@@ -46,7 +46,7 @@ def create_upgrade_cast_text(numjsons,k):
                 else:
                     break
                 j += 1
-            if '即时生效' in numjson[i] and numjson[i]['即时生效']['代码'] != 0:
+            if '即时生效' in numjson[i] and int(numjson[i]['即时生效']['代码']) != 0:
                 retext += numjson[i]['即时生效']['图片']['图片']
         return retext
     else:

@@ -135,9 +135,9 @@ def create_upgrade_cast_target(db):
                     elif i == '不分类':
                         retxt += '<td style="padding:0.25em 0em;">'
                     elif i == '英雄':
-                        retxt += '<td style="background:#000033;cursor:help;padding:0.5em 0em;" title="被视为英雄">'
+                        retxt += '<td style="background:#6666CC;cursor:help;padding:0.5em 0em;" title="被视为英雄">'
                     elif i == '非英雄':
-                        retxt += '<td style="background:#003300;cursor:help;padding:0.5em 0em;" title="被视为普通单位">'
+                        retxt += '<td style="background:#66CC66;cursor:help;padding:0.5em 0em;" title="被视为普通单位">'
                     else:
                         bool = False
                     if bool:
@@ -177,8 +177,6 @@ def create_upgrade_cast_target(db):
                             else:
                                 break
                         retxt += '</td>'
-                else:
-                    break
             retxt += '</tr></table></div>'
         else:
             if hh >= 1:
