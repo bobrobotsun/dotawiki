@@ -1919,18 +1919,33 @@ class Main(QMainWindow):
                   self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:')
             if ok:
-                self.update_json_name(self.download_json('json_name.json'))
-                self.json_base[ss[0]][text] = copy.deepcopy(self.json_base[ss[0]][ss[1]])
-                self.json_base[ss[0]].pop(ss[1])
-                self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
-                self.json_name[ss[0]].append(text)
-                self.resort()
-                self.upload_json('json_name.json', self.json_name)
-                self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
-                self.edit_category_selected_changed()
-                self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
-                self.edit_target_selected_changed()
-                QMessageBox.information(self, '改名完毕', '库【' + ss[1] + '】已经被改名为【' + text + '】\n请记得保存后上传')
+                upload_data = {'action': 'delete', 'format': 'json', 'token': self.csrf_token}
+                if ss[0] == '技能源':
+                    upload_data['title'] = 'Data:' + ss[1] + '/源.json'
+                else:
+                    upload_data['title'] = 'Data:' + ss[1] + '.json'
+                k = 0
+                while True:
+                    self.time_point_for_iterable_sleep_by_time()
+                    upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
+                    if upload_info.status_code < 400:
+                        self.json_base[ss[0]][text] = copy.deepcopy(self.json_base[ss[0]][ss[1]])
+                        self.json_name[ss[0]].append(text)
+                        self.json_base[ss[0]].pop(ss[1])
+                        self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
+                        self.resort()
+                        self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(ss[0])
+                        self.edit_category_selected_changed()
+                        self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
+                        self.edit_target_selected_changed()
+                        QMessageBox.information(self, '改名完毕', '库【' + ss[1] + '】已经被改名为【' + text + '】\n请记得保存后上传')
+                        break
+                    else:
+                        k += 1
+                        self.time_point_for_iterable_sleep_by_time(k)
+                        if k >= 5:
+                            QMessageBox.information(self, '删除失败', '删除失败！错误代码：' + str(upload_info.status_code))
+                            break
 
     def json_edit_save(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
