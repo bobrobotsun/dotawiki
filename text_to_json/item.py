@@ -154,16 +154,11 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
     for ii in all_json:
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
-        all_json[ii]["应用"] = 1
         all_json[ii]["传说"] = base_txt["物品"][all_json[ii]['代码名']]['lore']['1'] if 'lore' in base_txt["物品"][all_json[ii]['代码名']] else all_json[ii]["传说"]
         if all_json[ii]['图片'] == '':
             all_json[ii]['图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
         if all_json[ii]['迷你图片'] == '':
             all_json[ii]['迷你图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
-        if '图片地址' in all_json[ii]:
-            all_json[ii].pop('图片地址')
-        if '迷你图片地址' in all_json[ii]:
-            all_json[ii].pop('迷你图片地址')
         all_json[ii]['曾用名'] = []
         for namei in name_base:
             if namei != all_json[ii]['页面名']:
@@ -268,7 +263,7 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
             all_json[i]["同商店物品"][j] = {}
             for k in all_json:
                 for l in all_json[k]["商店"]:
-                    if all_json[i]["商店"][j] == all_json[k]["商店"][l]:
+                    if all_json[i]["商店"][j] == all_json[k]["商店"][l] and all_json[k]["应用"]==1:
                         all_json[i]["同商店物品"][j][str(len(all_json[i]["同商店物品"][j]) + 1)] = {"物品名": all_json[k]["页面名"], "图片": all_json[k]["图片"]}
 
 

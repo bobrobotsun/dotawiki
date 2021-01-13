@@ -115,17 +115,18 @@ def fulfill_vpk_data(json, base):
         if json['技能源'][i]['代码'] in base['技能'] and 'lore' in base['技能'][json['技能源'][i]['代码']]:
             json['技能源'][i]['传说'] = base['技能'][json['技能源'][i]['代码']]['lore']['1']
 
+#应用：0、因改版而被删除；1、正在使用；2、因为拥有者删除而被删除
 
 def get_source_to_data(all_json, upgrade_json, version, name_base):
     for i in all_json['技能源']:
-        all_json['技能源'][i]['应用'] = 1
         all_json['技能源'][i]['分类'] = '技能源'
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
         unit_dic["分类"] = "技能"
         unit_dic["版本"] = version
-        unit_dic["应用"] = 1
         unit_dic['曾用名'] = []
+        if '升级属性' in unit_dic:
+            unit_dic.pop('升级属性')
         for namei in name_base:
             if namei != unit_dic['页面名']:
                 for namej in name_base[namei]:
@@ -195,11 +196,13 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                             break
                 elif i in ability_trait_level[3]:
                     unit_dic[i] = {}
+                    if '代码' in temp1[i]:
+                        temp1[i] = {'1': temp1[i]}
                     for j in temp1[i]:
                         unit_dic[i][j] = group_source(temp1[i][j])
                 elif i == "升级":
                     if "神杖" in temp1[i] and len(temp1[i]["神杖"]) > 0 or "技能" in temp1[i] and len(
-                            temp1[i]["技能"]) > 0 or "魔晶" in temp1[i] and len(temp1[i]["魔晶"]) > 0:
+                            temp1[i]["技能"]) > 0 or "魔晶" in temp1[i] and len(temp1[i]["魔晶"]) > 0 and unit_dic['应用'] == 1:
                         upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
                 elif i == "页面名" or i == '应用' or i == '分类':
                     continue
@@ -209,6 +212,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
             all_json["技能"][unit_dic["页面名"]] = copy.deepcopy(unit_dic)
         else:
             raise (editerror('技能', ijk, '没有在【技能源】中搜索到' + unit_dic["数据来源"]))
+
 
 
 def group_source(a):
@@ -306,45 +310,46 @@ def input_upgrade(all_json, upgrade_json):
 
 def complete_upgrade(all_json, base_txt):
     for i in all_json:
-        for j in all_json[i]["属性"]:
-            if fulfil(all_json[i]["属性"][j], all_json[i]):
-                one_upgrade(all_json[i]["属性"][j], base_txt, i, '第' + str(j) + '个【属性】')
-        for j in all_json[i]["冷却时间"]:
-            if '名称' not in all_json[i]["冷却时间"][j]:
-                all_json[i]["冷却时间"][j]['名称'] = ''
-            kk = 2
-            while True:
-                k = str(kk)
-                kk += 1
-                if k in all_json[i]["冷却时间"][j] and '名称' in all_json[i]["冷却时间"][j][k]:
-                    all_json[i]["冷却时间"][j]['名称'] = all_json[i]["冷却时间"][j][k]['名称']
-                    all_json[i]["冷却时间"][j][k].pop('名称')
-                else:
-                    break
-            if fulfil(all_json[i]["冷却时间"][j], all_json[i]):
-                one_upgrade(all_json[i]["冷却时间"][j], base_txt, i, '第' + str(j) + '个【冷却时间】')
-        for j in all_json[i]["魔法消耗"]:
-            if '名称' not in all_json[i]["魔法消耗"][j]:
-                all_json[i]["魔法消耗"][j]['名称'] = ''
-            for k in all_json[i]["魔法消耗"][j]:
-                if k != '名称':
-                    ll = 2
-                    while True:
-                        l = str(ll)
-                        ll += 1
-                        if l in all_json[i]["魔法消耗"][j][k] and '名称' in all_json[i]["魔法消耗"][j][k][l]:
-                            all_json[i]["魔法消耗"][j]['名称'] = all_json[i]["魔法消耗"][j][k][l]['名称']
-                            all_json[i]["魔法消耗"][j][k][l].pop('名称')
-                        else:
-                            break
-                    if fulfil(all_json[i]["魔法消耗"][j][k], all_json[i]):
-                        one_upgrade(all_json[i]["魔法消耗"][j][k], base_txt, i, '第' + str(j) + '个【魔法消耗】')
-        for j in all_json[i]["施法前摇"]:
-            fulfil(all_json[i]["施法前摇"][j], all_json[i])
-            one_upgrade(all_json[i]["施法前摇"][j], base_txt, i, '第' + str(j) + '个【施法前摇】')
-        for j in all_json[i]["施法后摇"]:
-            fulfil(all_json[i]["施法后摇"][j], all_json[i])
-            one_upgrade(all_json[i]["施法后摇"][j], base_txt, i, '第' + str(j) + '个【施法后摇】')
+        if all_json[i]['应用']>0:
+            for j in all_json[i]["属性"]:
+                if fulfil(all_json[i]["属性"][j], all_json[i]):
+                    one_upgrade(all_json[i]["属性"][j], base_txt, i, '第' + str(j) + '个【属性】')
+            for j in all_json[i]["冷却时间"]:
+                if '名称' not in all_json[i]["冷却时间"][j]:
+                    all_json[i]["冷却时间"][j]['名称'] = ''
+                kk = 2
+                while True:
+                    k = str(kk)
+                    kk += 1
+                    if k in all_json[i]["冷却时间"][j] and '名称' in all_json[i]["冷却时间"][j][k]:
+                        all_json[i]["冷却时间"][j]['名称'] = all_json[i]["冷却时间"][j][k]['名称']
+                        all_json[i]["冷却时间"][j][k].pop('名称')
+                    else:
+                        break
+                if fulfil(all_json[i]["冷却时间"][j], all_json[i]):
+                    one_upgrade(all_json[i]["冷却时间"][j], base_txt, i, '第' + str(j) + '个【冷却时间】')
+            for j in all_json[i]["魔法消耗"]:
+                if '名称' not in all_json[i]["魔法消耗"][j]:
+                    all_json[i]["魔法消耗"][j]['名称'] = ''
+                for k in all_json[i]["魔法消耗"][j]:
+                    if k != '名称':
+                        ll = 2
+                        while True:
+                            l = str(ll)
+                            ll += 1
+                            if l in all_json[i]["魔法消耗"][j][k] and '名称' in all_json[i]["魔法消耗"][j][k][l]:
+                                all_json[i]["魔法消耗"][j]['名称'] = all_json[i]["魔法消耗"][j][k][l]['名称']
+                                all_json[i]["魔法消耗"][j][k][l].pop('名称')
+                            else:
+                                break
+                        if fulfil(all_json[i]["魔法消耗"][j][k], all_json[i]):
+                            one_upgrade(all_json[i]["魔法消耗"][j][k], base_txt, i, '第' + str(j) + '个【魔法消耗】')
+            for j in all_json[i]["施法前摇"]:
+                fulfil(all_json[i]["施法前摇"][j], all_json[i])
+                one_upgrade(all_json[i]["施法前摇"][j], base_txt, i, '第' + str(j) + '个【施法前摇】')
+            for j in all_json[i]["施法后摇"]:
+                fulfil(all_json[i]["施法后摇"][j], all_json[i])
+                one_upgrade(all_json[i]["施法后摇"][j], base_txt, i, '第' + str(j) + '个【施法后摇】')
 
 
 def fulfil(arr, json):

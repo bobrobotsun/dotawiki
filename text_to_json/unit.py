@@ -78,7 +78,6 @@ def fulfill_unit_json(base_txt, all_json, version,name_base):
     for i in all_json:
         all_json[i]["分类"] = "非英雄单位"
         all_json[i]["版本"] = version
-        all_json[i]["应用"] = 1
         all_json[i]['曾用名'] = []
         for namei in name_base:
             if namei != all_json[i]['页面名']:

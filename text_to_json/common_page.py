@@ -17,12 +17,18 @@ def analyse_upload_json(text, upload_info):
         return ['《' + text + '》修改失败', 0]
 
 
-# 获得所有该单位的名字和曾用名的list
-def all_the_names(db):
+# 获得所有该单位+技能的名字和曾用名的list
+def all_the_names(db,json_base):
     relist = [db['页面名']]
     if '曾用名' in db:
         for i in db['曾用名']:
             relist.append(i)
+    if '技能' in db:
+        for i in db['技能']:
+            relist.append(i)
+            if '曾用名' in json_base['技能'][i]:
+                for j in json_base['技能'][i]['曾用名']:
+                    relist.append(j)
     return relist
 
 
@@ -1008,16 +1014,10 @@ def create_page_hero(json_base, log_base, log_list, hero):
              + db["背景"] \
              + '</div>' \
              + '</div>'
-    ii = 0
-    while True:
-        ii += 1
-        i = str(ii)
-        if i in db['技能']:
-            retxt += create_page_ability(json_base['技能'][db['技能'][i]])
-        else:
-            break
+    for i in db['技能']:
+        retxt += create_page_ability(json_base['技能'][i])
     retxt += '<h2>历史更新</h2>' \
-             + create_2nd_logs(json_base, log_base, log_list, all_the_names(db), 10) \
+             + create_2nd_logs(json_base, log_base, log_list, all_the_names(db,json_base), 10) \
              + '<h2>饰品</h2>' \
              + '[[data:' + db["中文名"] + '/equipment|点击进入查看饰品信息]]' \
              + '{{navbox|title=DotA中的英雄|name=navboxhero|basestyle=max-width:800px;text-align:center;line-height:2em;' \
@@ -1073,15 +1073,9 @@ def create_page_unit(json_base, log_base, log_list, unit):
     retxt += '</div>'
     if db["类型"] == '士兵':
         retxt += '[[分类:士兵]]'
-    ii = 0
-    while True:
-        ii += 1
-        i = str(ii)
-        if i in db['技能']:
-            retxt += create_page_ability(json_base['技能'][db['技能'][i]])
-        else:
-            break
-    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db), 10) \
+    for i in db['技能']:
+        retxt += create_page_ability(json_base['技能'][i])
+    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db,json_base), 10) \
              + '<div>{{navbox|title=DotA中的非英雄单位|name=navbox minion' + create_navboxunit(json_base) + '}}</div>[[分类:非英雄单位]]'
     rere = ''
     nums = 0
@@ -1118,15 +1112,9 @@ def create_page_item(json_base, log_base, log_list, item):
             if int(j) % 4 == 0 or int(j) == len(db["同商店物品"][i]):
                 retxt += '</tr>'
         retxt += '</table>'
-    ii = 0
-    while True:
-        ii += 1
-        i = str(ii)
-        if i in db['技能']:
-            retxt += create_page_ability(json_base['技能'][db['技能'][i]])
-        else:
-            break
-    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db), 10) + '[[分类:物品]]'
+    for i in db['技能']:
+        retxt += create_page_ability(json_base['技能'][i])
+    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db,json_base), 10) + '[[分类:物品]]'
     rere = ''
     nums = 0
     for i in range(len(retxt)):

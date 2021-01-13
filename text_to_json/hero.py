@@ -128,7 +128,6 @@ def fulfill_hero_json(base_txt, all_json, version,name_base):
         if all_json[i]["代码名"] in base_txt["英雄"]:
             all_json[i]["分类"] = "英雄"
             all_json[i]["版本"] = version
-            all_json[i]["应用"] = 1
             all_json[i]['图片'] = 'Heroes_' + all_json[i]["代码名"] + '.png'
             all_json[i]['迷你图片'] = 'Miniheroes_' + all_json[i]["代码名"] + '.png'
             all_json[i]['攻击后摇']=float(all_json[i]['攻击后摇'])
