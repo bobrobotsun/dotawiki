@@ -704,6 +704,7 @@ class Main(QMainWindow):
             names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
             for i in names:
                 self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
+                self.mainlayout['列表'][i]['布局']['列表'].setIconSize(QSize(36,28))
                 self.mainlayout['列表'][i]['布局']['列表'].clear()
                 for j in self.json_base[i]:
                     temp = QListWidgetItem()
@@ -1344,6 +1345,10 @@ class Main(QMainWindow):
     def upload_same_kind(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
+        self.json_base[selected][selected_name] = {}
+        self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[selected][selected_name])
+        self.file_save_all()
+        self.update_json_base(info='已经保存并更新完毕\n之后将进行上传。')
         target_name = []
         if self.json_base[selected][selected_name]['应用']>0:
             if selected == '技能':

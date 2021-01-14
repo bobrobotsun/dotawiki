@@ -570,7 +570,7 @@ def array_cal(arr1, arr2, opp):
                 temp = float(arr2[i])
             except ValueError:
                 temp = arr2[i]
-        if isinstance(arr1[i],str):
+        if isinstance(arr1[i],str) and '=' not in opp:
             if opp == '=':
                 arr1[i] = temp
         else:
@@ -1016,11 +1016,6 @@ def calculate_combine_txt_numbers(list1, list2, op):
     expand1 = expand_value_source_list_with_another_source_dict(list1, lack1, all_up_source)
     expand2 = expand_value_source_list_with_another_source_dict(list2, lack2, all_up_source)
     for i in range(len(expand1)):
-        for j in range(max(len(expand1[i][0]), len(expand2[i][0]))):
-            if j >= len(expand1[i][0]):
-                expand1[i][0].append(expand1[i][0][j - 1])
-            if j >= len(expand2[i][0]):
-                expand2[i][0].append(expand2[i][0][j - 1])
         if op == 'max_stack':  # 前最大值，后公差，首项为0
             expand1[i][0] = [expand1[i][0][0]]
             j = 0
@@ -1090,6 +1085,11 @@ def calculate_combine_txt_numbers(list1, list2, op):
             rere = rere + '}}'
             expand1[i][0] = [rere]
         else:
+            for j in range(max(len(expand1[i][0]), len(expand2[i][0]))):
+                if j >= len(expand1[i][0]):
+                    expand1[i][0].append(expand1[i][0][j - 1])
+                if j >= len(expand2[i][0]):
+                    expand2[i][0].append(expand2[i][0][j - 1])
             for j in range(len(expand1[i][0])):
                 if op=='..':
                     expand1[i][0][j]=number_to_string(expand1[i][0][j])+number_to_string(expand2[i][0][j])

@@ -778,38 +778,42 @@ def create_miniimage_with_link(json_base):
 
 
 def create_navboxunit(json_base):
-    lists = ['', '', '', '', '', '']
+    lists = ['', '', '', '', '', '', '']
     for i, v in json_base['非英雄单位'].items():
-        if v["远古单位"]["1"]["1"] == 1:
-            if len(lists[0]) > 0:
-                lists[0] += '&nbsp;{{!}}&nbsp;'
-            lists[0] += create_miniimage_with_link(v)
-        elif v["英雄级单位"]["1"]["1"] == 1:
-            if len(lists[1]) > 0:
-                lists[1] += '&nbsp;{{!}}&nbsp;'
-            lists[1] += create_miniimage_with_link(v)
-        elif v["中立生物"]["1"]["1"] == 1:
-            if len(lists[2]) > 0:
-                lists[2] += '&nbsp;{{!}}&nbsp;'
-            lists[2] += create_miniimage_with_link(v)
-        elif v["召唤物"]["1"]["1"] == 1:
-            if len(lists[3]) > 0:
-                lists[3] += '&nbsp;{{!}}&nbsp;'
-            lists[3] += create_miniimage_with_link(v)
-        elif "关联类型" in v and v["关联类型"] == '守卫':
-            if len(lists[4]) > 0:
-                lists[4] += '&nbsp;{{!}}&nbsp;'
-            lists[4] += create_miniimage_with_link(v)
-        elif v["类型"] == '士兵':
-            if len(lists[5]) > 0:
-                lists[5] += '&nbsp;{{!}}&nbsp;'
-            lists[5] += create_miniimage_with_link(v)
+        if v['应用']==1:
+            if v["远古单位"]["1"]["1"] == 1:
+                if len(lists[0]) > 0:
+                    lists[0] += '&nbsp;{{!}}&nbsp;'
+                lists[0] += create_miniimage_with_link(v)
+            elif v["英雄级单位"]["1"]["1"] == 1:
+                if len(lists[1]) > 0:
+                    lists[1] += '&nbsp;{{!}}&nbsp;'
+                lists[1] += create_miniimage_with_link(v)
+            elif v["中立生物"]["1"]["1"] == 1:
+                if len(lists[2]) > 0:
+                    lists[2] += '&nbsp;{{!}}&nbsp;'
+                lists[2] += create_miniimage_with_link(v)
+            elif v["召唤物"]["1"]["1"] == 1:
+                if len(lists[3]) > 0:
+                    lists[3] += '&nbsp;{{!}}&nbsp;'
+                lists[3] += create_miniimage_with_link(v)
+            elif "关联类型" in v and v["关联类型"] == '守卫':
+                if len(lists[4]) > 0:
+                    lists[4] += '&nbsp;{{!}}&nbsp;'
+                lists[4] += create_miniimage_with_link(v)
+            elif v["类型"] == '士兵':
+                if len(lists[5]) > 0:
+                    lists[5] += '&nbsp;{{!}}&nbsp;'
+                lists[5] += create_miniimage_with_link(v)
+        else:
+            lists[6]+=create_miniimage_with_link(v)
     retxt = '|group1=远古生物|list1=' + lists[0] \
             + '|group2=英雄级单位|list2=' + lists[1] \
             + '|group3=中立生物|list3=' + lists[2] \
             + '|group4=召唤生物|list4=' + lists[3] \
             + '|group5=守卫|list5=' + lists[4] \
-            + '|group6=士兵|list6=' + lists[5]
+            + '|group6=士兵|list6=' + lists[5] \
+            + '|group7=已被移除的单位|list7=' + lists[6]
     return retxt
 
 

@@ -236,24 +236,25 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
                         all_json[i]["组件"][j] = {"物品名": all_json[k]["页面名"], "图片": all_json[k]["图片"]}
     # 接下来把所有的升级放在这儿
     for i in all_json:
-        if "组件" in all_json[i]:
-            if all_json[i]["合成"] == 0:
-                for j in base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"]:
-                    for k in base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"][j]:
-                        require_code=base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"][j][k]
-                        for l in all_json:
-                            if len(all_json[l]["代码名"])<=len(require_code) and  require_code[:len(all_json[l]["代码名"])]==all_json[l]["代码名"]:
-                                if "升级" not in all_json[l]:
-                                    all_json[l]["升级"] = {"1": {"物品名": all_json[i]["页面名"], "图片": all_json[i]["图片"]}}
-                                elif all_json[l]["升级"][str(len(all_json[l]["升级"]))]["物品名"] != i:
-                                    all_json[l]["升级"][str(len(all_json[l]["升级"]) + 1)] = {"物品名": all_json[i]["页面名"], "图片": all_json[i]["图片"]}
-            else:
-                for j in all_json[i]["组件"]:
-                    if "升级" not in all_json[all_json[i]["组件"][j]["物品名"]]:
-                        all_json[all_json[i]["组件"][j]["物品名"]]["升级"] = {"1": {"物品名": all_json[i]["页面名"], "图片": all_json[i]["图片"]}}
-                    elif all_json[all_json[i]["组件"][j]["物品名"]]["升级"][str(len(all_json[all_json[i]["组件"][j]["物品名"]]["升级"]))]["物品名"] != i:
-                        all_json[all_json[i]["组件"][j]["物品名"]]["升级"][str(len(all_json[all_json[i]["组件"][j]["物品名"]]["升级"]) + 1)] = {"物品名": all_json[i]["页面名"],
-                                                                                                                                  "图片": all_json[i]["图片"]}
+        if all_json[i]['应用']==1:
+            if "组件" in all_json[i]:
+                if all_json[i]["合成"] == 0:
+                    for j in base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"]:
+                        for k in base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"][j]:
+                            require_code = base_txt["物品"]['recipe_' + all_json[i]["代码名"]]["ItemRequirements"][j][k]
+                            for l in all_json:
+                                if len(all_json[l]["代码名"]) <= len(require_code) and require_code[:len(all_json[l]["代码名"])] == all_json[l]["代码名"]:
+                                    if "升级" not in all_json[l]:
+                                        all_json[l]["升级"] = {"1": {"物品名": all_json[i]["页面名"], "图片": all_json[i]["图片"]}}
+                                    elif all_json[l]["升级"][str(len(all_json[l]["升级"]))]["物品名"] != i:
+                                        all_json[l]["升级"][str(len(all_json[l]["升级"]) + 1)] = {"物品名": all_json[i]["页面名"], "图片": all_json[i]["图片"]}
+                else:
+                    for j in all_json[i]["组件"]:
+                        if "升级" not in all_json[all_json[i]["组件"][j]["物品名"]]:
+                            all_json[all_json[i]["组件"][j]["物品名"]]["升级"] = {"1": {"物品名": all_json[i]["页面名"], "图片": all_json[i]["图片"]}}
+                        elif all_json[all_json[i]["组件"][j]["物品名"]]["升级"][str(len(all_json[all_json[i]["组件"][j]["物品名"]]["升级"]))]["物品名"] != i:
+                            all_json[all_json[i]["组件"][j]["物品名"]]["升级"][str(len(all_json[all_json[i]["组件"][j]["物品名"]]["升级"]) + 1)] = {"物品名": all_json[i]["页面名"],
+                                                                                                                                      "图片": all_json[i]["图片"]}
         # 这里开始同商店物品填入
         all_json[i]["同商店物品"] = {}
         if isinstance(all_json[i]["商店"], str):
