@@ -29,6 +29,13 @@ def all_the_names(db,json_base):
             if '曾用名' in json_base['技能'][i]:
                 for j in json_base['技能'][i]['曾用名']:
                     relist.append(j)
+    if '源技能' in db:
+        for i,v in db['源技能'].items():
+            if v in db['技能']:
+                relist.append(v)
+                if '曾用名' in json_base['技能'][v]:
+                    for j in json_base['技能'][v]['曾用名']:
+                        relist.append(j)
     return relist
 
 

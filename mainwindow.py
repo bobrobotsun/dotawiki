@@ -108,13 +108,13 @@ class Main(QMainWindow):
             time.sleep(staytime + pasttime - temptime)
         self.time_point_for_iterable_sleep = time.time()
 
-    #将文字转换为整数、2位小数,不行就返回文字
-    def str_to_number(self,text,round_value=2):
+    # 将文字转换为整数、2位小数,不行就返回文字
+    def str_to_number(self, text, round_value=2):
         try:
-            if float(int(text))==float(text):
+            if float(int(text)) == float(text):
                 return int(text)
             else:
-                return float(round(text,round_value))
+                return float(round(text, round_value))
         except ValueError:
             return str(text)
 
@@ -704,7 +704,7 @@ class Main(QMainWindow):
             names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
             for i in names:
                 self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
-                self.mainlayout['列表'][i]['布局']['列表'].setIconSize(QSize(36,28))
+                self.mainlayout['列表'][i]['布局']['列表'].setIconSize(QSize(36, 28))
                 self.mainlayout['列表'][i]['布局']['列表'].clear()
                 for j in self.json_base[i]:
                     temp = QListWidgetItem()
@@ -788,6 +788,8 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传《非英雄单位》页面'].triggered.connect(lambda: self.upload_common_page('非英雄单位'))
         self.ml['高级功能']['上传《物品》页面'] = self.ml['高级功能'][0].addAction('上传《物品》页面')
         self.ml['高级功能']['上传《物品》页面'].triggered.connect(lambda: self.upload_common_page('物品'))
+        self.ml['高级功能']['上传《技能链接》页面'] = self.ml['高级功能'][0].addAction('上传《技能链接》页面')
+        self.ml['高级功能']['上传《技能链接》页面'].triggered.connect(lambda: self.upload_common_page('技能'))
         """
         下载上传的内容
         """
@@ -1185,21 +1187,21 @@ class Main(QMainWindow):
             ability.complete_upgrade(self.json_base["技能"], self.text_base)
 
             ability.complete_mech(self.json_base["技能"], self.mech)
-            #将图片信息规范化
+            # 将图片信息规范化
             for i in self.json_base:
                 for j in self.json_base[i]:
-                    if '图片' in self.json_base[i][j] and len(self.json_base[i][j]['图片'])>1:
-                        self.json_base[i][j]['图片']=self.json_base[i][j]['图片'][0].upper()+self.json_base[i][j]['图片'][1:].replace(' ','_')
-                    if '迷你图片' in self.json_base[i][j] and len(self.json_base[i][j]['迷你图片'])>1:
-                        self.json_base[i][j]['迷你图片']=self.json_base[i][j]['迷你图片'][0].upper()+self.json_base[i][j]['迷你图片'][1:].replace(' ','_')
-            #结算技能和技能源问题
+                    if '图片' in self.json_base[i][j] and len(self.json_base[i][j]['图片']) > 1:
+                        self.json_base[i][j]['图片'] = self.json_base[i][j]['图片'][0].upper() + self.json_base[i][j]['图片'][1:].replace(' ', '_')
+                    if '迷你图片' in self.json_base[i][j] and len(self.json_base[i][j]['迷你图片']) > 1:
+                        self.json_base[i][j]['迷你图片'] = self.json_base[i][j]['迷你图片'][0].upper() + self.json_base[i][j]['迷你图片'][1:].replace(' ', '_')
+            # 结算技能和技能源问题
             for i in self.json_base["技能"]:
                 target = []
                 if '数据来源' in self.json_base["技能"][i] and self.json_base["技能"][i]['数据来源'] in self.json_base["技能源"]:
                     target = [self.json_base["技能"][i]['数据来源']]
                 else:
                     raise (editerror('技能', i, "你没有书写数据来源，请立刻书写"))
-                if self.json_base["技能"][i]['应用']>0:
+                if self.json_base["技能"][i]['应用'] > 0:
                     ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target)
             ability.confirm_upgrade_info(self.json_base['技能'])
             # 增加拥有技能
@@ -1286,6 +1288,10 @@ class Main(QMainWindow):
                 all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
                 all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'],
                                                                             common_page.all_the_names(self.json_base['物品'][i], self.json_base), 0)])
+        if chosen == '技能':
+            for i in self.json_base['技能']:
+                page_link_content='#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
+                all_upload.append([i, page_link_content])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
@@ -1350,7 +1356,7 @@ class Main(QMainWindow):
         self.file_save_all()
         self.update_json_base(info='已经保存并更新完毕\n之后将进行上传。')
         target_name = []
-        if self.json_base[selected][selected_name]['应用']>0:
+        if self.json_base[selected][selected_name]['应用'] > 0:
             if selected == '技能':
                 target_name.append(self.json_base[selected][selected_name]['技能归属'])
             elif selected == '技能源':
@@ -1378,6 +1384,7 @@ class Main(QMainWindow):
                 for i in self.json_base['技能']:
                     if self.json_base['技能'][i]['技能归属'] == k:
                         all_upload.append([i + '.json', self.json_base['技能'][i]])
+                        all_page.append([i, '#重定向[[' + k + '#' + i + ']]'])
                         j = self.json_base['技能'][i]['数据来源']
                         if j in self.json_base['技能源']:
                             all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
@@ -1888,17 +1895,17 @@ class Main(QMainWindow):
         QMessageBox.information(self, '更新完毕', '更新成功！您成功从wiki下载到' + ss[1] + '的信息。')
 
     def json_edit_delete(self):
-        warning = QMessageBox.warning(self, '删除', '您正试图删除一个库，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No,QMessageBox.No)
+        warning = QMessageBox.warning(self, '删除', '您正试图删除一个库，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if warning == QMessageBox.Yes:
             self.update_json_name(self.download_json('json_name.json'))
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
                   self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             upload_data = {'action': 'delete', 'format': 'json', 'token': self.csrf_token}
             if ss[0] == '技能源':
-                upload_data['title']='Data:'+ss[1] + '/源.json'
+                upload_data['title'] = 'Data:' + ss[1] + '/源.json'
             else:
-                upload_data['title']='Data:'+ss[1] + '.json'
-            k=0
+                upload_data['title'] = 'Data:' + ss[1] + '.json'
+            k = 0
             while True:
                 self.time_point_for_iterable_sleep_by_time()
                 upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
@@ -1914,11 +1921,11 @@ class Main(QMainWindow):
                     k += 1
                     self.time_point_for_iterable_sleep_by_time(k)
                     if k >= 5:
-                        QMessageBox.information(self, '删除失败', '删除失败！错误代码：'+str(upload_info.status_code))
+                        QMessageBox.information(self, '删除失败', '删除失败！错误代码：' + str(upload_info.status_code))
                         break
 
     def json_edit_change_name(self):
-        warning = QMessageBox.warning(self, '改名', '您正改变库的名字，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No,QMessageBox.No)
+        warning = QMessageBox.warning(self, '改名', '您正改变库的名字，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if warning == QMessageBox.Yes:
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
                   self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
@@ -2544,10 +2551,12 @@ class Main(QMainWindow):
                         if ok:
                             re[ii][index]['序列级数'] = text
                             break
-                re[ii][index]['文字'] = item2.text(1)
+                re[ii][index]['文字'] = '{{upgrade|agha}}'+item2.text(1)[4:] if item2.text(1)[:4]=='神杖升级' or item2.text(1)[:4]=='agha' else item2.text(1)
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
                     re[ii][index]['目标'].append(item4.text(1))
+            if len(re[ii])==2 or re[ii][-1]['文字'] != '':
+                re[ii].append({'序列级数': 1, '文字': '', '目标': []})
         return re
 
     def create_one_version(self):
@@ -2697,6 +2706,7 @@ class Main(QMainWindow):
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
             text = re.sub(r'(?<!\\)([（）]{2})', lambda x: '\\' + x.group(1)[0], text)
+            text = re.sub(r'(?<!\\)([\[\]]{2})', lambda x: '\\' + x.group(1)[0]+'\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)[\(（](.+?)(?<!\\)[\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
             text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
             text = re.sub(r'(?<!\\)[<《](.+?)(?<!\\)[>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
