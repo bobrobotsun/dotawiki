@@ -59,20 +59,20 @@ def ability_cast_point_and_backswing(seesion, json_base, csrf_token):
         temp_base = edit_json.sortedDictValues(json_base[i], True)
         for j in temp_base:
             for k in temp_base[j]['技能']:
-                ability_name = temp_base[j]['技能'][k]
+                ability_name = k
                 if ability_name in json_base['技能']:
-                    k = 0
+                    l = 0
                     while True:
-                        k += 1
-                        if str(k) in json_base['技能'][ability_name]['施法前摇']:
+                        l += 1
+                        if str(l) in json_base['技能'][ability_name]['施法前摇']:
                             retxt += '<tr><td>{{H|' + j + '}}{{A|' + ability_name + '}}'
-                            if '名称' in json_base['技能'][ability_name]['施法前摇'][str(k)] and json_base['技能'][ability_name]['施法前摇'][str(k)]['名称']!='':
-                                retxt+='（'+json_base['技能'][ability_name]['施法前摇'][str(k)]['名称']+'）'
-                            if str(k) in json_base['技能'][ability_name]['施法后摇'] and '名称' in json_base['技能'][ability_name]['施法后摇'][str(k)] and json_base['技能'][ability_name]['施法后摇'][str(k)]['名称']!='':
-                                retxt+='（'+json_base['技能'][ability_name]['施法后摇'][str(k)]['名称']+'）'
+                            if '名称' in json_base['技能'][ability_name]['施法前摇'][str(l)] and json_base['技能'][ability_name]['施法前摇'][str(l)]['名称']!='':
+                                retxt+='（'+json_base['技能'][ability_name]['施法前摇'][str(l)]['名称']+'）'
+                            if str(l) in json_base['技能'][ability_name]['施法后摇'] and '名称' in json_base['技能'][ability_name]['施法后摇'][str(l)] and json_base['技能'][ability_name]['施法后摇'][str(l)]['名称']!='':
+                                retxt+='（'+json_base['技能'][ability_name]['施法后摇'][str(l)]['名称']+'）'
                             retxt+='</td><td>' + create_upgrade_cast_text(
-                                json_base['技能'][ability_name]['施法前摇'],str(k)) + '</td><td>' + create_upgrade_cast_text(
-                                json_base['技能'][ability_name]['施法后摇'],str(k)) + '</td></tr>'
+                                json_base['技能'][ability_name]['施法前摇'],str(l)) + '</td><td>' + create_upgrade_cast_text(
+                                json_base['技能'][ability_name]['施法后摇'],str(l)) + '</td></tr>'
                         else:
                             break
     retxt += '</table>'
