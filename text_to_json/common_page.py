@@ -18,7 +18,7 @@ def analyse_upload_json(text, upload_info):
 
 
 # 获得所有该单位+技能的名字和曾用名的list
-def all_the_names(db,json_base):
+def all_the_names(db, json_base):
     relist = [db['页面名']]
     if '曾用名' in db:
         for i in db['曾用名']:
@@ -30,7 +30,7 @@ def all_the_names(db,json_base):
                 for j in json_base['技能'][i]['曾用名']:
                     relist.append(j)
     if '源技能' in db:
-        for i,v in db['源技能'].items():
+        for i, v in db['源技能'].items():
             if v in db['技能']:
                 relist.append(v)
                 if '曾用名' in json_base['技能'][v]:
@@ -50,7 +50,7 @@ def number_to_string(number, rr=4):
         return str(i)
 
 
-def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x,y: ''):
+def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: ''):
     if k in numjsons:
         numjson = numjsons[k]
         retext = ''
@@ -75,7 +75,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
                             retext += post_each(numjsons[k])
                     else:
                         break
-                retext += post_group(numjson,i)
+                retext += post_group(numjson, i)
             else:
                 break
         return retext
@@ -211,7 +211,7 @@ def create_upgrade_cast_point_backswing(arr1, arr2):
             if i in arr2 and arr2[i]['名称'] != '':
                 retxt += '（' + arr2[i]['名称'] + '）'
             retxt += '： ' + create_upgrade_text(arr1, i, lambda x: '',
-                                                lambda x,y: x[y]["即时生效"]['图片']['图片'] if int(x[y]["即时生效"]['代码']) != 0 else '') + ' + ' \
+                                                lambda x, y: x[y]["即时生效"]['图片']['图片'] if int(x[y]["即时生效"]['代码']) != 0 else '') + ' + ' \
                      + create_upgrade_text(arr2, i) + '</div>'
         else:
             break
@@ -312,6 +312,7 @@ def create_upgrade_buff(json_dict):
     buff_mech = ['技能免疫', '状态抗性', '无敌']
     retxt = '<div style="paddin:0.5em;"><table>'
     i = 0
+    compeat_descripe = []  # 检查简述中是否存在重复文字
     while True:
         i += 1
         if str(i) in json_dict:
@@ -402,7 +403,8 @@ def create_upgrade_buff(json_dict):
                 jj += 1
                 j = str(jj)
                 if j in json_dict[str(i)]:
-                    if json_dict[str(i)][j]['简述'] != '':
+                    if json_dict[str(i)][j]['简述'] != '' and json_dict[str(i)][j]['简述'] not in compeat_descripe:
+                        compeat_descripe.append(json_dict[str(i)][j]['简述'])
                         retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)][j]['名称'] + '</span>：' + \
                                  json_dict[str(i)][j]['简述'] + '</td></tr>'
                 else:
@@ -787,7 +789,7 @@ def create_miniimage_with_link(json_base):
 def create_navboxunit(json_base):
     lists = ['', '', '', '', '', '', '']
     for i, v in json_base['非英雄单位'].items():
-        if v['应用']==1:
+        if v['应用'] == 1:
             if v["远古单位"]["1"]["1"] == 1:
                 if len(lists[0]) > 0:
                     lists[0] += '&nbsp;{{!}}&nbsp;'
@@ -813,7 +815,7 @@ def create_navboxunit(json_base):
                     lists[5] += '&nbsp;{{!}}&nbsp;'
                 lists[5] += create_miniimage_with_link(v)
         else:
-            lists[6]+=create_miniimage_with_link(v)
+            lists[6] += create_miniimage_with_link(v)
     retxt = '|group1=远古生物|list1=' + lists[0] \
             + '|group2=英雄级单位|list2=' + lists[1] \
             + '|group3=中立生物|list3=' + lists[2] \
@@ -893,7 +895,7 @@ def create_page_logs(title, log_base, log_list, name_base):
                                             retxt += '[[file:' + k[1] + '|x36px|link=' + k[0] + ']]'
                                     retxt += '[[' + name_base[w[0]][0][0] + '|' + w[0] + ']]===='
                                 else:
-                                    retxt += '<span class="dota_image_by_json_name" data-name="'+w[0]+'" data-img-height="36px"></span>[['+w[0] + ']]===='
+                                    retxt += '<span class="dota_image_by_json_name" data-name="' + w[0] + '" data-img-height="36px"></span>[[' + w[0] + ']]===='
                         current_ul = 0
                         for k in range(2, len(w)):
                             x = w[k]
@@ -928,8 +930,8 @@ def create_page_logs(title, log_base, log_list, name_base):
                             for tnumber in range(current_ul):
                                 retxt += '\t'
                             retxt += '</ul>'
-                        if len(w)>3:
-                            retxt+='\n<br/>'
+                        if len(w) > 3:
+                            retxt += '\n<br/>'
     retxt += '\n[[分类:版本更新]]'
     return retxt
 
@@ -1028,7 +1030,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i])
     retxt += '<h2>历史更新</h2>' \
-             + create_2nd_logs(json_base, log_base, log_list, all_the_names(db,json_base), 10) \
+             + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
              + '<h2>饰品</h2>' \
              + '[[data:' + db["中文名"] + '/equipment|点击进入查看饰品信息]]' \
              + '{{navbox|title=DotA中的英雄|name=navboxhero|basestyle=max-width:800px;text-align:center;line-height:2em;' \
@@ -1086,7 +1088,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
         retxt += '[[分类:士兵]]'
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i])
-    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db,json_base), 10) \
+    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
              + '<div>{{navbox|title=DotA中的非英雄单位|name=navbox minion' + create_navboxunit(json_base) + '}}</div>[[分类:非英雄单位]]'
     rere = ''
     nums = 0
@@ -1123,9 +1125,23 @@ def create_page_item(json_base, log_base, log_list, item):
             if int(j) % 4 == 0 or int(j) == len(db["同商店物品"][i]):
                 retxt += '</tr>'
         retxt += '</table>'
+    for i, v in json_base['物品'][item].items():
+        if isinstance(v, dict) and '叠加' in v and v['叠加'] != '':
+            all_the_item_name = []
+            for j, w in json_base['物品'].items():
+                if j != item and w['应用'] == 1 and i in w and w[i]['叠加'] == v['叠加']:
+                    all_the_item_name.append([j, number_to_string(w[i]['1'])+w[i]['后缀']])
+            retxt += '<br/>多个{{I|' + item + '}}的【' + i + '】(' + number_to_string(v['1'])+v['后缀'] + ')不会叠加'
+            if len(all_the_item_name) > 0:
+                retxt += '，且和以下物品不叠加，仅取最高值生效：'
+                for j in range(len(all_the_item_name)):
+                    if j > 0:
+                        retxt += '、'
+                    retxt += '{{I|' + all_the_item_name[j][0] + '}}(' + all_the_item_name[j][1] + ')'
+            retxt += '。'
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i])
-    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db,json_base), 10) + '[[分类:物品]]'
+    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) + '[[分类:物品]]'
     rere = ''
     nums = 0
     for i in range(len(retxt)):

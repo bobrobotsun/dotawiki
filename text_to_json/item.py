@@ -178,10 +178,8 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
                     all_json[ii][i]["1"] = base_txt["物品"][all_json[ii]["代码名"]][all_json[ii][i]["代码"]]["1"]
         for i in all_json[ii]:
             if i in edit_json.edit_adition['物品属性']:
-                if '前缀' in all_json[ii][i]:
-                    all_json[ii][i].pop('前缀')
-                if '展示名' in all_json[ii][i]:
-                    all_json[ii][i].pop('展示名')
+                if '叠加' not in all_json[ii][i]:
+                    all_json[ii][i]['叠加']=''
                 all_json[ii][i]['展示前缀'] = edit_json.edit_adition['物品属性'][i]['展示前缀']
                 all_json[ii][i]['后缀'] = edit_json.edit_adition['物品属性'][i]['后缀']
                 all_json[ii][i]['展示后缀'] = edit_json.edit_adition['物品属性'][i]['展示后缀']

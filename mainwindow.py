@@ -1761,9 +1761,9 @@ class Main(QMainWindow):
     def item_dict_to_extra_tree(self, tdict, sdict):
         tempmenu = TreeItemEdit(tdict[0], '物品属性')
         tempmenu.set_type('list')
-        tempmenu.set_kid_list(['tree', {'名称': ['text', ''], '代码': ['text', ''], '后缀': ['text', ''], '展示前缀': ['text', ''], '展示后缀': ['text', '']}, 1, 0, False])
+        tempmenu.set_kid_list(['tree', {'名称': ['text', ''], '代码': ['text', ''], '后缀': ['text', ''], '展示前缀': ['text', ''], '展示后缀': ['text', ''], '叠加': ['text', '']}, 1, 0, False])
         for ii in sdict:
-            if isinstance(sdict[ii], dict) and '代码' in sdict[ii] and '后缀' in sdict[ii] and '展示前缀' in sdict[ii] and '展示后缀' in sdict[ii]:
+            if isinstance(sdict[ii], dict) and '代码' in sdict[ii] and '后缀' in sdict[ii] and '展示前缀' in sdict[ii] and '展示后缀' in sdict[ii] and '叠加' in sdict[ii]:
                 i = str(tempmenu.listtype[2])
                 tempmenu.listtype[2] += 1
                 tempmenu.listtype[3] += 1
@@ -1785,6 +1785,9 @@ class Main(QMainWindow):
                 new5 = TreeItemEdit(new0, '展示后缀')
                 new5.set_type('text')
                 new5.set_value(sdict[ii]['展示后缀'])
+                new6 = TreeItemEdit(new0, '叠加')
+                new6.set_type('text')
+                new6.set_value(sdict[ii]['叠加'])
                 new0.setExpanded(True)
 
     def combine_text_to_tree(self, tdict, sdict):
@@ -2203,7 +2206,7 @@ class Main(QMainWindow):
             if category == '物品' and tli.text(0) == '物品属性':
                 for j in range(tli.childCount()):
                     jc = tli.child(j)
-                    sdict[jc.child(0).text(1)] = {'代码': jc.child(1).text(1), '后缀': jc.child(2).text(1), '展示前缀': jc.child(3).text(1), '展示后缀': jc.child(4).text(1)}
+                    sdict[jc.child(0).text(1)] = {'代码': jc.child(1).text(1), '后缀': jc.child(2).text(1), '展示前缀': jc.child(3).text(1), '展示后缀': jc.child(4).text(1), '叠加': jc.child(5).text(1)}
             else:
                 self.read_tree_item_to_json(tli, sdict)
 
@@ -2767,7 +2770,7 @@ class Main(QMainWindow):
         elif name in self.json_base['物品']:
             db = self.json_base['物品'][name]
             for i, v in db.items():
-                if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
+                if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '叠加' in v and '1' in v:
                     rere += v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + '，'
             if db['价格']['1'] != '中立生物掉落':
                 rere += '[[file:Gold symbol.png|20px|link=]]' + common_page.number_to_string(db['价格']['1'])
