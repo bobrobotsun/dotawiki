@@ -540,7 +540,7 @@ class Main(QMainWindow):
             tempjson = json.loads(texttemp)
             self.json_name.update(tempjson)
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
-        QMessageBox.information(self, '下载合成数据完成', '请继续操作')
+        QMessageBox.information(self, '下载合成数据完成', '下载合成数据完成，请继续操作')
 
     def download_name_base(self):
         self.name_base = self.download_json('name_base.json')
@@ -556,7 +556,7 @@ class Main(QMainWindow):
     def download_mech(self):
         self.mech = self.download_json('机制检索.json')
         self.file_save(os.path.join('database', 'mech.json'), json.dumps(self.mech))
-        QMessageBox.information(self, '下载机制定义完成', '请继续操作')
+        QMessageBox.information(self, '下载机制定义完成', '下载机制定义完成，请继续操作')
 
     def download_and_upload_wiki_menu(self):
         wiki_result = self.seesion.post(self.target_url, headers=self.header,
@@ -566,23 +566,25 @@ class Main(QMainWindow):
             wiki_menu['单位']['英雄'].append(i)
 
         for i in self.json_base['非英雄单位']:
-            if dota_menus.menu_单位_召唤物(self.json_base['非英雄单位'][i]):
-                wiki_menu['单位']['召唤物'].append(i)
-            if dota_menus.menu_单位_守卫(self.json_base['非英雄单位'][i]):
-                wiki_menu['单位']['守卫'].append(i)
-            if dota_menus.menu_单位_英雄级单位(self.json_base['非英雄单位'][i]):
-                wiki_menu['单位']['英雄级单位'].append(i)
-            if dota_menus.menu_单位_中立生物(self.json_base['非英雄单位'][i]):
-                wiki_menu['单位']['中立生物'].append(i)
-            if dota_menus.menu_单位_远古生物(self.json_base['非英雄单位'][i]):
-                wiki_menu['单位']['远古生物'].append(i)
-            if dota_menus.menu_单位_小兵(self.json_base['非英雄单位'][i]):
-                wiki_menu['单位']['小兵'].append(i)
+            if self.json_base['非英雄单位'][i]['应用']==1:
+                if dota_menus.menu_单位_召唤物(self.json_base['非英雄单位'][i]):
+                    wiki_menu['单位']['召唤物'].append(i)
+                if dota_menus.menu_单位_守卫(self.json_base['非英雄单位'][i]):
+                    wiki_menu['单位']['守卫'].append(i)
+                if dota_menus.menu_单位_英雄级单位(self.json_base['非英雄单位'][i]):
+                    wiki_menu['单位']['英雄级单位'].append(i)
+                if dota_menus.menu_单位_中立生物(self.json_base['非英雄单位'][i]):
+                    wiki_menu['单位']['中立生物'].append(i)
+                if dota_menus.menu_单位_远古生物(self.json_base['非英雄单位'][i]):
+                    wiki_menu['单位']['远古生物'].append(i)
+                if dota_menus.menu_单位_小兵(self.json_base['非英雄单位'][i]):
+                    wiki_menu['单位']['小兵'].append(i)
 
         for i in self.json_base['物品']:
-            wiki_menu['地图']['物品'].append(i)
-            if dota_menus.menu_地图_中立物品(self.json_base['物品'][i]):
-                wiki_menu['地图']['中立物品'].append(i)
+            if self.json_base['物品'][i]['应用']==1:
+                wiki_menu['地图']['物品'].append(i)
+                if dota_menus.menu_地图_中立物品(self.json_base['物品'][i]):
+                    wiki_menu['地图']['中立物品'].append(i)
 
         for i in self.json_base['技能']:
             if dota_menus.menu_地图_神符(self.json_base['技能'][i]):
@@ -608,8 +610,7 @@ class Main(QMainWindow):
             for i in self.json_name:
                 total_num += len(self.json_name[i])
             self.progress = upload_text('开始下载json')
-            self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,
-                                      self.screen_size[1] * 0.7)
+            self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,self.screen_size[1] * 0.7)
             self.progress.setWindowIcon(self.icon)
             self.progress.setWindowTitle('下载json中……')
             self.current_num = [0, 0]
@@ -659,8 +660,7 @@ class Main(QMainWindow):
                     try:
                         self.local.jsons = self.local.download_info.json()
                     except Exception as xx:
-                        print(self.download_json_list[self.local.current_num],
-                              '：下载出现错误，原因为：' + str(xx))
+                        print(self.download_json_list[self.local.current_num],'：下载出现错误，原因为：' + str(xx))
                         continue
                     else:
                         self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]] = self.local.jsons['jsondata']
@@ -1468,7 +1468,19 @@ class Main(QMainWindow):
                 if 'error' in download_content:
                     break
                 elif content == download_content['parse']['wikitext']['*']:
-                    return ['《' + pagename + '》通过校验，不需要修改！', 0]
+                    upload_data = {'action': 'purge', 'titles': pagename, 'format': 'json'}
+                    if bot:
+                        upload_data['bot'] = 1
+                    l=0
+                    while True:
+                        self.time_point_for_iterable_sleep_by_time()
+                        upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
+                        if upload_info.status_code < 400:
+                            return ['《' + pagename + '》没有进行任何操作，并且刷新缓存完毕！', 0]
+                        else:
+                            k += 1
+                            if k >= 10:
+                                return ['《' + pagename + '》刷新缓存失败，该页面没有进行任何操作！', 0]
                 break
             else:
                 k += 1
@@ -1932,7 +1944,7 @@ class Main(QMainWindow):
         if warning == QMessageBox.Yes:
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
                   self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
-            text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:')
+            text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:',ss[1])
             if ok:
                 upload_data = {'action': 'delete', 'format': 'json', 'token': self.csrf_token}
                 if ss[0] == '技能源':

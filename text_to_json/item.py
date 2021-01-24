@@ -230,7 +230,7 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
         if "组件" in all_json[i]:
             for j in all_json[i]["组件"]:
                 for k in all_json:
-                    if len(all_json[i]["组件"][j]) >= len(all_json[k]["代码名"]) and all_json[i]["组件"][j][:len(all_json[k]["代码名"])] == all_json[k]["代码名"]:
+                    if all_json[i]["组件"][j] == all_json[k]["代码名"] or all_json[i]["组件"][j] == all_json[k]["代码名"]+'*':
                         all_json[i]["组件"][j] = {"物品名": all_json[k]["页面名"], "图片": all_json[k]["图片"]}
     # 接下来把所有的升级放在这儿
     for i in all_json:

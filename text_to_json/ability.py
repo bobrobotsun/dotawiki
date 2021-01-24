@@ -116,12 +116,23 @@ def fulfill_vpk_data(json, base):
             json['技能源'][i]['传说'] = base['技能'][json['技能源'][i]['代码']]['lore']['1']
 
 #应用：0、因改版而被删除；1、正在使用；2、因为拥有者删除而被删除
-
 def get_source_to_data(all_json, upgrade_json, version, name_base):
     for i in all_json['技能源']:
+        all_json['技能源'][i]['页面名']=i
         all_json['技能源'][i]['分类'] = '技能源'
+        if '升级' in all_json['技能源'][i]:
+            if 'A杖' in all_json['技能源'][i]['升级']:
+                all_json['技能源'][i]['升级']['神杖']=copy.deepcopy(all_json['技能源'][i]['升级']['A杖'])
+                all_json['技能源'][i]['升级'].pop('A杖')
+            if '混合' in all_json['技能源'][i]['升级']:
+                all_json['技能源'][i]['升级'].pop('混合')
+            if '魔晶' not in all_json['技能源'][i]['升级']:
+                all_json['技能源'][i]['升级']['魔晶']=''
+            if '神杖' not in all_json['技能源'][i]['升级']:
+                all_json['技能源'][i]['升级']['神杖']=''
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
+        unit_dic['页面名']=ijk
         unit_dic["分类"] = "技能"
         unit_dic["版本"] = version
         unit_dic['曾用名'] = []
