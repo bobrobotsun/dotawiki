@@ -4,6 +4,18 @@ import math
 from text_to_json.WikiError import editerror
 
 
+def change_str_to_int(s):
+    rere = 0
+    try:
+        if float(int(s)) == float(s):
+            rere = int(s)
+        else:
+            rere = float(s)
+    except ValueError:
+        rere = str(s)
+    finally:
+        return rere
+
 # 查询数据范围
 def findtb(source, start, end, tb, brace=0):
     i = j = 0
@@ -190,8 +202,11 @@ def one_upgrade(json, base_txt, name, target):
                     break
         else:
             if json[i]["代码"]["3"] in base_txt[json[i]["代码"]["1"]][json[i]["代码"]["2"]]:
-                for k in base_txt[json[i]["代码"]["1"]][json[i]["代码"]["2"]][json[i]["代码"]["3"]]:
-                    getvalue[ii].append(base_txt[json[i]["代码"]["1"]][json[i]["代码"]["2"]][json[i]["代码"]["3"]][k])
+                if '4' in json[i]["代码"] and json[i]["代码"]["4"] in base_txt[json[i]["代码"]["1"]][json[i]["代码"]["2"]][json[i]["代码"]["3"]]:
+                    getvalue[ii].append(base_txt[json[i]["代码"]["1"]][json[i]["代码"]["2"]][json[i]["代码"]["3"]][json[i]["代码"]["4"]])
+                else:
+                    for k in base_txt[json[i]["代码"]["1"]][json[i]["代码"]["2"]][json[i]["代码"]["3"]]:
+                        getvalue[ii].append(base_txt[json[i]["代码"]["1"]][json[i]["代码"]["2"]][json[i]["代码"]["3"]][k])
             else:
                 raise (editerror('非英雄单位', name, target + '没有找到《' + json[i]["代码"]["1"] + '→' + json[i]["代码"]["2"] + '》数据库中' + json[i]["代码"]["3"] + '的内容'))
         caloprate[ii]=json[i]["修正"]["1"]
