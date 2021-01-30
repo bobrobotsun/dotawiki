@@ -827,7 +827,7 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                     returntxt += "("
                     for j in range(1, len(temp)):
                         for k in temp[j][1]:
-                            returntxt += "[[file:" + temp[j][1][k].replace('talent.png', 'talentb.png') + "|x18px|link=" + k + "]]"
+                            returntxt += "[[file:" + temp[j][1][k].replace('Talent.png', 'Talentb.png') + "|x18px|link=" + k + "]]"
                         returntxt += combine_numbers_post_level(temp[j][0], post, level)
                     returntxt += ")"
             else:
