@@ -130,12 +130,22 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 all_json['技能源'][i]['升级']['魔晶']=''
             if '神杖' not in all_json['技能源'][i]['升级']:
                 all_json['技能源'][i]['升级']['神杖']=''
+    #alllogs=[]
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
+        # if unit_dic["次级分类"] not in alllogs:
+        #     alllogs.append(unit_dic["次级分类"])
+        #     print(ijk,alllogs)
         unit_dic['页面名']=ijk
         unit_dic["分类"] = "技能"
         unit_dic["版本"] = version
         unit_dic['曾用名'] = []
+        if unit_dic["次级分类"]=='a杖技能' or unit_dic["次级分类"]=='A杖技能':
+            unit_dic["次级分类"]='神杖技能'
+        elif unit_dic["次级分类"]=='非英雄单位' or unit_dic["次级分类"]=='非英雄技能':
+            unit_dic["次级分类"]='非英雄单位技能'
+        elif unit_dic["次级分类"]=='':
+            raise (editerror('技能', ijk, '没有在【技能】中搜索到【次级分类】内容，请检查后及时输入'))
         if '升级属性' in unit_dic:
             unit_dic.pop('升级属性')
         for namei in name_base:
