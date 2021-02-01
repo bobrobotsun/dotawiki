@@ -100,7 +100,7 @@ class Main(QMainWindow):
         self.move(qr.topLeft())
 
     # 这是用来控制间隔时间的函数
-    def time_point_for_iterable_sleep_by_time(self, staytime=0.1, pasttime=0.0):
+    def time_point_for_iterable_sleep_by_time(self, staytime=0.05, pasttime=0.0):
         if pasttime == 0:
             pasttime = self.time_point_for_iterable_sleep
         temptime = time.time()
@@ -312,31 +312,31 @@ class Main(QMainWindow):
 
         self.mainlayout['加载按钮'] = {0: QHBoxLayout()}
         self.mainlayout[0].addLayout(self.mainlayout['加载按钮'][0])
-        self.mainlayout['加载按钮']['重新加载数据'] = QPushButton('重新加载数据', self)
-        self.mainlayout['加载按钮']['重新加载数据'].clicked.connect(self.load_data)
-        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['重新加载数据'])
-        self.mainlayout['加载按钮']['重新读取DOTA2文件'] = QPushButton('重新读取DOTA2文件', self)
-        self.mainlayout['加载按钮']['重新读取DOTA2文件'].clicked.connect(self.get_data_from_text)
-        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['重新读取DOTA2文件'])
-        self.mainlayout['加载按钮']['从wiki重新下载基础数据'] = QPushButton('从wiki重新下载基础数据', self)
-        self.mainlayout['加载按钮']['从wiki重新下载基础数据'].clicked.connect(self.download_text_base)
-        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['从wiki重新下载基础数据'])
-        self.mainlayout['加载按钮']['从wiki重新下载合成数据'] = QPushButton('从wiki重新下载合成数据', self)
-        self.mainlayout['加载按钮']['从wiki重新下载合成数据'].clicked.connect(self.download_json_base)
-        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['从wiki重新下载合成数据'])
-        self.mainlayout['加载按钮']['从wiki重新下载合成数据列表'] = QPushButton('从wiki重新下载合成数据列表', self)
-        self.mainlayout['加载按钮']['从wiki重新下载合成数据列表'].clicked.connect(self.download_json_name)
-        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['从wiki重新下载合成数据列表'])
-        self.mainlayout['加载按钮']['从wiki重新下载机制定义'] = QPushButton('从wiki重新下载机制定义', self)
+        # self.mainlayout['加载按钮']['重新加载数据'] = QPushButton('重新加载数据', self)
+        # self.mainlayout['加载按钮']['重新加载数据'].clicked.connect(self.load_data)
+        # self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['重新加载数据'])
+        self.mainlayout['加载按钮']['从wiki重新下载机制定义'] = QPushButton('1、下载机制定义（一般跳过即可）', self)
         self.mainlayout['加载按钮']['从wiki重新下载机制定义'].clicked.connect(self.download_mech)
         self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['从wiki重新下载机制定义'])
+        self.mainlayout['加载按钮']['重新读取DOTA2文件'] = QPushButton('2、读本地游戏文件（可跳过）', self)
+        self.mainlayout['加载按钮']['重新读取DOTA2文件'].clicked.connect(self.get_data_from_text)
+        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['重新读取DOTA2文件'])
+        # self.mainlayout['加载按钮']['从wiki重新下载基础数据'] = QPushButton('从wiki重新下载基础数据', self)
+        # self.mainlayout['加载按钮']['从wiki重新下载基础数据'].clicked.connect(self.download_text_base)
+        # self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['从wiki重新下载基础数据'])
+        self.mainlayout['加载按钮']['从wiki重新下载合成数据列表'] = QPushButton('3、下载列表（必点）', self)
+        self.mainlayout['加载按钮']['从wiki重新下载合成数据列表'].clicked.connect(self.download_json_name)
+        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['从wiki重新下载合成数据列表'])
+        self.mainlayout['加载按钮']['从wiki重新下载合成数据'] = QPushButton('4、开始下载内容（正式下）', self)
+        self.mainlayout['加载按钮']['从wiki重新下载合成数据'].clicked.connect(self.download_json_base)
+        self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['从wiki重新下载合成数据'])
+        self.mainlayout['加载按钮'][0].addStretch(1)
         self.mainlayout['加载按钮']['将wiki目录进行更新（不要乱点）'] = QPushButton('将wiki目录进行更新（不要乱点）', self)
         self.mainlayout['加载按钮']['将wiki目录进行更新（不要乱点）'].clicked.connect(self.download_and_upload_wiki_menu)
         self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['将wiki目录进行更新（不要乱点）'])
         self.mainlayout['加载按钮']['更新独立的页面（不要乱点）'] = QPushButton('更新独立的页面（不要乱点）', self)
         self.mainlayout['加载按钮']['更新独立的页面（不要乱点）'].clicked.connect(self.download_and_upload_single_pages)
         self.mainlayout['加载按钮'][0].addWidget(self.mainlayout['加载按钮']['更新独立的页面（不要乱点）'])
-        self.mainlayout['加载按钮'][0].addStretch(1)
 
         self.mainlayout['列表'] = {0: QHBoxLayout()}
         self.mainlayout[0].addLayout(self.mainlayout['列表'][0])
