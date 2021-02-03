@@ -100,7 +100,7 @@ class Main(QMainWindow):
         self.move(qr.topLeft())
 
     # 这是用来控制间隔时间的函数
-    def time_point_for_iterable_sleep_by_time(self, staytime=0.05, pasttime=0.0):
+    def time_point_for_iterable_sleep_by_time(self, staytime=0.06, pasttime=0.0):
         if pasttime == 0:
             pasttime = self.time_point_for_iterable_sleep
         temptime = time.time()

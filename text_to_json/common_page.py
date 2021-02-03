@@ -814,15 +814,17 @@ def create_navboxunit(json_base):
                 if len(lists[5]) > 0:
                     lists[5] += '&nbsp;{{!}}&nbsp;'
                 lists[5] += create_miniimage_with_link(v)
-        else:
-            lists[6] += create_miniimage_with_link(v)
+            elif v["类型"] == '建筑物':
+                if len(lists[6]) > 0:
+                    lists[6] += '&nbsp;{{!}}&nbsp;'
+                lists[6] += create_miniimage_with_link(v)
     retxt = '|group1=远古生物|list1=' + lists[0] \
             + '|group2=英雄级单位|list2=' + lists[1] \
             + '|group3=中立生物|list3=' + lists[2] \
             + '|group4=召唤生物|list4=' + lists[3] \
             + '|group5=守卫|list5=' + lists[4] \
             + '|group6=士兵|list6=' + lists[5] \
-            + '|group7=已被移除的单位|list7=' + lists[6]
+            + '|group7=建筑物|list7=' + lists[6]
     return retxt
 
 

@@ -115,36 +115,37 @@ def fulfill_vpk_data(json, base):
         if json['技能源'][i]['代码'] in base['技能'] and 'lore' in base['技能'][json['技能源'][i]['代码']]:
             json['技能源'][i]['传说'] = base['技能'][json['技能源'][i]['代码']]['lore']['1']
 
-#应用：0、因改版而被删除；1、正在使用；2、因为拥有者删除而被删除
+
+# 应用：0、因改版而被删除；1、正在使用；2、因为拥有者删除而被删除
 def get_source_to_data(all_json, upgrade_json, version, name_base):
     for i in all_json['技能源']:
-        all_json['技能源'][i]['页面名']=i
+        all_json['技能源'][i]['页面名'] = i
         all_json['技能源'][i]['分类'] = '技能源'
         if '升级' in all_json['技能源'][i]:
             if 'A杖' in all_json['技能源'][i]['升级']:
-                all_json['技能源'][i]['升级']['神杖']=copy.deepcopy(all_json['技能源'][i]['升级']['A杖'])
+                all_json['技能源'][i]['升级']['神杖'] = copy.deepcopy(all_json['技能源'][i]['升级']['A杖'])
                 all_json['技能源'][i]['升级'].pop('A杖')
             if '混合' in all_json['技能源'][i]['升级']:
                 all_json['技能源'][i]['升级'].pop('混合')
             if '魔晶' not in all_json['技能源'][i]['升级']:
-                all_json['技能源'][i]['升级']['魔晶']=''
+                all_json['技能源'][i]['升级']['魔晶'] = ''
             if '神杖' not in all_json['技能源'][i]['升级']:
-                all_json['技能源'][i]['升级']['神杖']=''
-    #alllogs=[]
+                all_json['技能源'][i]['升级']['神杖'] = ''
+    # alllogs=[]
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
         # if unit_dic["次级分类"] not in alllogs:
         #     alllogs.append(unit_dic["次级分类"])
         #     print(ijk,alllogs)
-        unit_dic['页面名']=ijk
+        unit_dic['页面名'] = ijk
         unit_dic["分类"] = "技能"
         unit_dic["版本"] = version
         unit_dic['曾用名'] = []
-        if unit_dic["次级分类"]=='a杖技能' or unit_dic["次级分类"]=='A杖技能':
-            unit_dic["次级分类"]='神杖技能'
-        elif unit_dic["次级分类"]=='非英雄单位' or unit_dic["次级分类"]=='非英雄技能':
-            unit_dic["次级分类"]='非英雄单位技能'
-        elif unit_dic["次级分类"]=='':
+        if unit_dic["次级分类"] == 'a杖技能' or unit_dic["次级分类"] == 'A杖技能':
+            unit_dic["次级分类"] = '神杖技能'
+        elif unit_dic["次级分类"] == '非英雄单位' or unit_dic["次级分类"] == '非英雄技能':
+            unit_dic["次级分类"] = '非英雄单位技能'
+        elif unit_dic["次级分类"] == '':
             raise (editerror('技能', ijk, '没有在【技能】中搜索到【次级分类】内容，请检查后及时输入'))
         if '升级属性' in unit_dic:
             unit_dic.pop('升级属性')
@@ -233,7 +234,6 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
             all_json["技能"][unit_dic["页面名"]] = copy.deepcopy(unit_dic)
         else:
             raise (editerror('技能', ijk, '没有在【技能源】中搜索到' + unit_dic["数据来源"]))
-
 
 
 def group_source(a):
@@ -331,7 +331,7 @@ def input_upgrade(all_json, upgrade_json):
 
 def complete_upgrade(all_json, base_txt):
     for i in all_json:
-        if all_json[i]['应用']>0:
+        if all_json[i]['应用'] > 0:
             for j in all_json[i]["属性"]:
                 if fulfil(all_json[i]["属性"][j], all_json[i]):
                     one_upgrade(all_json[i]["属性"][j], base_txt, i, '第' + str(j) + '个【属性】')
@@ -508,7 +508,7 @@ def one_upgrade(json, base_txt, name, target):
                 nowcheck = [-1 * int(caloprate[ii][0]), ii - 1]
         if nowcheck[0] < 0:
             for j in range(len(calvalue)):
-                if j >> (nowcheck[1]-1) & 1:
+                if j >> (nowcheck[1] - 1) & 1:
                     calvalue[j] = array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][1:])
             caloprate[nowcheck[1] + 1] = ''
         else:
@@ -529,7 +529,7 @@ def one_upgrade(json, base_txt, name, target):
                 nowcheck = [-1 * int(caloprate[ii][-1]), ii - 1]
         if nowcheck[0] < 0:
             for j in range(len(calvalue)):
-                if j >> (nowcheck[1]-1) & 1:
+                if j >> (nowcheck[1] - 1) & 1:
                     calvalue[j] = array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][:-1])
             caloprate[nowcheck[1] + 1] = ''
         else:
@@ -597,11 +597,11 @@ def array_cal(arr1, arr2, opp):
                 temp = float(arr2[i])
             except ValueError:
                 temp = arr2[i]
-        if isinstance(arr1[i],str) and '=' not in opp:
+        if isinstance(arr1[i], str) and '=' not in opp:
             if opp == '=':
                 arr1[i] = temp
         else:
-            if isinstance(temp,str):
+            if isinstance(temp, str):
                 arr1[i] = temp
             elif opp == '=':
                 arr1[i] = temp
@@ -837,7 +837,12 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                     returntxt += "("
                     for j in range(1, len(temp)):
                         for k in temp[j][1]:
-                            returntxt += "[[file:" + temp[j][1][k].replace('Talent.png', 'Talentb.png') + "|x18px|link=" + k + "]]"
+                            returntxt += "[[file:"
+                            if target[1]=='描述':
+                                returntxt += temp[j][1][k]
+                            else:
+                                returntxt += temp[j][1][k].replace('Talent.png', 'Talentb.png')
+                            returntxt += "|x18px|link=" + k + "]]"
                         returntxt += combine_numbers_post_level(temp[j][0], post, level)
                     returntxt += ")"
             else:
@@ -1118,8 +1123,8 @@ def calculate_combine_txt_numbers(list1, list2, op):
                 if j >= len(expand2[i][0]):
                     expand2[i][0].append(expand2[i][0][j - 1])
             for j in range(len(expand1[i][0])):
-                if op=='..':
-                    expand1[i][0][j]=number_to_string(expand1[i][0][j])+number_to_string(expand2[i][0][j])
+                if op == '..':
+                    expand1[i][0][j] = number_to_string(expand1[i][0][j]) + number_to_string(expand2[i][0][j])
                 elif op == '+':
                     expand1[i][0][j] += expand2[i][0][j]
                 elif op == '-':
@@ -1166,6 +1171,7 @@ def calculate_combine_txt_numbers(list1, list2, op):
                     expand1[i][0][j] = expand1[i][0][j] * (1 + expand2[i][0][j]) / 2
     return expand1
 
+
 def number_to_string(number, rr=2):
     i = number
     try:
@@ -1175,6 +1181,7 @@ def number_to_string(number, rr=2):
             return str(round(i, rr))
     except ValueError:
         return str(i)
+
 
 # list、dict、sort
 def expand_value_source_list_with_another_source_dict(l, d, s):
@@ -1232,6 +1239,8 @@ def combine_numbers_post_level(arr, post, level):
     else:
         for i in range(len(arr)):
             if i > 0:
+                if i % 8 == 0:
+                    re += ' '
                 re += "/"
             re += better_float_to_text(arr[i])
             re += post
