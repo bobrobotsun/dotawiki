@@ -458,6 +458,8 @@ def create_independent_mech(json_dict):
                 for j in json_dict[i]['升级来源']:
                     retxt += '[[file:' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
+            if json_dict[i]['简述']=='。':
+                return ''
         else:
             if ii > 1:
                 break
