@@ -116,6 +116,19 @@ def fulfill_vpk_data(json, base):
             json['技能源'][i]['传说'] = base['技能'][json['技能源'][i]['代码']]['lore']['1']
 
 
+def loop_check_source_to_change_content(json):
+    for i in json:
+        if isinstance(json[i], dict):
+            if "混合文字" in json[i]:
+                for j in json[i]['混合文字']:
+                    if isinstance(json[i]['混合文字'][j], dict) and '类型' not in json[i]['混合文字'][j]:
+                        temp = {'类型': ''}
+                        temp.update(json[i]['混合文字'][j])
+                        json[i]['混合文字'][j] = copy.deepcopy(temp)
+            else:
+                loop_check_source_to_change_content(json[i])
+
+
 # 应用：0、因改版而被删除；1、正在使用；2、因为拥有者删除而被删除
 def get_source_to_data(all_json, upgrade_json, version, name_base):
     for i in all_json['技能源']:
@@ -131,6 +144,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 all_json['技能源'][i]['升级']['魔晶'] = ''
             if '神杖' not in all_json['技能源'][i]['升级']:
                 all_json['技能源'][i]['升级']['神杖'] = ''
+        loop_check_source_to_change_content(all_json['技能源'][i])
     # alllogs=[]
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
@@ -799,52 +813,53 @@ def change_combine_txt(json, ii, data, all_json, name, target):
         i += 1
         if str(i) in json[ii]["混合文字"]:
             if isinstance(json[ii]["混合文字"][str(i)], dict):
-                j = 0
-                while True:
-                    j += 1
-                    if str(j) in json[ii]["混合文字"][str(i)]:
-                        if json[ii]["混合文字"][str(i)][str(j)]["0"] == "升级属性":
-                            if json[ii]["混合文字"][str(i)][str(j)]["1"] == "":
-                                json[ii]["混合文字"][str(i)][str(j)]["1"] = "技能"
-                            if json[ii]["混合文字"][str(i)][str(j)]["2"] == "":
-                                json[ii]["混合文字"][str(i)][str(j)]["2"] = name
-                        elif json[ii]["混合文字"][str(i)][str(j)]["0"] == "数据库":
-                            if json[ii]["混合文字"][str(i)][str(j)]["1"] == "":
-                                json[ii]["混合文字"][str(i)][str(j)]["1"] = "技能"
-                            if json[ii]["混合文字"][str(i)][str(j)]["2"] == "":
-                                json[ii]["混合文字"][str(i)][str(j)]["2"] = all_json["技能"][name]["代码"]
+                if json[ii]["混合文字"][str(i)]['类型'] == '' or json[ii]["混合文字"][str(i)]['类型'] == '数据':
+                    j = 0
+                    while True:
+                        j += 1
+                        if str(j) in json[ii]["混合文字"][str(i)]:
+                            if json[ii]["混合文字"][str(i)][str(j)]["0"] == "升级属性":
+                                if json[ii]["混合文字"][str(i)][str(j)]["1"] == "":
+                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = "技能"
+                                if json[ii]["混合文字"][str(i)][str(j)]["2"] == "":
+                                    json[ii]["混合文字"][str(i)][str(j)]["2"] = name
+                            elif json[ii]["混合文字"][str(i)][str(j)]["0"] == "数据库":
+                                if json[ii]["混合文字"][str(i)][str(j)]["1"] == "":
+                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = "技能"
+                                if json[ii]["混合文字"][str(i)][str(j)]["2"] == "":
+                                    json[ii]["混合文字"][str(i)][str(j)]["2"] = all_json["技能"][name]["代码"]
+                        else:
+                            break
+                    ttarget = copy.deepcopy(target)
+                    ttarget.append(str(i))
+                    temp = combine_txt_numbers(json[ii]["混合文字"][str(i)], [1], all_json, data, ttarget)
+                    if "等级" in json[ii]["混合文字"][str(i)] and int(json[ii]["混合文字"][str(i)]["等级"]) > 0:
+                        level = int(json[ii]["混合文字"][str(i)]["等级"])
                     else:
-                        break
-                ttarget = copy.deepcopy(target)
-                ttarget.append(str(i))
-                temp = combine_txt_numbers(json[ii]["混合文字"][str(i)], [1], all_json, data, ttarget)
-                if "等级" in json[ii]["混合文字"][str(i)] and int(json[ii]["混合文字"][str(i)]["等级"]) > 0:
-                    level = int(json[ii]["混合文字"][str(i)]["等级"])
-                else:
-                    level = 0
-                if "后缀" in json[ii]["混合文字"][str(i)]:
-                    post = json[ii]["混合文字"][str(i)]["后缀"]
-                else:
-                    post = ""
-                for j in range(len(temp)):
-                    bool = True
-                    for k in range(len(temp[j][0])):
-                        bool = bool and temp[j][0][0] == temp[j][0][k]
-                    if bool:
-                        temp[j][0] = [temp[j][0][0]]
-                returntxt += combine_numbers_post_level(temp[0][0], post, level)
-                if len(temp) > 1:
-                    returntxt += "("
-                    for j in range(1, len(temp)):
-                        for k in temp[j][1]:
-                            returntxt += "[[file:"
-                            if target[1]=='描述':
-                                returntxt += temp[j][1][k]
-                            else:
-                                returntxt += temp[j][1][k].replace('Talent.png', 'Talentb.png')
-                            returntxt += "|x18px|link=" + k + "]]"
-                        returntxt += combine_numbers_post_level(temp[j][0], post, level)
-                    returntxt += ")"
+                        level = 0
+                    if "后缀" in json[ii]["混合文字"][str(i)]:
+                        post = json[ii]["混合文字"][str(i)]["后缀"]
+                    else:
+                        post = ""
+                    for j in range(len(temp)):
+                        bool = True
+                        for k in range(len(temp[j][0])):
+                            bool = bool and temp[j][0][0] == temp[j][0][k]
+                        if bool:
+                            temp[j][0] = [temp[j][0][0]]
+                    returntxt += combine_numbers_post_level(temp[0][0], post, level)
+                    if len(temp) > 1:
+                        returntxt += "("
+                        for j in range(1, len(temp)):
+                            for k in temp[j][1]:
+                                returntxt += "[[file:"
+                                if target[1] == '描述':
+                                    returntxt += temp[j][1][k]
+                                else:
+                                    returntxt += temp[j][1][k].replace('Talent.png', 'Talentb.png')
+                                returntxt += "|x18px|link=" + k + "]]"
+                            returntxt += combine_numbers_post_level(temp[j][0], post, level)
+                        returntxt += ")"
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:

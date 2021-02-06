@@ -566,7 +566,7 @@ class Main(QMainWindow):
             wiki_menu['单位']['英雄'].append(i)
 
         for i in self.json_base['非英雄单位']:
-            if self.json_base['非英雄单位'][i]['应用']==1:
+            if self.json_base['非英雄单位'][i]['应用'] == 1:
                 if dota_menus.menu_单位_召唤物(self.json_base['非英雄单位'][i]):
                     wiki_menu['单位']['召唤物'].append(i)
                 if dota_menus.menu_单位_守卫(self.json_base['非英雄单位'][i]):
@@ -581,7 +581,7 @@ class Main(QMainWindow):
                     wiki_menu['单位']['小兵'].append(i)
 
         for i in self.json_base['物品']:
-            if self.json_base['物品'][i]['应用']==1:
+            if self.json_base['物品'][i]['应用'] == 1:
                 wiki_menu['地图']['物品'].append(i)
                 if dota_menus.menu_地图_中立物品(self.json_base['物品'][i]):
                     wiki_menu['地图']['中立物品'].append(i)
@@ -610,7 +610,7 @@ class Main(QMainWindow):
             for i in self.json_name:
                 total_num += len(self.json_name[i])
             self.progress = upload_text('开始下载json')
-            self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,self.screen_size[1] * 0.7)
+            self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
             self.progress.setWindowIcon(self.icon)
             self.progress.setWindowTitle('下载json中……')
             self.current_num = [0, 0]
@@ -660,7 +660,7 @@ class Main(QMainWindow):
                     try:
                         self.local.jsons = self.local.download_info.json()
                     except Exception as xx:
-                        print(self.download_json_list[self.local.current_num],'：下载出现错误，原因为：' + str(xx))
+                        print(self.download_json_list[self.local.current_num], '：下载出现错误，原因为：' + str(xx))
                         continue
                     else:
                         self.json_base[self.download_json_list[self.local.current_num][0]][self.download_json_list[self.local.current_num][1]] = self.local.jsons['jsondata']
@@ -681,7 +681,7 @@ class Main(QMainWindow):
                         break
                     self.lock.release()
         self.lock.acquire()
-        if (threading.activeCount() <= self.startactiveCount):
+        if (self.progress.success[1]==self.progress.maxmax):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
             self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口', 0])
@@ -1290,7 +1290,7 @@ class Main(QMainWindow):
                                                                             common_page.all_the_names(self.json_base['物品'][i], self.json_base), 0)])
         if chosen == '技能':
             for i in self.json_base['技能']:
-                page_link_content='#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
+                page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                 all_upload.append([i, page_link_content])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
@@ -1471,7 +1471,7 @@ class Main(QMainWindow):
                     upload_data = {'action': 'purge', 'titles': pagename, 'format': 'json'}
                     if bot:
                         upload_data['bot'] = 1
-                    l=0
+                    l = 0
                     while True:
                         self.time_point_for_iterable_sleep_by_time()
                         upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
@@ -1805,20 +1805,12 @@ class Main(QMainWindow):
     def combine_text_to_tree(self, tdict, sdict):
         tdict['混合文字'] = {0: TreeItemEdit(tdict[0], '混合文字')}
         tdict['混合文字'][0].set_type('combine_tree')
-        tdict['混合文字'][0].set_kid_list(['tree', {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''],
-                                                                                      "list": ['text', '', 0, 4,
-                                                                                               False]}, 1, 1, False]},
-                                       1, 0, False])
+        tdict['混合文字'][0].set_kid_list(edit_json.edit_adition['混合文字'])
         for i in sdict['混合文字']:
             if isinstance(sdict['混合文字'][i], dict):
                 tdict['混合文字'][i] = {0: TreeItemEdit(tdict['混合文字'][0], i)}
                 tdict['混合文字'][i][0].set_type('tree')
-                self.complex_dict_to_tree(tdict['混合文字'][i], {"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''],
-                                                                                                   "list": ['text', '',
-                                                                                                            0, 4,
-                                                                                                            False]}, 1,
-                                                                                          1, False]},
-                                          sdict['混合文字'][i])
+                self.complex_dict_to_tree(tdict['混合文字'][i], edit_json.edit_adition['混合文字'][1],sdict['混合文字'][i])
                 tdict['混合文字'][i][0].islist = True
                 tdict['混合文字'][i][0].setExpanded(True)
             else:
@@ -1944,7 +1936,7 @@ class Main(QMainWindow):
         if warning == QMessageBox.Yes:
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
                   self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
-            text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:',ss[1])
+            text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:', ss[1])
             if ok:
                 upload_data = {'action': 'delete', 'format': 'json', 'token': self.csrf_token}
                 if ss[0] == '技能源':
@@ -2154,9 +2146,7 @@ class Main(QMainWindow):
         item.delete_value()
         temp = TreeItemEdit(item, '混合文字')
         temp.set_type('combine_tree')
-        temp.set_kid_list(['tree', {"后缀": ['text', ''],
-                                    "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 4, False]}, 1, 1,
-                                             False]}, 1, 0, False])
+        temp.set_kid_list(edit_json.edit_adition['混合文字'])
         self.tree_item_clicked()
         item.setExpanded(True)
 
@@ -2218,7 +2208,8 @@ class Main(QMainWindow):
             if category == '物品' and tli.text(0) == '物品属性':
                 for j in range(tli.childCount()):
                     jc = tli.child(j)
-                    sdict[jc.child(0).text(1)] = {'代码': jc.child(1).text(1), '后缀': jc.child(2).text(1), '展示前缀': jc.child(3).text(1), '展示后缀': jc.child(4).text(1), '叠加': jc.child(5).text(1)}
+                    sdict[jc.child(0).text(1)] = {'代码': jc.child(1).text(1), '后缀': jc.child(2).text(1), '展示前缀': jc.child(3).text(1), '展示后缀': jc.child(4).text(1),
+                                                  '叠加': jc.child(5).text(1)}
             else:
                 self.read_tree_item_to_json(tli, sdict)
 
@@ -2566,11 +2557,11 @@ class Main(QMainWindow):
                         if ok:
                             re[ii][index]['序列级数'] = text
                             break
-                re[ii][index]['文字'] = '{{upgrade|agha}}'+item2.text(1)[4:] if item2.text(1)[:4]=='神杖升级' or item2.text(1)[:4]=='agha' else item2.text(1)
+                re[ii][index]['文字'] = '{{upgrade|agha}}' + item2.text(1)[4:] if item2.text(1)[:4] == '神杖升级' or item2.text(1)[:4] == 'agha' else item2.text(1)
                 for k in range(item3.childCount()):
                     item4 = item3.child(k)
                     re[ii][index]['目标'].append(item4.text(1))
-            if len(re[ii])==2 or re[ii][-1]['文字'] != '':
+            if len(re[ii]) == 2 or re[ii][-1]['文字'] != '':
                 re[ii].append({'序列级数': 1, '文字': '', '目标': []})
         return re
 
@@ -2721,7 +2712,7 @@ class Main(QMainWindow):
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
             text = re.sub(r'(?<!\\)([（）]{2})', lambda x: '\\' + x.group(1)[0], text)
-            text = re.sub(r'(?<!\\)([\[\]]{2})', lambda x: '\\' + x.group(1)[0]+'\\' + x.group(1)[0], text)
+            text = re.sub(r'(?<!\\)([\[\]]{2})', lambda x: '\\' + x.group(1)[0] + '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)[\(（](.+?)(?<!\\)[\)）]', lambda x: '{{H|' + x.group(1) + '}}', text)
             text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{A|' + x.group(1) + '}}', text)
             text = re.sub(r'(?<!\\)[<《](.+?)(?<!\\)[>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
