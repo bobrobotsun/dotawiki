@@ -2079,8 +2079,8 @@ class Main(QMainWindow):
                 temp[0].islist = True
                 self.complex_dict_to_tree(temp, item.listtype[1], sdict[i])
                 if item.itemtype == 'combine_tree':
-                    temp[0].child(1).child(1).set_value('升级属性')
-                    temp[0].child(1).child(4).set_value('属性')
+                    temp[0].child(2).child(1).set_value('升级属性')
+                    temp[0].child(2).child(4).set_value('属性')
                 temp[0].setExpanded(True)
             else:
                 temp = TreeItemEdit(item, i)
