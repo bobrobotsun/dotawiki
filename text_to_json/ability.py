@@ -144,7 +144,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 all_json['技能源'][i]['升级']['魔晶'] = ''
             if '神杖' not in all_json['技能源'][i]['升级']:
                 all_json['技能源'][i]['升级']['神杖'] = ''
-        loop_check_source_to_change_content(all_json['技能源'][i])
+        #loop_check_source_to_change_content(all_json['技能源'][i])
     # alllogs=[]
     for ijk in all_json['技能']:
         unit_dic = copy.deepcopy(all_json['技能'][ijk])
