@@ -160,11 +160,10 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
         if all_json[ii]['迷你图片'] == '':
             all_json[ii]['迷你图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
         all_json[ii]['曾用名'] = []
-        for namei in name_base:
-            if namei != all_json[ii]['页面名']:
-                for namej in name_base[namei]:
-                    if namej[0] == all_json[ii]['页面名']:
-                        all_json[ii]['曾用名'].append(namei)
+        if ii in name_base:
+            for namej in name_base[ii]:
+                if namej != ii:
+                    all_json[ii]['曾用名'].append(namej)
         if '升级' in all_json[ii]:
             all_json[ii].pop('升级')
         for i in item_for_item:

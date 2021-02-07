@@ -1171,16 +1171,23 @@ class Main(QMainWindow):
 
     def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
         try:
+            time_show=time.time()
             self.upgrade_base = {}
             name_dict_list = self.name_create_tree_list_name()
+            reversed_name_dict_list=self.reversed_name_create_tree_list_name()
 
-            hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version, name_dict_list)
-            item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version, name_dict_list)
+            hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version, reversed_name_dict_list)
+            item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version, reversed_name_dict_list)
 
             ability.fulfill_vpk_data(self.json_base, self.text_base)
             info += ability.autoget_talent_source(self.json_base, self.text_base['英雄'])
-            ability.get_source_to_data(self.json_base, self.upgrade_base, self.version, name_dict_list)#花费时间过久16s+
+            ability.get_source_to_data(self.json_base, self.upgrade_base, self.version, reversed_name_dict_list)#花费时间过久16s+
             unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version, name_dict_list)
+
+            self.file_save(os.path.join('database', 'temp_json_base.json'), json.dumps(self.json_base['技能']))
+            with open(os.path.join('database', 'temp_json_base.json'), mode="r", encoding="utf-8") as f:
+                self.json_base['技能'] = json.loads(f.read())
+            os.remove(os.path.join('database', 'temp_json_base.json'))
 
             ability.input_upgrade(self.json_base, self.upgrade_base)
 
@@ -1225,7 +1232,7 @@ class Main(QMainWindow):
                             if self.json_base[i][j]['应用'] == self.json_base["技能"][k[0]]['应用']:
                                 self.json_base[i][j]['技能'].append(k[0])
 
-            self.resort()
+            #self.resort() 这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
@@ -1234,7 +1241,7 @@ class Main(QMainWindow):
             self.edit_target_selected_changed()
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
         else:
-            QMessageBox.information(self, "已完成", info)
+            QMessageBox.information(self, "已完成", info+'\n总耗时：'+str(round(time.time()-time_show,2))+'秒')
 
     def upload_basic_json(self):
         self.upload_json('text_base.json', self.text_base)
@@ -3120,6 +3127,21 @@ class Main(QMainWindow):
             if j['名称'] not in redict:
                 redict[j['名称']] = []
             redict[j['名称']].append([j['页面名'], j['图片'], j['迷你图片']])
+        return redict
+
+    def reversed_name_create_tree_list_name(self):
+        redict = {}
+        for i in self.name_base:
+            if i != '历史':
+                for j in self.name_base[i]:
+                    if j['页面名'] not in redict:
+                        redict[j['页面名']] = []
+                    redict[j['页面名']].append(j['名称'])
+        i = '历史'
+        for j in self.name_base[i]:
+            if j['页面名'] not in redict:
+                redict[j['页面名']] = []
+            redict[j['页面名']].append(j['名称'])
         return redict
 
     def test_inputwindow(self):

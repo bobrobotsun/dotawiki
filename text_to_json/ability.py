@@ -147,7 +147,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
         #loop_check_source_to_change_content(all_json['技能源'][i])
     # alllogs=[]
     for ijk in all_json['技能']:
-        unit_dic = copy.deepcopy(all_json['技能'][ijk])
+        unit_dic = all_json['技能'][ijk]
         # if unit_dic["次级分类"] not in alllogs:
         #     alllogs.append(unit_dic["次级分类"])
         #     print(ijk,alllogs)
@@ -163,11 +163,10 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
             raise (editerror('技能', ijk, '没有在【技能】中搜索到【次级分类】内容，请检查后及时输入'))
         if '升级属性' in unit_dic:
             unit_dic.pop('升级属性')
-        for namei in name_base:
-            if namei != unit_dic['页面名']:
-                for namej in name_base[namei]:
-                    if namej[0] == unit_dic['页面名']:
-                        unit_dic['曾用名'].append(namei)
+        if ijk in name_base:
+            for namej in name_base[ijk]:
+                if namej != ijk:
+                    unit_dic['曾用名'].append(namej)
         if unit_dic["技能排序"] == "":
             if unit_dic["默认按键"] == "Q":
                 unit_dic["技能排序"] = "d"
@@ -186,7 +185,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
             else:
                 unit_dic["技能排序"] = "z"
         if unit_dic["数据来源"] in all_json['技能源']:
-            temp1 = copy.deepcopy(all_json['技能源'][unit_dic["数据来源"]])
+            temp1 = all_json['技能源'][unit_dic["数据来源"]]
             if unit_dic["次级分类"] == "天赋技能":
                 unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
                 unit_dic["迷你图片"] = 'Talent.png'
@@ -245,10 +244,8 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 else:
                     unit_dic[i] = group_source(temp1[i])
             unit_dic["技能升级信息"] = {}
-            all_json["技能"][unit_dic["页面名"]] = copy.deepcopy(unit_dic)
         else:
             raise (editerror('技能', ijk, '没有在【技能源】中搜索到' + unit_dic["数据来源"]))
-
 
 def group_source(a):
     temp = {"1": {}}

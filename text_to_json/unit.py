@@ -91,6 +91,10 @@ def fulfill_unit_json(base_txt, all_json, version,name_base):
         all_json[i]["分类"] = "非英雄单位"
         all_json[i]["版本"] = version
         all_json[i]['曾用名'] = []
+        if i in name_base:
+            for namej in name_base[i]:
+                if namej != i:
+                    all_json[i]['曾用名'].append(namej)
         for namei in name_base:
             if namei != all_json[i]['页面名']:
                 for namej in name_base[namei]:
