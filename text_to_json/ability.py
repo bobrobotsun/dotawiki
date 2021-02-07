@@ -237,8 +237,8 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                     for j in temp1[i]:
                         unit_dic[i][j] = group_source(temp1[i][j])
                 elif i == "升级":
-                    if "神杖" in temp1[i] and len(temp1[i]["神杖"]) > 0 or "技能" in temp1[i] and len(
-                            temp1[i]["技能"]) > 0 or "魔晶" in temp1[i] and len(temp1[i]["魔晶"]) > 0 and unit_dic['应用'] == 1:
+                    if ("神杖" in temp1[i] and len(temp1[i]["神杖"]) > 0 or "技能" in temp1[i] and len(
+                            temp1[i]["技能"]) > 0 or "魔晶" in temp1[i] and len(temp1[i]["魔晶"]) > 0) and unit_dic['应用'] == 1:
                         upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
                 elif i == "页面名" or i == '应用' or i == '分类':
                     continue

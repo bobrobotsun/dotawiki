@@ -845,6 +845,7 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['改名'] = QPushButton('改名', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['改名'])
         self.editlayout['竖布局']['改名'].clicked.connect(self.json_edit_change_name)
+        self.update_the_jsons_alreadey=True#确认是否经过更新数据，以减少所需耗费的时间
         self.editlayout['竖布局']['简单保存'] = QPushButton('简单保存', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['简单保存'])
         self.editlayout['竖布局']['简单保存'].clicked.connect(self.json_edit_save)
@@ -1178,7 +1179,7 @@ class Main(QMainWindow):
 
             ability.fulfill_vpk_data(self.json_base, self.text_base)
             info += ability.autoget_talent_source(self.json_base, self.text_base['英雄'])
-            ability.get_source_to_data(self.json_base, self.upgrade_base, self.version, name_dict_list)
+            ability.get_source_to_data(self.json_base, self.upgrade_base, self.version, name_dict_list)#花费时间过久16s+
             unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version, name_dict_list)
 
             ability.input_upgrade(self.json_base, self.upgrade_base)
@@ -1195,6 +1196,7 @@ class Main(QMainWindow):
                     if '迷你图片' in self.json_base[i][j] and len(self.json_base[i][j]['迷你图片']) > 1:
                         self.json_base[i][j]['迷你图片'] = self.json_base[i][j]['迷你图片'][0].upper() + self.json_base[i][j]['迷你图片'][1:].replace(' ', '_')
             # 结算技能和技能源问题
+
             for i in self.json_base["技能"]:
                 target = []
                 if '数据来源' in self.json_base["技能"][i] and self.json_base["技能"][i]['数据来源'] in self.json_base["技能源"]:
@@ -1202,9 +1204,11 @@ class Main(QMainWindow):
                 else:
                     raise (editerror('技能', i, "你没有书写数据来源，请立刻书写"))
                 if self.json_base["技能"][i]['应用'] > 0:
-                    ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target)
+                    ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target)#花费时间过久9s+
+
             ability.confirm_upgrade_info(self.json_base['技能'])
             # 增加拥有技能
+
             ability_own = {}
             for i in self.json_base["技能"]:
                 if self.json_base["技能"][i]['技能归属'] in ability_own:
@@ -1220,6 +1224,7 @@ class Main(QMainWindow):
                         for k in ability_own[self.json_base[i][j]['页面名']]:
                             if self.json_base[i][j]['应用'] == self.json_base["技能"][k[0]]['应用']:
                                 self.json_base[i][j]['技能'].append(k[0])
+
             self.resort()
             self.file_save_all()
         except editerror as err:
@@ -1351,10 +1356,12 @@ class Main(QMainWindow):
     def upload_same_kind(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
-        self.json_base[selected][selected_name] = {}
-        self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[selected][selected_name])
-        self.file_save_all()
-        self.update_json_base(info='已经保存并更新完毕\n之后将进行上传。')
+        if not self.update_the_jsons_alreadey:
+            self.json_base[selected][selected_name] = {}
+            self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[selected][selected_name])
+            self.file_save_all()
+            self.update_json_base(info='已经保存并更新完毕\n之后将进行上传。')
+            self.update_the_jsons_alreadey=True
         target_name = []
         if self.json_base[selected][selected_name]['应用'] > 0:
             if selected == '技能':
@@ -1972,6 +1979,7 @@ class Main(QMainWindow):
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
+        self.update_the_jsons_alreadey = False
         QMessageBox.information(self, "已完成", '已经保存更改，但没有进行数据更新\n请记得更新数据。')
         self.edit_target_selected_changed()
 
@@ -1982,6 +1990,7 @@ class Main(QMainWindow):
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
         self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
+        self.update_the_jsons_alreadey=True
         self.edit_target_selected_changed()
 
     def json_edit_loop_update(self):
