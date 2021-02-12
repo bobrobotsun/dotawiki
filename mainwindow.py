@@ -779,6 +779,8 @@ class Main(QMainWindow):
         self.ml['高级功能'] = {0: self.ml[0].addMenu('高级功能')}
         self.ml['高级功能']['更新数据'] = self.ml['高级功能'][0].addAction('更新数据')
         self.ml['高级功能']['更新数据'].triggered.connect(lambda: self.update_json_base())
+        self.ml['高级功能']['更新全部《机制》数据'] = self.ml['高级功能'][0].addAction('更新全部【机制】数据')
+        self.ml['高级功能']['更新全部《机制》数据'].triggered.connect(lambda: self.update_json_base_mechanism())
         self.ml['高级功能']['上传基础文件'] = self.ml['高级功能'][0].addAction('上传基础文件')
         self.ml['高级功能']['上传基础文件'].triggered.connect(self.upload_basic_json)
         self.ml['高级功能']['上传'] = self.ml['高级功能'][0].addAction('上传')
@@ -796,6 +798,10 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传《技能》'].triggered.connect(lambda: self.upload_all('技能'))
         self.ml['高级功能']['上传《技能源》'] = self.ml['高级功能'][0].addAction('上传《技能源》')
         self.ml['高级功能']['上传《技能源》'].triggered.connect(lambda: self.upload_all('技能源'))
+        self.ml['高级功能']['上传《机制》'] = self.ml['高级功能'][0].addAction('上传《机制》')
+        self.ml['高级功能']['上传《机制》'].triggered.connect(lambda: self.upload_all('机制'))
+        self.ml['高级功能']['上传《机制源》'] = self.ml['高级功能'][0].addAction('上传《机制源》')
+        self.ml['高级功能']['上传《机制源》'].triggered.connect(lambda: self.upload_all('机制源'))
         self.ml['高级功能'][0].addSeparator()
         self.ml['高级功能']['上传所有同单位文件'] = self.ml['高级功能'][0].addAction('上传所有同单位文件')
         self.ml['高级功能']['上传所有同单位文件'].triggered.connect(lambda: self.upload_same_kind())
@@ -810,6 +816,8 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传《物品》页面'].triggered.connect(lambda: self.upload_common_page('物品'))
         self.ml['高级功能']['上传《技能链接》页面'] = self.ml['高级功能'][0].addAction('上传《技能链接》页面')
         self.ml['高级功能']['上传《技能链接》页面'].triggered.connect(lambda: self.upload_common_page('技能'))
+        self.ml['高级功能']['上传《机制》页面'] = self.ml['高级功能'][0].addAction('上传《机制》页面')
+        self.ml['高级功能']['上传《机制》页面'].triggered.connect(lambda: self.upload_common_page('机制'))
         """
         下载上传的内容
         """
@@ -1275,16 +1283,7 @@ class Main(QMainWindow):
                         allupdate.append(i)
             else:
                 allupdate.append(target)
-            for i in allupdate:
-                tb1 = target in self.json_base['机制']
-                tb2 = target in self.json_base['机制源']
-                if tb1 and tb2:
-                    mechnism.get_one_source_to_data(self.json_base, target, self.version, self.text_base)
-                else:
-                    if not tb1:
-                        raise (editerror('机制源', i, "在【机制】中缺少关于【" + i + '】的信息，请及时补充'))
-                    if not tb2:
-                        raise (editerror('机制', i, "在【机制源】中缺少关于【" + i + '】的信息，请及时补充'))
+            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base)
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
@@ -1312,14 +1311,14 @@ class Main(QMainWindow):
         if chosen == '':
             for i in self.json_base:
                 for j in self.json_base[i]:
-                    if i == '技能源':
+                    if i[-1] == '源':
                         all_upload.append([j + '/源.json', self.json_base[i][j]])
                     else:
                         all_upload.append([j + '.json', self.json_base[i][j]])
         else:
             i = chosen
             for j in self.json_base[i]:
-                if i == '技能源':
+                if i[-1] == '源':
                     all_upload.append([j + '/源.json', self.json_base[i][j]])
                 else:
                     all_upload.append([j + '.json', self.json_base[i][j]])
