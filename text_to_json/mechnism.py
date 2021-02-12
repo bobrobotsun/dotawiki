@@ -9,6 +9,7 @@ from text_to_json.WikiError import editerror
 
 
 def get_source_to_data(all_json, tlist, version, text_base):
+    #一定报错的内容
     for i in tlist:
         if i not in all_json['机制']:
             raise (editerror('机制源', i, "在【机制】中缺少关于【" + i + '】的信息，请及时补充'))

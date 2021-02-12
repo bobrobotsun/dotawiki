@@ -1278,7 +1278,10 @@ class Main(QMainWindow):
             time_show = time.time()
             allupdate = []
             if target == '':
-                for i in self.json_base['机制'] + self.json_base['机制源']:
+                for i in self.json_base['机制'] :
+                    if i not in allupdate:
+                        allupdate.append(i)
+                for i in self.json_base['机制源']:
                     if i not in allupdate:
                         allupdate.append(i)
             else:
