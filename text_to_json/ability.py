@@ -1200,14 +1200,14 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
                 result, bool = check_the_json_meet_the_conditions(conditions['满足'], all_json[i][j], target)
                 if bool:
                     for k in range(len(result)):
-                        retxt += change_the_right_result_json_to_text_to_show(conditions, result[k], all_json[i][j], all_json)
+                        retxt += change_the_right_result_json_to_text_to_show(conditions, result[k], all_json[i][j], all_json, target)
     if retxt == '':
         raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】时没有找到满足条件的库，请检查是否填写错误'))
     else:
         return retxt
 
 
-def change_the_right_result_json_to_text_to_show(conditions, conclusion, json, all_json):
+def change_the_right_result_json_to_text_to_show(conditions, result, json, all_json, target):
     retxt = ''
     miniimage = ''
     minisource = ''
@@ -1224,8 +1224,9 @@ def change_the_right_result_json_to_text_to_show(conditions, conclusion, json, a
         retxt += '[[file:' + json['迷你图片'] + '|x24px|link=]] [[' + json['页面名'] + ']]' + another_info
     else:  # 普通的ability_desc
         another_name = ''
-        value = ''
         trait = ''
+        traitlist = []
+        mech = ''
         note = ''
         if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
             another_name += '(' + json['中文名'] + ')'
@@ -1233,21 +1234,100 @@ def change_the_right_result_json_to_text_to_show(conditions, conclusion, json, a
             for i in conditions['属性名'][0]:
                 for j in json['属性']:
                     if json['属性'][j]['名称'] == i:
-                        trait += '<div>' + i + '：' + common_page.create_upgrade_text(json["属性"], j) + '</div>'
+                        if j not in traitlist:
+                            traitlist.append(j)
+        if '条件属性' in conditions:
+            for i in range(len(conditions['条件属性'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件属性'][i], i, json, result, target)
+                kk = 0
+                while True:
+                    kk += 1
+                    k = str(kk)
+                    if k in tempjson:
+                        if str(tempjson[k]) in json['属性']:
+                            if str(tempjson[k]) not in traitlist:
+                                traitlist.append(str(tempjson[k]))
+                        else:
+                            raise (editerror(target[0], target[1], '在调用第' + str(i) + '条【条件属性】时，没有找到【' + json['页面名'] + '】的第' + str(tempjson[k]) + '条【属性】'))
+                    else:
+                        break
+                if '简述' in tempjson:
+                    note+='<div style="color:#3f5a67">'+tempjson['简述']+'</div>'
+        for i in traitlist:
+            trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i, image_size='x18px') + '</div>'
+
+        if '条件机制' in conditions:
+            for i in range(len(conditions['条件机制'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件机制'][i], i, json, result, target)
+                if '代码' in tempjson:
+                    if tempjson['代码'] != 0:
+                        mech += ability_desc_show_one_mech(tempjson)
+                else:
+                    has_mech = False
+                    if isinstance(tempjson, dict):
+                        for j in tempjson:
+                            if isinstance(tempjson[j], dict) and '代码' in tempjson[j]:
+                                has_mech = True
+                                if tempjson[j]['代码'] != 0:
+                                    mech += ability_desc_show_one_mech(tempjson[j],True)
+                    if not has_mech:
+                        raise (editerror(target[0], target[1], '在调用第' + str(i) + '条【条件机制】时，没有找到任何可能的机制内容，请检查输入是否正确（本功能不能一个条件输入多个机制）'))
+
+        if '次级分类' in json:
+            if json['次级分类']=='神杖技能':
+                note+='<div style="float:right;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
+            elif json['次级分类']=='魔晶技能':
+                note+='<div style="float:right;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
+
         retxt += '<div class="dota-ability-wrapper">' \
                  '<span class="dota-ability-image">[[file:' + json['图片'] + '|72px|link=]]</span>' \
                                                                            '<span class="dota-ability-right">' \
                                                                            '<div class="dota-ability-title"><span>' + minisource + '[[' + json[
                      '页面名'] + ']]' + another_name + '</span></div>' \
-                                                    '<div class="dota-ability-desc">' + value + trait + note + '</div></span></div>'
+                                                    '<div class="dota-ability-desc">' + trait + mech + note + '</div></span></div>'
     return retxt
+
+
+def ability_desc_show_one_mech(json,upgrade=False):
+    retxt = '<div>'
+    if upgrade and '升级来源' in json:
+        for i in json['升级来源']:
+            retxt += '[[file:' + json['升级来源'][i]['图片'] + '|x18px|link=' + json['升级来源'][i]['名称'] + ']]'
+    if '图片' in json:
+        retxt += '[[file:' + json['图片'] + '|x18px|link=]]'
+    if '值' in json:
+        retxt += json['值']
+    if '简述' in json:
+        retxt += '：' + json['简述']
+    retxt += '</div>'
+    return retxt
+
+
+def find_json_by_condition_with_result(condition, i, tempjson, result, target):
+    for j in range(len(condition)):
+        the_key = ''
+        if '-' in condition[j]:
+            indexlist = condition[j].split('-')
+            indexlist[0] = change_str_to_int(indexlist[0]) - 1
+            indexlist[1] = change_str_to_int(indexlist[1]) - 1
+            if indexlist[0] < len(result) and indexlist[1] < len(result[indexlist[0]]):
+                the_key = result[indexlist[0]][indexlist[1]]
+            else:
+                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【条件属性】第' + str(j) + '项时，检查到序数超标了，请检查是否填写错误'))
+        else:
+            the_key = condition[j]
+        if the_key in tempjson:
+            tempjson = tempjson[the_key]
+        else:
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【条件属性】第' + str(j) + '项时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
+    return tempjson
 
 
 def check_the_json_meet_the_conditions(conditions, json, target):
     relist = [[]]  # 预设一个空结果，防止复制失败
     all_bools = True
     for i in conditions:
-        one_result, one_bool = check_the_json_meet_one_condition(i, json, target)
+        one_result, one_bool = check_the_json_meet_one_condition(i, json, target, [0])
         if one_bool:
             while len(relist) < len(one_result):  # 将总结果数扩充为已知结果数个数
                 relist.append(copy.copy(relist[-1]))
@@ -1262,96 +1342,114 @@ def check_the_json_meet_the_conditions(conditions, json, target):
     return relist, all_bools
 
 
-def check_the_json_meet_one_condition(condition, json, target):
+def check_the_json_meet_one_condition(condition, json, target, index):
     relist = [[]]
     all_bools = True
     tempjson = json
-    for ii in range(len(condition)):
-        i = condition[ii]
-        half_result = []
-        if isinstance(i, list):
-            if all_bools:
-                half_result, one_bool = check_the_json_meet_one_condition(i, tempjson, target)
-                all_bools = one_bool
-        elif i == '@and' or i == '@和':
-            if all_bools:  # true
-                half_result, one_bool = check_the_json_meet_one_condition(condition[ii + 1:], json, target)
-                all_bools = one_bool
-        elif i == '@except' or i == '@除了':
-            if all_bools:  # true
-                half_result, one_bool = check_the_json_meet_one_condition(condition[ii + 1:], json, target)
-                all_bools = not one_bool
-        elif i == '@or' or i == '@或':
-            half_result, one_bool = check_the_json_meet_one_condition(condition[ii + 1:], json, target)
-            all_bools = all_bools or one_bool
-            if one_bool:
-                relist = relist + half_result
-                continue
-        elif i == '@one':  # 在一系列数字作为key的键值中，选择第一个有效的项
-            if all_bools:  # true
-                one_bool = False
-                jj = 0
-                while True:
-                    jj += 1
-                    j = str(jj)
-                    if j in tempjson:
-                        one_half_result, one_half_bool = check_the_json_meet_one_condition(condition[ii + 1:], tempjson, target)
-                        if one_half_bool:
-                            half_result.append(one_half_result[0])
-                            one_bool = one_bool or one_half_bool
-                        if one_bool:
-                            break
+    ii = index[0]
+    while True:
+        if ii < len(condition):
+            i = condition[ii]
+            half_result = []
+            if isinstance(i, list):
+                if all_bools:
+                    half_result, one_bool = check_the_json_meet_one_condition(i, tempjson, target, [0])
+                    all_bools = one_bool
+            elif i == '@and' or i == '@和':
+                if all_bools:  # true
+                    index[0] = ii + 1
+                    half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                    all_bools = one_bool
+                    ii = index[0] - 1
+            elif i == '@except' or i == '@除了':
+                if all_bools:  # true
+                    index[0] = ii + 1
+                    half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                    all_bools = not one_bool
+                    ii = index[0] - 1
+            elif i == '@or' or i == '@或':
+                index[0] = ii + 1
+                half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                all_bools = all_bools or one_bool
+                ii = index[0] - 1
+                if one_bool:
+                    relist = relist + half_result
+                    continue
+            elif i == '@one':  # 在一系列数字作为key的键值中，选择第一个有效的项
+                if all_bools:  # true
+                    one_bool = False
+                    jj = 0
+                    while True:
+                        jj += 1
+                        j = str(jj)
+                        if j in tempjson:
+                            index[0] = ii + 1
+                            one_half_result, one_half_bool = check_the_json_meet_one_condition(condition, tempjson[j], target, index)
+                            if one_half_bool:
+                                one_half_result[0] = [j] + one_half_result[0]
+                                half_result.append(one_half_result[0])
+                                one_bool = one_bool or one_half_bool
+                            if one_bool:
+                                break
+                        else:
+                            if jj > 1:
+                                break
+                    all_bools = one_bool
+                    ii = index[0] - 1
+            elif i == '@list':  # 在一系列数字作为key的键值中，选择所有有效的项
+                if all_bools:  # true
+                    one_bool = False
+                    jj = 0
+                    while True:
+                        jj += 1
+                        j = str(jj)
+                        if j in tempjson:
+                            index[0] = ii + 1
+                            one_half_result, one_half_bool = check_the_json_meet_one_condition(condition, tempjson[j], target, index)
+                            if one_half_bool:
+                                one_half_result[0] = [j] + one_half_result[0]
+                                half_result = half_result + one_half_result
+                                one_bool = one_bool or one_half_bool
+                        else:
+                            if jj > 1:
+                                break
+                    all_bools = one_bool
+                    ii = index[0] - 1
+            elif i[0] == '@':
+                if len(condition) >= ii + 2:
+                    if i == '@=' or i == '@==':
+                        all_bools = operation_number_str_equal(tempjson, condition[ii + 1])
+                    elif i == '@!=' or i == '@<>' or i == '@><':
+                        all_bools = not operation_number_str_equal(tempjson, condition[ii + 1])
+                    elif i == '@<' or i == '@<=' or i == '@>' or i == '@>=':
+                        all_bools = operation_number_check(tempjson, condition[ii + 1], i[1:])
                     else:
-                        if jj > 1:
-                            break
-                all_bools = one_bool
-        elif i == '@list':  # 在一系列数字作为key的键值中，选择所有有效的项
-            if all_bools:  # true
-                one_bool = False
-                jj = 0
-                while True:
-                    jj += 1
-                    j = str(jj)
-                    if j in tempjson:
-                        one_half_result, one_half_bool = check_the_json_meet_one_condition(condition[ii + 1:], tempjson, target)
-                        if one_half_bool:
-                            half_result = half_result + one_half_result
-                            one_bool = one_bool or one_half_bool
-                    else:
-                        if jj > 1:
-                            break
-                all_bools = one_bool
-        elif i[0] == '@':
-            if len(condition) >= ii + 2:
-                if i == '@=' or i == '@==':
-                    all_bools = operation_number_str_equal(tempjson, condition[ii + 1])
-                elif i == '@!=' or i == '@<>' or i == '@><':
-                    all_bools = not operation_number_str_equal(tempjson, condition[ii + 1])
-                elif i == '@<' or i == '@<=' or i == '@>' or i == '@>=':
-                    all_bools = operation_number_check(tempjson, condition[ii + 1], i[1:])
+                        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
+                    ii += 1
+                    half_result.append([condition[ii]])
                 else:
-                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
-                ii += 1
-                half_result.append([condition[ii]])
+                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到符号”' + i + '“后的值，请检查代码错误还是输入缺失'))
             else:
-                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到符号”' + i + '“后的值，请检查代码错误还是输入缺失'))
+                if isinstance(tempjson, dict):
+                    if i in tempjson:
+                        for j in relist:
+                            j.append(i)
+                            tempjson = tempjson[i]
+                    else:
+                        all_bools = False
+            if all_bools:
+                k1 = len(relist)
+                k2 = len(half_result)
+                if k2 > 0:
+                    combinejson = [0 for _ in range(k1 * k2)]
+                    for m in range(k1):
+                        for n in range(k2):
+                            combinejson[m * k2 + n] = relist[m] + half_result[n]
+                    relist = combinejson
+            ii += 1
         else:
-            if isinstance(tempjson, dict):
-                if i in tempjson:
-                    for j in relist:
-                        j.append(i)
-                        tempjson = tempjson[i]
-                else:
-                    all_bools = False
-        if all_bools:
-            k1 = len(relist)
-            k2 = len(half_result)
-            if k2 > 0:
-                combinejson = [0 for _ in range(k1 * k2)]
-                for m in range(k1):
-                    for n in range(k2):
-                        combinejson[m * k2 + n] = relist[m] + half_result[n]
-                relist = combinejson
+            break
+    index[0] = ii
     return relist, all_bools
 
 

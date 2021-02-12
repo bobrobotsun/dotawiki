@@ -50,7 +50,7 @@ def number_to_string(number, rr=4):
         return str(i)
 
 
-def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: ''):
+def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '',image_size='x22px'):
     if k in numjsons:
         numjson = numjsons[k]
         retext = ''
@@ -61,7 +61,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
             if i in numjson:
                 if ii > 1:
                     for j in numjson[i]['升级来源']:
-                        retext += '[[file:' + numjson[i]['升级来源'][j]["图片"] + '|x22px|link=' + numjson[i]['升级来源'][j][
+                        retext += '[[file:' + numjson[i]['升级来源'][j]["图片"] + '|'+image_size+'|link=' + numjson[i]['升级来源'][j][
                             "名称"] + ']]'
                 jj = 0
                 while True:

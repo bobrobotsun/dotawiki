@@ -1270,15 +1270,17 @@ class Main(QMainWindow):
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
+            return True
         else:
             QMessageBox.information(self, "已完成", info + '\n总耗时：' + str(round(time.time() - time_show, 2)) + '秒')
+            return False
 
     def update_json_base_mechanism(self, target=''):
         try:
             time_show = time.time()
             allupdate = []
             if target == '':
-                for i in self.json_base['机制'] :
+                for i in self.json_base['机制']:
                     if i not in allupdate:
                         allupdate.append(i)
                 for i in self.json_base['机制源']:
@@ -1294,8 +1296,10 @@ class Main(QMainWindow):
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
+            return True
         else:
             QMessageBox.information(self, "已完成", '总耗时：' + str(round(time.time() - time_show, 2)) + '秒')
+            return False
 
     def upload_basic_json(self):
         self.upload_json('text_base.json', self.text_base)
@@ -1421,14 +1425,18 @@ class Main(QMainWindow):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
         if not self.update_the_jsons_alreadey:
+            error_stop=True
             self.json_base[selected][selected_name] = {}
             self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[selected][selected_name])
             self.file_save_all()
             if selected[:2] == '机制':
-                self.update_json_base_mechanism(selected_name)
+                error_stop=self.update_json_base_mechanism(selected_name)
             else:
-                self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
-            self.update_the_jsons_alreadey = True
+                error_stop=self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
+            if error_stop:
+                return None
+            else:
+                self.update_the_jsons_alreadey = True
         target_name = []
         if self.json_base[selected][selected_name]['应用'] > 0:
             if selected == '技能':
@@ -2059,16 +2067,17 @@ class Main(QMainWindow):
         self.edit_target_selected_changed()
 
     def json_edit_save_and_update(self):
+        error_stop=False
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
               self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
         if ss[0][:2] == '机制':
-            self.update_json_base_mechanism(ss[1])
+            error_stop=self.update_json_base_mechanism(ss[1])
         else:
-            self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
-        self.update_the_jsons_alreadey = True
+            error_stop=self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
+        self.update_the_jsons_alreadey = not error_stop
         self.edit_target_selected_changed()
 
     def json_edit_loop_update(self):

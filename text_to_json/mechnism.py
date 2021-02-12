@@ -43,7 +43,7 @@ def get_source_to_data(all_json, tlist, version, text_base):
                     todict['内容'][ii]['内容'][jj]['内容'][k] = fromdict['内容'][i]['内容'][j]['内容'][k]
         for i in todict:
             if i != '内容':
-                ttarget = ['机制', target, i]
+                ttarget = ['机制源', target, i]
                 if isinstance(todict[i], dict):
                     if "混合文字" in todict[i]:
                         ability.change_combine_txt(todict, i, text_base, all_json, target, ttarget + ['混合文字'])
@@ -51,4 +51,4 @@ def get_source_to_data(all_json, tlist, version, text_base):
                         ability.loop_check(todict[i], text_base, all_json, target, ttarget)
     # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
     for target in tlist:
-        ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, '内容', ['机制', target, '内容'])
+        ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, '内容', ['机制源', target, '内容'])
