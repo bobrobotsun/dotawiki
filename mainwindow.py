@@ -22,7 +22,7 @@ import hashlib
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from text_to_json import hero, ability, item, unit, edit_json, dota_menus, page, common_page
+from text_to_json import hero, ability, item, unit, mechnism, edit_json, dota_menus, page, common_page
 from text_to_json.WikiError import editerror
 import win32con
 import win32clipboard as wincld
@@ -59,8 +59,8 @@ class Main(QMainWindow):
         self.icon = QIcon(os.path.join('material_lib', 'DOTA2.jpg'))
         # 数据库信息
         self.text_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}}
-        self.json_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}, '技能源': {}}
-        self.json_name = {"英雄": [], "非英雄单位": [], "物品": [], "技能": [], '技能源': []}
+        self.json_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}, '技能源': {}, "机制": {}, '机制源': {}}
+        self.json_name = {"英雄": [], "非英雄单位": [], "物品": [], "技能": [], '技能源': [], "机制": [], '机制源': []}
         self.upgrade_base = {}
         self.mech = {}
         self.red = QBrush(Qt.red)
@@ -288,27 +288,35 @@ class Main(QMainWindow):
         self.mainlayout[0].addWidget(self.mainlayout['加载信息'][0])
         self.mainlayout['加载信息']['信息'] = {0: QHBoxLayout()}
         self.mainlayout['加载信息'][0].setLayout(self.mainlayout['加载信息']['信息'][0])
-        self.mainlayout['加载信息']['信息'][0].addStretch(1)
+        # self.mainlayout['加载信息']['信息'][0].addStretch(1)
         self.mainlayout['加载信息']['信息']['英雄'] = QLabel(self)
         self.mainlayout['加载信息']['信息']['英雄'].setText('【英雄】')
         self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['英雄'])
-        self.mainlayout['加载信息']['信息'][0].addStretch(2)
+        self.mainlayout['加载信息']['信息'][0].addStretch(1)
         self.mainlayout['加载信息']['信息']['非英雄单位'] = QLabel(self)
         self.mainlayout['加载信息']['信息']['非英雄单位'].setText('【非英雄单位】')
         self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['非英雄单位'])
-        self.mainlayout['加载信息']['信息'][0].addStretch(2)
+        self.mainlayout['加载信息']['信息'][0].addStretch(1)
         self.mainlayout['加载信息']['信息']['技能'] = QLabel(self)
         self.mainlayout['加载信息']['信息']['技能'].setText('【技能】')
         self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['技能'])
-        self.mainlayout['加载信息']['信息'][0].addStretch(2)
+        self.mainlayout['加载信息']['信息'][0].addStretch(1)
         self.mainlayout['加载信息']['信息']['技能源'] = QLabel(self)
         self.mainlayout['加载信息']['信息']['技能源'].setText('【技能源】')
         self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['技能源'])
-        self.mainlayout['加载信息']['信息'][0].addStretch(2)
+        self.mainlayout['加载信息']['信息'][0].addStretch(1)
         self.mainlayout['加载信息']['信息']['物品'] = QLabel(self)
         self.mainlayout['加载信息']['信息']['物品'].setText('【物品】')
         self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['物品'])
         self.mainlayout['加载信息']['信息'][0].addStretch(1)
+        self.mainlayout['加载信息']['信息']['机制'] = QLabel(self)
+        self.mainlayout['加载信息']['信息']['机制'].setText('【机制】')
+        self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['机制'])
+        self.mainlayout['加载信息']['信息'][0].addStretch(1)
+        self.mainlayout['加载信息']['信息']['机制源'] = QLabel(self)
+        self.mainlayout['加载信息']['信息']['机制源'].setText('【机制源】')
+        self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['机制源'])
+        # self.mainlayout['加载信息']['信息'][0].addStretch(1)
 
         self.mainlayout['加载按钮'] = {0: QHBoxLayout()}
         self.mainlayout[0].addLayout(self.mainlayout['加载按钮'][0])
@@ -370,6 +378,18 @@ class Main(QMainWindow):
         self.mainlayout['列表']['物品'][0].setLayout(self.mainlayout['列表']['物品']['布局'][0])
         self.mainlayout['列表']['物品']['布局']['列表'] = QListWidget()
         self.mainlayout['列表']['物品']['布局'][0].addWidget(self.mainlayout['列表']['物品']['布局']['列表'])
+        self.mainlayout['列表']['机制'] = {0: QGroupBox('机制', self)}
+        self.mainlayout['列表'][0].addWidget(self.mainlayout['列表']['机制'][0])
+        self.mainlayout['列表']['机制']['布局'] = {0: QVBoxLayout()}
+        self.mainlayout['列表']['机制'][0].setLayout(self.mainlayout['列表']['机制']['布局'][0])
+        self.mainlayout['列表']['机制']['布局']['列表'] = QListWidget()
+        self.mainlayout['列表']['机制']['布局'][0].addWidget(self.mainlayout['列表']['机制']['布局']['列表'])
+        self.mainlayout['列表']['机制源'] = {0: QGroupBox('机制源', self)}
+        self.mainlayout['列表'][0].addWidget(self.mainlayout['列表']['机制源'][0])
+        self.mainlayout['列表']['机制源']['布局'] = {0: QVBoxLayout()}
+        self.mainlayout['列表']['机制源'][0].setLayout(self.mainlayout['列表']['机制源']['布局'][0])
+        self.mainlayout['列表']['机制源']['布局']['列表'] = QListWidget()
+        self.mainlayout['列表']['机制源']['布局'][0].addWidget(self.mainlayout['列表']['机制源']['布局']['列表'])
         """
         上面是主页情况
         下面是修改页面
@@ -620,7 +640,7 @@ class Main(QMainWindow):
             for i in self.json_name:
                 self.json_base[i] = {}
                 for j in self.json_name[i]:
-                    if i == '技能源':
+                    if i[-1] == '源':
                         self.download_json_list.append([i, j, j + '/源.json'])
                     else:
                         self.download_json_list.append([i, j, j + '.json'])
@@ -681,7 +701,7 @@ class Main(QMainWindow):
                         break
                     self.lock.release()
         self.lock.acquire()
-        if (self.progress.success[1]==self.progress.maxmax):
+        if (self.progress.success[1] == self.progress.maxmax):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
             self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口', 0])
@@ -701,7 +721,7 @@ class Main(QMainWindow):
     def fix_window_with_json_data(self):
         try:
             self.resort()
-            names = ['英雄', '非英雄单位', '技能', '技能源', '物品']
+            names = ['英雄', '非英雄单位', '技能', '技能源', '物品', '机制', '机制源']
             for i in names:
                 self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
                 self.mainlayout['列表'][i]['布局']['列表'].setIconSize(QSize(36, 28))
@@ -845,7 +865,7 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['改名'] = QPushButton('改名', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['改名'])
         self.editlayout['竖布局']['改名'].clicked.connect(self.json_edit_change_name)
-        self.update_the_jsons_alreadey=True#确认是否经过更新数据，以减少所需耗费的时间
+        self.update_the_jsons_alreadey = False  # 确认是否经过更新数据，以减少所需耗费的时间
         self.editlayout['竖布局']['简单保存'] = QPushButton('简单保存', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['简单保存'])
         self.editlayout['竖布局']['简单保存'].clicked.connect(self.json_edit_save)
@@ -932,6 +952,8 @@ class Main(QMainWindow):
         self.mainlayout['列表']['非英雄单位']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('非英雄单位'))
         self.mainlayout['列表']['技能']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('技能'))
         self.mainlayout['列表']['技能源']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('技能源'))
+        self.mainlayout['列表']['机制']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('机制'))
+        self.mainlayout['列表']['机制源']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('机制源'))
         for i in self.json_base:
             self.mainlayout['列表'][i]['布局']['列表'].doubleClicked.connect(lambda: self.centralWidget().setCurrentIndex(1))
         """
@@ -1171,17 +1193,17 @@ class Main(QMainWindow):
 
     def update_json_base(self, info="更新数据成功！\n您可以选择上传这些数据。"):
         try:
-            time_show=time.time()
+            time_show = time.time()
             self.upgrade_base = {}
             name_dict_list = self.name_create_tree_list_name()
-            reversed_name_dict_list=self.reversed_name_create_tree_list_name()
+            reversed_name_dict_list = self.reversed_name_create_tree_list_name()
 
             hero.fulfill_hero_json(self.text_base, self.json_base["英雄"], self.version, reversed_name_dict_list)
             item.fulfill_item_json(self.text_base, self.json_base["物品"], self.version, reversed_name_dict_list)
 
             ability.fulfill_vpk_data(self.json_base, self.text_base)
             info += ability.autoget_talent_source(self.json_base, self.text_base['英雄'])
-            ability.get_source_to_data(self.json_base, self.upgrade_base, self.version, reversed_name_dict_list)#花费时间过久16s+
+            ability.get_source_to_data(self.json_base, self.upgrade_base, self.version, reversed_name_dict_list)  # 花费时间过久16s+
             unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version, name_dict_list)
 
             self.file_save(os.path.join('database', 'temp_json_base.json'), json.dumps(self.json_base['技能']))
@@ -1205,13 +1227,13 @@ class Main(QMainWindow):
             # 结算技能和技能源问题
 
             for i in self.json_base["技能"]:
-                target = []
+                target = ['技能源']
                 if '数据来源' in self.json_base["技能"][i] and self.json_base["技能"][i]['数据来源'] in self.json_base["技能源"]:
                     target = [self.json_base["技能"][i]['数据来源']]
                 else:
                     raise (editerror('技能', i, "你没有书写数据来源，请立刻书写"))
                 if self.json_base["技能"][i]['应用'] > 0:
-                    ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target)#花费时间过久9s+
+                    ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target)  # 花费时间过久9s+
 
             ability.confirm_upgrade_info(self.json_base['技能'])
             # 增加拥有技能
@@ -1232,7 +1254,7 @@ class Main(QMainWindow):
                             if self.json_base[i][j]['应用'] == self.json_base["技能"][k[0]]['应用']:
                                 self.json_base[i][j]['技能'].append(k[0])
 
-            #self.resort() 这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
+            # self.resort() 这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
@@ -1241,7 +1263,37 @@ class Main(QMainWindow):
             self.edit_target_selected_changed()
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
         else:
-            QMessageBox.information(self, "已完成", info+'\n总耗时：'+str(round(time.time()-time_show,2))+'秒')
+            QMessageBox.information(self, "已完成", info + '\n总耗时：' + str(round(time.time() - time_show, 2)) + '秒')
+
+    def update_json_base_mechanism(self, target=''):
+        try:
+            time_show = time.time()
+            allupdate = []
+            if target == '':
+                for i in self.json_base['机制'] + self.json_base['机制源']:
+                    if i not in allupdate:
+                        allupdate.append(i)
+            else:
+                allupdate.append(target)
+            for i in allupdate:
+                tb1 = target in self.json_base['机制']
+                tb2 = target in self.json_base['机制源']
+                if tb1 and tb2:
+                    mechnism.get_one_source_to_data(self.json_base, target, self.version, self.text_base)
+                else:
+                    if not tb1:
+                        raise (editerror('机制源', i, "在【机制】中缺少关于【" + i + '】的信息，请及时补充'))
+                    if not tb2:
+                        raise (editerror('机制', i, "在【机制源】中缺少关于【" + i + '】的信息，请及时补充'))
+            self.file_save_all()
+        except editerror as err:
+            self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
+            self.edit_category_selected_changed()
+            self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
+            self.edit_target_selected_changed()
+            QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
+        else:
+            QMessageBox.information(self, "已完成", '总耗时：' + str(round(time.time() - time_show, 2)) + '秒')
 
     def upload_basic_json(self):
         self.upload_json('text_base.json', self.text_base)
@@ -1304,6 +1356,9 @@ class Main(QMainWindow):
             for i in self.json_base['技能']:
                 page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                 all_upload.append([i, page_link_content])
+        if chosen == '机制':
+            for i in self.json_base['机制']:
+                all_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
@@ -1367,8 +1422,11 @@ class Main(QMainWindow):
             self.json_base[selected][selected_name] = {}
             self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[selected][selected_name])
             self.file_save_all()
-            self.update_json_base(info='已经保存并更新完毕\n之后将进行上传。')
-            self.update_the_jsons_alreadey=True
+            if selected[:2] == '机制':
+                self.update_json_base_mechanism(selected_name)
+            else:
+                self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
+            self.update_the_jsons_alreadey = True
         target_name = []
         if self.json_base[selected][selected_name]['应用'] > 0:
             if selected == '技能':
@@ -1417,6 +1475,11 @@ class Main(QMainWindow):
                     all_page.append([k, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], k)])
                     all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'],
                                                                               common_page.all_the_names(self.json_base['非英雄单位'][k], self.json_base), 0)])
+                if k in self.json_base['机制源']:
+                    all_upload.append([k + '/源.json', self.json_base['机制源'][k]])
+                if k in self.json_base['机制']:
+                    all_upload.append([k + '.json', self.json_base['机制'][k]])
+                    all_page.append([k, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], k)])
         total_num = len(all_upload) + len(all_page)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
@@ -1613,25 +1676,28 @@ class Main(QMainWindow):
 
     def edit_category_selected_changed(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
-        selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
-        selected_bool = False
-        alike_name = ''
-        self.editlayout['修改核心']['竖布局']['具体库'][0].clear()
-        self.editlayout['修改核心']['竖布局']['代码库'][0].clear()
-        for i in self.json_base[selected]:
-            self.editlayout['修改核心']['竖布局']['具体库'][0].addItem(i)
-            if selected_name != '':
-                if not selected_bool and selected_name == i:
-                    selected_bool = True
-                if alike_name == '' and selected_name[0] == i[0]:
-                    alike_name = i
-        if len(edit_json.edit_source[selected]) > 0:
-            for i in self.text_base[edit_json.edit_source[selected][0]]:
-                self.editlayout['修改核心']['竖布局']['代码库'][0].addItem(i)
-            QApplication.processEvents()
-        if not selected_bool and alike_name != '':
-            selected_name = alike_name
-        self.edit_target_selected_changed(selected_name)
+        if len(self.json_name[selected]) == 0:
+            self.json_edit_new()
+        else:
+            selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
+            selected_bool = False
+            alike_name = ''
+            self.editlayout['修改核心']['竖布局']['具体库'][0].clear()
+            self.editlayout['修改核心']['竖布局']['代码库'][0].clear()
+            for i in self.json_base[selected]:
+                self.editlayout['修改核心']['竖布局']['具体库'][0].addItem(i)
+                if selected_name != '':
+                    if not selected_bool and selected_name == i:
+                        selected_bool = True
+                    if alike_name == '' and selected_name[0] == i[0]:
+                        alike_name = i
+            if len(edit_json.edit_source[selected]) > 0:
+                for i in self.text_base[edit_json.edit_source[selected][0]]:
+                    self.editlayout['修改核心']['竖布局']['代码库'][0].addItem(i)
+                QApplication.processEvents()
+            if not selected_bool and alike_name != '':
+                selected_name = alike_name
+            self.edit_target_selected_changed(selected_name)
 
     def edit_target_selected_changed(self, target_name=''):
         if target_name != '':
@@ -1824,7 +1890,7 @@ class Main(QMainWindow):
             if isinstance(sdict['混合文字'][i], dict):
                 tdict['混合文字'][i] = {0: TreeItemEdit(tdict['混合文字'][0], i)}
                 tdict['混合文字'][i][0].set_type('tree')
-                self.complex_dict_to_tree(tdict['混合文字'][i], edit_json.edit_adition['混合文字'][1],sdict['混合文字'][i])
+                self.complex_dict_to_tree(tdict['混合文字'][i], edit_json.edit_adition['混合文字'][1], sdict['混合文字'][i])
                 tdict['混合文字'][i][0].islist = True
                 tdict['混合文字'][i][0].setExpanded(True)
             else:
@@ -1996,8 +2062,11 @@ class Main(QMainWindow):
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
-        self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
-        self.update_the_jsons_alreadey=True
+        if ss[0][:2] == '机制':
+            self.update_json_base_mechanism(ss[1])
+        else:
+            self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
+        self.update_the_jsons_alreadey = True
         self.edit_target_selected_changed()
 
     def json_edit_loop_update(self):

@@ -458,7 +458,7 @@ def create_independent_mech(json_dict):
                 for j in json_dict[i]['升级来源']:
                     retxt += '[[file:' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
-            if json_dict[i]['简述']=='。':
+            if json_dict[i]['简述'] == '。':
                 return ''
         else:
             if ii > 1:
@@ -1134,8 +1134,8 @@ def create_page_item(json_base, log_base, log_list, item):
             all_the_item_name = []
             for j, w in json_base['物品'].items():
                 if j != item and w['应用'] == 1 and i in w and w[i]['叠加'] == v['叠加']:
-                    all_the_item_name.append([j, number_to_string(w[i]['1'])+w[i]['后缀']])
-            retxt += '<br/>多个{{I|' + item + '}}的【' + i + '】(' + number_to_string(v['1'])+v['后缀'] + ')不会叠加'
+                    all_the_item_name.append([j, number_to_string(w[i]['1']) + w[i]['后缀']])
+            retxt += '<br/>多个{{I|' + item + '}}的【' + i + '】(' + number_to_string(v['1']) + v['后缀'] + ')不会叠加'
             if len(all_the_item_name) > 0:
                 retxt += '，且和以下物品不叠加，仅取最高值生效：'
                 for j in range(len(all_the_item_name)):
@@ -1146,6 +1146,50 @@ def create_page_item(json_base, log_base, log_list, item):
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i])
     retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) + '[[分类:物品]]'
+    rere = ''
+    nums = 0
+    for i in range(len(retxt)):
+        if retxt[i] == '<':
+            if retxt[i + 1] == '/':
+                nums -= 1
+            elif retxt[i + 1] == 'b' and retxt[i + 2] == 'r':
+                nums += 0
+            else:
+                if retxt[i + 1] == 't' or retxt[i + 1] == 'd' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
+                    rere += '\n'
+                    for j in range(nums):
+                        rere += '\t'
+                nums += 1
+        rere += retxt[i]
+    return rere
+
+
+def create_page_mechnism(json_base, log_base, log_list, mech):
+    db = json_base['机制'][mech]
+    retxt = '__NOTOC__' + db['简述']
+    for i in db['内容']:
+        retxt += '\n<br/>\n'
+        titles = db['内容'][i]['标题级数']
+        for es in range(titles):
+            retxt += '='
+        retxt += i
+        for es in range(titles):
+            retxt += '='
+        for j in db['内容'][i]['内容']:
+            uls = 0
+            for k in db['内容'][i]['内容'][j]['内容']:
+                kk = db['内容'][i]['内容'][j]['内容'][k]
+                while kk['序列级数'] > uls:
+                    uls += 1
+                    retxt += '<ul>'
+                while kk['序列级数'] < uls:
+                    uls -= 1
+                    retxt += '</ul>'
+                if uls == 0:
+                    retxt += kk['文字']
+                else:
+                    retxt += '<li>' + kk['文字'] + '</li>'
+            retxt += '\n\n'
     rere = ''
     nums = 0
     for i in range(len(retxt)):

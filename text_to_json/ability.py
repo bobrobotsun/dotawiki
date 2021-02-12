@@ -5,6 +5,7 @@ import math
 import hashlib
 import re
 import time
+from text_to_json import common_page
 from text_to_json.WikiError import editerror
 
 
@@ -144,7 +145,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 all_json['技能源'][i]['升级']['魔晶'] = ''
             if '神杖' not in all_json['技能源'][i]['升级']:
                 all_json['技能源'][i]['升级']['神杖'] = ''
-        #loop_check_source_to_change_content(all_json['技能源'][i])
+        # loop_check_source_to_change_content(all_json['技能源'][i])
     # alllogs=[]
     for ijk in all_json['技能']:
         unit_dic = all_json['技能'][ijk]
@@ -246,6 +247,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
             unit_dic["技能升级信息"] = {}
         else:
             raise (editerror('技能', ijk, '没有在【技能源】中搜索到' + unit_dic["数据来源"]))
+
 
 def group_source(a):
     temp = {"1": {}}
@@ -857,6 +859,10 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                                 returntxt += "|x18px|link=" + k + "]]"
                             returntxt += combine_numbers_post_level(temp[j][0], post, level)
                         returntxt += ")"
+                elif json[ii]["混合文字"][str(i)]['类型'] == '检索' or json[ii]["混合文字"][str(i)]['类型'] == '查询':
+                    ttarget = copy.deepcopy(target)
+                    ttarget.append(str(i))
+                    returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget)
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:
@@ -914,7 +920,7 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
                 else:
                     break
         else:
-            raise (editerror('技能源', target[0], '→'.join(target[1:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
     elif json["0"] == "数据库":
         if json["3"] in base_txt[json["1"]][json["2"]]:
             temp = base_txt[json["1"]][json["2"]][json["3"]]
@@ -936,7 +942,7 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
             else:
                 rere[0][0].append(change_str_to_float(temp))
         else:
-            raise (editerror('技能源', target[0], '→'.join(target[1:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
     elif json['0'] == '普通属性':
         if json["3"] in all_json[json["1"]][json["2"]]:
             temp = all_json[json["1"]][json["2"]][json["3"]]
@@ -949,7 +955,7 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
                     break
             rere[0][0].append(change_str_to_float(temp))
         else:
-            raise (editerror('技能源', target[0], '→'.join(target[1:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
     elif json['0'] == '图片链接':
         temp = all_json[json["1"]][json["2"]]
         rere[0][0].append('[[file:' + temp['迷你图片'] + '|' + json['3'] + '|link=]][[' + temp['页面名'] + ']]')
@@ -1003,7 +1009,7 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
                 else:
                     break
         else:
-            raise (editerror('技能源', target[0], '→'.join(target[1:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
     else:
         if json["3"] in all_json[json["1"]][json["2"]]:
             temp = all_json[json["1"]][json["2"]][json["3"]]
@@ -1038,7 +1044,7 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
                 else:
                     break
         else:
-            raise (editerror('技能源', target[0], '→'.join(target[1:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
     return rere
 
 
@@ -1182,6 +1188,248 @@ def calculate_combine_txt_numbers(list1, list2, op):
                 elif op == 'ap_s2':  # 等比数列（AP）求和（前末项，后项数，首项1倍公差）
                     expand1[i][0][j] = expand1[i][0][j] * (1 + expand2[i][0][j]) / 2
     return expand1
+
+
+# 查询满足条件的内容并展示
+def find_the_jsons_by_conditions_and_show(json, all_json, target):
+    retxt = ''
+    conditions = change_json_to_condition_dict(json, target)
+    for i in all_json:
+        if i[-1] != '源':
+            for j in all_json[i]:
+                result, bool = check_the_json_meet_the_conditions(conditions['满足'], all_json[i][j], target)
+                if bool:
+                    for k in range(len(result)):
+                        retxt += change_the_right_result_json_to_text_to_show(conditions, result[k], all_json[i][j], all_json)
+    if retxt == '':
+        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】时没有找到满足条件的库，请检查是否填写错误'))
+    else:
+        return retxt
+
+
+def change_the_right_result_json_to_text_to_show(conditions, conclusion, json, all_json):
+    retxt = ''
+    miniimage = ''
+    minisource = ''
+    if '迷你图片' in json and json['迷你图片'] != '':
+        miniimage = '[[file:' + json['迷你图片'] + '|x24px|link=]]'
+    if '技能归属' in json:
+        for i in all_json:
+            if json['技能归属'] in all_json[i]:
+                if '迷你图片' in all_json[i][json['技能归属']] and all_json[i][json['技能归属']]['迷你图片'] != '':
+                    minisource = '[[file:' + all_json[i][json['技能归属']]['迷你图片'] + '|x24px|link=]]'
+                minisource += '[[' + json['技能归属'] + ']] - '
+    if conditions['函数'][0][0] == '短':
+        another_info = ''
+        retxt += '[[file:' + json['迷你图片'] + '|x24px|link=]] [[' + json['页面名'] + ']]' + another_info
+    else:  # 普通的ability_desc
+        another_name = ''
+        value = ''
+        trait = ''
+        note = ''
+        if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
+            another_name += '(' + json['中文名'] + ')'
+        if '属性名' in conditions:
+            for i in conditions['属性名'][0]:
+                for j in json['属性']:
+                    if json['属性'][j]['名称'] == i:
+                        trait += '<div>' + i + '：' + common_page.create_upgrade_text(json["属性"], j) + '</div>'
+        retxt += '<div class="dota-ability-wrapper">' \
+                 '<span class="dota-ability-image">[[file:' + json['图片'] + '|72px|link=]]</span>' \
+                                                                           '<span class="dota-ability-right">' \
+                                                                           '<div class="dota-ability-title"><span>' + minisource + '[[' + json[
+                     '页面名'] + ']]' + another_name + '</span></div>' \
+                                                    '<div class="dota-ability-desc">' + value + trait + note + '</div></span></div>'
+    return retxt
+
+
+def check_the_json_meet_the_conditions(conditions, json, target):
+    relist = [[]]  # 预设一个空结果，防止复制失败
+    all_bools = True
+    for i in conditions:
+        one_result, one_bool = check_the_json_meet_one_condition(i, json, target)
+        if one_bool:
+            while len(relist) < len(one_result):  # 将总结果数扩充为已知结果数个数
+                relist.append(copy.copy(relist[-1]))
+            for j in range(len(relist)):  # 将当前条件的结果填入内容
+                if len(one_result) > j:
+                    relist[j].append(one_result[j])
+                else:
+                    relist[j].append(one_result[0])
+        else:
+            all_bools = False
+            break
+    return relist, all_bools
+
+
+def check_the_json_meet_one_condition(condition, json, target):
+    relist = [[]]
+    all_bools = True
+    tempjson = json
+    for ii in range(len(condition)):
+        i = condition[ii]
+        half_result = []
+        if isinstance(i, list):
+            if all_bools:
+                half_result, one_bool = check_the_json_meet_one_condition(i, tempjson, target)
+                all_bools = one_bool
+        elif i == '@and' or i == '@和':
+            if all_bools:  # true
+                half_result, one_bool = check_the_json_meet_one_condition(condition[ii + 1:], json, target)
+                all_bools = one_bool
+        elif i == '@except' or i == '@除了':
+            if all_bools:  # true
+                half_result, one_bool = check_the_json_meet_one_condition(condition[ii + 1:], json, target)
+                all_bools = not one_bool
+        elif i == '@or' or i == '@或':
+            half_result, one_bool = check_the_json_meet_one_condition(condition[ii + 1:], json, target)
+            all_bools = all_bools or one_bool
+            if one_bool:
+                relist = relist + half_result
+                continue
+        elif i == '@one':  # 在一系列数字作为key的键值中，选择第一个有效的项
+            if all_bools:  # true
+                one_bool = False
+                jj = 0
+                while True:
+                    jj += 1
+                    j = str(jj)
+                    if j in tempjson:
+                        one_half_result, one_half_bool = check_the_json_meet_one_condition(condition[ii + 1:], tempjson, target)
+                        if one_half_bool:
+                            half_result.append(one_half_result[0])
+                            one_bool = one_bool or one_half_bool
+                        if one_bool:
+                            break
+                    else:
+                        if jj > 1:
+                            break
+                all_bools = one_bool
+        elif i == '@list':  # 在一系列数字作为key的键值中，选择所有有效的项
+            if all_bools:  # true
+                one_bool = False
+                jj = 0
+                while True:
+                    jj += 1
+                    j = str(jj)
+                    if j in tempjson:
+                        one_half_result, one_half_bool = check_the_json_meet_one_condition(condition[ii + 1:], tempjson, target)
+                        if one_half_bool:
+                            half_result = half_result + one_half_result
+                            one_bool = one_bool or one_half_bool
+                    else:
+                        if jj > 1:
+                            break
+                all_bools = one_bool
+        elif i[0] == '@':
+            if len(condition) >= ii + 2:
+                if i == '@=' or i == '@==':
+                    all_bools = operation_number_str_equal(tempjson, condition[ii + 1])
+                elif i == '@!=' or i == '@<>' or i == '@><':
+                    all_bools = not operation_number_str_equal(tempjson, condition[ii + 1])
+                elif i == '@<' or i == '@<=' or i == '@>' or i == '@>=':
+                    all_bools = operation_number_check(tempjson, condition[ii + 1], i[1:])
+                else:
+                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
+                ii += 1
+                half_result.append([condition[ii]])
+            else:
+                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到符号”' + i + '“后的值，请检查代码错误还是输入缺失'))
+        else:
+            if isinstance(tempjson, dict):
+                if i in tempjson:
+                    for j in relist:
+                        j.append(i)
+                        tempjson = tempjson[i]
+                else:
+                    all_bools = False
+        if all_bools:
+            k1 = len(relist)
+            k2 = len(half_result)
+            if k2 > 0:
+                combinejson = [0 for _ in range(k1 * k2)]
+                for m in range(k1):
+                    for n in range(k2):
+                        combinejson[m * k2 + n] = relist[m] + half_result[n]
+                relist = combinejson
+    return relist, all_bools
+
+
+def change_json_to_condition_dict(json, target):
+    redict = {}
+    ii = 0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in json:
+            if '符号' in json[i] and json[i]['符号'] != '':
+                key = json[i]['符号']
+                if json[i]['符号'] not in redict:
+                    redict[key] = []
+                redict[key].append(change_one_condition_dict(json[i], [0]))
+        else:
+            break
+    if '函数' not in redict:
+        redict['函数'] = [['']]
+    if '满足' not in redict:
+        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】时没有找到“满足”的条件，请正确填写'))
+    yingyong = True
+    for i in redict['满足']:
+        if i[0] == '应用':
+            yingyong = False
+            break
+    if yingyong:
+        redict['满足'].append(['应用', '@=', '1'])
+    return redict
+
+
+def change_one_condition_dict(json, index):
+    relist = []
+    while True:
+        i = str(index[0])
+        index[0] += 1
+        if i in json:
+            if json[i] == '(' or json[i] == '（':
+                relist.append(change_one_condition_dict(json, index))
+            elif json[i] == ')' or json[i] == '）':
+                return relist
+            elif json[i] == '':
+                continue
+            else:
+                relist.append(json[i])
+        else:
+            return relist
+
+
+# 通过符号检查两边的信息是否完全相等（会将内容)
+def operation_number_str_equal(str1, str2):
+    if isinstance(str1, dict) or isinstance(str2, dict):
+        return False
+    try:
+        i1 = float(str1)
+        i2 = float(str2)
+        return i1 == i2
+    except ValueError:
+        i1 = str(str1)
+        i2 = str(str2)
+        return i1 == i2
+
+
+# 通过符号检查两边的信息是否满足条件（必须是两个数字，否则返回false)
+def operation_number_check(num1, num2, op):
+    try:
+        i1 = float(num1)
+        i2 = float(num2)
+        if op == '>':
+            return i1 > i2
+        elif op == '>=':
+            return i1 >= i2
+        elif op == '<':
+            return i1 < i2
+        elif op == '<=':
+            return i1 <= i2
+    except ValueError:
+        return False
 
 
 def number_to_string(number, rr=2):
