@@ -12,14 +12,14 @@ from xpinyin import Pinyin
 
 
 # dict排序方法
-def sortedDictValues(adict, pinyin):
+def sortedDictValues(adict, pinyin,_reverse=False):
     keys = []
     new = {}
     if pinyin:
         p = Pinyin()
         for i in adict:
             keys.append([p.get_pinyin(i), i])
-            keys = sorted(keys, key=lambda x: x[0])
+        keys = sorted(keys, key=lambda x:x[0],reverse=_reverse)
         for i in keys:
             new[i[1]] = adict[i[1]]
     else:
@@ -28,14 +28,13 @@ def sortedDictValues(adict, pinyin):
             new[i] = adict[i]
     return new
 
-
-def sortedList(alist):
+def sortedList(alist,function=lambda x:x[0],_reverse=False):
     keys = []
     new = []
     p = Pinyin()
     for i in alist:
         keys.append([p.get_pinyin(i), i])
-        keys = sorted(keys, key=lambda x: x[0])
+    keys = sorted(keys, key=function,reverse=_reverse)
     for i in keys:
         new.append(i[1])
     return new

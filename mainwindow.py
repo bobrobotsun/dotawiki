@@ -1262,7 +1262,7 @@ class Main(QMainWindow):
                             if self.json_base[i][j]['应用'] == self.json_base["技能"][k[0]]['应用']:
                                 self.json_base[i][j]['技能'].append(k[0])
 
-            # self.resort() 这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
+            #self.resort() #这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])

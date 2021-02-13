@@ -5,8 +5,9 @@ import math
 import hashlib
 import re
 import time
-from text_to_json import common_page
+from text_to_json import common_page, edit_json
 from text_to_json.WikiError import editerror
+from xpinyin import Pinyin
 
 
 def change_str_to_int(s):
@@ -1193,6 +1194,7 @@ def calculate_combine_txt_numbers(list1, list2, op):
 # 查询满足条件的内容并展示
 def find_the_jsons_by_conditions_and_show(json, all_json, target):
     retxt = ''
+    all_results_with_sort_mark = []
     conditions = change_json_to_condition_dict(json, target)
     for i in all_json:
         if i[-1] != '源':
@@ -1200,14 +1202,18 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
                 result, bool = check_the_json_meet_the_conditions(conditions['满足'], all_json[i][j], target)
                 if bool:
                     for k in range(len(result)):
-                        retxt += change_the_right_result_json_to_text_to_show(conditions, result[k], all_json[i][j], all_json, target)
-    if retxt == '':
-        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】时没有找到满足条件的库，请检查是否填写错误'))
-    else:
-        return retxt
+                        all_results_with_sort_mark.append(change_the_right_result_json_to_text_to_show(conditions, result[k], all_json[i][j], all_json, target))
+    sorttime = len(all_results_with_sort_mark[0])
+    for i in range(1, sorttime):
+        reverse = all_results_with_sort_mark[0][i][1] == '-'
+        all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
+    for i in all_results_with_sort_mark:
+        retxt += i[0]
+    return retxt
 
 
 def change_the_right_result_json_to_text_to_show(conditions, result, json, all_json, target):
+    sort_mark = []
     retxt = ''
     miniimage = ''
     minisource = ''
@@ -1219,6 +1225,9 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 if '迷你图片' in all_json[i][json['技能归属']] and all_json[i][json['技能归属']]['迷你图片'] != '':
                     minisource = '[[file:' + all_json[i][json['技能归属']]['迷你图片'] + '|x24px|link=]]'
                 minisource += '[[' + json['技能归属'] + ']] - '
+    if '排序' in conditions:
+        for i in range(len(conditions['排序'])):
+            sort_mark+=find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target)
     if conditions['函数'][0][0] == '短':
         another_info = ''
         retxt += '[[file:' + json['迷你图片'] + '|x24px|link=]] [[' + json['页面名'] + ']]' + another_info
@@ -1230,6 +1239,11 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         note = ''
         if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
             another_name += '(' + json['中文名'] + ')'
+        if '条件名称' in conditions:
+            for i in range(len(conditions['条件名称'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target)
+                if isinstance(tempjson, str):
+                    another_name += '('+tempjson+')'
         if '属性名' in conditions:
             for i in conditions['属性名'][0]:
                 for j in json['属性']:
@@ -1252,7 +1266,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     else:
                         break
                 if '简述' in tempjson:
-                    note+='<div style="color:#3f5a67">'+tempjson['简述']+'</div>'
+                    note += '<div style="color:#3f5a67">' + tempjson['简述'] + '</div>'
         for i in traitlist:
             trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i, image_size='x18px') + '</div>'
 
@@ -1269,15 +1283,15 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                             if isinstance(tempjson[j], dict) and '代码' in tempjson[j]:
                                 has_mech = True
                                 if tempjson[j]['代码'] != 0:
-                                    mech += ability_desc_show_one_mech(tempjson[j],True)
+                                    mech += ability_desc_show_one_mech(tempjson[j], True)
                     if not has_mech:
                         raise (editerror(target[0], target[1], '在调用第' + str(i) + '条【条件机制】时，没有找到任何可能的机制内容，请检查输入是否正确（本功能不能一个条件输入多个机制）'))
 
         if '次级分类' in json:
-            if json['次级分类']=='神杖技能':
-                note+='<div style="float:right;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
-            elif json['次级分类']=='魔晶技能':
-                note+='<div style="float:right;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
+            if json['次级分类'] == '神杖技能':
+                note += '<div style="float:right;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
+            elif json['次级分类'] == '魔晶技能':
+                note += '<div style="float:right;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
 
         retxt += '<div class="dota-ability-wrapper">' \
                  '<span class="dota-ability-image">[[file:' + json['图片'] + '|72px|link=]]</span>' \
@@ -1285,10 +1299,10 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                                                                            '<div class="dota-ability-title"><span>' + minisource + '[[' + json[
                      '页面名'] + ']]' + another_name + '</span></div>' \
                                                     '<div class="dota-ability-desc">' + trait + mech + note + '</div></span></div>'
-    return retxt
+    return [retxt] + sort_mark
 
 
-def ability_desc_show_one_mech(json,upgrade=False):
+def ability_desc_show_one_mech(json, upgrade=False):
     retxt = '<div>'
     if upgrade and '升级来源' in json:
         for i in json['升级来源']:
@@ -1314,6 +1328,65 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target):
                 the_key = result[indexlist[0]][indexlist[1]]
             else:
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【条件属性】第' + str(j) + '项时，检查到序数超标了，请检查是否填写错误'))
+        elif condition[j] == '@average' or condition[j] == '@平均' or condition[j] == '@min' or condition[j] == '@最小' or condition[j] == '@max' or condition[j] == '@最大':
+            _sum, count, _min, _max = 0, 0, float('inf'), float('-inf')
+            kk = 0
+            while True:
+                kk += 1
+                k = str(kk)
+                if k in tempjson:
+                    _sum += tempjson[k]
+                    count += 1
+                    _min = min(_min, tempjson[k])
+                    _max = max(_max, tempjson[k])
+                else:
+                    break
+            if len(condition) >= j + 2 and (condition[j + 1] == '+' or condition[j] == '-'):
+                if condition[j] == '@average' or condition[j] == '@平均':
+                    return [[_sum / count, condition[j + 1]]]
+                if condition[j] == '@min' or condition[j] == '@最小':
+                    return [[_min, condition[j + 1]]]
+                if condition[j] == '@max' or condition[j] == '@最大':
+                    return [[_max, condition[j + 1]]]
+            else:
+                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【条件属性】第' + str(j) + '项时，您的排序没有声明升降序，或声明发生了错误'))
+        elif condition[j]=='@技能':
+            if tempjson['分类']=='技能':
+                p = Pinyin()
+                list1=[tempjson['技能排序'], '+']
+                list2=[p.get_pinyin(tempjson['技能归属']), '+']
+                indexdict = {'英雄技能': 1, '非英雄单位技能': 2, '物品技能': 3}
+                indexkey=tempjson['次级分类']
+                list3=[]
+                if indexkey in indexdict:
+                    list3=[indexdict[indexkey],'+']
+                else:
+                    list3=[1,'+']
+                return [list1,list2,list3]
+            else:
+                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【条件属性】第' + str(j) + '项时，查询到的不是技能，请重新确定自己【满足】条件'))
+        elif condition[j] == '@pinyin' or condition[j] == '@拼音':
+            if isinstance(tempjson, str) and len(condition) >= j + 2 and (condition[j + 1] == '+' or condition[j] == '-'):
+                p = Pinyin()
+                return [[p.get_pinyin(tempjson), condition[j + 1]]]
+            else:
+                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【条件属性】第' + str(j) + '项时，您的排序没有声明升降序，或声明发生了错误，或目标不是文字'))
+        elif condition[j] == '@+' or condition[j] == '@升序':
+            return [[tempjson, '+']]
+        elif condition[j] == '@-' or condition[j] == '@降序':
+            return [[tempjson, '-']]
+        elif condition[j] == '@大分类' or condition[j] == '@英非物':
+            indexkey = {'英雄技能': 1, '非英雄单位技能': 2, '物品技能': 3}
+            if len(condition) >= j + 2 and len(condition[j + 1]) > 0:
+                indexkey['英雄技能'] = int(condition[j + 1][0])
+                if len(condition[j + 1]) > 1:
+                    indexkey['非英雄单位技能'] = int(condition[j + 1][1])
+                    if len(condition[j + 1]) > 2:
+                        indexkey['物品技能'] = int(condition[j + 1][2])
+            if tempjson in indexkey:
+                return [[indexkey[tempjson], '+']]
+            else:
+                return [[indexkey['英雄技能'], '+']]
         else:
             the_key = condition[j]
         if the_key in tempjson:
