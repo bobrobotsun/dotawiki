@@ -50,7 +50,7 @@ def number_to_string(number, rr=4):
         return str(i)
 
 
-def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '',image_size='x22px'):
+def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '', image_size='x22px'):
     if k in numjsons:
         numjson = numjsons[k]
         retext = ''
@@ -61,7 +61,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
             if i in numjson:
                 if ii > 1:
                     for j in numjson[i]['升级来源']:
-                        retext += '[[file:' + numjson[i]['升级来源'][j]["图片"] + '|'+image_size+'|link=' + numjson[i]['升级来源'][j][
+                        retext += '[[file:' + numjson[i]['升级来源'][j]["图片"] + '|' + image_size + '|link=' + numjson[i]['升级来源'][j][
                             "名称"] + ']]'
                 jj = 0
                 while True:
@@ -1176,20 +1176,7 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
         for es in range(titles):
             retxt += '='
         for j in db['内容'][i]['内容']:
-            uls = 0
-            for k in db['内容'][i]['内容'][j]['内容']:
-                kk = db['内容'][i]['内容'][j]['内容'][k]
-                while kk['序列级数'] > uls:
-                    uls += 1
-                    retxt += '<ul>'
-                while kk['序列级数'] < uls:
-                    uls -= 1
-                    retxt += '</ul>'
-                if uls == 0:
-                    retxt += kk['文字']
-                else:
-                    retxt += '<li>' + kk['文字'] + '</li>'
-            retxt += '\n\n'
+            retxt += db['内容'][i]['内容'][j]['内容'] + '\n\n'
     rere = ''
     nums = 0
     for i in range(len(retxt)):

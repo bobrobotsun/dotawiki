@@ -153,6 +153,8 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
         # if unit_dic["次级分类"] not in alllogs:
         #     alllogs.append(unit_dic["次级分类"])
         #     print(ijk,alllogs)
+        if 'A杖信息' in unit_dic:
+            unit_dic.pop('A杖信息')
         unit_dic['页面名'] = ijk
         unit_dic["分类"] = "技能"
         unit_dic["版本"] = version
@@ -1287,6 +1289,12 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     if not has_mech:
                         raise (editerror(target[0], target[1], '在调用第' + str(i) + '条【条件机制】时，没有找到任何可能的机制内容，请检查输入是否正确（本功能不能一个条件输入多个机制）'))
 
+        if '条件注释' in conditions:
+            for i in range(len(conditions['条件注释'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件注释'][i], i, json, result, target)
+                if isinstance(tempjson,str):
+                    note += '<div style="color:#3f5a67">' + tempjson + '</div>'
+
         if '次级分类' in json:
             if json['次级分类'] == '神杖技能':
                 note += '<div style="float:right;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
@@ -1488,6 +1496,10 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                                 break
                     all_bools = one_bool
                     ii = index[0] - 1
+            elif i == '@has' or i == '@have':
+                all_bools = isinstance(tempjson, str) and tempjson != ''
+            elif i == '@hasnot' or i == '@havenot':
+                all_bools = isinstance(tempjson, str) and tempjson == ''
             elif i[0] == '@':
                 if len(condition) >= ii + 2:
                     if i == '@=' or i == '@==':

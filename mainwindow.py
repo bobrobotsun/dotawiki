@@ -1212,7 +1212,7 @@ class Main(QMainWindow):
             ability.fulfill_vpk_data(self.json_base, self.text_base)
             info += ability.autoget_talent_source(self.json_base, self.text_base['英雄'])
             ability.get_source_to_data(self.json_base, self.upgrade_base, self.version, reversed_name_dict_list)  # 花费时间过久16s+
-            unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version, name_dict_list)
+            unit.fulfill_unit_json(self.text_base, self.json_base["非英雄单位"], self.version, reversed_name_dict_list)
 
             self.file_save(os.path.join('database', 'temp_json_base.json'), json.dumps(self.json_base['技能']))
             with open(os.path.join('database', 'temp_json_base.json'), mode="r", encoding="utf-8") as f:

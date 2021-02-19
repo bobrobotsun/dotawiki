@@ -9,7 +9,7 @@ from text_to_json.WikiError import editerror
 
 
 def get_source_to_data(all_json, tlist, version, text_base):
-    #一定报错的内容
+    # 一定报错的内容
     for i in tlist:
         if i not in all_json['机制']:
             raise (editerror('机制源', i, "在【机制】中缺少关于【" + i + '】的信息，请及时补充'))
@@ -52,3 +52,24 @@ def get_source_to_data(all_json, tlist, version, text_base):
     # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
     for target in tlist:
         ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, '内容', ['机制源', target, '内容'])
+        # 上面将文字全部转化掉
+        # 下面把序列级数合并成为一串文字，以方便调用
+        for i in all_json['机制'][target]['内容']:
+            for j in all_json['机制'][target]['内容'][i]['内容']:
+                comtext = ''
+                uls = 0
+                for k in all_json['机制'][target]['内容'][i]['内容'][j]['内容']:
+                    kk = all_json['机制'][target]['内容'][i]['内容'][j]['内容'][k]
+                    while kk['序列级数'] > uls:
+                        uls += 1
+                        comtext += '<ul>'
+                    while kk['序列级数'] < uls:
+                        uls -= 1
+                        comtext += '</ul>'
+                    if uls == 0:
+                        comtext += kk['文字']
+                    else:
+                        comtext += '<li>' + kk['文字'] + '</li>'
+                for k in range(uls):
+                    comtext += '</ul>'
+                all_json['机制'][target]['内容'][i]['内容'][j]['内容'] = comtext
