@@ -1457,7 +1457,7 @@ class Main(QMainWindow):
         all_upload = []
         all_page = []
         if len(target_name) == 0:
-            if selected == '技能源':
+            if selected[-1] == '源':
                 all_upload.append([selected_name + '/源.json', self.json_base[selected][selected_name]])
             else:
                 all_upload.append([selected_name + '.json', self.json_base[selected][selected_name]])
@@ -1983,7 +1983,7 @@ class Main(QMainWindow):
     def json_edit_download(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
               self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
-        if ss[0] == '技能源':
+        if ss[0][-1] == '源':
             self.json_base[ss[0]][ss[1]] = self.download_json(ss[1] + '/源.json')
         else:
             self.json_base[ss[0]][ss[1]] = self.download_json(ss[1] + '.json')
@@ -1998,7 +1998,7 @@ class Main(QMainWindow):
             ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
                   self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
             upload_data = {'action': 'delete', 'format': 'json', 'token': self.csrf_token}
-            if ss[0] == '技能源':
+            if ss[0][-1] == '源':
                 upload_data['title'] = 'Data:' + ss[1] + '/源.json'
             else:
                 upload_data['title'] = 'Data:' + ss[1] + '.json'
@@ -2029,7 +2029,7 @@ class Main(QMainWindow):
             text, ok = MoInputWindow.getText(self, '修改名字', '您希望将' + ss[1] + '的名字改为:', ss[1])
             if ok:
                 upload_data = {'action': 'delete', 'format': 'json', 'token': self.csrf_token}
-                if ss[0] == '技能源':
+                if ss[0][-1] == '源':
                     upload_data['title'] = 'Data:' + ss[1] + '/源.json'
                 else:
                     upload_data['title'] = 'Data:' + ss[1] + '.json'
