@@ -36,7 +36,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.28b'
+        self.version = '7.28c'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'http://dota.huijiwiki.com/w/api.php'
@@ -1314,7 +1314,6 @@ class Main(QMainWindow):
         self.w.setWindowTitle('上传json中……')
         all_upload = []
         all_upload.append(['版本.json', {'版本': self.version}])
-        all_upload.append(['json_name.json', self.json_name])
         if chosen == '':
             for i in self.json_base:
                 for j in self.json_base[i]:
