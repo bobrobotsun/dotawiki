@@ -820,16 +820,16 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                     while True:
                         j += 1
                         if str(j) in json[ii]["混合文字"][str(i)]:
-                            if json[ii]["混合文字"][str(i)][str(j)]["0"] == "升级属性":
+                            if json[ii]["混合文字"][str(i)][str(j)]["0"][-2:] == "属性":
                                 if json[ii]["混合文字"][str(i)][str(j)]["1"] == "":
-                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = "技能"
+                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = target[0] if target[0][-1]!='源' else target[0][:-1]
                                 if json[ii]["混合文字"][str(i)][str(j)]["2"] == "":
                                     json[ii]["混合文字"][str(i)][str(j)]["2"] = name
                             elif json[ii]["混合文字"][str(i)][str(j)]["0"] == "数据库":
                                 if json[ii]["混合文字"][str(i)][str(j)]["1"] == "":
-                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = "技能"
+                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = target[0] if target[0][-1]!='源' else target[0][:-1]
                                 if json[ii]["混合文字"][str(i)][str(j)]["2"] == "":
-                                    json[ii]["混合文字"][str(i)][str(j)]["2"] = all_json["技能"][name]["代码"]
+                                    json[ii]["混合文字"][str(i)][str(j)]["2"] = all_json[target[0]][name]["代码"]
                         else:
                             break
                     ttarget = copy.deepcopy(target)
@@ -855,7 +855,7 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                         for j in range(1, len(temp)):
                             for k in temp[j][1]:
                                 returntxt += "[[file:"
-                                if target[1] == '描述':
+                                if target[2] == '描述':
                                     returntxt += temp[j][1][k]
                                 else:
                                     returntxt += temp[j][1][k].replace('Talent.png', 'Talentb.png')
@@ -959,6 +959,28 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
             rere[0][0].append(change_str_to_float(temp))
         else:
             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
+    elif json['0']=='全部文字属性':
+        temp = all_json[json["1"]][json["2"]]
+        temptext=''
+        seps=json['符号']
+        ii=2
+        while True:
+            ii+=1
+            i=str(ii)
+            if i in json and json[i] !='':
+                if json[i] in temp:
+                    temp=temp[json[i]]
+                else:
+                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中第'+i+'项' + json[i] + '的内容'))
+            else:
+                break
+        if isinstance(temp,dict):
+            for i in temp:
+                if isinstance(temp[i],str):
+                    if temptext!='':
+                        temptext +=seps
+                    temptext+=temp[i]
+        rere[0][0].append(temptext)
     elif json['0'] == '图片链接':
         temp = all_json[json["1"]][json["2"]]
         rere[0][0].append('[[file:' + temp['迷你图片'] + '|' + json['3'] + '|link=]][[' + temp['页面名'] + ']]')
@@ -1198,6 +1220,7 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
     retxt = ''
     all_results_with_sort_mark = []
     conditions = change_json_to_condition_dict(json, target)
+    seps=json['后缀']
     for i in all_json:
         if i[-1] != '源':
             for j in all_json[i]:
@@ -1209,8 +1232,10 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
     for i in range(1, sorttime):
         reverse = all_results_with_sort_mark[0][i][1] == '-'
         all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
-    for i in all_results_with_sort_mark:
-        retxt += i[0]
+    for i in range(len(all_results_with_sort_mark)):
+        if i>0:
+            retxt+=seps
+        retxt += all_results_with_sort_mark[i][0]
     return retxt
 
 
@@ -1232,7 +1257,30 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             sort_mark+=find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target)
     if conditions['函数'][0][0] == '短':
         another_info = ''
-        retxt += '[[file:' + json['迷你图片'] + '|x24px|link=]] [[' + json['页面名'] + ']]' + another_info
+        traitlist = []
+        if '条件属性' in conditions:
+            for i in range(len(conditions['条件属性'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件属性'][i], i, json, result, target)
+                kk = 0
+                while True:
+                    kk += 1
+                    k = str(kk)
+                    if k in tempjson:
+                        if str(tempjson[k]) in json['属性']:
+                            if str(tempjson[k]) not in traitlist:
+                                traitlist.append(str(tempjson[k]))
+                        else:
+                            raise (editerror(target[0], target[1], '在调用第' + str(i) + '条【条件属性】时，没有找到【' + json['页面名'] + '】的第' + str(tempjson[k]) + '条【属性】'))
+                    else:
+                        break
+        if len(traitlist)>0:
+            another_info += '('
+            for i in range(len(traitlist)):
+                if i>0:
+                    another_info +=';'
+                another_info += common_page.create_upgrade_text(json["属性"], traitlist[i], image_size='x18px')
+            another_info += ')'
+        retxt += '[[file:' + json['迷你图片'] + '|x24px|link=]][[' + json['页面名'] + ']]' + another_info
     else:  # 普通的ability_desc
         another_name = ''
         trait = ''

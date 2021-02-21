@@ -24,8 +24,15 @@ def get_source_to_data(all_json, tlist, version, text_base):
         todict['分类'] = '机制'
         todict['页面名'] = target
         todict["版本"] = version
-        for i in ["图片", "迷你图片", "简述", "简单条目", "具体条目"]:
+        for i in ["图片", "迷你图片", "简述"]:
             todict[i] = fromdict[i]
+        for i in ["简单条目", "具体条目"]:
+            todict[i]={}
+            for j in fromdict[i]:
+                dictkey=j
+                if fromdict[i][j]['标识']!='':
+                    dictkey=fromdict[i][j]['标识']
+                todict[i][dictkey]=fromdict[i][j]['文字']
         todict['内容'] = {}
         for i in fromdict['内容']:
             ii = i
@@ -41,17 +48,24 @@ def get_source_to_data(all_json, tlist, version, text_base):
                 todict['内容'][ii]['内容'][jj]['内容'] = {}
                 for k in fromdict['内容'][i]['内容'][j]['内容']:
                     todict['内容'][ii]['内容'][jj]['内容'][k] = fromdict['内容'][i]['内容'][j]['内容'][k]
-        for i in todict:
-            if i != '内容':
-                ttarget = ['机制源', target, i]
-                if isinstance(todict[i], dict):
-                    if "混合文字" in todict[i]:
-                        ability.change_combine_txt(todict, i, text_base, all_json, target, ttarget + ['混合文字'])
+        for i in ["图片", "迷你图片", "简述"]:
+            ttarget = ['机制源', target, i]
+            if isinstance(todict[i], dict):
+                if "混合文字" in todict[i]:
+                    ability.change_combine_txt(todict, i, text_base, all_json, target, ttarget + ['混合文字'])
+                else:
+                    ability.loop_check(todict[i], text_base, all_json, target, ttarget)
+        for i in ["简单条目", "具体条目"]:
+            for j in todict[i]:
+                ttarget = ['机制源', target, i,j]
+                if isinstance(todict[i][j], dict):
+                    if "混合文字" in todict[i][j]:
+                        ability.change_combine_txt(todict[i], j, text_base, all_json, target, ttarget + ['混合文字'])
                     else:
-                        ability.loop_check(todict[i], text_base, all_json, target, ttarget)
+                        ability.loop_check(todict[i][j], text_base, all_json, target, ttarget)
     # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
     for target in tlist:
-        ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, '内容', ['机制源', target, '内容'])
+        ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, target, ['机制源', target, '内容'])
         # 上面将文字全部转化掉
         # 下面把序列级数合并成为一串文字，以方便调用
         for i in all_json['机制'][target]['内容']:
