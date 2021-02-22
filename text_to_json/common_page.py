@@ -389,7 +389,7 @@ def create_upgrade_buff(json_dict):
                 jj += 1
                 j = str(jj)
                 if j in json_dict[str(i)]:
-                    if json_dict[str(i)][j]['名称'] != '':
+                    if json_dict[str(i)][j]['名称'] != '' and json_dict[str(i)][j]['名称'][0]!='#':
                         if jj == 1:
                             retxt += '：包含'
                         else:
@@ -405,8 +405,9 @@ def create_upgrade_buff(json_dict):
                 if j in json_dict[str(i)]:
                     if json_dict[str(i)][j]['简述'] != '' and json_dict[str(i)][j]['简述'] not in compeat_descripe:
                         compeat_descripe.append(json_dict[str(i)][j]['简述'])
-                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)][j]['名称'] + '</span>：' + \
-                                 json_dict[str(i)][j]['简述'] + '</td></tr>'
+                        if json_dict[str(i)][j]['名称'][0]!='#':
+                            retxt+='<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)][j]['名称'] + '</span>'
+                        retxt += '<tr><td></td><td>' + json_dict[str(i)][j]['简述'] + '</td></tr>'
                 else:
                     break
         else:

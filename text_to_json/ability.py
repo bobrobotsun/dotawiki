@@ -1231,14 +1231,17 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
     if seps=='数量':
         retxt=str(len(all_results_with_sort_mark))#这个地方直接用=是为了防止之前加入一些奇怪的东西
     else:
-        sorttime = len(all_results_with_sort_mark[0])
-        for i in range(1, sorttime):
-            reverse = all_results_with_sort_mark[0][i][1] == '-'
-            all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
-        for i in range(len(all_results_with_sort_mark)):
-            if i > 0:
-                retxt += seps
-            retxt += all_results_with_sort_mark[i][0]
+        if len(all_results_with_sort_mark)>0:
+            sorttime = len(all_results_with_sort_mark[0])
+            for i in range(1, sorttime):
+                reverse = all_results_with_sort_mark[0][i][1] == '-'
+                all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
+            for i in range(len(all_results_with_sort_mark)):
+                if i > 0:
+                    retxt += seps
+                retxt += all_results_with_sort_mark[i][0]
+        else:
+            retxt=''
     return retxt
 
 
