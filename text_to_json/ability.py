@@ -956,7 +956,7 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
                     temp = temp[json[str(i)]]
                 else:
                     break
-            rere[0][0].append(change_str_to_float(temp))
+            rere[0][0].append(change_str_to_int(temp))
         else:
             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
     elif json['0']=='全部文字属性':
@@ -1228,14 +1228,17 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
                 if bool:
                     for k in range(len(result)):
                         all_results_with_sort_mark.append(change_the_right_result_json_to_text_to_show(conditions, result[k], all_json[i][j], all_json, target))
-    sorttime = len(all_results_with_sort_mark[0])
-    for i in range(1, sorttime):
-        reverse = all_results_with_sort_mark[0][i][1] == '-'
-        all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
-    for i in range(len(all_results_with_sort_mark)):
-        if i>0:
-            retxt+=seps
-        retxt += all_results_with_sort_mark[i][0]
+    if seps=='数量':
+        retxt=str(len(all_results_with_sort_mark))#这个地方直接用=是为了防止之前加入一些奇怪的东西
+    else:
+        sorttime = len(all_results_with_sort_mark[0])
+        for i in range(1, sorttime):
+            reverse = all_results_with_sort_mark[0][i][1] == '-'
+            all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
+        for i in range(len(all_results_with_sort_mark)):
+            if i > 0:
+                retxt += seps
+            retxt += all_results_with_sort_mark[i][0]
     return retxt
 
 

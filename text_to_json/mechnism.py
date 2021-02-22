@@ -26,6 +26,15 @@ def get_source_to_data(all_json, tlist, version, text_base):
         todict["版本"] = version
         for i in ["图片", "迷你图片", "简述"]:
             todict[i] = fromdict[i]
+        todict['属性'] = {}
+        for i in fromdict['属性']:
+            dictkey = i
+            if fromdict['属性'][i]['标识'] != '':
+                dictkey = fromdict['属性'][i]['标识']
+            todict['属性'][dictkey] = {}
+            for j in fromdict['属性'][i]:
+                if j!='标识' and fromdict['属性'][i][j]!='':
+                    todict['属性'][dictkey][j]=fromdict['属性'][i][j]
         for i in ["简单条目", "具体条目"]:
             todict[i]={}
             for j in fromdict[i]:
@@ -55,7 +64,7 @@ def get_source_to_data(all_json, tlist, version, text_base):
                     ability.change_combine_txt(todict, i, text_base, all_json, target, ttarget + ['混合文字'])
                 else:
                     ability.loop_check(todict[i], text_base, all_json, target, ttarget)
-        for i in ["简单条目", "具体条目"]:
+        for i in ["属性","简单条目", "具体条目"]:
             for j in todict[i]:
                 ttarget = ['机制源', target, i,j]
                 if isinstance(todict[i][j], dict):
