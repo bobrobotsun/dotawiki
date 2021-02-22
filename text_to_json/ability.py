@@ -1256,8 +1256,23 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         for i in range(len(conditions['排序'])):
             sort_mark+=find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target)
     if conditions['函数'][0][0] == '短':
+        another_image = ''
+        another_name = ''
         another_info = ''
         traitlist = []
+
+        if '条件升级图片' in conditions:
+            for i in range(len(conditions['条件升级图片'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target)
+                if '升级来源' in tempjson:
+                    for j in tempjson['升级来源']:
+                        another_image+='[[file:' + tempjson['升级来源']['图片'] + '|x22px|link=]]'
+        if '条件名称' in conditions:
+            for i in range(len(conditions['条件名称'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target)
+                if isinstance(tempjson, str):
+                    another_name += '('+tempjson+')'
+
         if '条件属性' in conditions:
             for i in range(len(conditions['条件属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件属性'][i], i, json, result, target)
@@ -1280,8 +1295,9 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     another_info +=';'
                 another_info += common_page.create_upgrade_text(json["属性"], traitlist[i], image_size='x18px')
             another_info += ')'
-        retxt += '[[file:' + json['迷你图片'] + '|x24px|link=]][[' + json['页面名'] + ']]' + another_info
+        retxt += '[[file:' + json['迷你图片'] + '|x24px|link=]]'+another_image+'[[' + json['页面名'] + ']]' +another_name+ another_info
     else:  # 普通的ability_desc
+        another_image = ''
         another_name = ''
         trait = ''
         traitlist = []
@@ -1289,6 +1305,13 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         note = ''
         if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
             another_name += '(' + json['中文名'] + ')'
+
+        if '条件升级图片' in conditions:
+            for i in range(len(conditions['条件升级图片'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target)
+                if '升级来源' in tempjson:
+                    for j in tempjson['升级来源']:
+                        another_image+='[[file:' + tempjson['升级来源'][j]['图片'] + '|x22px|link=' + tempjson['升级来源'][j]['名称'] + ']]'
         if '条件名称' in conditions:
             for i in range(len(conditions['条件名称'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target)
@@ -1353,7 +1376,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                  '<span class="dota-ability-image">[[file:' + json['图片'] + '|72px|link=]]</span>' \
                                                                            '<span class="dota-ability-right">' \
                                                                            '<div class="dota-ability-title"><span>' + minisource + '[[' + json[
-                     '页面名'] + ']]' + another_name + '</span></div>' \
+                     '页面名'] + ']]' + another_image+another_name + '</span></div>' \
                                                     '<div class="dota-ability-desc">' + trait + mech + note + '</div></span></div>'
     return [retxt] + sort_mark
 

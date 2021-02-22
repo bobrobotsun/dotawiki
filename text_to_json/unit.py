@@ -88,6 +88,7 @@ def get_hero_data_from_txt(base_txt, address):
 
 def fulfill_unit_json(base_txt, all_json, version,name_base):
     for i in all_json:
+        all_json[i]["页面名"] = i
         all_json[i]["分类"] = "非英雄单位"
         all_json[i]["版本"] = version
         all_json[i]['曾用名'] = []
