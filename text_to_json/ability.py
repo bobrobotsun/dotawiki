@@ -1344,8 +1344,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                             raise (editerror(target[0], target[1], '在调用第' + str(i) + '条【条件属性】时，没有找到【' + json['页面名'] + '】的第' + str(tempjson[k]) + '条【属性】'))
                     else:
                         break
-                if '简述' in tempjson:
-                    note += '<div style="color:#3f5a67">' + tempjson['简述'] + '</div>'
+                if '简述' in tempjson and tempjson['简述']!='':
+                    note += '<div>' + tempjson['简述'] + '</div>'
         for i in traitlist:
             trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i, image_size='x18px') + '</div>'
 
@@ -1369,8 +1369,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         if '条件注释' in conditions:
             for i in range(len(conditions['条件注释'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件注释'][i], i, json, result, target)
-                if isinstance(tempjson,str):
-                    note += '<div style="color:#3f5a67">' + tempjson + '</div>'
+                if isinstance(tempjson,str) and tempjson!='':
+                    note += '<div>' + tempjson + '</div>'
 
         if '次级分类' in json:
             if json['次级分类'] == '神杖技能':
@@ -1755,7 +1755,8 @@ def combine_numbers_post_level(arr, post, level):
             re += better_float_to_text(arr[level])
         else:
             re += better_float_to_text(arr[0])
-        re += post
+        if re[-1].isnumeric():
+            re += post
     else:
         for i in range(len(arr)):
             if i > 0:
@@ -1763,7 +1764,8 @@ def combine_numbers_post_level(arr, post, level):
                     re += ' '
                 re += "/"
             re += better_float_to_text(arr[i])
-            re += post
+            if re[-1].isnumeric():
+                re += post
     return re
 
 

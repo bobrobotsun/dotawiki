@@ -389,7 +389,7 @@ def create_upgrade_buff(json_dict):
                 jj += 1
                 j = str(jj)
                 if j in json_dict[str(i)]:
-                    if json_dict[str(i)][j]['名称'] != '' and json_dict[str(i)][j]['名称'][0]!='#':
+                    if json_dict[str(i)][j]['名称'] != '' and json_dict[str(i)][j]['名称'][0] != '#':
                         if jj == 1:
                             retxt += '：包含'
                         else:
@@ -405,9 +405,10 @@ def create_upgrade_buff(json_dict):
                 if j in json_dict[str(i)]:
                     if json_dict[str(i)][j]['简述'] != '' and json_dict[str(i)][j]['简述'] not in compeat_descripe:
                         compeat_descripe.append(json_dict[str(i)][j]['简述'])
-                        if json_dict[str(i)][j]['名称'][0]!='#':
-                            retxt+='<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)][j]['名称'] + '</span>'
-                        retxt += '<tr><td></td><td>' + json_dict[str(i)][j]['简述'] + '</td></tr>'
+                        retxt += '<tr><td></td><td>'
+                        if json_dict[str(i)][j]['名称'][0] != '#':
+                            retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)][j]['名称'] + '</span>'
+                        retxt += json_dict[str(i)][j]['简述'] + '</td></tr>'
                 else:
                     break
         else:
@@ -832,9 +833,9 @@ def create_navboxunit(json_base):
 
 
 def create_page_logs(title, log_base, log_list, name_base):
-    retxt=''
+    retxt = ''
     retxt += '<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;">\n<tr><th colspan=2>' + title + '</th></tr>' + '\n<tr><td>游戏本体</td><td>' + \
-            log_base['游戏本体'] + '</td></tr>' + '\n<tr><td>更新日期</td><td>' + log_base['更新日期'] + '</td></tr>'
+             log_base['游戏本体'] + '</td></tr>' + '\n<tr><td>更新日期</td><td>' + log_base['更新日期'] + '</td></tr>'
     if log_base['地图作者'] != '':
         retxt += '\n<tr><td>作者</td><td>' + log_base['地图作者'] + '</td></tr>'
     junior = False
@@ -1168,26 +1169,27 @@ def create_page_item(json_base, log_base, log_list, item):
 
 def create_page_mechnism(json_base, log_base, log_list, mech):
     db = json_base['机制'][mech]
-    retxt=''
-    if db['图片'] !='':
-        retxt+='[[file:'+db['图片']+'|120px|right]]'
+    retxt = ''
+    if db['图片'] != '':
+        retxt += '[[file:' + db['图片'] + '|120px|right]]'
     retxt += db['简述']
     for i in db['内容']:
         retxt += '\n<br/>\n'
         titles = db['内容'][i]['标题级数']
-        for es in range(titles):
-            retxt += '='
-        retxt += i
-        for es in range(titles):
-            retxt += '='
+        if titles>0:
+            for es in range(titles):
+                retxt += '='
+            retxt += i
+            for es in range(titles):
+                retxt += '='
         for j in db['内容'][i]['内容']:
-            retxt += '\n'+ db['内容'][i]['内容'][j]['内容'] + '\n'
+            retxt += '\n' + db['内容'][i]['内容'][j]['内容'] + '\n'
     retxt += '\n==感谢您的阅读==\n以上内容均通过特殊方式上传，如果您觉得我们写的东西错了，请通过以下方式告知我们：' \
              '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]\n#QQ群：539026033\n#新浪微博：[http://weibo.com/5617043593 DotA中文wiki]' \
              '\n*若您明白我们的编写规则和逻辑，那么您也可以直接进入页面进行修改[[Data:' + mech + '/源.json]]、[[Data:' + mech + '.json]]' \
                                                                                                '[[分类:机制]][[分类:生成机制]]'
-    if db['次级分类']!='':
-        retxt+='[[分类:'+db['次级分类']+']]'
+    if db['次级分类'] != '':
+        retxt += '[[分类:' + db['次级分类'] + ']]'
     rere = ''
     nums = 0
     for i in range(len(retxt)):
