@@ -824,6 +824,8 @@ class Main(QMainWindow):
         self.ml['图片处理'] = {0: self.ml[0].addMenu('图片处理')}
         self.ml['图片处理']['下载图片'] = self.ml['图片处理'][0].addAction('下载图片')
         self.ml['图片处理']['下载图片'].triggered.connect(lambda: self.download_images())
+        self.ml['图片处理']['下载单个图片'] = self.ml['图片处理'][0].addAction('下载单个图片')
+        self.ml['图片处理']['下载单个图片'].triggered.connect(lambda: self.download_one_json_image())
 
         """
         制作一个默认的单位统称列表，具体效果见edit_json.py
@@ -1390,6 +1392,27 @@ class Main(QMainWindow):
                 k += 1
                 if k >= 5:
                     return ['《' + image_name + '》下载失败！错误原因为' + download_info.reason, 0]
+
+    def download_one_json_image(self):
+        self.w = upload_text('开始下载图片')
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6,
+                           self.screen_size[1] * 0.7)
+        self.w.setWindowIcon(self.icon)
+        self.w.setWindowTitle('下载图片中……')
+        QApplication.processEvents()
+        s1 = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        s2 = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
+        all_upload = []
+        if '图片' in self.json_base[s1][s2] and self.json_base[s1][s2]['图片'] != '' and self.json_base[s1][s2]['图片'] not in all_upload:
+            all_upload.append(self.json_base[s1][s2]['图片'])
+        if '迷你图片' in self.json_base[s1][s2] and self.json_base[s1][s2]['迷你图片'] != '' and self.json_base[s1][s2]['迷你图片'] not in all_upload:
+            all_upload.append(self.json_base[s1][s2]['迷你图片'])
+        total_num = len(all_upload)
+        self.w.confirm_numbers(total_num)
+        for i in range(total_num):
+            self.w.addtext(self.download_one_image(all_upload[i]), i)
+            QApplication.processEvents()
+        QMessageBox.information(self.w, '下载完毕', "您已下载完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
     def download_images(self, chosen=''):
         self.w = upload_text('开始下载图片')

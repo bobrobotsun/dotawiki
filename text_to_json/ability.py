@@ -815,19 +815,24 @@ def change_combine_txt(json, ii, data, all_json, name, target):
         i += 1
         if str(i) in json[ii]["混合文字"]:
             if isinstance(json[ii]["混合文字"][str(i)], dict):
-                if json[ii]["混合文字"][str(i)]['类型'] == '' or json[ii]["混合文字"][str(i)]['类型'] == '数据':
+                if json[ii]["混合文字"][str(i)]['类型'] == '' or json[ii]["混合文字"][str(i)]['类型'] == '数据' or json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
+                    if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
+                        if len(json[ii]["混合文字"][str(i)]['类型']) <= 2 or json[ii]["混合文字"][str(i)]['类型'][2] == '0':
+                            returntxt += '<div class="dota_rotatey_transform_switch_content0">'
+                        else:
+                            returntxt += '<div class="dota_rotatey_transform_switch_content1">'
                     j = 0
                     while True:
                         j += 1
                         if str(j) in json[ii]["混合文字"][str(i)]:
                             if json[ii]["混合文字"][str(i)][str(j)]["0"][-2:] == "属性":
                                 if json[ii]["混合文字"][str(i)][str(j)]["1"] == "":
-                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = target[0] if target[0][-1]!='源' else target[0][:-1]
+                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = target[0] if target[0][-1] != '源' else target[0][:-1]
                                 if json[ii]["混合文字"][str(i)][str(j)]["2"] == "":
                                     json[ii]["混合文字"][str(i)][str(j)]["2"] = name
                             elif json[ii]["混合文字"][str(i)][str(j)]["0"] == "数据库":
                                 if json[ii]["混合文字"][str(i)][str(j)]["1"] == "":
-                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = target[0] if target[0][-1]!='源' else target[0][:-1]
+                                    json[ii]["混合文字"][str(i)][str(j)]["1"] = target[0] if target[0][-1] != '源' else target[0][:-1]
                                 if json[ii]["混合文字"][str(i)][str(j)]["2"] == "":
                                     json[ii]["混合文字"][str(i)][str(j)]["2"] = all_json[target[0]][name]["代码"]
                         else:
@@ -862,10 +867,15 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                                 returntxt += "|x18px|link=" + k + "]]"
                             returntxt += combine_numbers_post_level(temp[j][0], post, level)
                         returntxt += ")"
+                    if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
+                        returntxt += '</div>'
                 elif json[ii]["混合文字"][str(i)]['类型'] == '检索' or json[ii]["混合文字"][str(i)]['类型'] == '查询':
                     ttarget = copy.deepcopy(target)
                     ttarget.append(str(i))
                     returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget)
+                elif json[ii]["混合文字"][str(i)]['类型'] == '按钮切换':
+                    returntxt += '<div class="hidden-xs dota_rotatey_transform_switch" data-switch-state="1"></div>'\
+                                 +'<div class="visible-xs-block hidden-lg hidden-md hidden-sm dota_rotatey_transform_switch" data-switch-state="0"></div>'
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:
@@ -959,27 +969,27 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
             rere[0][0].append(change_str_to_int(temp))
         else:
             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
-    elif json['0']=='全部文字属性':
+    elif json['0'] == '全部文字属性':
         temp = all_json[json["1"]][json["2"]]
-        temptext=''
-        seps=json['符号']
-        ii=2
+        temptext = ''
+        seps = json['符号']
+        ii = 2
         while True:
-            ii+=1
-            i=str(ii)
-            if i in json and json[i] !='':
+            ii += 1
+            i = str(ii)
+            if i in json and json[i] != '':
                 if json[i] in temp:
-                    temp=temp[json[i]]
+                    temp = temp[json[i]]
                 else:
-                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中第'+i+'项' + json[i] + '的内容'))
+                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中第' + i + '项' + json[i] + '的内容'))
             else:
                 break
-        if isinstance(temp,dict):
+        if isinstance(temp, dict):
             for i in temp:
-                if isinstance(temp[i],str):
-                    if temptext!='':
-                        temptext +=seps
-                    temptext+=temp[i]
+                if isinstance(temp[i], str):
+                    if temptext != '':
+                        temptext += seps
+                    temptext += temp[i]
         rere[0][0].append(temptext)
     elif json['0'] == '图片链接':
         temp = all_json[json["1"]][json["2"]]
@@ -1220,7 +1230,7 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
     retxt = ''
     all_results_with_sort_mark = []
     conditions = change_json_to_condition_dict(json, target)
-    seps=json['后缀']
+    seps = json['后缀']
     for i in all_json:
         if i[-1] != '源':
             for j in all_json[i]:
@@ -1228,10 +1238,10 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
                 if bool:
                     for k in range(len(result)):
                         all_results_with_sort_mark.append(change_the_right_result_json_to_text_to_show(conditions, result[k], all_json[i][j], all_json, target))
-    if seps=='数量':
-        retxt=str(len(all_results_with_sort_mark))#这个地方直接用=是为了防止之前加入一些奇怪的东西
+    if seps == '数量':
+        retxt = str(len(all_results_with_sort_mark))  # 这个地方直接用=是为了防止之前加入一些奇怪的东西
     else:
-        if len(all_results_with_sort_mark)>0:
+        if len(all_results_with_sort_mark) > 0:
             sorttime = len(all_results_with_sort_mark[0])
             for i in range(1, sorttime):
                 reverse = all_results_with_sort_mark[0][i][1] == '-'
@@ -1241,7 +1251,7 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
                     retxt += seps
                 retxt += all_results_with_sort_mark[i][0]
         else:
-            retxt=''
+            retxt = ''
     return retxt
 
 
@@ -1260,7 +1270,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 minisource += '[[' + json['技能归属'] + ']] - '
     if '排序' in conditions:
         for i in range(len(conditions['排序'])):
-            sort_mark+=find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target)
+            sort_mark += find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target)
     if conditions['函数'][0][0] == '短':
         another_image = ''
         another_name = ''
@@ -1272,12 +1282,12 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target)
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
-                        another_image+='[[file:' + tempjson['升级来源']['图片'] + '|x22px|link=]]'
+                        another_image += '[[file:' + tempjson['升级来源']['图片'] + '|x22px|link=]]'
         if '条件名称' in conditions:
             for i in range(len(conditions['条件名称'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target)
                 if isinstance(tempjson, str):
-                    another_name += '('+tempjson+')'
+                    another_name += '(' + tempjson + ')'
 
         if '条件属性' in conditions:
             for i in range(len(conditions['条件属性'])):
@@ -1294,14 +1304,19 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                             raise (editerror(target[0], target[1], '在调用第' + str(i) + '条【条件属性】时，没有找到【' + json['页面名'] + '】的第' + str(tempjson[k]) + '条【属性】'))
                     else:
                         break
-        if len(traitlist)>0:
+        if len(traitlist) > 0:
             another_info += '('
             for i in range(len(traitlist)):
-                if i>0:
-                    another_info +=';'
+                if i > 0:
+                    another_info += ';'
                 another_info += common_page.create_upgrade_text(json["属性"], traitlist[i], image_size='x18px')
             another_info += ')'
-        retxt += '[[file:' + json['迷你图片'] + '|x24px|link=]]'+another_image+'[[' + json['页面名'] + ']]' +another_name+ another_info
+
+        if '条件物品属性' in conditions:
+            for i in conditions['条件物品属性']:
+                another_info += '(' + number_to_string(json[i[0]]['1']) + json[i[0]]['后缀'] + ')'
+
+        retxt += '[[file:' + json['迷你图片'] + '|x24px|link=]]' + another_image + '[[' + json['页面名'] + ']]' + another_name + another_info
     else:  # 普通的ability_desc
         another_image = ''
         another_name = ''
@@ -1317,12 +1332,12 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target)
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
-                        another_image+='[[file:' + tempjson['升级来源'][j]['图片'] + '|x22px|link=' + tempjson['升级来源'][j]['名称'] + ']]'
+                        another_image += '[[file:' + tempjson['升级来源'][j]['图片'] + '|x22px|link=' + tempjson['升级来源'][j]['名称'] + ']]'
         if '条件名称' in conditions:
             for i in range(len(conditions['条件名称'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target)
                 if isinstance(tempjson, str):
-                    another_name += '('+tempjson+')'
+                    another_name += '(' + tempjson + ')'
         if '属性名' in conditions:
             for i in conditions['属性名'][0]:
                 for j in json['属性']:
@@ -1344,10 +1359,14 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                             raise (editerror(target[0], target[1], '在调用第' + str(i) + '条【条件属性】时，没有找到【' + json['页面名'] + '】的第' + str(tempjson[k]) + '条【属性】'))
                     else:
                         break
-                if '简述' in tempjson and tempjson['简述']!='':
+                if '简述' in tempjson and tempjson['简述'] != '':
                     note += '<div>' + tempjson['简述'] + '</div>'
         for i in traitlist:
             trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i, image_size='x18px') + '</div>'
+
+        if '条件物品属性' in conditions:
+            for i in conditions['条件物品属性']:
+                trait += '<div>' + i[0] + '：' + number_to_string(json[i[0]]['1']) + json[i[0]]['后缀'] + '</div>'
 
         if '条件机制' in conditions:
             for i in range(len(conditions['条件机制'])):
@@ -1369,7 +1388,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         if '条件注释' in conditions:
             for i in range(len(conditions['条件注释'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件注释'][i], i, json, result, target)
-                if isinstance(tempjson,str) and tempjson!='':
+                if isinstance(tempjson, str) and tempjson != '':
                     note += '<div>' + tempjson + '</div>'
 
         if '次级分类' in json:
@@ -1382,8 +1401,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                  '<span class="dota-ability-image">[[file:' + json['图片'] + '|72px|link=]]</span>' \
                                                                            '<span class="dota-ability-right">' \
                                                                            '<div class="dota-ability-title"><span>' + minisource + '[[' + json[
-                     '页面名'] + ']]' + another_image+another_name + '</span></div>' \
-                                                    '<div class="dota-ability-desc">' + trait + mech + note + '</div></span></div>'
+                     '页面名'] + ']]' + another_image + another_name + '</span></div>' \
+                                                                    '<div class="dota-ability-desc">' + trait + mech + note + '</div></span></div>'
     return [retxt] + sort_mark
 
 
@@ -1435,19 +1454,19 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target):
                     return [[_max, condition[j + 1]]]
             else:
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【条件属性】第' + str(j) + '项时，您的排序没有声明升降序，或声明发生了错误'))
-        elif condition[j]=='@技能':
-            if tempjson['分类']=='技能':
+        elif condition[j] == '@技能':
+            if tempjson['分类'] == '技能':
                 p = Pinyin()
-                list1=[tempjson['技能排序'], '+']
-                list2=[p.get_pinyin(tempjson['技能归属']), '+']
+                list1 = [tempjson['技能排序'], '+']
+                list2 = [p.get_pinyin(tempjson['技能归属']), '+']
                 indexdict = {'英雄技能': 1, '非英雄单位技能': 2, '物品技能': 3}
-                indexkey=tempjson['次级分类']
-                list3=[]
+                indexkey = tempjson['次级分类']
+                list3 = []
                 if indexkey in indexdict:
-                    list3=[indexdict[indexkey],'+']
+                    list3 = [indexdict[indexkey], '+']
                 else:
-                    list3=[1,'+']
-                return [list1,list2,list3]
+                    list3 = [1, '+']
+                return [list1, list2, list3]
             else:
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【条件属性】第' + str(j) + '项时，查询到的不是技能，请重新确定自己【满足】条件'))
         elif condition[j] == '@pinyin' or condition[j] == '@拼音':
@@ -1585,6 +1604,10 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                         all_bools = not operation_number_str_equal(tempjson, condition[ii + 1])
                     elif i == '@<' or i == '@<=' or i == '@>' or i == '@>=':
                         all_bools = operation_number_check(tempjson, condition[ii + 1], i[1:])
+                    elif i == '@in':
+                        all_bools = isinstance(tempjson, dict) and condition[ii + 1] in tempjson
+                    elif i == '@notin':
+                        all_bools = isinstance(tempjson, dict) and condition[ii + 1] not in tempjson
                     else:
                         raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
                     ii += 1
