@@ -490,7 +490,7 @@ def create_page_ability(db):
     retxt += '<h4 id="' + db["代码"] + '"  style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db[
         "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%">\'\'\'[[Data:' + db[
                  "数据来源"] + '/源.json|S]] [[Data:' + db[
-                 "页面名"] + '.json|J]]\'\'\'</span><br/>' + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + \
+                 "页面名"] + '.json|J]]\'\'\'</span><br>' + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + \
              db[
                  "中文名"] + '</span>' + '<span style="font-size:12px;color:#ccc;white-space: nowrap;padding: 2px; width:75px;overflow: hidden;text-overflow: ellipsis;text-align: center;"> ' + \
              db["英文名"] + '</span></div>'
@@ -615,7 +615,7 @@ def get_unit_upgrade_double(db1, db2, combine='~', post=''):
         i = str(ii)
         if i in db1:
             if ii > 1:
-                retxt += '<br/>'
+                retxt += '<br>'
                 for j, w in db1[i]['升级来源'].items():
                     retxt += '[[file:' + w["图片"] + '|16px|link=' + w["名称"] + ']]'
             jj = 0
@@ -649,7 +649,7 @@ def create_infobox_unit(db):
     data = 'style="border:1px solid white;padding:0px 8px;background:#000;text-align:left;"'
     retxt = '<table class="infobox" style="text-align:center;background:#222;width:300px;color:#fff;margin-top:12px;margin-right:12px;"><tr class="infobox-title">' \
             + '<th colspan=2 style="background:#000;padding:8px 16px 0 16px;text-align:center;"><span style="font-size:36px;">' \
-            + get_unit_value(db["中文名"]) + '</span><br/><span style="font-size:24px;text-align:center;">' + get_unit_value(db["英文名"]) + '</span></th></tr>'
+            + get_unit_value(db["中文名"]) + '</span><br><span style="font-size:24px;text-align:center;">' + get_unit_value(db["英文名"]) + '</span></th></tr>'
     if db["图片"] != '':
         retxt += '<tr><td colspan=2 style="background:#fff">[[file:' + db["图片"] + '|200px|center|link=' + db["页面名"] + ']]</td></tr>'
     retxt += '<tr><td ' + label + '>是否远古单位</td><td ' + data + '>'
@@ -664,9 +664,9 @@ def create_infobox_unit(db):
         retxt += '否'
     retxt += '</td></tr>'
     show_in_infobox = [['等级', [['等级']]], ['奖励金钱', [['金钱下限', '金钱上限']]], ['奖励经验', [['经验']]], ['远近程', [['近战远程']]], ['攻击警觉范围', [['警戒范围']]], ['生命值', [['生命值']]]
-        , ['魔法值', [['魔法值']]], ['生命恢复', [['生命恢复']]], ['魔法恢复', [['魔法恢复']]], ['攻击力<br/>（攻击类型）', [['攻击下限', '攻击上限']], '<br/>（', [['攻击类型']], '）']
+        , ['魔法值', [['魔法值']]], ['生命恢复', [['生命恢复']]], ['魔法恢复', [['魔法恢复']]], ['攻击力<br>（攻击类型）', [['攻击下限', '攻击上限']], '<br>（', [['攻击类型']], '）']
         , ['攻击距离+不中断距离', [['攻击距离']], '+', [['攻击距离缓冲']]], ['攻击前摇', [['攻击前摇']]], ['弹道速度', [['弹道速度']]], ['基础攻击间隔', [['攻击间隔']]]
-        , ['护甲<br/>（护甲类型）', [['护甲']], '<br/>（', [['护甲类型']], '）'], ['转身速率', [['转身速率']]], ['移动速度', [['移动速度']]], ['魔法抗性', [['魔法抗性'], lambda x: '%']]
+        , ['护甲<br>（护甲类型）', [['护甲']], '<br>（', [['护甲类型']], '）'], ['转身速率', [['转身速率']]], ['移动速度', [['移动速度']]], ['魔法抗性', [['魔法抗性'], lambda x: '%']]
         , ['移动类型', [['移动方式']]], ['跟随距离', [['跟随距离']]], ['白天视野/夜晚视野', [['白天视野']], '|', [['夜晚视野']]], ['碰撞体积', [['碰撞体积']]], ['模型大小', [['模型比例']]]]
     for i in show_in_infobox:
         if len(db[i[1][0][0]]) > 0:
@@ -726,14 +726,14 @@ def create_infobox_item(db):
         retxt += '<tr><td colspan=2 style="background:#a03030;padding:4px;text-align:center;">' + '可合成</td></tr><tr><td colspan=2 style="background:#222;padding:6px;">'
         for i, v in db['升级'].items():
             if int(i) % 4 == 1 and int(i) > 1:
-                retxt += '<br/><br/>'
+                retxt += '<br><br>'
             retxt += ' [[file:' + v["图片"] + '|48px|link=' + v["物品名"] + ']] '
         retxt += '</td></tr>'
     if '组件' in db:
         retxt += '<tr><td colspan=2 style="background:#a03030;padding:4px;text-align:center;">' + '配方</td></tr><tr><td colspan=2 style="background:#222;padding:6px;">'
         for i, v in db['组件'].items():
             if int(i) % 4 == 1 and int(i) > 1:
-                retxt += '<br/><br/>'
+                retxt += '<br><br>'
             retxt += ' [[file:' + v["图片"] + '|48px|link=' + v["物品名"] + ']] '
         if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
             retxt += ' [[file:items recipe.png|48px|link=]] '
@@ -872,7 +872,7 @@ def create_page_logs(title, log_base, log_list, name_base):
         retxt += '\n<tr><td>小更新</td><td>'
         for i in range(len(log_base['次级版本'])):
             if i > 0:
-                retxt += '<br/>'
+                retxt += '<br>'
             retxt += '[[' + log_base['次级版本'][i] + ']]'
     if '官网链接' in log_base and log_base['官网链接'] != '' and log_base['官网链接'] != '-':
         retxt += '\n<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
@@ -938,7 +938,7 @@ def create_page_logs(title, log_base, log_list, name_base):
                                 retxt += '\t'
                             retxt += '</ul>'
                         if len(w) > 3:
-                            retxt += '\n<br/>'
+                            retxt += '\n<br>'
     retxt += '\n[[分类:版本更新]]'
     return retxt
 
@@ -1025,7 +1025,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
         retxt += '<div class="full-width-xs" style="padding:0.5em;display:block;">' \
                  + '<div style="float:left;margin-right:0.5em;">[[file:dota hero ' + db["代码名"] + '.png|link=|64px]]</div>' \
                  + '<div>' \
-                 + '<div style="display:inline-block;">' + db["dota中文别名"] + '&nbsp;' + db["dota英文别名"] + '</div><br/>' \
+                 + '<div style="display:inline-block;">' + db["dota中文别名"] + '&nbsp;' + db["dota英文别名"] + '</div><br>' \
                  + '<div style="display:inline-block;margin-left:1em"><small>' + db["dota中文名"] + '&nbsp;' + db["dota英文名"] + '</small></div>' \
                  + '</div>' \
                  + '</div>'
@@ -1079,7 +1079,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
         else:
             retxt += db["关联类型"]
     if "简介" in db and db["简介"] != '':
-        retxt += '<br/>' + db["简介"]
+        retxt += '<br>' + db["简介"]
     if db["中立生物"]["1"]["1"] == 1:
         # 这里有个东西，是关于野怪营地的东西，目前还没办法改动
         retxt += '<h2>营地</h2>{{#arraymap:{{#ask:[[Creep type::' + db['页面名'] + ']]|link=none}}|,|@@@|[[{{#ask:[[has subobject::@@@]]|?name|mainlabel=-|headers=hide}}]]}}'
@@ -1088,7 +1088,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
         for i, v in db['源技能'].items():
             if v in json_base['技能']:
                 sdb = json_base['技能'][v]
-                retxt += '<br/><div>[[' + v + ']]<br/>:[[file:' + sdb['图片'] + '|64px|link=' + sdb['页面名'] + '|left]]' + sdb['描述'] \
+                retxt += '<br><div>[[' + v + ']]<br>:[[file:' + sdb['图片'] + '|64px|link=' + sdb['页面名'] + '|left]]' + sdb['描述'] \
                          + create_upgrade_manacost(sdb['魔法消耗']) + create_upgrade_cooldown(sdb['冷却时间']) + '</div>'
     retxt += '</div>'
     if db["类型"] == '士兵':
@@ -1122,9 +1122,9 @@ def create_page_item(json_base, log_base, log_list, item):
         if i != '1':
             retxt += '、'
         retxt += db['商店'][i] + '[[分类:' + db['商店'][i] + '物品]]'
-    retxt += '"</b>商店获得。<br/>'
+    retxt += '"</b>商店获得。<br>'
     for i, v in db['商店'].items():
-        retxt += '<br/><b>' + v + '商店</b>出售以下商品：<br/><br/>' + '<table style="font-size:16px;">'
+        retxt += '<br><b>' + v + '商店</b>出售以下商品：<br><br>' + '<table style="font-size:16px;">'
         for j, w in db["同商店物品"][i].items():
             if int(j) % 4 == 1:
                 retxt += '\n<tr>'
@@ -1138,7 +1138,7 @@ def create_page_item(json_base, log_base, log_list, item):
             for j, w in json_base['物品'].items():
                 if j != item and w['应用'] == 1 and i in w and w[i]['叠加'] == v['叠加']:
                     all_the_item_name.append([j, number_to_string(w[i]['1']) + w[i]['后缀']])
-            retxt += '<br/>多个{{I|' + item + '}}的【' + i + '】(' + number_to_string(v['1']) + v['后缀'] + ')不会叠加'
+            retxt += '<br>多个{{I|' + item + '}}的【' + i + '】(' + number_to_string(v['1']) + v['后缀'] + ')不会叠加'
             if len(all_the_item_name) > 0:
                 retxt += '，且和以下物品不叠加，仅取最高值生效：'
                 for j in range(len(all_the_item_name)):

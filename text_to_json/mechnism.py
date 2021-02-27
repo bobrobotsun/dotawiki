@@ -90,7 +90,7 @@ def get_source_to_data(all_json, tlist, version, text_base):
                         uls -= 1
                         comtext += '</ul>'
                     if uls == 0:
-                        comtext += kk['文字']+ '<br/>'
+                        comtext += kk['文字']+ '<br>'
                     else:
                         comtext += '<li>' + kk['文字'] + '</li>'
                 for k in range(uls):
