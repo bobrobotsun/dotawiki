@@ -1787,7 +1787,7 @@ def combine_numbers_post_level(arr, post, level):
                     re += ' '
                 re += "/"
             re += better_float_to_text(arr[i])
-            if re[-1].isnumeric():
+            if len(re)>0 and re[-1].isnumeric():
                 re += post
     return re
 
