@@ -872,7 +872,7 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                 elif json[ii]["混合文字"][str(i)]['类型'] == '检索' or json[ii]["混合文字"][str(i)]['类型'] == '查询':
                     ttarget = copy.deepcopy(target)
                     ttarget.append(str(i))
-                    returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget)
+                    returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget, returntxt!='')
                 elif json[ii]["混合文字"][str(i)]['类型'] == '按钮切换':
                     returntxt += '<div class="notmobile dota_rotatey_transform_switch" data-switch-state="1"></div>'\
                                  +'<div class="ismobile dota_rotatey_transform_switch" data-switch-state="0"></div>'
@@ -1226,7 +1226,7 @@ def calculate_combine_txt_numbers(list1, list2, op):
 
 
 # 查询满足条件的内容并展示
-def find_the_jsons_by_conditions_and_show(json, all_json, target):
+def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=False):
     retxt = ''
     all_results_with_sort_mark = []
     conditions = change_json_to_condition_dict(json, target)
@@ -1247,7 +1247,7 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target):
                 reverse = all_results_with_sort_mark[0][i][1] == '-'
                 all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
             for i in range(len(all_results_with_sort_mark)):
-                if i > 0:
+                if firstseps or i > 0:
                     retxt += seps
                 retxt += all_results_with_sort_mark[i][0]
         else:
