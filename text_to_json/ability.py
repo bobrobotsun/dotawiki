@@ -874,8 +874,8 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                     ttarget.append(str(i))
                     returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget, returntxt!='')
                 elif json[ii]["混合文字"][str(i)]['类型'] == '按钮切换':
-                    returntxt += '<div class="notmobile dota_rotatey_transform_switch" data-switch-state="1"></div>'\
-                                 +'<div class="ismobile dota_rotatey_transform_switch" data-switch-state="0"></div>'
+                    returntxt += '<div class="dota_hidden_menu_at_right_of_the_screen"><div class="notmobile dota_rotatey_transform_switch" data-switch-state="1"></div>'\
+                                 +'<div class="ismobile dota_rotatey_transform_switch" data-switch-state="0"></div></div>'
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:

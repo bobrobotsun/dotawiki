@@ -73,7 +73,6 @@ def get_source_to_data(all_json, tlist, version, text_base):
                     else:
                         ability.loop_check(todict[i][j], text_base, all_json, target, ttarget)
     # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
-    for target in tlist:
         ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, target, ['机制源', target, '内容'])
         # 上面将文字全部转化掉
         # 下面把序列级数合并成为一串文字，以方便调用
