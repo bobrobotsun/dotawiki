@@ -22,7 +22,7 @@ import hashlib
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from text_to_json import hero, ability, item, unit, mechnism, edit_json, dota_menus, page, common_page
+from text_to_json import hero, ability, item, unit, mechnism, unitgroup, edit_json, dota_menus, page, common_page
 from text_to_json.WikiError import editerror
 import win32con
 import win32clipboard as wincld
@@ -59,8 +59,8 @@ class Main(QMainWindow):
         self.icon = QIcon(os.path.join('material_lib', 'DOTA2.jpg'))
         # 数据库信息
         self.text_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}}
-        self.json_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}, '技能源': {}, "机制": {}, '机制源': {}}
-        self.json_name = {"英雄": [], "非英雄单位": [], "物品": [], "技能": [], '技能源': [], "机制": [], '机制源': []}
+        self.json_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}, '技能源': {}, '单位组': {}, "机制": {}, '机制源': {}}
+        self.json_name = {"英雄": [], "非英雄单位": [], "物品": [], "技能": [], '技能源': [], '单位组': [], "机制": [], '机制源': []}
         self.upgrade_base = {}
         self.mech = {}
         self.red = QBrush(Qt.red)
@@ -77,7 +77,7 @@ class Main(QMainWindow):
         # 设定软件的图标
         self.setWindowIcon(self.icon)
         # 设定窗口大小、位置至0.8倍屏幕长宽，且边缘为0.1倍长宽
-        self.setGeometry(self.screen_size[0] * 0.05, self.screen_size[1] * 0.1, self.screen_size[0] * 0.9, self.screen_size[1] * 0.8)
+        self.setGeometry(self.screen_size[0] * 0.02, self.screen_size[1] * 0.1, self.screen_size[0] * 0.96, self.screen_size[1] * 0.8)
         # 创建一个菜单栏
         self.create_menubar()
         self.main_layout()
@@ -309,6 +309,10 @@ class Main(QMainWindow):
         self.mainlayout['加载信息']['信息']['物品'].setText('【物品】')
         self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['物品'])
         self.mainlayout['加载信息']['信息'][0].addStretch(1)
+        self.mainlayout['加载信息']['信息']['单位组'] = QLabel(self)
+        self.mainlayout['加载信息']['信息']['单位组'].setText('【单位组】')
+        self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['单位组'])
+        self.mainlayout['加载信息']['信息'][0].addStretch(1)
         self.mainlayout['加载信息']['信息']['机制'] = QLabel(self)
         self.mainlayout['加载信息']['信息']['机制'].setText('【机制】')
         self.mainlayout['加载信息']['信息'][0].addWidget(self.mainlayout['加载信息']['信息']['机制'])
@@ -378,6 +382,12 @@ class Main(QMainWindow):
         self.mainlayout['列表']['物品'][0].setLayout(self.mainlayout['列表']['物品']['布局'][0])
         self.mainlayout['列表']['物品']['布局']['列表'] = QListWidget()
         self.mainlayout['列表']['物品']['布局'][0].addWidget(self.mainlayout['列表']['物品']['布局']['列表'])
+        self.mainlayout['列表']['单位组'] = {0: QGroupBox('单位组', self)}
+        self.mainlayout['列表'][0].addWidget(self.mainlayout['列表']['单位组'][0])
+        self.mainlayout['列表']['单位组']['布局'] = {0: QVBoxLayout()}
+        self.mainlayout['列表']['单位组'][0].setLayout(self.mainlayout['列表']['单位组']['布局'][0])
+        self.mainlayout['列表']['单位组']['布局']['列表'] = QListWidget()
+        self.mainlayout['列表']['单位组']['布局'][0].addWidget(self.mainlayout['列表']['单位组']['布局']['列表'])
         self.mainlayout['列表']['机制'] = {0: QGroupBox('机制', self)}
         self.mainlayout['列表'][0].addWidget(self.mainlayout['列表']['机制'][0])
         self.mainlayout['列表']['机制']['布局'] = {0: QVBoxLayout()}
@@ -721,7 +731,7 @@ class Main(QMainWindow):
     def fix_window_with_json_data(self):
         try:
             self.resort()
-            names = ['英雄', '非英雄单位', '技能', '技能源', '物品', '机制', '机制源']
+            names = ['英雄', '非英雄单位', '技能', '技能源', '物品', '单位组', '机制', '机制源']
             for i in names:
                 self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
                 self.mainlayout['列表'][i]['布局']['列表'].setIconSize(QSize(36, 28))
@@ -798,6 +808,8 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传《技能》'].triggered.connect(lambda: self.upload_all('技能'))
         self.ml['高级功能']['上传《技能源》'] = self.ml['高级功能'][0].addAction('上传《技能源》')
         self.ml['高级功能']['上传《技能源》'].triggered.connect(lambda: self.upload_all('技能源'))
+        self.ml['高级功能']['上传《单位组》'] = self.ml['高级功能'][0].addAction('上传《单位组》')
+        self.ml['高级功能']['上传《单位组》'].triggered.connect(lambda: self.upload_all('单位组'))
         self.ml['高级功能']['上传《机制》'] = self.ml['高级功能'][0].addAction('上传《机制》')
         self.ml['高级功能']['上传《机制》'].triggered.connect(lambda: self.upload_all('机制'))
         self.ml['高级功能']['上传《机制源》'] = self.ml['高级功能'][0].addAction('上传《机制源》')
@@ -816,6 +828,8 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传《物品》页面'].triggered.connect(lambda: self.upload_common_page('物品'))
         self.ml['高级功能']['上传《技能链接》页面'] = self.ml['高级功能'][0].addAction('上传《技能链接》页面')
         self.ml['高级功能']['上传《技能链接》页面'].triggered.connect(lambda: self.upload_common_page('技能'))
+        self.ml['高级功能']['上传《单位组》页面'] = self.ml['高级功能'][0].addAction('上传《单位组》页面')
+        self.ml['高级功能']['上传《单位组》页面'].triggered.connect(lambda: self.upload_common_page('单位组'))
         self.ml['高级功能']['上传《机制》页面'] = self.ml['高级功能'][0].addAction('上传《机制》页面')
         self.ml['高级功能']['上传《机制》页面'].triggered.connect(lambda: self.upload_common_page('机制'))
         """
@@ -962,6 +976,7 @@ class Main(QMainWindow):
         self.mainlayout['列表']['非英雄单位']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('非英雄单位'))
         self.mainlayout['列表']['技能']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('技能'))
         self.mainlayout['列表']['技能源']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('技能源'))
+        self.mainlayout['列表']['单位组']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('单位组'))
         self.mainlayout['列表']['机制']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('机制'))
         self.mainlayout['列表']['机制源']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('机制源'))
         for i in self.json_base:
@@ -1264,7 +1279,10 @@ class Main(QMainWindow):
                             if self.json_base[i][j]['应用'] == self.json_base["技能"][k[0]]['应用']:
                                 self.json_base[i][j]['技能'].append(k[0])
 
-            #self.resort() #这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
+            # 生成单位组信息（怀疑是个时间耗费大户）
+            unitgroup.get_source_to_data(self.json_base, self.version, self.text_base)
+
+            # self.resort() #这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
@@ -1363,6 +1381,9 @@ class Main(QMainWindow):
             for i in self.json_base['技能']:
                 page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                 all_upload.append([i, page_link_content])
+        if chosen == '单位组':
+            for i in self.json_base['单位组']:
+                all_upload.append([i, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], i)])
         if chosen == '机制':
             for i in self.json_base['机制']:
                 all_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
@@ -1447,14 +1468,14 @@ class Main(QMainWindow):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
         if not self.update_the_jsons_alreadey:
-            error_stop=True
+            error_stop = True
             self.json_base[selected][selected_name] = {}
             self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[selected][selected_name])
             self.file_save_all()
             if selected[:2] == '机制':
-                error_stop=self.update_json_base_mechanism(selected_name)
+                error_stop = self.update_json_base_mechanism(selected_name)
             else:
-                error_stop=self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
+                error_stop = self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
             if error_stop:
                 return None
             else:
@@ -1512,6 +1533,10 @@ class Main(QMainWindow):
                 if k in self.json_base['机制']:
                     all_upload.append([k + '.json', self.json_base['机制'][k]])
                     all_page.append([k, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], k)])
+
+                if k in self.json_base['单位组']:
+                    all_upload.append([k + '.json', self.json_base['单位组'][k]])
+                    all_page.append([k, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], k)])
         total_num = len(all_upload) + len(all_page)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
@@ -1708,6 +1733,9 @@ class Main(QMainWindow):
 
     def edit_category_selected_changed(self):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        if selected not in self.json_name:
+            self.json_name[selected] = []
+            self.json_base[selected] = {}
         if len(self.json_name[selected]) == 0:
             self.json_edit_new()
         else:
@@ -2089,16 +2117,16 @@ class Main(QMainWindow):
         self.edit_target_selected_changed()
 
     def json_edit_save_and_update(self):
-        error_stop=False
+        error_stop = False
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),
               self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()]
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
         if ss[0][:2] == '机制':
-            error_stop=self.update_json_base_mechanism(ss[1])
+            error_stop = self.update_json_base_mechanism(ss[1])
         else:
-            error_stop=self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
+            error_stop = self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
         self.update_the_jsons_alreadey = not error_stop
         self.edit_target_selected_changed()
 

@@ -12,14 +12,14 @@ from xpinyin import Pinyin
 
 
 # dict排序方法
-def sortedDictValues(adict, pinyin,_reverse=False):
+def sortedDictValues(adict, pinyin, _reverse=False):
     keys = []
     new = {}
     if pinyin:
         p = Pinyin()
         for i in adict:
             keys.append([p.get_pinyin(i), i])
-        keys = sorted(keys, key=lambda x:x[0],reverse=_reverse)
+        keys = sorted(keys, key=lambda x: x[0], reverse=_reverse)
         for i in keys:
             new[i[1]] = adict[i[1]]
     else:
@@ -28,13 +28,14 @@ def sortedDictValues(adict, pinyin,_reverse=False):
             new[i] = adict[i]
     return new
 
-def sortedList(alist,function=lambda x:x[0],_reverse=False):
+
+def sortedList(alist, function=lambda x: x[0], _reverse=False):
     keys = []
     new = []
     p = Pinyin()
     for i in alist:
         keys.append([p.get_pinyin(i), i])
-    keys = sorted(keys, key=function,reverse=_reverse)
+    keys = sorted(keys, key=function, reverse=_reverse)
     for i in keys:
         new.append(i[1])
     return new
@@ -97,6 +98,7 @@ edit_source = {
     '非英雄单位': ['非英雄单位'],
     '技能': [],
     '技能源': ['技能', '机制检索'],
+    '单位组': [],
     '机制': [],
     '机制源': []
 }
@@ -345,6 +347,15 @@ edit = {
                          0, True]}]
         }]
     },
+    '单位组': {
+        "页面名": ['text', ''],
+        "应用": ['int', 1],
+        "图片": ['text', ''],
+        "迷你图片": ['text', ''],
+        "次级分类": ['text', ''],
+        "成员": ['tree', {"list": ["tree", {'名称': ['text', ''], 'list': ['tree', {'单位名': ['text', '']
+            , '数量': ['tree', {'代码': ['tree', {'list': ['text', '', 0, 4, False]}]}]}, 1, 1, False]}, 1, 1, False]}]
+    },
     '机制': {
         "页面名": ['text', ''],
         "应用": ['int', 1],
@@ -360,15 +371,15 @@ edit = {
         "简单条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],
         "具体条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],
         "内容": ['tree', {"list": ['tree', {'标题': ['text', ''], '标题级数': ['int', 2],
-                                          '内容':['tree',{"list": ['tree', {'标识': ['text', ''],
-                                                                          '内容':['tree',{"list": ['tree', {'序列级数': ['int', 0], '文字': ['text', '']}, 1, 1, False]}]
-                                                                          }, 1, 1, False]}]
+                                          '内容': ['tree', {"list": ['tree', {'标识': ['text', ''],
+                                                                            '内容': ['tree', {"list": ['tree', {'序列级数': ['int', 0], '文字': ['text', '']}, 1, 1, False]}]
+                                                                            }, 1, 1, False]}]
 
                                           }, 1, 0, True]}]
     }
 }
 edit_adition = {
-    '混合文字': ['tree', {"类型": ['text', ''],"后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 4, False]}, 1, 1, False]}, 1, 0, False],
+    '混合文字': ['tree', {"类型": ['text', ''], "后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 4, False]}, 1, 1, False]}, 1, 0, False],
     '物品属性': {
         '全属性': {'代码': 'bonus_all_stats', '后缀': '', '展示前缀': '+', '展示后缀': '[[属性|全属性]]'},
         '主属性': {'代码': 'bonus_primary_stat', '后缀': '', '展示前缀': '+', '展示后缀': '[[属性|主属性]]'},

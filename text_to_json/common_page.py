@@ -1170,29 +1170,34 @@ def create_page_item(json_base, log_base, log_list, item):
 def create_page_mechnism(json_base, log_base, log_list, mech):
     db = json_base['机制'][mech]
     retxt = ''
-    if db['次级分类']!='引用机制':
+    if db['次级分类'] != '引用机制':
         if db['图片'] != '':
             retxt += '[[file:' + db['图片'] + '|120px|right]]'
     retxt += db['简述']
     for i in db['内容']:
         titles = db['内容'][i]['标题级数']
         retxt += '\n'
-        if titles>0:
+        if titles > 0:
             for es in range(titles):
                 retxt += '='
             retxt += i
             for es in range(titles):
                 retxt += '='
             retxt += '\n'
+        anotherbool = False
         for j in db['内容'][i]['内容']:
+            if anotherbool:
+                retxt += '\n'
+            else:
+                anotherbool = True
             retxt += db['内容'][i]['内容'][j]['内容'] + '\n'
-    if db['次级分类']!='引用机制':
+    if db['次级分类'] != '引用机制':
         retxt += '\n==感谢您的阅读==\n以上内容均通过特殊方式上传，如果您觉得我们写的东西错了，请通过以下方式告知我们：' \
-             '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]\n#QQ群：539026033\n#新浪微博：[https://weibo.com/u/5617043593 DotA中文wiki]' \
-             '\n*若您明白我们的编写规则和逻辑，那么您也可以直接进入页面进行修改[[Data:' + mech + '/源.json]]、[[Data:' + mech + '.json]]' \
-                                                                                               '[[分类:机制]][[分类:生成机制]]'
+                 '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]\n#QQ群：539026033\n#新浪微博：[https://weibo.com/u/5617043593 DotA中文wiki]' \
+                 '[[分类:机制]][[分类:生成机制]]'
         if db['次级分类'] != '':
             retxt += '[[分类:' + db['次级分类'] + ']]'
+        retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + mech + '/源.json]]<br>[[Data:' + mech + '.json]]</div>'
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1209,3 +1214,13 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
                 nums += 1
         rere += retxt[i]
     return rere
+
+
+def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
+    db = json_base['单位组'][unitgroup]
+    retxt = ''
+    for i in db['成员']:
+        for j in db['成员'][i]:
+            if isinstance(db['成员'][i][j], str):
+                retxt += j + '：' + db['成员'][i][j] + '<br>'
+    return retxt

@@ -47,9 +47,12 @@ def dict_to_list_first_1(dic):
 
 
 # 将数字转化为文字，取消小数点和无用末尾0
-def better_float_to_text(x):
-    if isinstance(x, float) and int(x) == x:
-        return str(int(x))
+def better_float_to_text(x,rounds=2):
+    if isinstance(x, float):
+        if int(x) == x:
+            return str(int(x))
+        else:
+            return str(round(x,rounds))
     else:
         return str(x)
 
@@ -874,8 +877,8 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                     ttarget.append(str(i))
                     returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget, returntxt!='')
                 elif json[ii]["混合文字"][str(i)]['类型'] == '按钮切换':
-                    returntxt += '<div class="dota_hidden_menu_at_right_of_the_screen"><div class="notmobile dota_rotatey_transform_switch" data-switch-state="1"></div>'\
-                                 +'<div class="ismobile dota_rotatey_transform_switch" data-switch-state="0"></div></div>'
+                    returntxt += '<div class="notmobile dota_rotatey_transform_switch dota_hidden_menu_item_at_right_of_the_screen" data-switch-state="1"></div>'\
+                                 +'<div class="ismobile dota_rotatey_transform_switch dota_hidden_menu_item_at_right_of_the_screen" data-switch-state="0"></div>'
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:
@@ -1771,7 +1774,7 @@ def expand_value_source_list_with_another_source_dict(l, d, s):
     return rel
 
 
-def combine_numbers_post_level(arr, post, level):
+def combine_numbers_post_level(arr, post='', level=0):
     re = ""
     if level > 0:
         if level < len(arr):
@@ -1790,7 +1793,6 @@ def combine_numbers_post_level(arr, post, level):
             if len(re)>0 and re[-1].isnumeric():
                 re += post
     return re
-
 
 def confirm_upgrade_info(arr):
     for i in arr:
