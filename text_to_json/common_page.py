@@ -1219,8 +1219,21 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
 def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     db = json_base['单位组'][unitgroup]
     retxt = ''
+    retxt+='<div class="dota_rotatey_transform_switch_content1">'
     for i in db['成员']:
-        for j in db['成员'][i]:
-            if isinstance(db['成员'][i][j], str):
-                retxt += j + '：' + db['成员'][i][j] + '<br>'
+        retxt += '<div>'+db['成员'][i]['大表格']+'</div>'
+    retxt+='</div><div class="dota_rotatey_transform_switch_content0">'
+    for i in db['成员']:
+        retxt += '<div>'+db['成员'][i]['小表格']+'</div>'
+    retxt+='</div>'
+
+    retxt += '\n==感谢您的阅读==\n以上内容均通过特殊方式上传，如果您觉得我们写的东西错了，请通过以下方式告知我们：' \
+             '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]\n#QQ群：539026033\n#新浪微博：[https://weibo.com/u/5617043593 DotA中文wiki]' \
+             '[[分类:单位组]]'
+    if db['次级分类'] != '':
+        retxt += '[[分类:' + db['次级分类'] + ']]'
+    retxt += '<div class="notmobile dota_rotatey_transform_switch dota_hidden_menu_item_at_right_of_the_screen" data-switch-state="1"></div>' \
+             + '<div class="ismobile dota_rotatey_transform_switch dota_hidden_menu_item_at_right_of_the_screen" data-switch-state="0"></div>' \
+               '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json]]</div>'
+
     return retxt

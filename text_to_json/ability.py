@@ -47,7 +47,7 @@ def dict_to_list_first_1(dic):
 
 
 # 将数字转化为文字，取消小数点和无用末尾0
-def better_float_to_text(x,rounds=2):
+def better_float_to_text(x,rounds=4):
     if isinstance(x, float):
         if int(x) == x:
             return str(int(x))
@@ -1774,13 +1774,13 @@ def expand_value_source_list_with_another_source_dict(l, d, s):
     return rel
 
 
-def combine_numbers_post_level(arr, post='', level=0):
+def combine_numbers_post_level(arr, post='', level=0,round=4):
     re = ""
     if level > 0:
         if level < len(arr):
-            re += better_float_to_text(arr[level])
+            re += better_float_to_text(arr[level],round)
         else:
-            re += better_float_to_text(arr[0])
+            re += better_float_to_text(arr[0],round)
         if re[-1].isnumeric():
             re += post
     else:
@@ -1789,7 +1789,7 @@ def combine_numbers_post_level(arr, post='', level=0):
                 if i % 8 == 0:
                     re += ' '
                 re += "/"
-            re += better_float_to_text(arr[i])
+            re += better_float_to_text(arr[i],round)
             if len(re)>0 and re[-1].isnumeric():
                 re += post
     return re
