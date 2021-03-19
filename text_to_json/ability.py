@@ -872,13 +872,34 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                         returntxt += ")"
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
                         returntxt += '</div>'
+                elif json[ii]["混合文字"][str(i)]['类型'] == '机制切换':
+                    re0=''
+                    re1=''
+                    j = 0
+                    while True:
+                        j += 1
+                        if str(j) in json[ii]["混合文字"][str(i)]:
+                            if json[ii]["混合文字"][str(i)][str(j)]["0"] == "":
+                                jsonname=name
+                            else:
+                                jsonname=json[ii]["混合文字"][str(i)][str(j)]["0"]
+                            if jsonname in all_json['机制']:
+                                if json[ii]["混合文字"][str(i)][str(j)]["1"] == "":
+                                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有输入条目的名称，请进行输入'))
+                                else:
+                                    listname=json[ii]["混合文字"][str(i)][str(j)]["1"]
+                                    if listname in all_json['机制'][jsonname]['简单条目']:
+                                        re0+=all_json['机制'][jsonname]['简单条目'][listname]
+                                    if listname in all_json['机制'][jsonname]['具体条目']:
+                                        re1+=all_json['机制'][jsonname]['具体条目'][listname]
+                        else:
+                            break
+                    returntxt += '<div class="dota_rotatey_transform_switch_content0">'+re0+'</div>'\
+                                 +'<div class="dota_rotatey_transform_switch_content1">'+re1+'</div>'
                 elif json[ii]["混合文字"][str(i)]['类型'] == '检索' or json[ii]["混合文字"][str(i)]['类型'] == '查询':
                     ttarget = copy.deepcopy(target)
                     ttarget.append(str(i))
                     returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget, returntxt!='')
-                elif json[ii]["混合文字"][str(i)]['类型'] == '按钮切换':
-                    returntxt += '<div class="notmobile dota_rotatey_transform_switch dota_hidden_menu_item_at_right_of_the_screen" data-switch-state="1"></div>'\
-                                 +'<div class="ismobile dota_rotatey_transform_switch dota_hidden_menu_item_at_right_of_the_screen" data-switch-state="0"></div>'
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:

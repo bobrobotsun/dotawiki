@@ -831,7 +831,6 @@ def create_navboxunit(json_base):
             + '|group7=建筑物|list7=' + lists[6]
     return retxt
 
-
 def create_page_logs(title, log_base, log_list, name_base):
     retxt = ''
     retxt += '<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;">\n<tr><th colspan=2>' + title + '</th></tr>' + '\n<tr><td>游戏本体</td><td>' + \
@@ -1219,6 +1218,8 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
 def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     db = json_base['单位组'][unitgroup]
     retxt = ''
+    if db['图片'] != '':
+        retxt += '[[file:' + db['图片'] + '|120px|right]]'
     retxt+='<div class="dota_rotatey_transform_switch_content1">'
     for i in db['成员']:
         retxt += '<div>'+db['成员'][i]['大表格']+'</div>'
@@ -1232,8 +1233,6 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
              '[[分类:单位组]]'
     if db['次级分类'] != '':
         retxt += '[[分类:' + db['次级分类'] + ']]'
-    retxt += '<div class="notmobile dota_rotatey_transform_switch dota_hidden_menu_item_at_right_of_the_screen" data-switch-state="1"></div>' \
-             + '<div class="ismobile dota_rotatey_transform_switch dota_hidden_menu_item_at_right_of_the_screen" data-switch-state="0"></div>' \
-               '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json]]</div>'
+    retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json]]</div>'
 
     return retxt
