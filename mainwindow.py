@@ -1786,7 +1786,7 @@ class Main(QMainWindow):
         self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]], self.json_base[selected[0]][selected[1]])
         if selected[0] == '物品':
             self.item_dict_to_extra_tree(self.editlayout['修改核心']['竖布局']['树'], self.json_base[selected[0]][selected[1]])
-        self.edit_json_expand_all()
+        self.edit_json_expand_2nd()
         self.self_edit_button_default()
         self.edit_target_selected_changed_quick_link_tree()
 
@@ -2327,6 +2327,13 @@ class Main(QMainWindow):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
         parent = item.parent()
         parent.removeChild(item)
+
+    def edit_json_expand_2nd(self):
+        self.editlayout['修改核心']['竖布局']['树'][0].expandAll()
+        tree = self.editlayout['修改核心']['竖布局']['树'][0]
+        for i in range(tree.topLevelItemCount()):
+            for j in range(tree.topLevelItem(i).childCount()):
+                tree.topLevelItem(i).child(j).setExpanded(False)
 
     def edit_json_expand_all(self):
         self.editlayout['修改核心']['竖布局']['树'][0].expandAll()

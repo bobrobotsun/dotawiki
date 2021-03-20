@@ -896,10 +896,11 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                             break
                     returntxt += '<div class="dota_rotatey_transform_switch_content0">'+re0+'</div>'\
                                  +'<div class="dota_rotatey_transform_switch_content1">'+re1+'</div>'
-                elif json[ii]["混合文字"][str(i)]['类型'] == '检索' or json[ii]["混合文字"][str(i)]['类型'] == '查询':
+                elif json[ii]["混合文字"][str(i)]['类型'][:2] == '检索' or json[ii]["混合文字"][str(i)]['类型'][:2] == '查询':
                     ttarget = copy.deepcopy(target)
                     ttarget.append(str(i))
-                    returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget, returntxt!='')
+                    firstsep=(len(json[ii]["混合文字"][str(i)]['类型'])<=2 or json[ii]["混合文字"][str(i)]['类型'][2]!='1') and returntxt!=''
+                    returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget,firstsep)
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:
