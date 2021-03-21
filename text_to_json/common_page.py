@@ -1232,7 +1232,8 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
              '[[分类:单位组]]'
     if db['次级分类'] != '':
         retxt += '[[分类:' + db['次级分类'] + ']]'
-    retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']\
-             +'<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json]]</div>'
+        if db['次级分类'][2:] == '中立营地':
+            retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']
+    retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json]]</div>'
 
     return retxt
