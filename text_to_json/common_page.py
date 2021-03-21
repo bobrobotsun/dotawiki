@@ -1039,8 +1039,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
              + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
              + '<h2>饰品</h2>' \
              + '[[data:' + db["中文名"] + '/equipment|点击进入查看饰品信息]]' \
-             + '{{navbox|title=DotA中的英雄|name=navboxhero|basestyle=max-width:800px;text-align:center;line-height:2em;' \
-             + create_navboxhero(json_base) + '}}'
+             +json_base['机制']['通用']['简单条目']['英雄导航']
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1095,7 +1094,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i])
     retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
-             + '<div>{{navbox|title=DotA中的非英雄单位|name=navbox minion' + create_navboxunit(json_base) + '}}</div>[[分类:非英雄单位]]'
+             + '<div>'+json_base['机制']['通用']['简单条目']['非英雄单位导航']+'</div>[[分类:非英雄单位]]'
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1233,6 +1232,7 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
              '[[分类:单位组]]'
     if db['次级分类'] != '':
         retxt += '[[分类:' + db['次级分类'] + ']]'
-    retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json]]</div>'
+    retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']\
+             +'<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json]]</div>'
 
     return retxt

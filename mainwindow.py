@@ -702,11 +702,11 @@ class Main(QMainWindow):
                         self.lock.release()
                 else:
                     self.local.k += 1
-                    self.time_point_for_iterable_sleep_by_time()
+                    self.time_point_for_iterable_sleep_by_time(1)
                     self.progress.addtext(
                         ['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：' + str(self.local.download_info.status_code) + '，尝试次数：' + str(self.local.k), 2],
                         self.current_num[0], threading.current_thread().name)
-                    if self.local.k >= 10:
+                    if self.local.k >= 20:
                         self.lock.release()
                         break
                     self.lock.release()
@@ -1377,13 +1377,14 @@ class Main(QMainWindow):
                 all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
                 all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'],
                                                                             common_page.all_the_names(self.json_base['物品'][i], self.json_base), 0)])
+        if chosen == '' or chosen == '单位组':
+            for i in self.json_base['单位组']:
+                all_upload.append([i, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], i)])
+
         if chosen == '技能':
             for i in self.json_base['技能']:
                 page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                 all_upload.append([i, page_link_content])
-        if chosen == '单位组':
-            for i in self.json_base['单位组']:
-                all_upload.append([i, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], i)])
         if chosen == '机制':
             for i in self.json_base['机制']:
                 all_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
