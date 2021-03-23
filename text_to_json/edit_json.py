@@ -135,7 +135,7 @@ edit = {
         "中文名": ['tree', {"list": ['text', '', 1, 1, False]}],
         "英文名": ['tree', {"list": ['text', '', 1, 1, False]}],
         "攻击后摇": ['tree', {"list": ['number', 0, 1, 1, False]}],
-        "源技能": ['tree', {"list": ['text', '', 1, 1, False]}],
+        "源技能": ['tree', {"list": ['text', '', 1, 0, True]}],
         "英雄级单位": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                              '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "远古单位": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],

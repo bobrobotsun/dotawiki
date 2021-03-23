@@ -469,7 +469,7 @@ def create_independent_mech(json_dict):
     return retxt
 
 
-def create_page_ability(db):
+def create_page_ability(db, json_base):
     retxt = '<div style="display-block;clear:both;overflow: hidden;margin-bottom:1em;background-color: #d1d1d1;">' \
             + '<div style="float:left;">' \
             + '<div class="abilitybox full-width-xs" style="float:left;padding-bottom:1em;background:#222;color:#eee;width:400px;margin-right:8px;font-size:85%;">' \
@@ -591,7 +591,12 @@ def create_page_ability(db):
                 break
     for i in range(1, uls + 1):
         retxt += '</ul>'
-    retxt += '</div></div></div></div>' + '{{#invoke:unit data|summon_unit_card|' + db['页面名'] + '}}' + '</div>'
+    retxt += '</div></div></div></div>'
+    for i in db['技能召唤物']:
+        if i in json_base['非英雄单位']:
+            retxt += json_base['非英雄单位'][i]['简易展示']
+    retxt += '</div>'
+    retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + db['数据来源'] + '/源.json|' + db['数据来源'] + '/源]]<br>[[Data:' + db['页面名'] + '.json|' + db['页面名'] + ']]</div>'
     return retxt
 
 
@@ -831,6 +836,7 @@ def create_navboxunit(json_base):
             + '|group7=建筑物|list7=' + lists[6]
     return retxt
 
+
 def create_page_logs(title, log_base, log_list, name_base):
     retxt = ''
     retxt += '<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;">\n<tr><th colspan=2>' + title + '</th></tr>' + '\n<tr><td>游戏本体</td><td>' + \
@@ -1034,12 +1040,12 @@ def create_page_hero(json_base, log_base, log_list, hero):
              + '</div>' \
              + '</div>'
     for i in db['技能']:
-        retxt += create_page_ability(json_base['技能'][i])
+        retxt += create_page_ability(json_base['技能'][i], json_base)
     retxt += '<h2>历史更新</h2>' \
              + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
              + '<h2>饰品</h2>' \
              + '[[data:' + db["中文名"] + '/equipment|点击进入查看饰品信息]]' \
-             +json_base['机制']['通用']['简单条目']['英雄导航']
+             + json_base['机制']['通用']['简单条目']['英雄导航']
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1055,6 +1061,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
                         rere += '\t'
                 nums += 1
         rere += retxt[i]
+    rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + hero + '.json|' + hero + ']]</div>'
     return rere
 
 
@@ -1092,9 +1099,9 @@ def create_page_unit(json_base, log_base, log_list, unit):
     if db["类型"] == '士兵':
         retxt += '[[分类:士兵]]'
     for i in db['技能']:
-        retxt += create_page_ability(json_base['技能'][i])
+        retxt += create_page_ability(json_base['技能'][i], json_base)
     retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
-             + '<div>'+json_base['机制']['通用']['简单条目']['非英雄单位导航']+'</div>[[分类:非英雄单位]]'
+             + '<div>' + json_base['机制']['通用']['简单条目']['非英雄单位导航'] + '</div>[[分类:非英雄单位]]'
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1110,6 +1117,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
                         rere += '\t'
                 nums += 1
         rere += retxt[i]
+    rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unit + '.json|' + unit + ']]</div>'
     return rere
 
 
@@ -1145,7 +1153,7 @@ def create_page_item(json_base, log_base, log_list, item):
                     retxt += '{{I|' + all_the_item_name[j][0] + '}}(' + all_the_item_name[j][1] + ')'
             retxt += '。'
     for i in db['技能']:
-        retxt += create_page_ability(json_base['技能'][i])
+        retxt += create_page_ability(json_base['技能'][i], json_base)
     retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) + '[[分类:物品]]'
     rere = ''
     nums = 0
@@ -1162,6 +1170,7 @@ def create_page_item(json_base, log_base, log_list, item):
                         rere += '\t'
                 nums += 1
         rere += retxt[i]
+    rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + item + '.json|' + item + ']]</div>'
     return rere
 
 
@@ -1195,7 +1204,7 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
                  '[[分类:机制]][[分类:生成机制]]'
         if db['次级分类'] != '':
             retxt += '[[分类:' + db['次级分类'] + ']]'
-        retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + mech + '/源.json]]<br>[[Data:' + mech + '.json]]</div>'
+        retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + mech + '/源.json|' + mech + '/源]]<br>[[Data:' + mech + '.json|' + mech + ']]</div>'
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1219,14 +1228,17 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     retxt = ''
     if db['图片'] != '':
         retxt += '[[file:' + db['图片'] + '|120px|right]]'
-    retxt+='<div class="dota_rotatey_transform_switch_content1">'
+    retxt += '==组信息==\n<div class="dota_rotatey_transform_switch_content1">'
     for i in db['成员']:
-        retxt += '<div>'+db['成员'][i]['大表格']+'</div>'
-    retxt+='</div><div class="dota_rotatey_transform_switch_content0">'
+        retxt += '<div>' + db['成员'][i]['大表格'] + '</div>'
+    retxt += '</div><div class="dota_rotatey_transform_switch_content0">'
     for i in db['成员']:
-        retxt += '<div>'+db['成员'][i]['小表格']+'</div>'
-    retxt+='</div>'
-
+        retxt += '<div>' + db['成员'][i]['小表格'] + '</div>'
+    retxt += '</div>'
+    retxt+='\n==成员信息==\n'
+    for i in db['全部单位']:
+        if i in json_base['非英雄单位']:
+            retxt+=json_base['非英雄单位'][i]['简易展示']
     retxt += '\n==感谢您的阅读==\n以上内容均通过特殊方式上传，如果您觉得我们写的东西错了，请通过以下方式告知我们：' \
              '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]\n#QQ群：539026033\n#新浪微博：[https://weibo.com/u/5617043593 DotA中文wiki]' \
              '[[分类:单位组]]'
@@ -1234,6 +1246,6 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
         retxt += '[[分类:' + db['次级分类'] + ']]'
         if db['次级分类'][2:] == '中立营地':
             retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']
-    retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json]]</div>'
+    retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json|' + unitgroup + ']]</div>'
 
     return retxt

@@ -1,6 +1,7 @@
 import json
 import copy
 import math
+from text_to_json import common_page, ability
 from text_to_json.WikiError import editerror
 
 
@@ -15,6 +16,7 @@ def change_str_to_int(s):
         rere = str(s)
     finally:
         return rere
+
 
 # 查询数据范围
 def findtb(source, start, end, tb, brace=0):
@@ -86,7 +88,7 @@ def get_hero_data_from_txt(base_txt, address):
             break
 
 
-def fulfill_unit_json(base_txt, all_json, version,name_base):
+def fulfill_unit_json(base_txt, all_json, version, name_base):
     for i in all_json:
         all_json[i]["页面名"] = i
         all_json[i]["分类"] = "非英雄单位"
@@ -107,6 +109,8 @@ def fulfill_unit_json(base_txt, all_json, version,name_base):
         if len(all_json[i]['迷你图片']) > 1:
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'][0].upper() + all_json[i]['迷你图片'][1:]
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'].replace(' ', '_')
+        if '源技能' not in all_json[i]:
+            all_json[i]['源技能']={}
         for j in unitpro_txt + unitpro_num:
             popit = []
             for k in all_json[i][j[0]]:
@@ -129,16 +133,16 @@ def fulfill_unit_json(base_txt, all_json, version,name_base):
                             bool = bool and all_json[i][j[0]][k]["1"] == all_json[i][j[0]][k][l]
                         all_json[i][j[0]][k]['代码']['3'] = j[1]
                         if bool:
-                            ll=2
+                            ll = 2
                             while True:
-                                l=str(ll)
-                                ll+=1
+                                l = str(ll)
+                                ll += 1
                                 if l in all_json[i][j[0]][k]:
                                     all_json[i][j[0]][k].pop(l)
                                 else:
                                     break
                     else:
-                        temp_daima=all_json[i][j[0]][k]["代码"]
+                        temp_daima = all_json[i][j[0]][k]["代码"]
                         for l in base_txt[temp_daima["1"]][temp_daima["2"]][temp_daima["3"]]:
                             all_json[i][j[0]][k][l] = base_txt[temp_daima["1"]][temp_daima["2"]][temp_daima["3"]][l]
 
@@ -147,8 +151,9 @@ def complete_upgrade(all_json, base_txt):
     for i in all_json:
         for jj in unitpro_txt + unitpro_num:
             j = jj[0]
-            if isinstance(all_json[i][j],dict):
+            if isinstance(all_json[i][j], dict):
                 one_upgrade(all_json[i][j], base_txt, i, j)
+
 
 def fulfil(arr, json):
     for i in arr:
@@ -165,6 +170,7 @@ def fulfil(arr, json):
                     arr[i]['代码']["2"] = json["代码"]
     return True
 
+
 def one_upgrade(json, base_txt, name, target):
     ii = 1
     while True:
@@ -177,10 +183,10 @@ def one_upgrade(json, base_txt, name, target):
     calvalue = [[] for _ in range(pow(2, extra))]
     caloprate = ['' for _ in range(extra + 2)]
     if "1" in json:
-        ii=1
+        ii = 1
         while True:
-            i=str(ii)
-            ii+=1
+            i = str(ii)
+            ii += 1
             if i in json['1']:
                 getvalue[0].append(json['1'][i])
             else:
@@ -188,12 +194,12 @@ def one_upgrade(json, base_txt, name, target):
     else:
         getvalue[0].append(0)
         json["1"] = {}
-        tempi='2'
+        tempi = '2'
         for tempj in json[tempi]:
             if not tempj.isnumeric() and tempj != '代码':
                 json["1"][tempj] = copy.deepcopy(json[tempi][tempj])
-    for ii in range(2,extra+2):
-        i=str(ii)
+    for ii in range(2, extra + 2):
+        i = str(ii)
         if "0" in json[i]["代码"] and json[i]["代码"]["0"] == "手填":
             k = 0
             while True:
@@ -214,7 +220,7 @@ def one_upgrade(json, base_txt, name, target):
                         getvalue[ii].append(base_txt[json[i]["代码"]["1"]][json[i]["代码"]["2"]][json[i]["代码"]["3"]][k])
             else:
                 raise (editerror('非英雄单位', name, target + '没有找到《' + json[i]["代码"]["1"] + '→' + json[i]["代码"]["2"] + '》数据库中' + json[i]["代码"]["3"] + '的内容'))
-        caloprate[ii]=json[i]["修正"]["1"]
+        caloprate[ii] = json[i]["修正"]["1"]
     maxlen = 0
     for i in range(len(getvalue)):
         maxlen = max(maxlen, len(getvalue[i]))
@@ -224,23 +230,23 @@ def one_upgrade(json, base_txt, name, target):
                 getvalue[i].append(getvalue[i][j - 1])
     for i in range(len(calvalue)):
         calvalue[i] = copy.deepcopy(getvalue[0])
-    #优先生效的修正
+    # 优先生效的修正
     while True:
-        nowcheck=[0,0]
-        for ii in range(2,extra+2):
-            if len(caloprate[ii])>0 and caloprate[ii][0].isnumeric():
-                nowcheck=[-1*int(caloprate[ii][0]),ii-1]
-        if nowcheck[0]<0:
+        nowcheck = [0, 0]
+        for ii in range(2, extra + 2):
+            if len(caloprate[ii]) > 0 and caloprate[ii][0].isnumeric():
+                nowcheck = [-1 * int(caloprate[ii][0]), ii - 1]
+        if nowcheck[0] < 0:
             for j in range(len(calvalue)):
-                if j>>(nowcheck[1]-1)&1:
-                    array_cal(calvalue[j], getvalue[nowcheck[1]+1], caloprate[nowcheck[1]+1][1:])
-            caloprate[nowcheck[1] + 1]=''
+                if j >> (nowcheck[1] - 1) & 1:
+                    array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][1:])
+            caloprate[nowcheck[1] + 1] = ''
         else:
             break
-    for ii in range(2,extra+2):
-        if len(caloprate[ii])>0 and not caloprate[ii][-1].isnumeric():
+    for ii in range(2, extra + 2):
+        if len(caloprate[ii]) > 0 and not caloprate[ii][-1].isnumeric():
             for j in range(len(calvalue)):
-                if j>>(ii-2)&1:
+                if j >> (ii - 2) & 1:
                     array_cal(calvalue[j], getvalue[ii], caloprate[ii])
             caloprate[ii] = ''
     if len(caloprate[1]) > 0:
@@ -248,33 +254,34 @@ def one_upgrade(json, base_txt, name, target):
             array_cal(calvalue[j], getvalue[1], caloprate[1])
     while True:
         nowcheck = [0, 0]
-        for ii in range(2,extra+2):
-            if len(caloprate[ii])>0 and caloprate[ii][-1].isnumeric():
-                nowcheck=[-1*int(caloprate[ii][-1]),ii-1]
-        if nowcheck[0]<0:
+        for ii in range(2, extra + 2):
+            if len(caloprate[ii]) > 0 and caloprate[ii][-1].isnumeric():
+                nowcheck = [-1 * int(caloprate[ii][-1]), ii - 1]
+        if nowcheck[0] < 0:
             for j in range(len(calvalue)):
-                if j>>(nowcheck[1]-1) & 1:
-                    array_cal(calvalue[j], getvalue[nowcheck[1]+1], caloprate[nowcheck[1]+1][:-1])
-            caloprate[nowcheck[1] + 1]=''
+                if j >> (nowcheck[1] - 1) & 1:
+                    array_cal(calvalue[j], getvalue[nowcheck[1] + 1], caloprate[nowcheck[1] + 1][:-1])
+            caloprate[nowcheck[1] + 1] = ''
         else:
             break
     for i in range(len(calvalue)):
-        if len(calvalue[i])>0:
+        if len(calvalue[i]) > 0:
             cut_the_same_to_one(calvalue[i])
-    bitsum_list=[all_bit_sum(i) for i in range(pow(2, extra))]
-    result_to_show_index=[]
-    for i in range(extra+1):
+    bitsum_list = [all_bit_sum(i) for i in range(pow(2, extra))]
+    result_to_show_index = []
+    for i in range(extra + 1):
         for j in range(len(bitsum_list)):
-            if bitsum_list[j]==i:
+            if bitsum_list[j] == i:
                 result_to_show_index.append(i)
     for i in range(len(calvalue)):
         for k in range(len(calvalue[result_to_show_index[i]])):
-            json[str(i+1)][str(k+1)]=calvalue[result_to_show_index[i]][k]
-        if bitsum_list[result_to_show_index[i]]>1:
-            json[str(i+1)]["升级来源"]={}
+            json[str(i + 1)][str(k + 1)] = calvalue[result_to_show_index[i]][k]
+        if bitsum_list[result_to_show_index[i]] > 1:
+            json[str(i + 1)]["升级来源"] = {}
             for j in range(extra):
-                if result_to_show_index[i]>>j &1:
-                    json[str(i + 1)]["升级来源"][str(len(json[str(i+1)]["升级来源"])+1)]=json[str(result_to_show_index[j+1]+1)]["升级来源"]['1']
+                if result_to_show_index[i] >> j & 1:
+                    json[str(i + 1)]["升级来源"][str(len(json[str(i + 1)]["升级来源"]) + 1)] = json[str(result_to_show_index[j + 1] + 1)]["升级来源"]['1']
+
 
 def all_bit_sum(i):
     rere = 0
@@ -301,6 +308,7 @@ def cut_the_same_to_one(lists):
     if bool and i > 1:
         for i in range(delete_number):
             lists.pop(1)
+
 
 def array_cal(arr1, arr2, opp):
     for i in range(len(arr1)):
@@ -363,6 +371,88 @@ def create_file(all_json):
         file = open("E:/json/pythonupload/" + i + '.json', mode="w")
         file.write(json.dumps(all_json[i]))
         file.close()
+
+
+def fulfil_complex_and_simple_show(all_json):
+    for i in all_json['非英雄单位']:
+        db = all_json['非英雄单位'][i]
+        bt = ''  # 完整显示
+        st = ''  # 缩略显示
+        st += '<table class="dota_unit_simple_infobox"><tr class="bg-primary"><th class="dota_unit_simple_infobox_title" colspan=3>' + i \
+              + '</th></tr><tr><td class="dota_unit_simple_infobox_label" colspan=3>'
+        if db["英雄级单位"]['1']['1'] == 1:
+            st += '<span class="label bg-primary">英雄级</span>'
+        else:
+            st += '<span class="label bg-default">非英雄级</span>'
+        if db["关联类型"] == '守卫':
+            st += ' <span class="label bg-warning">守卫</span>'
+        else:
+            st += ' <span class="label bg-default">非守卫</span>'
+        if db["远古单位"]['1']['1'] == 1:
+            st += ' <span class="label bg-warning">远古</span>'
+        else:
+            st += ' <span class="label bg-default">非远古</span>'
+        if db["生命类型"] == '攻击次数':
+            st += ' <span class="label bg-warning">攻击次数型</span>'
+        else:
+            st += ' <span class="label bg-default">生命值型</span>'
+        st += '</td></tr>' \
+              '<tr><td rowspan=7 style="background: linear-gradient(#000,#3a3a3a,#000);width:30%">'
+        if db['图片'] == '':
+            st += '[[' + i + '|暂无' + i + '图片]]'
+        else:
+            st += '[[file:' + db['图片'] + '|160px|center|link=' + i + ']]'
+        st += '</td><td class="bg-primary dota_unit_simple_infobox_trait_title">等级</td>' \
+              '<td class="bg-primary dota_unit_simple_infobox_trait_title">攻击间隔</td></tr>' \
+              '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'等级') \
+              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'攻击间隔') \
+              + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">生命值</td>' \
+                '<td class="bg-primary dota_unit_simple_infobox_trait_title">生命恢复</td></tr>' \
+                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'生命值') \
+              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'生命恢复') \
+              + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">魔法值</td>' \
+                '<td class="bg-primary dota_unit_simple_infobox_trait_title">魔法恢复</td></tr>' \
+                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'魔法值') \
+              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'魔法恢复') \
+              + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">攻击力</td>' \
+                '<td class="bg-primary dota_unit_simple_infobox_trait_title">'
+        if change_combine_numbers_to_str(db,'护甲类型') != "英雄/非英雄":
+            st += '攻击造成伤害'
+        else:
+            st += '护甲/魔法抗性'
+        st += '</td></tr>'
+        if len(db['技能']) == 0:
+            st += '<tr><td class="dota_unit_simple_infobox_skill" rowspan=6>无技能</td>'
+        else:
+            st += '<tr><td class="dota_unit_simple_infobox_skill" rowspan=6>'
+            for j in range(len(db['技能'])):
+                if j > 0:
+                    st += '<br>'
+                st += '{{A|' + db['技能'][j] + '}}'
+            st += '</td>'
+        st += '<td class="dota_unit_simple_infobox_trait_value">' + change_double_combine_numbers_to_str(db['攻击下限'], db['攻击上限']) \
+              + '<br/>(' + change_combine_numbers_to_str(db,'攻击类型') \
+              + ')</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'护甲') + '<br/>(' + change_combine_numbers_to_str(db,'护甲类型') + ')'
+        if change_combine_numbers_to_str(db,'护甲类型') != "英雄/非英雄":
+            st += '<br/>' + change_combine_numbers_to_str(db,'魔法抗性', '%')
+        st += '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">移动速度</td>' \
+              '<td class="bg-primary dota_unit_simple_infobox_trait_title">攻击距离</td></tr>' \
+              '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'移动速度') \
+              + '</td><td class="dota_unit_simple_infobox_trait_value" rowspan=2>' + change_combine_numbers_to_str(db,'攻击距离') \
+              + '<br/>(' + change_combine_numbers_to_str(db,'近战远程') \
+              + ')</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">金钱</td></tr>' \
+                '<tr><td class="dota_unit_simple_infobox_trait_value" rowspan=2>' + change_double_combine_numbers_to_str(db['金钱下限'], db['金钱上限']) \
+              + '</td><td class="bg-primary dota_unit_simple_infobox_trait_title">经验</td></tr>' \
+                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'经验') \
+              + '</td></tr></table>'
+        db['简易展示'] = st
+        db['具体展示'] = bt
+
+def change_combine_numbers_to_str(s1,s2, post=''):
+    return common_page.create_upgrade_text(s1,s2,lambda x: post,lambda x,y:'<br>' if str(1+int(y)) in x else '')
+
+def change_double_combine_numbers_to_str(slist1, slist2):
+    return common_page.get_unit_upgrade_double(slist1, slist2)
 
 
 unitpro_txt = [

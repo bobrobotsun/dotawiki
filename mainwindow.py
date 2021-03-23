@@ -1278,6 +1278,19 @@ class Main(QMainWindow):
                         for k in ability_own[self.json_base[i][j]['页面名']]:
                             if self.json_base[i][j]['应用'] == self.json_base["技能"][k[0]]['应用']:
                                 self.json_base[i][j]['技能'].append(k[0])
+            unit_own={}
+            for i in self.json_base['非英雄单位']:
+                for j,w in self.json_base['非英雄单位'][i]['源技能'].items():
+                    if w not in unit_own:
+                        unit_own[w]=[]
+                    unit_own[w].append(i)
+            for i in self.json_base['技能']:
+                if i in unit_own:
+                    self.json_base['技能'][i]['技能召唤物']=unit_own[i]
+                else:
+                    self.json_base['技能'][i]['技能召唤物'] = []
+
+            unit.fulfil_complex_and_simple_show(self.json_base)
 
             # 生成单位组信息（怀疑是个时间耗费大户）
             unitgroup.get_source_to_data(self.json_base, self.version, self.text_base)
@@ -1787,7 +1800,7 @@ class Main(QMainWindow):
         self.complex_dict_to_tree(self.editlayout['修改核心']['竖布局']['树'], edit_json.edit[selected[0]], self.json_base[selected[0]][selected[1]])
         if selected[0] == '物品':
             self.item_dict_to_extra_tree(self.editlayout['修改核心']['竖布局']['树'], self.json_base[selected[0]][selected[1]])
-        self.edit_json_expand_2nd()
+        self.edit_json_expand_all()
         self.self_edit_button_default()
         self.edit_target_selected_changed_quick_link_tree()
 

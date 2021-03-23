@@ -12,6 +12,7 @@ def get_source_to_data(all_json, version, text_base):
     for i in all_json['单位组']:
         all_json['单位组'][i]['页面名'] = i
         all_json['单位组'][i]['分类'] = '单位组'
+        all_units=[]
         for j in all_json['单位组'][i]['成员']:
             members = all_json['单位组'][i]['成员'][j]
             #bt大表格
@@ -29,6 +30,8 @@ def get_source_to_data(all_json, version, text_base):
                 if k in members:
                     if members[k]['单位名'] in all_json['非英雄单位']:
                         one_member = all_json['非英雄单位'][members[k]['单位名']]
+                        if members[k]['单位名'] not in all_units:
+                            all_units.append(members[k]['单位名'])
                         one_result = {}
                         one_result['数量'] = ability.one_combine_txt_numbers(members[k]['数量']['代码'], all_json, text_base, ['单位组', i, '成员', '数量'])
                         bt+='<div style="display:inline-block;padding:0 0.25em;"><div>[[file:'+one_member['图片']+'|x100px|center|link=]]</div><div>[['+one_member['页面名']+']]×'+change_combine_numbers_to_str(one_result['数量'])+'</div></div>'
@@ -96,6 +99,7 @@ def get_source_to_data(all_json, version, text_base):
             st += '</table>'
             members['大表格']=bt
             members['小表格']=st
+        all_json['单位组'][i]['全部单位']=all_units
 
 def combine_numbers_back_to_json(slist):
     redict={}
