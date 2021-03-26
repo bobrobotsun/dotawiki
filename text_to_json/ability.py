@@ -1307,7 +1307,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target)
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
-                        another_image += '[[file:' + tempjson['升级来源']['图片'] + '|x22px|link=]]'
+                        another_image += '[[file:' + tempjson['升级来源'][j]['图片'] + '|x22px|link=]]'
         if '条件名称' in conditions:
             for i in range(len(conditions['条件名称'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target)
@@ -1451,8 +1451,8 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target):
         the_key = ''
         if '-' in condition[j]:
             indexlist = condition[j].split('-')
-            indexlist[0] = change_str_to_int(indexlist[0]) - 1
-            indexlist[1] = change_str_to_int(indexlist[1]) - 1
+            indexlist[0] = change_str_to_int(indexlist[0])-1
+            indexlist[1] = change_str_to_int(indexlist[1])
             if indexlist[0] < len(result) and indexlist[1] < len(result[indexlist[0]]):
                 the_key = result[indexlist[0]][indexlist[1]]
             else:
@@ -1556,22 +1556,31 @@ def check_the_json_meet_one_condition(condition, json, target, index):
             if isinstance(i, list):
                 if all_bools:
                     half_result, one_bool = check_the_json_meet_one_condition(i, tempjson, target, [0])
+                    for i in half_result:
+                        i.insert(0, '(')
+                        i.append(')')
                     all_bools = one_bool
             elif i == '@and' or i == '@和':
                 if all_bools:  # true
                     index[0] = ii + 1
                     half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                    for j in half_result:
+                        j.insert(0,i)
                     all_bools = one_bool
                     ii = index[0] - 1
             elif i == '@except' or i == '@除了':
                 if all_bools:  # true
                     index[0] = ii + 1
                     half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                    for j in half_result:
+                        j.insert(0,i)
                     all_bools = not one_bool
                     ii = index[0] - 1
             elif i == '@or' or i == '@或':
                 index[0] = ii + 1
                 half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                for j in half_result:
+                    j.insert(0, i)
                 all_bools = all_bools or one_bool
                 ii = index[0] - 1
                 if one_bool:
@@ -1619,8 +1628,10 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                     ii = index[0] - 1
             elif i == '@has' or i == '@have':
                 all_bools = isinstance(tempjson, str) and tempjson != ''
+                half_result.append([i])
             elif i == '@hasnot' or i == '@havenot':
                 all_bools = isinstance(tempjson, str) and tempjson == ''
+                half_result.append([i])
             elif i[0] == '@':
                 if len(condition) >= ii + 2:
                     if i == '@=' or i == '@==':
@@ -1636,7 +1647,7 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                     else:
                         raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
                     ii += 1
-                    half_result.append([condition[ii]])
+                    half_result.append([i,condition[ii]])
                 else:
                     raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到符号”' + i + '“后的值，请检查代码错误还是输入缺失'))
             else:

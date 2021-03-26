@@ -7,7 +7,6 @@ import time
 from text_to_json import common_page, ability
 from text_to_json.WikiError import editerror
 
-
 def get_source_to_data(all_json, tlist, version, text_base):
     # 一定报错的内容
     for i in tlist:
