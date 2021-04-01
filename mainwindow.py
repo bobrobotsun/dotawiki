@@ -879,7 +879,7 @@ class Main(QMainWindow):
         self.editlayout[0].addLayout(self.editlayout['竖布局'][0])
         self.editlayout['竖布局']['新增'] = QPushButton('新增', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['新增'])
-        self.editlayout['竖布局']['新增'].clicked.connect(self.json_edit_new)
+        self.editlayout['竖布局']['新增'].clicked.connect(lambda:self.json_edit_new())
         self.editlayout['竖布局']['下载更新'] = QPushButton('下载更新', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['下载更新'])
         self.editlayout['竖布局']['下载更新'].clicked.connect(self.json_edit_download)
@@ -1592,8 +1592,8 @@ class Main(QMainWindow):
                 break
             else:
                 k += 1
-                if k >= 5:
-                    return ['《' + pagename + '》上传失败，请之后重新上传！', 0]
+                if k >= 10:
+                    return ['《' + pagename + '》上传失败，请之后重新上传！上传代码：'+str(upload_info.status_code), 0]
         if 'edit' in upload_info_json and upload_info_json['edit']['result'] == 'Success':
             if 'nochange' in upload_info.json()['edit']:
                 return ['没有修改《' + pagename + '》', 0]
@@ -2029,20 +2029,24 @@ class Main(QMainWindow):
         self.dict_to_tree(self.editlayout['基础数据']['竖布局']['树'], self.text_base[edit_json.edit_source[ss[0]][0]][ss[1]])
         self.editlayout['基础数据']['竖布局']['树'][0].expandAll()
 
-    def json_edit_new(self):
+    def json_edit_new(self,default_text=''):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
-        text, ok = MoInputWindow.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:')
+        text, ok = MoInputWindow.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:',default_text)
         if ok:
-            self.json_name[selected].append(text)
-            self.json_base[selected][text] = {}
-            for i in edit_json.edit[selected]:
-                self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
-            self.json_base[selected][text]['页面名'] = text
-            self.resort()
-            self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
-            self.edit_category_selected_changed()
-            self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
-            self.edit_target_selected_changed()
+            if text in self.json_name[selected]:
+                QMessageBox.critical(self, '您的输入有问题', '您输入的【' + text + '】已经存在于【'+selected+'】中，请检查是否书写错误。')
+                self.json_edit_new(text)
+            else:
+                self.json_name[selected].append(text)
+                self.json_base[selected][text] = {}
+                for i in edit_json.edit[selected]:
+                    self.add_another_to_json(i, edit_json.edit[selected][i], self.json_base[selected][text])
+                self.json_base[selected][text]['页面名'] = text
+                self.resort()
+                self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(selected)
+                self.edit_category_selected_changed()
+                self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(text)
+                self.edit_target_selected_changed()
 
     def json_edit_download(self):
         ss = [self.editlayout['修改核心']['竖布局']['大分类'][0].currentText(),

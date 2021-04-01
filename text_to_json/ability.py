@@ -1391,7 +1391,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
 
         if '条件物品属性' in conditions:
             for i in conditions['条件物品属性']:
-                trait += '<div>' + i[0] + '：' + number_to_string(json[i[0]]['1']) + json[i[0]]['后缀'] + '</div>'
+                if i[0] in json:
+                    trait += '<div>' + i[0] + '：' + number_to_string(json[i[0]]['1']) + json[i[0]]['后缀'] + '</div>'
 
         if '条件机制' in conditions:
             for i in range(len(conditions['条件机制'])):
@@ -1586,6 +1587,13 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                 if one_bool:
                     relist = relist + half_result
                     continue
+            elif i == '@either' or i == '@要么':
+                index[0] = ii + 1
+                half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                for j in half_result:
+                    j.insert(0,i)
+                all_bools = all_bools or one_bool
+                ii = index[0] - 1
             elif i == '@one':  # 在一系列数字作为key的键值中，选择第一个有效的项
                 if all_bools:  # true
                     one_bool = False
