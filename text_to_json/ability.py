@@ -1314,6 +1314,26 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 if isinstance(tempjson, str):
                     another_name += '(' + tempjson + ')'
 
+        if '条件复合属性' in conditions:
+            for i in range(len(conditions['条件复合属性'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i][:-1], i, json, result, target)
+                if conditions['条件复合属性'][i][-1] in tempjson:
+                    another_info += '(' + common_page.create_upgrade_text(tempjson, conditions['条件复合属性'][i][-1], image_size='x18px') + ')'
+        if '条件单一属性' in conditions:
+            for i in range(len(conditions['条件单一属性'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件单一属性'][i], i, json, result, target)
+                combinetxt=''
+                jj=0
+                while True:
+                    jj+=1
+                    j=str(jj)
+                    if j in tempjson:
+                        if combinetxt!='':
+                            combinetxt+='/'
+                        combinetxt += number_to_string(tempjson[j])
+                    else:
+                        break
+                another_info += '(' + combinetxt  + ')'
         if '条件属性' in conditions:
             for i in range(len(conditions['条件属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件属性'][i], i, json, result, target)
@@ -1369,6 +1389,27 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     if json['属性'][j]['名称'] == i:
                         if j not in traitlist:
                             traitlist.append(j)
+        if '条件复合属性' in conditions:
+            for i in range(len(conditions['条件复合属性'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i][:-2], i, json, result, target)
+                if conditions['条件复合属性'][i][-2] in tempjson:
+                    trait += '<div>' + conditions['条件复合属性'][i][-1] + '：' + common_page.create_upgrade_text(tempjson, conditions['条件复合属性'][i][-2], image_size='x18px') + '</div>'
+        if '条件单一属性' in conditions:
+            for i in range(len(conditions['条件单一属性'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件单一属性'][i][:-1], i, json, result, target)
+                trait += '<div>' + conditions['条件单一属性'][i][-1] + '：'
+                combinetxt=''
+                jj=0
+                while True:
+                    jj+=1
+                    j=str(jj)
+                    if j in tempjson:
+                        if combinetxt!='':
+                            combinetxt+='/'
+                        combinetxt += number_to_string(tempjson[j])
+                    else:
+                        break
+                trait += combinetxt + '</div>'
         if '条件属性' in conditions:
             for i in range(len(conditions['条件属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件属性'][i], i, json, result, target)
@@ -1594,6 +1635,27 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                     j.insert(0,i)
                 all_bools = all_bools or one_bool
                 ii = index[0] - 1
+            elif i=='@all':     # 在一系列数字作为key的键值中，必须全部满足
+                if all_bools:  # true
+                    has_one=False
+                    one_bool = True
+                    jj = 0
+                    while True:
+                        jj += 1
+                        j = str(jj)
+                        if j in tempjson:
+                            index[0] = ii + 1
+                            has_one=True
+                            one_half_result, one_half_bool = check_the_json_meet_one_condition(condition, tempjson[j], target, index)
+                            one_bool = one_bool and one_half_bool
+                            if one_half_bool:
+                                one_half_result[0] = [i] + one_half_result[0]
+                                half_result = half_result + one_half_result
+                        else:
+                            if jj > 1:
+                                break
+                    all_bools = one_bool and has_one
+                    ii = index[0] - 1
             elif i == '@one':  # 在一系列数字作为key的键值中，选择第一个有效的项
                 if all_bools:  # true
                     one_bool = False
@@ -1640,6 +1702,21 @@ def check_the_json_meet_one_condition(condition, json, target, index):
             elif i == '@hasnot' or i == '@havenot':
                 all_bools = isinstance(tempjson, str) and tempjson == ''
                 half_result.append([i])
+            elif i=='@combine' or i == '@复合':
+                combinetxt=''
+                kk=1
+                while True:
+                    k=str(kk)
+                    kk+=1
+                    if k in tempjson:
+                        if combinetxt!='':
+                            combinetxt+='/'
+                        combinetxt+=number_to_string(tempjson[k])
+                    else:
+                        break
+                half_result.append([i,combinetxt])
+                tempjson=combinetxt
+                all_bools = True
             elif i[0] == '@':
                 if len(condition) >= ii + 2:
                     if i == '@=' or i == '@==':
