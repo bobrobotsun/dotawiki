@@ -1070,6 +1070,19 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
                     break
         else:
             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《' + json["1"] + '→' + json["2"] + '》数据库中' + json["3"] + '的内容'))
+    elif json["0"] == "机制全章节":
+        if json['1'] in all_json['机制']:
+            rere[0][0].append(common_page.create_all_chapter_page_mechnism(all_json['机制'][json['1']]))
+        else:
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《机制》目录下的《' + json["1"] +'》请检查输入名称是否正确'))
+    elif json["0"] == "机制单章节":
+        if json['1'] in all_json['机制']:
+            if json['2'] in all_json['机制'][json['1']]['内容']:
+                rere[0][0].append(common_page.create_one_chapter_content_page_mechnism(all_json['机制'][json['1']]['内容'][json['2']]))
+            else:
+                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《机制→' + json["1"] + '》目录下的《' + json["2"] + '》请检查输入名称是否正确'))
+        else:
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《机制》目录下的《' + json["1"] +'》请检查输入名称是否正确'))
     else:
         if json["3"] in all_json[json["1"]][json["2"]]:
             temp = all_json[json["1"]][json["2"]][json["3"]]

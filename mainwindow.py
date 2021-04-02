@@ -2307,18 +2307,25 @@ class Main(QMainWindow):
 
     def json_edit_text_to_combine(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        itemtxt=item.itemvalue
         item.delete_value()
         temp = TreeItemEdit(item, '混合文字')
         temp.set_type('combine_tree')
         temp.set_kid_list(edit_json.edit_adition['混合文字'])
+        tree = self.editlayout['修改核心']['竖布局']['树'][0].setCurrentItem(temp)
         self.tree_item_clicked()
+        self.json_edit_add_list()
+        temp2=temp.child(0)
+        temp2.set_value(itemtxt)
         item.setExpanded(True)
 
     def json_edit_combine_to_text(self):
-        item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-        item.removeChild(item.child(0))
-        item.set_value('')
-        self.tree_item_clicked()
+        warning = QMessageBox.warning(self, '转换', '您正试图将一串已有的混合文字转换为普通文字。\n内部所有的内容将会消失，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if warning == QMessageBox.Yes:
+            item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+            item.removeChild(item.child(0))
+            item.set_value('')
+            self.tree_item_clicked()
 
     def json_edit_add_new_item(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()

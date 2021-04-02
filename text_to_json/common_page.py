@@ -1173,14 +1173,8 @@ def create_page_item(json_base, log_base, log_list, item):
     rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + item + '.json|' + item + ']]</div>'
     return rere
 
-
-def create_page_mechnism(json_base, log_base, log_list, mech):
-    db = json_base['机制'][mech]
+def create_all_chapter_page_mechnism(db):
     retxt = ''
-    if db['次级分类'] != '引用机制':
-        if db['图片'] != '':
-            retxt += '[[file:' + db['图片'] + '|120px|right]]'
-    retxt += db['简述']
     for i in db['内容']:
         titles = db['内容'][i]['标题级数']
         retxt += '\n'
@@ -1191,13 +1185,28 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
             for es in range(titles):
                 retxt += '='
             retxt += '\n'
-        anotherbool = False
-        for j in db['内容'][i]['内容']:
-            if anotherbool:
-                retxt += '\n'
-            else:
-                anotherbool = True
-            retxt += db['内容'][i]['内容'][j]['内容'] + '\n'
+        retxt +=create_one_chapter_content_page_mechnism(db['内容'][i])
+    return retxt
+
+def create_one_chapter_content_page_mechnism(db):
+    retxt=''
+    anotherbool = False
+    for j in db['内容']:
+        if anotherbool:
+            retxt += '\n'
+        else:
+            anotherbool = True
+        retxt += db['内容'][j]['内容'] + '\n'
+    return retxt
+
+
+def create_page_mechnism(json_base, log_base, log_list, mech):
+    db = json_base['机制'][mech]
+    retxt = ''
+    if db['次级分类'] != '引用机制':
+        if db['图片'] != '':
+            retxt += '[[file:' + db['图片'] + '|120px|right]]'
+    retxt += db['简述'] +create_all_chapter_page_mechnism(db)
     if db['次级分类'] != '引用机制':
         retxt += '\n==感谢您的阅读==\n以上内容均通过特殊方式上传，如果您觉得我们写的东西错了，请通过以下方式告知我们：' \
                  '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]\n#QQ群：539026033\n#新浪微博：[https://weibo.com/u/5617043593 DotA中文wiki]' \
