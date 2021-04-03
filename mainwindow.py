@@ -1816,6 +1816,12 @@ class Main(QMainWindow):
             for i in self.json_base['技能']:
                 if self.json_base['技能'][i]['数据来源'] == skill_name:
                     target_name.append(self.json_base['技能'][i]['技能归属'])
+        elif selected =='非英雄单位':
+            target_name.append(selected_name)
+            for i,v in self.json_base['非英雄单位'][selected_name]['源技能'].items():
+                if v in self.json_base['技能']:
+                    if len(self.json_base['技能'][v]['技能归属']) > 0:
+                        target_name.append(self.json_base['技能'][v]['技能归属'])
         else:
             target_name.append(selected_name)
         if len(target_name) > 0:
@@ -1823,9 +1829,9 @@ class Main(QMainWindow):
             for k in target_name:
                 new0 = QTreeWidgetItem(self.editlayout['额外机制']['竖布局']['关联技能'][0])
                 new0.setText(0, k)
-                new1 = QTreeWidgetItem(new0)
-                for l in ['英雄', '非英雄单位', '物品']:
+                for l in ['英雄', '非英雄单位', '物品','机制','机制源']:
                     if k in self.json_base[l]:
+                        new1 = QTreeWidgetItem(new0)
                         new1.setText(0, l)
                         new1.setText(1, k)
                 for i in self.json_base['技能']:

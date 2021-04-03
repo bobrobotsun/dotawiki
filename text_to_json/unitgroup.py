@@ -130,14 +130,14 @@ def change_combine_numbers_to_str(slist):
         rere += ")"
     return rere
 
-def change_double_combine_numbers_to_str(slist1,slist2):
+def change_double_combine_numbers_to_str(slist1,slist2,linkop='~'):
     rere = ''
-    rere += ability.combine_numbers_post_level(slist1[0][0],round=1)+'~'+ability.combine_numbers_post_level(slist2[0][0],round=1)
+    rere += ability.combine_numbers_post_level(slist1[0][0],round=1)+linkop+ability.combine_numbers_post_level(slist2[0][0],round=1)
     if len(slist1) > 1:
         rere += "("
         for l in range(1, len(slist1)):
             for m in slist1[l][1]:
                 rere += "[[file:" + slist1[l][1][m] + "|x18px|link=" + m + "]]"
-            rere += ability.combine_numbers_post_level(slist1[l][0],round=1)+'~'+ability.combine_numbers_post_level(slist2[l][0],round=1)
+            rere += ability.combine_numbers_post_level(slist1[l][0],round=1)+linkop+ability.combine_numbers_post_level(slist2[l][0],round=1)
         rere += ")"
     return rere

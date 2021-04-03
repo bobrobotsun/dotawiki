@@ -109,9 +109,10 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
         if len(all_json[i]['迷你图片']) > 1:
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'][0].upper() + all_json[i]['迷你图片'][1:]
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'].replace(' ', '_')
-        if '源技能' not in all_json[i]:
-            all_json[i]['源技能']={}
-        for j in unitpro_txt + unitpro_num:
+        for j in ['英雄攻击伤害','非英雄攻击伤害']:
+            if j not in all_json[i] or ('0' in all_json[i][j]['1']['代码'] and all_json[i][j]['1']['代码']['0']==''):
+                all_json[i][j]={'1':{'代码':{'0':'手填','1':0},'修正':{'1':''}}}
+        for j in unitpro_txt + unitpro_num+[['英雄攻击伤害'],['非英雄攻击伤害']]:
             popit = []
             for k in all_json[i][j[0]]:
                 if k != "代码" and k != "1" and k != '修正':
@@ -125,6 +126,8 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
                         l += 1
                         if str(l) in all_json[i][j[0]][k]["代码"]:
                             all_json[i][j[0]][k][str(l)] = all_json[i][j[0]][k]["代码"][str(l)]
+                        else:
+                            break
                 else:
                     if all_json[i][j[0]][k]["代码"]["2"] == "":
                         bool = True
@@ -149,7 +152,7 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
 
 def complete_upgrade(all_json, base_txt):
     for i in all_json:
-        for jj in unitpro_txt + unitpro_num:
+        for jj in unitpro_txt + unitpro_num+[['英雄攻击伤害'],['非英雄攻击伤害']]:
             j = jj[0]
             if isinstance(all_json[i][j], dict):
                 one_upgrade(all_json[i][j], base_txt, i, j)
@@ -416,10 +419,10 @@ def fulfil_complex_and_simple_show(all_json):
               + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'魔法恢复') \
               + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">攻击力</td>' \
                 '<td class="bg-primary dota_unit_simple_infobox_trait_title">'
-        if change_combine_numbers_to_str(db,'护甲类型') != "英雄/非英雄":
-            st += '攻击造成伤害'
-        else:
+        if db['生命类型']=='生命值':
             st += '护甲/魔法抗性'
+        elif db['生命类型']=='攻击次数':
+            st += '攻击造成伤害'
         st += '</td></tr>'
         if len(db['技能']) == 0:
             st += '<tr><td class="dota_unit_simple_infobox_skill" rowspan=6>无技能</td>'
@@ -432,9 +435,11 @@ def fulfil_complex_and_simple_show(all_json):
             st += '</td>'
         st += '<td class="dota_unit_simple_infobox_trait_value">' + change_double_combine_numbers_to_str(db['攻击下限'], db['攻击上限']) \
               + '<br/>(' + change_combine_numbers_to_str(db,'攻击类型') \
-              + ')</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'护甲') + '<br/>(' + change_combine_numbers_to_str(db,'护甲类型') + ')'
-        if change_combine_numbers_to_str(db,'护甲类型') != "英雄/非英雄":
-            st += '<br/>' + change_combine_numbers_to_str(db,'魔法抗性', '%')
+              + ')</td><td class="dota_unit_simple_infobox_trait_value">'
+        if db['生命类型']=='生命值':
+            st += change_combine_numbers_to_str(db,'护甲') +'<br/>(' + change_combine_numbers_to_str(db,'护甲类型') + ')<br/>' + change_combine_numbers_to_str(db,'魔法抗性', '%')
+        elif db['生命类型'] == '攻击次数':
+            st+=change_combine_numbers_to_str(db,'英雄攻击伤害') +'(英雄)<br/>' + change_combine_numbers_to_str(db,'非英雄攻击伤害') + '(非英雄)'
         st += '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">移动速度</td>' \
               '<td class="bg-primary dota_unit_simple_infobox_trait_title">攻击距离</td></tr>' \
               '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'移动速度') \

@@ -125,8 +125,9 @@ def get_dota_data_from_vpk(base_txt, ffile):
     alltext = re.finditer('"DOTA_Tooltip_ability_item_(.*?)_Lore".*?"(.*?)"', this_string)
     for i in alltext:
         name = i.group(1)
+        texts=re.sub(r'\\n', lambda x: '<br>', i.group(2))
         if name in base_txt:
-            base_txt[name]['lore'] = {'1': i.group(2)}
+            base_txt[name]['lore'] = {'1': texts}
 
 
 def get_hero_data_from_txt(base_txt, ffile):

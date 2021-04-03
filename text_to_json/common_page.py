@@ -649,6 +649,7 @@ def get_unit_upgrade_double(db1, db2, combine='~', post=''):
     return retxt
 
 
+
 def create_infobox_unit(db):
     label = 'style="border:1px solid white;padding:0px 8px;background:#000;text-align:right;"'
     data = 'style="border:1px solid white;padding:0px 8px;background:#000;text-align:left;"'
@@ -1236,7 +1237,7 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     db = json_base['单位组'][unitgroup]
     retxt = ''
     if db['图片'] != '':
-        retxt += '[[file:' + db['图片'] + '|120px|right]]'
+        retxt += '[[file:' + db['图片'] + '|120px|right]]\n'
     retxt += '==组信息==\n<div class="dota_rotatey_transform_switch_content1">'
     for i in db['成员']:
         retxt += '<div>' + db['成员'][i]['大表格'] + '</div>'
