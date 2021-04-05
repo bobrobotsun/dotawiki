@@ -15,6 +15,9 @@ def get_source_to_data(all_json, version, text_base):
         all_units=[]
         for j in all_json['单位组'][i]['成员']:
             members = all_json['单位组'][i]['成员'][j]
+            if '额外属性' not in members:
+                members['额外属性']={}
+            extra_attribute=confirm_extra_attribute(members['额外属性'],all_json,i,j)
             #bt大表格
             bt='<table class="wikitable" style="width:100%;text-align:right;"><tr><td colspan="2" style="text-align:center;">[['\
                +i+']]（'+members['名称']+'）</td></tr><tr><td rowspan="5" style="text-align:center;">'
@@ -34,7 +37,7 @@ def get_source_to_data(all_json, version, text_base):
                             all_units.append(members[k]['单位名'])
                         one_result = {}
                         one_result['数量'] = ability.one_combine_txt_numbers(members[k]['数量']['代码'], all_json, text_base, ['单位组', i, '成员', '数量'])
-                        bt+='<div style="display:inline-block;padding:0 0.25em;"><div>[[file:'+one_member['图片']+'|x100px|center|link=]]</div><div>[['+one_member['页面名']+']]×'+change_combine_numbers_to_str(one_result['数量'])+'</div></div>'
+                        bt+='<div style="display:inline-block;padding:0 0.25em;"><div>[[file:'+one_member['图片']+'|x100px|center|link='+one_member['页面名']+']]</div><div>[['+one_member['页面名']+']]×'+change_combine_numbers_to_str(one_result['数量'])+'</div></div>'
                         st+='<div>{{H|' + one_member['页面名'] + '}}×'+change_combine_numbers_to_str(one_result['数量'])+'</div>'
                         codes = {'0': '升级属性', '1': '非英雄单位', '2': members[k]['单位名']}
                         for l in ['生命值', '护甲', '魔法抗性', '经验', '金钱上限', '金钱下限']:
@@ -44,16 +47,17 @@ def get_source_to_data(all_json, version, text_base):
                         one_result['平均金钱']=ability.one_combine_txt_numbers(codes, all_json, text_base, ['单位组', '金钱上限', '成员', '单位名称'])
                         one_result['平均金钱'] = ability.calculate_combine_txt_numbers(one_result['平均金钱'], one_result['金钱下限'], '+')
                         for l in one_result['平均金钱']:
-                            for k in range(len(l[0])):
-                                l[0][k] = l[0][k] / 2
+                            for m in range(len(l[0])):
+                                l[0][m] = l[0][m] / 2
+                        one_result=apply_extra_attribute(one_result,extra_attribute,members[k]['单位名'])
                         for l in ['生命值', '经验', '金钱上限', '金钱下限', '平均金钱']:
                             one_result[l] = ability.calculate_combine_txt_numbers(one_result[l], one_result['数量'], '*')
                         for l in one_result['护甲']:
-                            for k in range(len(l[0])):
-                                l[0][k] = 1 - 0.06 * l[0][k] / (1 + 0.06 * abs(l[0][k]))
+                            for m in range(len(l[0])):
+                                l[0][m] = 1 - 0.06 * l[0][m] / (1 + 0.06 * abs(l[0][m]))
                         for l in one_result['魔法抗性']:
-                            for k in range(len(l[0])):
-                                l[0][k] = 1 - l[0][k] / 100
+                            for m in range(len(l[0])):
+                                l[0][m] = 1 - l[0][m] / 100
                         one_result['物理生命']=ability.calculate_combine_txt_numbers(one_result['生命值'], one_result['护甲'], '/')
                         one_result['魔法生命']=ability.calculate_combine_txt_numbers(one_result['生命值'], one_result['魔法抗性'], '/')
                         for l in result:
@@ -149,3 +153,31 @@ def change_double_combine_numbers_to_str(slist1,slist2,linkop='~'):
             rere += ability.combine_numbers_post_level(slist1[l][0],round=1)+linkop+ability.combine_numbers_post_level(slist2[l][0],round=1)
         rere += ")"
     return rere
+
+def confirm_extra_attribute(jsons,all_json,name,index):
+    relist=[]
+    for i,v in jsons.items():
+        if v['属性']!='':
+            one_dict = {}
+            one_dict['属性'] = v['属性']
+            one_dict['目标'] = []
+            for j, w in v['目标']:
+                one_dict['目标'].append(w)
+            tempcode = v['代码']
+            tempcode['0'] = '升级属性' if tempcode['0'] == '' else tempcode['0']
+            tempcode['1'] = '技能' if tempcode['1'] == '' else tempcode['1']
+            one_dict['值'] = ability.one_combine_txt_numbers(tempcode, all_json, {}, ['单位组', name, '成员', index, '额外属性', i])
+            relist.append(one_dict)
+    return relist
+
+
+def apply_extra_attribute(result,extra,name):
+    for i in extra:
+        if len(i['目标'])==0 or name in i['目标']:
+            if i['属性']=='加百分比生命':
+                result['生命值'] = ability.calculate_combine_txt_numbers(result['生命值'], i['值'], '%+')
+            elif i['属性']=='加护甲':
+                result['护甲'] = ability.calculate_combine_txt_numbers(result['护甲'], i['值'], '+')
+            elif i['属性']=='加魔抗':
+                result['魔法抗性'] = ability.calculate_combine_txt_numbers(result['魔法抗性'], i['值'], '%*%')
+    return result

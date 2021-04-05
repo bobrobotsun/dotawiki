@@ -357,8 +357,13 @@ edit = {
         "图片": ['text', ''],
         "迷你图片": ['text', ''],
         "次级分类": ['text', ''],
-        "成员": ['tree', {"list": ["tree", {'名称': ['text', ''], 'list': ['tree', {'单位名': ['text', '']
-            , '数量': ['tree', {'代码': ['tree', {'list': ['text', '', 0, 4, False]}]}]}, 1, 1, False]}, 1, 1, False]}]
+        "成员": ['tree', {"list": ["tree", {'名称': ['text', ''],
+            '额外属性': ['tree', {'list': ['tree', {
+                                            '属性':['text',''],
+                                            '代码': ['tree', {'list': ['text', '', 0, 4, False]}],
+                                            '目标': ['tree', {'list': ['text', '', 1, 0, True]}]}, 1, 0, True]}],
+            'list': ['tree', {'单位名': ['text', ''], '数量': ['tree', {'代码': ['tree', {'list': ['text', '', 0, 4, False]}]}]}, 1, 1, False],
+                }, 1, 1, False]}],
     },
     '机制': {
         "页面名": ['text', ''],
