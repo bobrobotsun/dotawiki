@@ -109,10 +109,7 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
         if len(all_json[i]['迷你图片']) > 1:
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'][0].upper() + all_json[i]['迷你图片'][1:]
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'].replace(' ', '_')
-        for j in ['英雄攻击伤害','非英雄攻击伤害']:
-            if j not in all_json[i] or ('0' in all_json[i][j]['1']['代码'] and all_json[i][j]['1']['代码']['0']==''):
-                all_json[i][j]={'1':{'代码':{'0':'手填','1':0},'修正':{'1':''}}}
-        for j in unitpro_txt + unitpro_num+[['英雄攻击伤害'],['非英雄攻击伤害']]:
+        for j in unitpro_txt + unitpro_num:
             popit = []
             for k in all_json[i][j[0]]:
                 if k != "代码" and k != "1" and k != '修正':
@@ -152,10 +149,10 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
 
 def complete_upgrade(all_json, base_txt):
     for i in all_json:
-        for jj in unitpro_txt + unitpro_num+[['英雄攻击伤害'],['非英雄攻击伤害']]:
+        for jj in unitpro_txt + unitpro_num:
             j = jj[0]
             if isinstance(all_json[i][j], dict):
-                one_upgrade(all_json[i][j], base_txt, i, j)
+                one_upgrade(all_json[i][j], base_txt, i, j, all_json)
 
 
 def fulfil(arr, json):
@@ -174,7 +171,7 @@ def fulfil(arr, json):
     return True
 
 
-def one_upgrade(json, base_txt, name, target):
+def one_upgrade(json, base_txt, name, target, all_json):
     ii = 1
     while True:
         ii += 1
@@ -194,6 +191,36 @@ def one_upgrade(json, base_txt, name, target):
                 getvalue[0].append(json['1'][i])
             else:
                 break
+        if json["1"]["修正"]["1"] != "":
+            caloprate[1] = json["1"]["修正"]["1"]
+            k = 1
+            try:
+                while True:
+                    k += 1
+                    if str(k) in json["1"]["修正"]:
+                        getvalue[1].append(float(json["1"]["修正"][str(k)]))
+                    else:
+                        break
+            except ValueError:
+                edits=[json["1"]["修正"]["2"],json["1"]["修正"]["3"],json["1"]["修正"]["4"]]
+                if edits[0]=='':
+                    edits[0]='非英雄单位'
+                if edits[1]=='':
+                    edits[1]=name
+                if edits[1] in base_txt[edits[0]]:
+                    if edits[2] in base_txt[edits[0]][edits[1]]:
+                        for k in base_txt[edits[0]][edits[1]][edits[2]]:
+                            getvalue[1].append(base_txt[edits[0]][edits[1]][edits[2]][k])
+                    else:
+                        raise (editerror('非英雄单位', name, target + '没有找到《' + '→'.join(edits) + '》的内容'))
+                elif edits[1] in all_json:
+                    for l in all_json[edits[1]]["代码名"]:
+                        if edits[2] in base_txt['非英雄单位'][all_json[edits[1]]["代码名"][l]]:
+                            getvalue[1].append(base_txt['非英雄单位'][all_json[edits[1]]["代码名"][l]][edits[2]]['1'])
+                        else:
+                            raise (editerror('非英雄单位', name, target + '没有找到《' + '→'.join(edits) + '》的内容'))
+                else:
+                    raise (editerror('非英雄单位', name, target + '没有找到《' + '→'.join(edits) + '》的内容'))
     else:
         getvalue[0].append(0)
         json["1"] = {}
@@ -504,5 +531,7 @@ unitpro_num = [["远古单位", "IsAncient"]
     , ["夜晚视野", "VisionNighttimeRange"]
     , ["攻击欲望", "AttackDesire"]
     , ["模型比例", "ModelScale"]
+    , ["英雄攻击伤害", "StatusHealth"]
+    , ["非英雄攻击伤害", "StatusHealth"]
                ]
 unit_default = {"ConsideredHero": {"1": 0}, "IsSummoned": {"1": 0}, "ModelScale": {"1": 1}}

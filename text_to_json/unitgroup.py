@@ -22,7 +22,7 @@ def get_source_to_data(all_json, version, text_base):
                +i+']]（'+members['名称']+'）</td></tr><tr><td>'
             #st小表格
             # 成员数量，生命值，金钱，经验，物理生命，魔法生命
-            result = {'数量': [[[0], {}]], '生命值': [[[0], {}]], '金钱上限': [[[0], {}]], '金钱下限': [[[0], {}]], '经验': [[[0], {}]], '物理生命': [[[0], {}]], '魔法生命': [[[0], {}]]}
+            result = {'数量': [[[0], {}]], '生命值': [[[0], {}]], '金钱上限': [[[0], {}]], '金钱下限': [[[0], {}]], '平均金钱': [[[0], {}]], '经验': [[[0], {}]], '物理生命': [[[0], {}]], '魔法生命': [[[0], {}]]}
             kk = 0
             while True:
                 kk += 1
@@ -40,7 +40,13 @@ def get_source_to_data(all_json, version, text_base):
                         for l in ['生命值', '护甲', '魔法抗性', '经验', '金钱上限', '金钱下限']:
                             codes['3'] = l
                             one_result[l] = ability.one_combine_txt_numbers(codes, all_json, text_base, ['单位组', i, '成员', '单位名称'])
-                        for l in ['生命值', '经验', '金钱上限', '金钱下限']:
+                        codes['3'] = '金钱上限'
+                        one_result['平均金钱']=ability.one_combine_txt_numbers(codes, all_json, text_base, ['单位组', '金钱上限', '成员', '单位名称'])
+                        one_result['平均金钱'] = ability.calculate_combine_txt_numbers(one_result['平均金钱'], one_result['金钱下限'], '+')
+                        for l in one_result['平均金钱']:
+                            for k in range(len(l[0])):
+                                l[0][k] = l[0][k] / 2
+                        for l in ['生命值', '经验', '金钱上限', '金钱下限', '平均金钱']:
                             one_result[l] = ability.calculate_combine_txt_numbers(one_result[l], one_result['数量'], '*')
                         for l in one_result['护甲']:
                             for k in range(len(l[0])):
@@ -59,28 +65,29 @@ def get_source_to_data(all_json, version, text_base):
             for k in ['数量']:
                 kk=k+'平均'
                 result[kk]={}
-                for l in ['经验', '金钱上限', '金钱下限']:
+                for l in ['经验', '金钱上限', '金钱下限', '平均金钱']:
                     result[kk][l]=ability.calculate_combine_txt_numbers(result[l], result[k], '/')
             for k in ['生命值','物理生命','魔法生命']:
                 kk=k+'平均'
                 result[kk]={}
-                for l in ['经验', '金钱上限', '金钱下限']:
+                for l in ['经验', '金钱上限', '金钱下限', '平均金钱']:
                     result[kk][l]=ability.calculate_combine_txt_numbers(result[l], result[k], '/')
                     for m in result[kk][l]:
                         for n in range(len(m[0])):
                             m[0][n] = m[0][n] * 1000
             members['总计']={}
-            for k in ['经验', '金钱上限', '金钱下限']:
+            for k in ['经验', '金钱上限', '金钱下限', '平均金钱']:
                 members['总计'][k]=combine_numbers_back_to_json(result[k])
             for k in ['数量','生命值','物理生命','魔法生命']:
                 kk=k+'平均'
                 members[k]={k:combine_numbers_back_to_json(result[k])}
-                for l in ['经验', '金钱上限', '金钱下限']:
+                for l in ['经验', '金钱上限', '金钱下限', '平均金钱']:
                     members[k][l]=combine_numbers_back_to_json(result[kk][l])
             bt+='</td><td style="background-color:#eeeecc;">总计' \
-                '{{H|金钱}}'+change_double_combine_numbers_to_str(result['金钱下限'],result['金钱上限'])\
+                '{{H|金钱}}'+change_combine_numbers_to_str(result['平均金钱'])+'('+change_double_combine_numbers_to_str(result['金钱下限'],result['金钱上限'])+')'\
                 +'{{H|经验}}'+change_combine_numbers_to_str(result['经验'])+'</td></tr>'
-            st+='</td></tr><tr><td style="background-color:#eeeecc;">{{H|金钱}}'+change_double_combine_numbers_to_str(result['金钱下限'],result['金钱上限'])\
+            st+='</td></tr><tr><td style="background-color:#eeeecc;">{{H|金钱}}'+change_combine_numbers_to_str(result['平均金钱'])\
+                +'('+change_double_combine_numbers_to_str(result['金钱下限'],result['金钱上限'])+')'\
                 +'</td></tr><tr><td style="background-color:#eeeecc;">{{H|经验}}'+change_combine_numbers_to_str(result['经验'])+'</td></tr>'
             for k in [['数量','cceeee'],['生命值','cceecc'],['物理生命','eecccc'],['魔法生命','ccccee']]:
                 kk=k[0]+'平均'
@@ -92,7 +99,8 @@ def get_source_to_data(all_json, version, text_base):
                 else:
                     bt+=k[0]+'，千血'
                     st+=k[0]
-                bt+='平均{{H|金钱}}'+change_double_combine_numbers_to_str(result[kk]['金钱下限'],result[kk]['金钱上限'])\
+                bt+='平均{{H|金钱}}'+change_combine_numbers_to_str(result[kk]['平均金钱'])\
+                    +'('+change_double_combine_numbers_to_str(result[kk]['金钱下限'],result[kk]['金钱上限'])+')'\
                     +'{{H|经验}}'+change_combine_numbers_to_str(result[kk]['经验'])+'</td></tr>'
                 st+='</td></tr>'
             bt+='</table>'

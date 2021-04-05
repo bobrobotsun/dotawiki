@@ -1089,7 +1089,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
     if db["中立生物"]["1"]["1"] == 1:
         # 这里有个东西，是关于野怪营地的东西，目前还没办法改动
         retxt += '<h2>营地</h2>{{#arraymap:{{#ask:[[Creep type::' + db['页面名'] + ']]|link=none}}|,|@@@|[[{{#ask:[[has subobject::@@@]]|?name|mainlabel=-|headers=hide}}]]}}'
-    if db["召唤物"]["1"]["1"] == 1 or db["英雄级单位"]["1"]["1"] == 1 or db["关联类型"] == '守卫':
+    if '1' in db['源技能']:
         retxt += '<h2>召唤源技能</h2>'
         for i, v in db['源技能'].items():
             if v in json_base['技能']:
@@ -1254,7 +1254,7 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
              '[[分类:单位组]]'
     if db['次级分类'] != '':
         retxt += '[[分类:' + db['次级分类'] + ']]'
-        if db['次级分类'][2:] == '中立营地':
+        if db['次级分类'][-4:] == '中立营地':
             retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']
     retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json|' + unitgroup + ']]</div>'
 
