@@ -156,7 +156,8 @@ def change_double_combine_numbers_to_str(slist1,slist2,linkop='~'):
 
 def confirm_extra_attribute(jsons,all_json,name,index):
     relist=[]
-    for i,v in jsons.items():
+    for i in jsons:
+        v=jsons[i]
         if v['属性']!='':
             one_dict = {}
             one_dict['属性'] = v['属性']

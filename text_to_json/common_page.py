@@ -1253,7 +1253,7 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
              '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]\n#QQ群：539026033\n#新浪微博：[https://weibo.com/u/5617043593 DotA中文wiki]' \
              '[[分类:单位组]]'
     if db['次级分类'] != '':
-        retxt += '[[分类:' + db['次级分类'] + ']]'
+        retxt += '[[分类:' + db['次级分类'] + ']]\n'
         if len(db['次级分类'])>=4 and db['次级分类'][-4:] == '中立营地':
             retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']
     retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json|' + unitgroup + ']]</div>'
