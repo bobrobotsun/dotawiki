@@ -1280,7 +1280,8 @@ class Main(QMainWindow):
                                 self.json_base[i][j]['技能'].append(k[0])
             unit_own={}
             for i in self.json_base['非英雄单位']:
-                for j,w in self.json_base['非英雄单位'][i]['源技能'].items():
+                for j in self.json_base['非英雄单位'][i]['源技能']:
+                    w=self.json_base['非英雄单位'][i]['源技能'][j]
                     if w not in unit_own:
                         unit_own[w]=[]
                     unit_own[w].append(i)
@@ -1817,12 +1818,14 @@ class Main(QMainWindow):
                 if self.json_base['技能'][i]['数据来源'] == skill_name:
                     target_name.append(self.json_base['技能'][i]['技能归属'])
             for i,v in self.json_base['非英雄单位'].items():
-                for j,w in v['源技能'].items():
+                for j in v['源技能']:
+                    w=v['源技能'][j]
                     if w==selected_name:
                         target_name.append(i)
         elif selected =='非英雄单位':
             target_name.append(selected_name)
-            for i,v in self.json_base['非英雄单位'][selected_name]['源技能'].items():
+            for i in self.json_base['非英雄单位'][selected_name]['源技能']:
+                v=self.json_base['非英雄单位'][selected_name]['源技能'][i]
                 if v in self.json_base['技能']:
                     if len(self.json_base['技能'][v]['技能归属']) > 0:
                         target_name.append(self.json_base['技能'][v]['技能归属'])

@@ -111,6 +111,8 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'].replace(' ', '_')
         for j in unitpro_txt + unitpro_num:
             popit = []
+            if j[0] not in all_json[i]:
+                all_json[i][j[0]] = {'1': {'代码': {'0': '', '1': '', '2': '', '3': ''}, '修正': {'1': ''}}}
             for k in all_json[i][j[0]]:
                 if k != "代码" and k != "1" and k != '修正':
                     popit.append(k)
@@ -202,11 +204,11 @@ def one_upgrade(json, base_txt, name, target, all_json):
                     else:
                         break
             except ValueError:
-                edits=[json["1"]["修正"]["2"],json["1"]["修正"]["3"],json["1"]["修正"]["4"]]
-                if edits[0]=='':
-                    edits[0]='非英雄单位'
-                if edits[1]=='':
-                    edits[1]=name
+                edits = [json["1"]["修正"]["2"], json["1"]["修正"]["3"], json["1"]["修正"]["4"]]
+                if edits[0] == '':
+                    edits[0] = '非英雄单位'
+                if edits[1] == '':
+                    edits[1] = name
                 if edits[1] in base_txt[edits[0]]:
                     if edits[2] in base_txt[edits[0]][edits[1]]:
                         for k in base_txt[edits[0]][edits[1]][edits[2]]:
@@ -414,7 +416,7 @@ def fulfil_complex_and_simple_show(all_json):
             st += '<span class="label bg-primary">英雄级</span>'
         else:
             st += '<span class="label bg-default">非英雄级</span>'
-        if db["关联类型"] == '守卫':
+        if db["单位关系类型"]['1']['1'] == '守卫':
             st += ' <span class="label bg-warning">守卫</span>'
         else:
             st += ' <span class="label bg-default">非守卫</span>'
@@ -434,21 +436,21 @@ def fulfil_complex_and_simple_show(all_json):
             st += '[[file:' + db['图片'] + '|160px|center|link=' + i + ']]'
         st += '</td><td class="bg-primary dota_unit_simple_infobox_trait_title">等级</td>' \
               '<td class="bg-primary dota_unit_simple_infobox_trait_title">攻击间隔</td></tr>' \
-              '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'等级') \
-              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'攻击间隔') \
+              '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '等级') \
+              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '攻击间隔') \
               + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">生命值</td>' \
                 '<td class="bg-primary dota_unit_simple_infobox_trait_title">生命恢复</td></tr>' \
-                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'生命值') \
-              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'生命恢复') \
+                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '生命值') \
+              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '生命恢复') \
               + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">魔法值</td>' \
                 '<td class="bg-primary dota_unit_simple_infobox_trait_title">魔法恢复</td></tr>' \
-                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'魔法值') \
-              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'魔法恢复') \
+                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '魔法值') \
+              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '魔法恢复') \
               + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">攻击力</td>' \
                 '<td class="bg-primary dota_unit_simple_infobox_trait_title">'
-        if db['生命类型']=='生命值':
+        if db['生命类型'] == '生命值':
             st += '护甲/魔法抗性'
-        elif db['生命类型']=='攻击次数':
+        elif db['生命类型'] == '攻击次数':
             st += '攻击造成伤害'
         st += '</td></tr>'
         if len(db['技能']) == 0:
@@ -461,27 +463,29 @@ def fulfil_complex_and_simple_show(all_json):
                 st += '{{A|' + db['技能'][j] + '}}'
             st += '</td>'
         st += '<td class="dota_unit_simple_infobox_trait_value">' + change_double_combine_numbers_to_str(db['攻击下限'], db['攻击上限']) \
-              + '<br/>(' + change_combine_numbers_to_str(db,'攻击类型') \
+              + '<br/>(' + change_combine_numbers_to_str(db, '攻击类型') \
               + ')</td><td class="dota_unit_simple_infobox_trait_value">'
-        if db['生命类型']=='生命值':
-            st += change_combine_numbers_to_str(db,'护甲') +'<br/>(' + change_combine_numbers_to_str(db,'护甲类型') + ')<br/>' + change_combine_numbers_to_str(db,'魔法抗性', '%')
+        if db['生命类型'] == '生命值':
+            st += change_combine_numbers_to_str(db, '护甲') + '<br/>(' + change_combine_numbers_to_str(db, '护甲类型') + ')<br/>' + change_combine_numbers_to_str(db, '魔法抗性', '%')
         elif db['生命类型'] == '攻击次数':
-            st+=change_combine_numbers_to_str(db,'英雄攻击伤害') +'(英雄)<br/>' + change_combine_numbers_to_str(db,'非英雄攻击伤害') + '(非英雄)'
+            st += change_combine_numbers_to_str(db, '英雄攻击伤害') + '(英雄)<br/>' + change_combine_numbers_to_str(db, '非英雄攻击伤害') + '(非英雄)'
         st += '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">移动速度</td>' \
               '<td class="bg-primary dota_unit_simple_infobox_trait_title">攻击距离</td></tr>' \
-              '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'移动速度') \
-              + '</td><td class="dota_unit_simple_infobox_trait_value" rowspan=2>' + change_combine_numbers_to_str(db,'攻击距离') \
-              + '<br/>(' + change_combine_numbers_to_str(db,'近战远程') \
+              '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '移动速度') \
+              + '</td><td class="dota_unit_simple_infobox_trait_value" rowspan=2>' + change_combine_numbers_to_str(db, '攻击距离') \
+              + '<br/>(' + change_combine_numbers_to_str(db, '近战远程') \
               + ')</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">金钱</td></tr>' \
                 '<tr><td class="dota_unit_simple_infobox_trait_value" rowspan=2>' + change_double_combine_numbers_to_str(db['金钱下限'], db['金钱上限']) \
               + '</td><td class="bg-primary dota_unit_simple_infobox_trait_title">经验</td></tr>' \
-                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db,'经验') \
+                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '经验') \
               + '</td></tr></table>'
         db['简易展示'] = st
         db['具体展示'] = bt
 
-def change_combine_numbers_to_str(s1,s2, post=''):
-    return common_page.create_upgrade_text(s1,s2,lambda x: post,lambda x,y:'<br>' if str(1+int(y)) in x else '')
+
+def change_combine_numbers_to_str(s1, s2, post=''):
+    return common_page.create_upgrade_text(s1, s2, lambda x: post, lambda x, y: '<br>' if str(1 + int(y)) in x else '')
+
 
 def change_double_combine_numbers_to_str(slist1, slist2):
     return common_page.get_unit_upgrade_double(slist1, slist2)
@@ -496,6 +500,10 @@ unitpro_txt = [
        {"DOTA_UNIT_CAP_MELEE_ATTACK": "近战", "DOTA_UNIT_CAP_RANGED_ATTACK": "远程", "DOTA_UNIT_CAP_NO_ATTACK": "不攻击"}]
     , ["移动方式", "MovementCapabilities",
        {"DOTA_UNIT_CAP_MOVE_GROUND": "地面", "DOTA_UNIT_CAP_MOVE_FLY": "飞行", "DOTA_UNIT_CAP_MOVE_NONE": "不移动"}]
+    , ["单位关系类型", "UnitRelationshipClass",
+       {"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT": "默认", "DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD": "守卫", "DOTA_NPC_UNIT_RELATIONSHIP_TYPE_ATTACHED": "附着物"
+           , "DOTA_NPC_UNIT_RELATIONSHIP_TYPE_COURIER": "信使", 'DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING': '建筑', 'DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BARRACKS': '兵营'
+           , 'DOTA_NPC_UNIT_RELATIONSHIP_TYPE_SIEGE': '投石车'}]
     , ["碰撞体积", "BoundsHullName",
        {"DOTA_HULL_SIZE_SMALL": 16, "DOTA_HULL_SIZE_REGULAR": 16, "DOTA_HULL_SIZE_HERO": 24,
         "DOTA_HULL_SIZE_TOWER": 144, "DOTA_HULL_SIZE_FILLER": 96, "DOTA_HULL_SIZE_BARRACKS": 144,

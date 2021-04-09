@@ -30,7 +30,8 @@ def all_the_names(db, json_base):
                 for j in json_base['技能'][i]['曾用名']:
                     relist.append(j)
     if '源技能' in db:
-        for i, v in db['源技能'].items():
+        for i in db['源技能']:
+            v=db['源技能'][i]
             if v in db['技能']:
                 relist.append(v)
                 if '曾用名' in json_base['技能'][v]:
@@ -816,7 +817,7 @@ def create_navboxunit(json_base):
                 if len(lists[3]) > 0:
                     lists[3] += '&nbsp;{{!}}&nbsp;'
                 lists[3] += create_miniimage_with_link(v)
-            elif "关联类型" in v and v["关联类型"] == '守卫':
+            elif v["单位关系类型"]["1"]["1"] == '守卫':
                 if len(lists[4]) > 0:
                     lists[4] += '&nbsp;{{!}}&nbsp;'
                 lists[4] += create_miniimage_with_link(v)
@@ -1079,23 +1080,33 @@ def create_page_unit(json_base, log_base, log_list, unit):
         retxt += '[[中立生物]][[分类:中立生物]]'
     if db["类型"] == '建筑物':
         retxt += '[[建筑物]][[分类:建筑物]]'
-    if "关联类型" in db:
-        if db["关联类型"] == '守卫':
-            retxt += '[[守卫]][[分类:守卫]][[分类:召唤物]]'
-        else:
-            retxt += db["关联类型"]
+    if db["单位关系类型"]["1"]["1"] == '守卫':
+        retxt += '[[守卫]][[分类:守卫]][[分类:召唤物]]'
+    elif db["单位关系类型"]["1"]["1"] != '默认':
+        retxt += '[['+db["单位关系类型"]["1"]["1"]+']]'
     if "简介" in db and db["简介"] != '':
         retxt += '<br>' + db["简介"]
     if db["中立生物"]["1"]["1"] == 1:
         # 这里有个东西，是关于野怪营地的东西，目前还没办法改动
-        retxt += '<h2>营地</h2>{{#arraymap:{{#ask:[[Creep type::' + db['页面名'] + ']]|link=none}}|,|@@@|[[{{#ask:[[has subobject::@@@]]|?name|mainlabel=-|headers=hide}}]]}}'
+        retxt += '\n==营地==\n{{#arraymap:{{#ask:[[Creep type::' + db['页面名'] + ']]|link=none}}|,|@@@|[[{{#ask:[[has subobject::@@@]]|?name|mainlabel=-|headers=hide}}]]}}'
     if '1' in db['源技能']:
-        retxt += '<h2>召唤源技能</h2>'
+        retxt += '\n==召唤源技能==\n'
         for i, v in db['源技能'].items():
             if v in json_base['技能']:
                 sdb = json_base['技能'][v]
                 retxt += '<br><div>[[' + v + ']]<br>:[[file:' + sdb['图片'] + '|64px|link=' + sdb['页面名'] + '|left]]' + sdb['描述'] \
                          + create_upgrade_manacost(sdb['魔法消耗']) + create_upgrade_cooldown(sdb['冷却时间']) + '</div>'
+    unitgroup=[]
+    for i,v in json_base['单位组'].items():
+        if unit in v['全部单位']:
+            unitgroup.append(i)
+    if len(unitgroup)>0:
+        retxt += '\n==所属单位组==\n<div class="dota_rotatey_transform_switch_content1">'
+        for i in unitgroup:
+            retxt += '<div>' + json_base['单位组'][i]['成员']['1']['大表格'] + '</div>'
+        retxt += '</div><div class="dota_rotatey_transform_switch_content0">'
+        for i in unitgroup:
+            retxt += '<div>' + json_base['单位组'][i]['成员']['1']['小表格'] + '</div>'
     retxt += '</div>'
     if db["类型"] == '士兵':
         retxt += '[[分类:士兵]]'

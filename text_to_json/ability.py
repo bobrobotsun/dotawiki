@@ -1309,7 +1309,52 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
     if '排序' in conditions:
         for i in range(len(conditions['排序'])):
             sort_mark += find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target)
-    if conditions['函数'][0][0] == '短':
+    if conditions['函数'][0][0] == '文字':
+        tag=''
+        tag_class=''
+        tag_style=''
+        tag_other=''
+        content_text=''
+        if 'tag' in conditions:
+            if conditions['tag'][0][0] != '':
+                tag=conditions['tag'][0][0]
+        if 'class' in conditions:
+            for i in conditions['class']:
+                for j in i:
+                    if j!='':
+                        tag_class+=j
+                        if j[-1]!=' ':
+                            tag_class+=' '
+            if tag_class!='':
+                tag_class = ' class="'+tag_class+'"'
+        if 'style' in conditions:
+            for i in conditions['style']:
+                for j in i:
+                    if j!='':
+                        tag_style+=j
+                        if j[-1]!=';':
+                            tag_style+=';'
+            if tag_style!='':
+                tag_style = ' style="'+tag_style+'"'
+        if 'other' in conditions:
+            for i in conditions['other']:
+                for j in i:
+                    if j!='':
+                        tag_other+=j
+                        if j[-1]!=' ':
+                            tag_other+=' '
+            if tag_other!='':
+                tag_other = ' '+tag_other
+        if '条件文字' in conditions:
+            for i in range(len(conditions['条件文字'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件文字'][i], i, json, result, target)
+                if isinstance(tempjson, str):
+                    content_text += tempjson
+        if tag=='':
+            retxt += content_text
+        else:
+            retxt += '<'+tag+tag_class+tag_style+tag_other+'>'+content_text+'</'+tag+'>'
+    elif conditions['函数'][0][0] == '短':
         another_image = ''
         another_name = ''
         another_info = ''
@@ -1663,7 +1708,6 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                             one_bool = one_bool and one_half_bool
                             if one_half_bool:
                                 one_half_result[0] = [i] + one_half_result[0]
-                                half_result = half_result + one_half_result
                         else:
                             if jj > 1:
                                 break
@@ -1742,6 +1786,10 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                         all_bools = isinstance(tempjson, dict) and condition[ii + 1] in tempjson
                     elif i == '@notin':
                         all_bools = isinstance(tempjson, dict) and condition[ii + 1] not in tempjson
+                    elif i == '@strin':
+                        all_bools = isinstance(tempjson, str) and condition[ii + 1] in tempjson
+                    elif i == '@notstrin':
+                        all_bools = isinstance(tempjson, str) and condition[ii + 1] not in tempjson
                     else:
                         raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
                     ii += 1

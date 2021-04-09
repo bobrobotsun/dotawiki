@@ -144,6 +144,8 @@ edit = {
                                             '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "召唤物": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                            '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
+        "单位关系类型": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                             '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "等级": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                           '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "生命值": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
