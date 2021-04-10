@@ -1214,7 +1214,9 @@ def calculate_combine_txt_numbers(list1, list2, op):
                 if j >= len(expand2[i][0]):
                     expand2[i][0].append(expand2[i][0][j - 1])
             for j in range(len(expand1[i][0])):
-                if op == '..':
+                if expand1[i][0][j]=='无穷大':
+                    expand1[i][0][j] = '无穷大'
+                elif op == '..':
                     expand1[i][0][j] = number_to_string(expand1[i][0][j]) + number_to_string(expand2[i][0][j])
                 elif op == '+':
                     expand1[i][0][j] += expand2[i][0][j]
@@ -1223,7 +1225,10 @@ def calculate_combine_txt_numbers(list1, list2, op):
                 elif op == '*':
                     expand1[i][0][j] *= expand2[i][0][j]
                 elif op == '/':
-                    expand1[i][0][j] /= expand2[i][0][j]
+                    if expand2[i][0][j]==0:
+                        expand1[i][0][j]='无穷大'
+                    else:
+                        expand1[i][0][j] /= expand2[i][0][j]
                 elif op == '\\':
                     expand1[i][0][j] = expand2[i][0][j] / expand1[i][0][j]
                 elif op == '^' or op == 'pow':
