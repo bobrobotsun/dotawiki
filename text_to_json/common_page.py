@@ -947,6 +947,7 @@ def create_page_logs(title, log_base, log_list, name_base):
                         if len(w) > 3:
                             retxt += '\n<br>'
     retxt += '\n[[分类:版本更新]]'
+    retxt += thanks_for_the_audience()
     return retxt
 
 
@@ -1043,11 +1044,12 @@ def create_page_hero(json_base, log_base, log_list, hero):
              + '</div>'
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i], json_base)
-    retxt += '<h2>历史更新</h2>' \
+    retxt += '\n==历史更新==' \
              + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
-             + '<h2>饰品</h2>' \
+             + '\n==饰品==' \
              + '[[data:' + db["中文名"] + '/equipment|点击进入查看饰品信息]]' \
              + json_base['机制']['通用']['简单条目']['英雄导航']
+    retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1112,8 +1114,9 @@ def create_page_unit(json_base, log_base, log_list, unit):
         retxt += '[[分类:士兵]]'
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i], json_base)
-    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
+    retxt += '\n==历史更新==' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
              + '<div>' + json_base['机制']['通用']['简单条目']['非英雄单位导航'] + '</div>[[分类:非英雄单位]]'
+    retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1166,7 +1169,8 @@ def create_page_item(json_base, log_base, log_list, item):
             retxt += '。'
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i], json_base)
-    retxt += '<h2>历史更新</h2>' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) + '[[分类:物品]]'
+    retxt += '\n==历史更新==' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) + '[[分类:物品]]'
+    retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1226,6 +1230,7 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
         if db['次级分类'] != '':
             retxt += '[[分类:' + db['次级分类'] + ']]'
         retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + mech + '/源.json|' + mech + '/源]]<br>[[Data:' + mech + '.json|' + mech + ']]</div>'
+    retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
     for i in range(len(retxt)):
@@ -1260,13 +1265,20 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     for i in db['全部单位']:
         if i in json_base['非英雄单位']:
             retxt+=json_base['非英雄单位'][i]['简易展示']
-    retxt += '\n==感谢您的阅读==\n以上内容均通过特殊方式上传，如果您觉得我们写的东西错了，请通过以下方式告知我们：' \
-             '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]\n#QQ群：539026033\n#新浪微博：[https://weibo.com/u/5617043593 DotA中文wiki]' \
-             '[[分类:单位组]]'
+    retxt += thanks_for_the_audience()
+    retxt += '[[分类:单位组]]'
     if db['次级分类'] != '':
         retxt += '[[分类:' + db['次级分类'] + ']]\n'
         if len(db['次级分类'])>=4 and db['次级分类'][-4:] == '中立营地':
             retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']
     retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + unitgroup + '.json|' + unitgroup + ']]</div>'
 
+    return retxt
+
+def thanks_for_the_audience():
+    retxt='\n==感谢您的阅读==' \
+          '\n以上内容均通过特殊方式上传，如果您觉得书写内容有误，需要修改，请通过以下方式告知我们：' \
+          '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]' \
+          '\n#QQ群：539026033' \
+          '\n#新浪微博：[https://weibo.com/u/5617043593 DotA中文wiki]'
     return retxt

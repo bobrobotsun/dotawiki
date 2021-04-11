@@ -2604,10 +2604,10 @@ class Main(QMainWindow):
                             break
                         except:
                             k += 1
-                            self.w.addtext([title + '版本json下载暂时出现了失败。已尝试' + k + '次，正在重新尝试', 2], i)
+                            self.w.addtext([title + '版本json下载暂时出现了失败。已尝试' + str(k) + '次，正在重新尝试', 2], i)
                     else:
                         k += 1
-                        self.w.addtext([title + '版本json下载暂时出现了失败。已尝试' + k + '次，正在重新尝试', 2], i)
+                        self.w.addtext([title + '版本json下载暂时出现了失败。已尝试' + str(k) + '次，正在重新尝试', 2], i)
                         if k > 10:
                             self.w.addtext([title + '版本json下载失败。请重新检查网络后重新下载', 0], i)
                             break
