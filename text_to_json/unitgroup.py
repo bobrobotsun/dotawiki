@@ -17,6 +17,10 @@ def get_source_to_data(all_json, version, text_base):
             members = all_json['单位组'][i]['成员'][j]
             if '额外属性' not in members:
                 members['额外属性']={}
+            if '大表格' in members:
+                members.pop('大表格')
+            if '小表格' in members:
+                members.pop('小表格')
             extra_attribute=confirm_extra_attribute(members['额外属性'],all_json,i,j)
             #bt大表格
             bt='<table class="wikitable" style="width:100%;text-align:right;"><tr><td colspan="2" style="text-align:center;">[['\
@@ -109,8 +113,8 @@ def get_source_to_data(all_json, version, text_base):
                 st+='</td></tr>'
             bt+='</table>'
             st += '</table>'
-            members['大表格']=bt
-            members['小表格']=st
+            members['简易展示'] = st
+            members['具体展示'] = bt
         all_json['单位组'][i]['全部单位']=all_units
 
 def combine_numbers_back_to_json(slist):

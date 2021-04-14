@@ -1256,10 +1256,10 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
         retxt += '[[file:' + db['图片'] + '|120px|right]]\n'
     retxt += '==组信息==\n<div class="dota_rotatey_transform_switch_content1">'
     for i in db['成员']:
-        retxt += '<div>' + db['成员'][i]['大表格'] + '</div>'
+        retxt += '<div>' + db['成员'][i]['具体展示'] + '</div>'
     retxt += '</div><div class="dota_rotatey_transform_switch_content0">'
     for i in db['成员']:
-        retxt += '<div>' + db['成员'][i]['小表格'] + '</div>'
+        retxt += '<div>' + db['成员'][i]['简易展示'] + '</div>'
     retxt += '</div>'
     retxt+='\n==成员信息==\n'
     for i in db['全部单位']:

@@ -664,6 +664,8 @@ def array_cal(arr1, arr2, opp):
                 arr1[i] = float(opp[1:-1]) * temp
             elif opp[0] == '=' and opp[-1] == '/':
                 arr1[i] = float(opp[1:-1]) / temp
+            elif opp[0] == '+' and opp[-1] == '*':
+                arr1[i] = arr1[i]+(float(opp[1:-1]) * temp)
     return arr1
 
 
