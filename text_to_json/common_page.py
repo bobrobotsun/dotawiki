@@ -1044,9 +1044,9 @@ def create_page_hero(json_base, log_base, log_list, hero):
              + '</div>'
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i], json_base)
-    retxt += '\n==历史更新==' \
+    retxt += '\n==历史更新==\n' \
              + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
-             + '\n==饰品==' \
+             + '\n==饰品==\n' \
              + '[[data:' + db["中文名"] + '/equipment|点击进入查看饰品信息]]' \
              + json_base['机制']['通用']['简单条目']['英雄导航']
     retxt += thanks_for_the_audience()
@@ -1105,16 +1105,16 @@ def create_page_unit(json_base, log_base, log_list, unit):
     if len(unitgroup)>0:
         retxt += '\n==所属单位组==\n<div class="dota_rotatey_transform_switch_content1">'
         for i in unitgroup:
-            retxt += '<div>' + json_base['单位组'][i]['成员']['1']['大表格'] + '</div>'
+            retxt += '<div>' + json_base['单位组'][i]['成员']['1']['具体展示'] + '</div>'
         retxt += '</div><div class="dota_rotatey_transform_switch_content0">'
         for i in unitgroup:
-            retxt += '<div>' + json_base['单位组'][i]['成员']['1']['小表格'] + '</div>'
+            retxt += '<div>' + json_base['单位组'][i]['成员']['1']['简易展示'] + '</div>'
     retxt += '</div>'
     if db["类型"] == '士兵':
         retxt += '[[分类:士兵]]'
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i], json_base)
-    retxt += '\n==历史更新==' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
+    retxt += '\n==历史更新==\n' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
              + '<div>' + json_base['机制']['通用']['简单条目']['非英雄单位导航'] + '</div>[[分类:非英雄单位]]'
     retxt += thanks_for_the_audience()
     rere = ''
@@ -1169,7 +1169,7 @@ def create_page_item(json_base, log_base, log_list, item):
             retxt += '。'
     for i in db['技能']:
         retxt += create_page_ability(json_base['技能'][i], json_base)
-    retxt += '\n==历史更新==' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) + '[[分类:物品]]'
+    retxt += '\n==历史更新==\n' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) + '[[分类:物品]]'
     retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
