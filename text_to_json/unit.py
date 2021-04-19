@@ -174,6 +174,8 @@ def fulfil(arr, json):
 
 
 def one_upgrade(json, base_txt, name, target, all_json):
+    if name=='群蛇守卫（召唤物）' and target=='攻击距离':
+        print('sadf')
     ii = 1
     while True:
         ii += 1
@@ -304,16 +306,17 @@ def one_upgrade(json, base_txt, name, target, all_json):
     for i in range(extra + 1):
         for j in range(len(bitsum_list)):
             if bitsum_list[j] == i:
-                result_to_show_index.append(i)
+                result_to_show_index.append(j)
     for i in range(len(calvalue)):
         for k in range(len(calvalue[result_to_show_index[i]])):
+            if str(i + 1) not in json:
+                json[str(i+1)]={}
             json[str(i + 1)][str(k + 1)] = calvalue[result_to_show_index[i]][k]
         if bitsum_list[result_to_show_index[i]] > 1:
             json[str(i + 1)]["升级来源"] = {}
             for j in range(extra):
                 if result_to_show_index[i] >> j & 1:
                     json[str(i + 1)]["升级来源"][str(len(json[str(i + 1)]["升级来源"]) + 1)] = json[str(result_to_show_index[j + 1] + 1)]["升级来源"]['1']
-
 
 def all_bit_sum(i):
     rere = 0

@@ -1224,13 +1224,10 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
             retxt += '[[file:' + db['图片'] + '|120px|right]]'
     retxt += db['简述'] +create_all_chapter_page_mechnism(db)
     if db['次级分类'] != '引用机制':
-        retxt += '\n==感谢您的阅读==\n以上内容均通过特殊方式上传，如果您觉得我们写的东西错了，请通过以下方式告知我们：' \
-                 '\n#[[用户:Bobrobotsun]]、[[用户:Axiaosiris]]\n#QQ群：539026033\n#新浪微博：[https://weibo.com/u/5617043593 DotA中文wiki]' \
-                 '[[分类:机制]][[分类:生成机制]]'
+        retxt += thanks_for_the_audience()
         if db['次级分类'] != '':
             retxt += '[[分类:' + db['次级分类'] + ']]'
         retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + mech + '/源.json|' + mech + '/源]]<br>[[Data:' + mech + '.json|' + mech + ']]</div>'
-    retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
     for i in range(len(retxt)):
