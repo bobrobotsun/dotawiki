@@ -5,6 +5,7 @@ import math
 import hashlib
 import re
 import time
+import operator
 from text_to_json import common_page, edit_json
 from text_to_json.WikiError import editerror
 from xpinyin import Pinyin
@@ -903,6 +904,10 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                     ttarget.append(str(i))
                     firstsep=(len(json[ii]["混合文字"][str(i)]['类型'])<=2 or json[ii]["混合文字"][str(i)]['类型'][2]!='1') and returntxt!=''
                     returntxt += find_the_jsons_by_conditions_and_show(json[ii]["混合文字"][str(i)], all_json, ttarget,firstsep)
+                elif json[ii]["混合文字"][str(i)]['类型'] == '数值表格':
+                    ttarget = copy.deepcopy(target)
+                    ttarget.append(str(i))
+                    returntxt += find_the_target_value_jsons_by_conditions_and_show_in_table(json[ii]["混合文字"][str(i)], all_json, ttarget)
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:
@@ -1399,6 +1404,22 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     else:
                         break
                 another_info += '(' + combinetxt  + ')'
+        if '条件魔法消耗' in conditions:
+            for i in range(len(conditions['条件魔法消耗'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件魔法消耗'][i], i, json, result, target)
+                temptxt=''
+                jj = 0
+                while True:
+                    jj += 1
+                    j = str(jj)
+                    if j in tempjson:
+                        w = tempjson[j]
+                        if jj > 1:
+                            temptxt += '+'
+                        temptxt += common_page.create_upgrade_text(tempjson, j, lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '')
+                    else:
+                        break
+                another_info += '(' + temptxt  + ')'
         if '条件属性' in conditions:
             for i in range(len(conditions['条件属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件属性'][i], i, json, result, target)
@@ -1458,6 +1479,10 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             for i in range(len(conditions['条件复合属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i][:-2], i, json, result, target)
                 if conditions['条件复合属性'][i][-2] in tempjson:
+                    if '名称' in tempjson[conditions['条件复合属性'][i][-2]]:
+                        name=tempjson[conditions['条件复合属性'][i][-2]]['名称']
+                    else:
+                        name=conditions['条件复合属性'][i][-1]
                     trait += '<div>' + conditions['条件复合属性'][i][-1] + '：' + common_page.create_upgrade_text(tempjson, conditions['条件复合属性'][i][-2], image_size='x18px') + '</div>'
         if '条件单一属性' in conditions:
             for i in range(len(conditions['条件单一属性'])):
@@ -1475,6 +1500,27 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     else:
                         break
                 trait += combinetxt + '</div>'
+        if '条件魔法消耗' in conditions:
+            for i in range(len(conditions['条件魔法消耗'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件魔法消耗'][i][:-1], i, json, result, target)
+                if '名称' in tempjson and tempjson['名称'] != '':
+                    tempname = tempjson['名称']
+                else:
+                    tempname=conditions['条件魔法消耗'][i][-1]
+                temptxt=''
+                jj = 0
+                while True:
+                    jj += 1
+                    j = str(jj)
+                    if j in tempjson:
+                        w = tempjson[j]
+                        if jj > 1:
+                            temptxt += '+'
+                        temptxt += common_page.create_upgrade_text(tempjson, j, lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '')
+                    else:
+                        break
+                trait += '<div>' + tempname + '：' + temptxt + '</div>'
+
         if '条件属性' in conditions:
             for i in range(len(conditions['条件属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件属性'][i], i, json, result, target)
@@ -1825,6 +1871,119 @@ def check_the_json_meet_one_condition(condition, json, target, index):
             break
     index[0] = ii
     return relist, all_bools
+
+##查询满足要求的内容，并将同类进行合并，然后在表格中显示
+def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, target):
+    retxt = ''
+    all_results_with_sort_mark = []
+    seps = json['后缀']
+    conditions = change_json_to_condition_dict(json, target)
+    for i in all_json:
+        if i[-1] != '源':
+            for j in all_json[i]:
+                result, bool = check_the_json_meet_the_conditions(conditions['满足'], all_json[i][j], target)
+                if bool:
+                    for k in range(len(result)):
+                        all_results_with_sort_mark.append(change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions, result[k], all_json[i][j], all_json, target))
+    combined_result=[]
+    all_counts=len(all_results_with_sort_mark)
+    same_counts=[]
+    text_counts=2
+    for i in range(len(all_results_with_sort_mark[0])):
+        if isinstance(all_results_with_sort_mark[0][i],list):
+            text_counts=i
+            break
+    if len(all_results_with_sort_mark) > 0:
+        if seps=='' or seps=='合并':
+            for i in all_results_with_sort_mark:
+                check_bool = False
+                for j in range(len(combined_result)):
+                    if i[1] == combined_result[j][1]:
+                        check_bool = True
+                        combined_result[j][0] += '、' + i[0]
+                        same_counts[j] += 1
+                        break
+                if not check_bool:
+                    new_combine_list = [i[0], i[1]]
+                    if len(i) > 2:
+                        new_combine_list += i[2:]
+                    combined_result.append(new_combine_list)
+                    same_counts.append(1)
+            # 接下来根据结果删除部分
+            if '数量删除' in conditions:
+                for i in conditions['数量删除'][0]:
+                    for j in range(len(same_counts)):
+                        if i[:2] == '>=':
+                            same_counts[j] = 0 if same_counts[j] >= change_str_to_int(i[2:]) else same_counts[j]
+                        elif i[:2] == '<=':
+                            same_counts[j] = 0 if same_counts[j] <= change_str_to_int(i[2:]) else same_counts[j]
+                        elif i[:2] == '>%':
+                            same_counts[j] = 0 if same_counts[j] / all_counts >= change_str_to_float(i[2:]) / 100 else same_counts[j]
+                        elif i[:2] == '<%':
+                            same_counts[j] = 0 if same_counts[j] / all_counts <= change_str_to_float(i[2:]) / 100 else same_counts[j]
+            for i in range(len(same_counts) - 1, -1, -1):
+                if same_counts[i] == 0:
+                    combined_result.pop(i)
+        elif seps=='罗列':
+            combined_result=all_results_with_sort_mark
+        sorttime = len(combined_result[0])
+        for i in range(text_counts,sorttime):
+            reverse = combined_result[0][i][1] == '-'
+            combined_result.sort(key=lambda x: x[i][0], reverse=reverse)
+        retxt='<table class="wikitable sortable"><tr>'
+        if '标题' in conditions:
+            for i in range(text_counts):
+                if len(conditions['标题'][0])>i:
+                    retxt+='<th>'+conditions['标题'][0][i]+'</th>'
+                else:
+                    retxt+='<th></th>'
+        retxt+='</tr>'
+        for i in combined_result:
+            retxt += '<tr>'
+            for j in range(text_counts):
+                if len(i)>j:
+                    retxt+='<td>'+i[j]+'</td>'
+                else:
+                    retxt+='<td></td>'
+            retxt+='</tr>'
+        retxt+='</table>'
+    else:
+        retxt = ''
+    return retxt
+
+#change_the_right_result_json_to_text_to_show
+def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions, result, json, all_json, target):
+    sort_mark = []
+    relist = []
+    if '迷你图片' in json and json['迷你图片'] != '':
+        relist.append('[[file:' + json['迷你图片'] + '|x24px|link=]] [[' + json['页面名'] + ']]')
+    else:
+        relist.append('[[' + json['页面名'] + ']]')
+    if '排序' in conditions:
+        for i in range(len(conditions['排序'])):
+            sort_mark += find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target)
+    if True:
+        if '条件值' in conditions:
+            for i in range(len(conditions['条件数组'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件数组'][i], i, json, result, target)
+                if not isinstance(tempjson,dict):
+                    relist.append(better_float_to_text(tempjson))
+        if '条件数组' in conditions:
+            for i in range(len(conditions['条件数组'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件数组'][i], i, json, result, target)
+                one_text=''
+                kk = 0
+                while True:
+                    kk += 1
+                    k = str(kk)
+                    if k in tempjson:
+                        if kk>1:
+                            one_text+='/'
+                        one_text+=better_float_to_text(tempjson[k])
+                    else:
+                        break
+                relist.append(one_text)
+    return relist+sort_mark
 
 
 def change_json_to_condition_dict(json, target):
