@@ -1637,13 +1637,13 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target):
                 p = Pinyin()
                 list1 = [tempjson['技能排序'], '+']
                 list2 = [p.get_pinyin(tempjson['技能归属']), '+']
-                indexdict = {'英雄技能': 1, '非英雄单位技能': 2, '物品技能': 3}
+                indexdict = {'英雄技能': 1, '非英雄单位技能': 2, '物品技能': 3,'天赋技能':4}
                 indexkey = tempjson['次级分类']
                 list3 = []
                 if indexkey in indexdict:
                     list3 = [indexdict[indexkey], '+']
                 else:
-                    list3 = [1, '+']
+                    list3 = [5, '+']
                 return [list1, list2, list3]
             else:
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【条件属性】第' + str(j) + '项时，查询到的不是技能，请重新确定自己【满足】条件'))
