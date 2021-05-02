@@ -124,7 +124,7 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
                     while True:
                         l += 1
                         if str(l) in all_json[i][j[0]][k]["代码"]:
-                            all_json[i][j[0]][k][str(l)] = all_json[i][j[0]][k]["代码"][str(l)]
+                            all_json[i][j[0]][k][str(l)] = change_str_to_int(all_json[i][j[0]][k]["代码"][str(l)])
                         else:
                             break
                 else:
@@ -174,8 +174,6 @@ def fulfil(arr, json):
 
 
 def one_upgrade(json, base_txt, name, target, all_json):
-    if name=='群蛇守卫（召唤物）' and target=='攻击距离':
-        print('sadf')
     ii = 1
     while True:
         ii += 1
@@ -239,10 +237,7 @@ def one_upgrade(json, base_txt, name, target, all_json):
             while True:
                 k += 1
                 if str(k) in json[i]["代码"]:
-                    try:
-                        getvalue[ii].append(float(json[i]["代码"][str(k)]))
-                    except ValueError:
-                        getvalue[ii].append(json[i]["代码"][str(k)])
+                    getvalue[ii].append(change_str_to_int(json[i]["代码"][str(k)]))
                 else:
                     break
         else:

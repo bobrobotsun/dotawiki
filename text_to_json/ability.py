@@ -1678,6 +1678,8 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target,co
             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【'+condition_name+'】第' + str(j) + '项时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
     return tempjson
 
+def calculate_json_by_condition_with_result(condition, i, tempjson, result, target,condition_name=''):
+    return tempjson
 
 def check_the_json_meet_the_conditions(conditions, json, target):
     relist = [[]]  # 预设一个空结果，防止复制失败
