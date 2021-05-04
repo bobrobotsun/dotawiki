@@ -1402,10 +1402,11 @@ class Main(QMainWindow):
         if chosen == '机制':
             for i in self.json_base['机制']:
                 all_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
+        name_list_tree=self.name_create_tree_list_name()
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
-            self.w.addtext(self.upload_page(all_upload[i][0], all_upload[i][1], True), i)
+            self.w.addtext(self.upload_page(all_upload[i][0], all_upload[i][1],name_list_tree, True), i)
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
@@ -1552,13 +1553,14 @@ class Main(QMainWindow):
                 if k in self.json_base['单位组']:
                     all_upload.append([k + '.json', self.json_base['单位组'][k]])
                     all_page.append([k, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], k)])
+        name_list_tree=self.name_create_tree_list_name()
         total_num = len(all_upload) + len(all_page)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
             self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1], True), i)
             QApplication.processEvents()
         for i in range(len(all_page)):
-            self.w.addtext(self.upload_page(all_page[i][0], all_page[i][1], True), i + len(all_upload))
+            self.w.addtext(self.upload_page(all_page[i][0], all_page[i][1],name_list_tree, True), i + len(all_upload))
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
@@ -1606,8 +1608,11 @@ class Main(QMainWindow):
         else:
             return [json.dumps(upload_info.json()), 0]
 
-    def upload_page(self, pagename, content, bot=False):
+    def upload_page(self, pagename, content,name_list_tree, bot=False):
         download_data = {'action': 'parse', 'prop': 'wikitext', 'page': pagename, 'format': 'json'}
+        #这里会对文字进行一个提纯操作
+        upcontent = re.sub(r'\{\{(.*?)\|(.*?)\}\}', lambda x: self.upload_text_template(x,name_list_tree), content)
+        #本地处理好后再进行上传
         k = 0
         while True:
             self.time_point_for_iterable_sleep_by_time()
@@ -1616,7 +1621,7 @@ class Main(QMainWindow):
                 download_content = download_info.json()
                 if 'error' in download_content:
                     break
-                elif content == download_content['parse']['wikitext']['*']:
+                elif upcontent == download_content['parse']['wikitext']['*']:
                     upload_data = {'action': 'purge', 'titles': pagename, 'format': 'json'}
                     if bot:
                         upload_data['bot'] = 1
@@ -1635,7 +1640,7 @@ class Main(QMainWindow):
                 k += 1
                 if k >= 5:
                     break
-        upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
+        upload_data = {'action': 'edit', 'title': pagename, 'text': upcontent, 'format': 'json', 'token': self.csrf_token}
         if bot:
             upload_data['bot'] = 1
         k = 0
@@ -1659,6 +1664,29 @@ class Main(QMainWindow):
                 return ['上传《' + pagename + '》内容成功', 1]
         else:
             return [json.dumps(upload_info.json()), 0]
+
+    def upload_text_template(self,x,name_list_tree):
+        retxt=''
+        template_name=x.group(1)
+        template_args=x.group(2).split('|')
+        if template_name in ['H','A','I','h','a','i']:
+            if template_args[0] in name_list_tree:
+                pic_style=''
+                if template_name in ['A','a']:
+                    pic_style+=' class="ability_icon"'
+                elif template_name in ['I','i']:
+                    pic_style+=' class="item_icon"'
+                for i in name_list_tree[template_args[0]]:
+                    if i[2]!='':
+                        retxt+='<span'+pic_style+'>[[file:'+i[2]+'|x24px|link='+i[0]+']]</span>'
+                retxt+='[['+name_list_tree[template_args[0]][0][0]+'|'+template_args[0]+']]'
+                return retxt
+            else:
+                return x.group(0)
+        else:
+            return x.group(0)
+
+
 
     def check_dict_equal(self, d1, d2):
         bool = True
@@ -2675,8 +2703,9 @@ class Main(QMainWindow):
 
     def upload_one_version(self, bools=True):
         title = self.version_save_the_version()
+        name_list_tree=self.name_create_tree_list_name()
         self.upload_json(title + '.json', self.version_base[title])
-        self.upload_page(title, common_page.create_page_logs(title, self.version_base[title], self.version_list['版本'], self.name_create_tree_list_name()))
+        self.upload_page(title, common_page.create_page_logs(title, self.version_base[title], self.version_list['版本'], name_list_tree),name_list_tree)
         if bools:
             self.complex_json_to_version_tree()
         QMessageBox.information(self, '上传成功', '版本信息已经更新保存完毕。')
@@ -2707,6 +2736,7 @@ class Main(QMainWindow):
                     self.version_base[i][j] = copy.deepcopy(temp1)
             all_upload.append([i + '.json', self.version_base[i]])
             all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'], name_upload_base)])
+        name_list_tree=self.name_create_tree_list_name()
         num1 = len(all_upload)
         num2 = len(all_upload_page)
         self.w.confirm_numbers(num1 + num2)
@@ -2714,7 +2744,7 @@ class Main(QMainWindow):
             self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1], True), i)
             QApplication.processEvents()
         for i in range(num2):
-            self.w.addtext(self.upload_page(all_upload_page[i][0], all_upload_page[i][1], True), i + num1)
+            self.w.addtext(self.upload_page(all_upload_page[i][0], all_upload_page[i][1],name_list_tree, True), i + num1)
             QApplication.processEvents()
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
