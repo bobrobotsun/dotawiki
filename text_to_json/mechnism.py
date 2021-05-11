@@ -88,9 +88,9 @@ def get_source_to_data(all_json, tlist, version, text_base):
                         uls -= 1
                         comtext += '</ul>'
                     if uls == 0:
-                        comtext += kk['文字']+ '<br>'
+                        comtext += '\n'+kk['文字']+ '<br>'
                     else:
-                        comtext += '<li>' + kk['文字'] + '</li>'
+                        comtext += '<li>' +'\n'+ kk['文字'] + '</li>'
                 for k in range(uls):
                     comtext += '</ul>'
                 all_json['机制'][target]['内容'][i]['内容'][j]['内容'] = comtext
