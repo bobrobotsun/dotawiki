@@ -1290,7 +1290,7 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
                         all_results_with_sort_mark.append(change_the_right_result_json_to_text_to_show(conditions, result[k], all_json[i][j], all_json, target))
     if seps == '数量':
         retxt = str(len(all_results_with_sort_mark))  # 这个地方直接用=是为了防止之前加入一些奇怪的东西
-    elif seps=='非空' and len(all_results_with_sort_mark) == 0:
+    elif '非空' in conditions and len(all_results_with_sort_mark) == 0:
         retxt = '<span style="color:#c33">没有找到符合条件的内容！</span>'
     else:
         if len(all_results_with_sort_mark) > 0:
