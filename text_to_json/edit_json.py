@@ -204,6 +204,8 @@ edit = {
                                             '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "碰撞体积": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                             '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
+        "边界体积": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
+                                            '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "模型比例": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                             '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "英雄攻击伤害": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],

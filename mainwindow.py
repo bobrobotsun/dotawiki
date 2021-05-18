@@ -1672,6 +1672,8 @@ class Main(QMainWindow):
         if template_name in ['H','A','I','h','a','i']:
             if template_args[0] in name_list_tree:
                 pic_style=''
+                if len(template_args[0])>2 and template_args[0][:-2]=='天赋':
+                    pic_style=''
                 if template_name in ['A','a']:
                     pic_style+=' class="ability_icon"'
                 elif template_name in ['I','i']:

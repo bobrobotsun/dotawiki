@@ -305,13 +305,14 @@ def one_upgrade(json, base_txt, name, target, all_json):
     for i in range(len(calvalue)):
         for k in range(len(calvalue[result_to_show_index[i]])):
             if str(i + 1) not in json:
-                json[str(i+1)]={}
+                json[str(i + 1)] = {}
             json[str(i + 1)][str(k + 1)] = calvalue[result_to_show_index[i]][k]
         if bitsum_list[result_to_show_index[i]] > 1:
             json[str(i + 1)]["升级来源"] = {}
             for j in range(extra):
                 if result_to_show_index[i] >> j & 1:
                     json[str(i + 1)]["升级来源"][str(len(json[str(i + 1)]["升级来源"]) + 1)] = json[str(result_to_show_index[j + 1] + 1)]["升级来源"]['1']
+
 
 def all_bit_sum(i):
     rere = 0
@@ -503,10 +504,17 @@ unitpro_txt = [
            , "DOTA_NPC_UNIT_RELATIONSHIP_TYPE_COURIER": "信使", 'DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BUILDING': '建筑', 'DOTA_NPC_UNIT_RELATIONSHIP_TYPE_BARRACKS': '兵营'
            , 'DOTA_NPC_UNIT_RELATIONSHIP_TYPE_SIEGE': '投石车'}]
     , ["碰撞体积", "BoundsHullName",
-       {"DOTA_HULL_SIZE_SMALL": 16, "DOTA_HULL_SIZE_REGULAR": 16, "DOTA_HULL_SIZE_HERO": 24,
-        "DOTA_HULL_SIZE_TOWER": 144, "DOTA_HULL_SIZE_FILLER": 96, "DOTA_HULL_SIZE_BARRACKS": 144,
-        "DOTA_HULL_SIZE_BUILDING": 81, "DOTA_HULL_SIZE_SIEGE": 16, "DOTA_HULL_SIZE_SMALLEST": 8,
-        "DOTA_HULL_SIZE_HUGE": 80}]
+       {"DOTA_HULL_SIZE_BUILDING": 314, "DOTA_HULL_SIZE_BARRACKS": 161, "DOTA_HULL_SIZE_TOWER": 144,
+        "DOTA_HULL_SIZE_FILLER": 112, "DOTA_HULL_SIZE_HUGE": 80,
+        "DOTA_HULL_SIZE_HERO": 28, "DOTA_HULL_SIZE_REGULAR": 36, "DOTA_HULL_SIZE_SIEGE": 40,
+        "DOTA_HULL_SIZE_SMALL": 18, "DOTA_HULL_SIZE_SMALLEST": 4
+        }]
+    , ["边界体积", "BoundsHullName",
+       {"DOTA_HULL_SIZE_BUILDING": 298, "DOTA_HULL_SIZE_BARRACKS": 144, "DOTA_HULL_SIZE_TOWER": 144,
+        "DOTA_HULL_SIZE_FILLER": 96, "DOTA_HULL_SIZE_HUGE": 80,
+        "DOTA_HULL_SIZE_HERO": 24, "DOTA_HULL_SIZE_REGULAR": 16, "DOTA_HULL_SIZE_SIEGE": 16,
+        "DOTA_HULL_SIZE_SMALL": 8, "DOTA_HULL_SIZE_SMALLEST": 2
+        }]
 ]
 unitpro_num = [["远古单位", "IsAncient"]
     , ["中立生物", "IsNeutralUnitType"]
