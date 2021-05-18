@@ -50,9 +50,12 @@ def findunitname(source, tb):
 # 寻找属性（查询源字符串，数据存储位置，上下限，属性序数，是否继承默认数据）
 def findunitpro(source, data, tb, pro, inherit=True, number=True):
     i = source.find('\"' + pro[1] + '\"', tb[0], tb[1])
+    proname=pro[1]
+    if len(pro)>3:
+        proname=pro[3]
     if i == -1:
-        if inherit and pro[1] in unit_default:
-            data[pro[1]] = unit_default[pro[1]]
+        if inherit and proname in unit_default:
+            data[proname] = unit_default[proname]
     else:
         j = source.find('\"', i + 1, tb[1])
         j = source.find('\"', j + 1, tb[1])
@@ -63,7 +66,7 @@ def findunitpro(source, data, tb, pro, inherit=True, number=True):
             else:
                 data[pro[1]] = {"1": float(source[j + 1:k])}
         else:
-            data[pro[1]] = {"1": pro[2][source[j + 1:k]]}
+            data[proname] = {"1": pro[2][source[j + 1:k]]}
     return
 
 
@@ -130,10 +133,11 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
                 else:
                     if all_json[i][j[0]][k]["代码"]["2"] == "":
                         bool = True
+                        proname=j[3] if len(j)>3 else j[1]
                         for l in all_json[i]["代码名"]:
-                            all_json[i][j[0]][k][l] = base_txt["非英雄单位"][all_json[i]["代码名"][l]][j[1]]["1"]
+                            all_json[i][j[0]][k][l] = base_txt["非英雄单位"][all_json[i]["代码名"][l]][proname]["1"]
                             bool = bool and all_json[i][j[0]][k]["1"] == all_json[i][j[0]][k][l]
-                        all_json[i][j[0]][k]['代码']['3'] = j[1]
+                        all_json[i][j[0]][k]['代码']['3'] = proname
                         if bool:
                             ll = 2
                             while True:
@@ -514,7 +518,7 @@ unitpro_txt = [
         "DOTA_HULL_SIZE_FILLER": 96, "DOTA_HULL_SIZE_HUGE": 80,
         "DOTA_HULL_SIZE_HERO": 24, "DOTA_HULL_SIZE_REGULAR": 16, "DOTA_HULL_SIZE_SIEGE": 16,
         "DOTA_HULL_SIZE_SMALL": 8, "DOTA_HULL_SIZE_SMALLEST": 2
-        }]
+        },'BoundsHullName2']
 ]
 unitpro_num = [["远古单位", "IsAncient"]
     , ["中立生物", "IsNeutralUnitType"]
