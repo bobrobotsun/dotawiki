@@ -57,6 +57,8 @@ def findheropro(source, data, tb, pro, inherit=True, number=True, splitit=False)
                         data[pro[1]][str(j + 1)] = pro[2][rolesplit[j]]
             elif len(pro) == 3:
                 data[pro[1]] = {"1": pro[2][source[j + 1:k]]}
+            elif len(pro) == 4:
+                data[pro[3]] = {"1": pro[2][source[j + 1:k]]}
             else:
                 if number:
                     data[pro[1]] = {"1": float(source[j + 1:k])}
@@ -107,8 +109,12 @@ def get_hero_data_from_txt(base_txt, source_address):
                             base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
                         except ValueError:
                             for l in heropro_txt:
-                                if temp_name==l[1] and len(l)>2 and temp_valuek in l[2]:
-                                    base_txt[name][temp_name][str(k + 1)] = l[2][temp_valuek]
+                                if temp_name==l[1]:
+                                    if len(l)==3 and temp_valuek in l[2]:
+                                        base_txt[name][temp_name][str(k + 1)] = l[2][temp_valuek]
+                                    elif len(l)==4 and temp_valuek in l[2]:
+                                        base_txt[name][l[3]]={}
+                                        base_txt[name][l[3]][str(k + 1)] = l[2][temp_valuek]
                             if str(k + 1) not in base_txt[name][temp_name]:
                                 base_txt[name][temp_name][str(k + 1)] = temp_valuek
             else:
@@ -138,10 +144,13 @@ def fulfill_hero_json(base_txt, all_json, version,name_base):
             if '迷你图片地址' in all_json[i]:
                 all_json[i].pop('迷你图片地址')
             for j in heropro_txt:
-                if j[1] in base_txt["英雄"][all_json[i]["代码名"]]:
-                    all_json[i][j[0]] = {"代码": j[1]}
-                    for k in base_txt["英雄"][all_json[i]["代码名"]][j[1]]:
-                        all_json[i][j[0]][k] = base_txt["英雄"][all_json[i]["代码名"]][j[1]][k]
+                if len(j)==4 and j[3] in base_txt["英雄"][all_json[i]["代码名"]]:
+                    proname=j[3]
+                elif j[1] in base_txt["英雄"][all_json[i]["代码名"]]:
+                    proname = j[1]
+                all_json[i][j[0]] = {"代码": proname}
+                for k in base_txt["英雄"][all_json[i]["代码名"]][proname]:
+                    all_json[i][j[0]][k] = base_txt["英雄"][all_json[i]["代码名"]][proname][k]
             for j in heropro_num:
                 if j[1] in base_txt["英雄"][all_json[i]["代码名"]]:
                     all_json[i][j[0]] = {"代码": j[1]}
@@ -167,7 +176,8 @@ def create_file(all_json):
 heropro_txt = [["主属性", "AttributePrimary", {"DOTA_ATTRIBUTE_STRENGTH": "力量", "DOTA_ATTRIBUTE_AGILITY": "敏捷", "DOTA_ATTRIBUTE_INTELLECT": "智力"}]
     , ["近战远程", "AttackCapabilities", {"DOTA_UNIT_CAP_MELEE_ATTACK": "近战", "DOTA_UNIT_CAP_RANGED_ATTACK": "远程", "DOTA_UNIT_CAP_NO_ATTACK": "不攻击"}]
     , ["阵营", "Team", {"Good": "天辉", "Bad": "夜魇", "good": "天辉", "bad": "夜魇"}]
-    , ["碰撞体积", "BoundsHullName", {"DOTA_HULL_SIZE_HERO": 24, "DOTA_HULL_SIZE_SMALL": 16}]
+    , ["碰撞体积", "BoundsHullName", {"DOTA_HULL_SIZE_HERO": 28, "DOTA_HULL_SIZE_SMALL": 18}]
+    , ["边界体积", "BoundsHullName", {"DOTA_HULL_SIZE_HERO": 24, "DOTA_HULL_SIZE_SMALL": 8},'BoundsHullName2']
     , ["定位", "Role", {"Carry": "核心", "Escape": "逃生", "Nuker": "爆发", "Initiator": "先手", "Durable": "耐久", "Disabler": "控制", "Jungler": "打野", "Support": "辅助", "Pusher": "推进"}]
     ,['定位等级','Rolelevels']
     ,['体质类型','GibType']]

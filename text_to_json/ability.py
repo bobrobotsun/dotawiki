@@ -1626,7 +1626,7 @@ def ability_desc_show_one_mech(json, upgrade=False):
 def find_json_by_condition_with_result(condition, i, tempjson, result, target, condition_name=''):
     for j in range(len(condition)):
         the_key = ''
-        if '-' in condition[j]:
+        if '@' not in condition[j] and '-' in condition[j]:
             indexlist = condition[j].split('-')
             indexlist[0] = change_str_to_int(indexlist[0]) - 1
             indexlist[1] = change_str_to_int(indexlist[1])
@@ -1927,7 +1927,13 @@ def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, 
             for i in all_results_with_sort_mark:
                 check_bool = False
                 for j in range(len(combined_result)):
-                    if i[1] == combined_result[j][1]:
+                    equalbool=True
+                    for k in range(1,len(i)):
+                        if isinstance(i[k],list):
+                            break
+                        else:
+                            equalbool=equalbool and i[k]==combined_result[j][k]
+                    if equalbool:
                         check_bool = True
                         combined_result[j][0] += '、' + i[0]
                         same_counts[j] += 1
