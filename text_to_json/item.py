@@ -2,7 +2,7 @@ import json
 import hashlib
 import re
 import math
-from text_to_json import edit_json
+from text_to_json import edit_json,common_page
 from text_to_json.WikiError import editerror
 
 
@@ -271,6 +271,61 @@ def create_file(all_json):
         file = open("E:/json/pythonupload/" + i + '.json', mode="w")
         file.write(json.dumps(all_json[i]))
         file.close()
+
+def fulfil_complex_and_simple_show(all_json):
+    for i in all_json['物品']:
+        db = all_json['物品'][i]
+        bt = ''  # 完整显示
+        st = ''  # 缩略显示
+        common_tag = ['<tr><td colspan=2 style="background:#ccc;', '</td></tr>']
+        common_pro = {'共享': ['color:#a03030;"><i class="fa fa-times" aria-hidden="true"></i>不可以给队友共享', ';color:#229944;"><i class="fa fa-check" aria-hidden="true"></i>可以给队友共享'],
+                      '可拆分': ['color:#a03030;"><i class="fa fa-times" aria-hidden="true"></i>合成10秒后不可拆分', ';color:#229944;"><i class="fa fa-check" aria-hidden="true"></i>永久可以拆分']}
+        normal_tag = ['<tr><td colspan=2 style="background:#ddd;color:#000;margin:6px;font-size:1em;">', '</td></tr>']
+        bt += '<table class="infobox" style="text-align:center;background:#fff;width:300px;color:#fff;"><tr class="infobox-title">' + '<th colspan=2 style="background: #a03030;padding: 0.5em 1em;;text-align:center;">' + '<span style="font-size:125%">' + \
+                db["中文名"] + '</span><div style="text-align:center;">' + db["英文名"] + '</div>' + '</th></tr>'
+        if db["图片"] != '':
+            bt += '<tr><td colspan=2 style="background:#222">[[file:' + db["图片"] + '|100px|center|link=' + db["页面名"] \
+                     + ']]</td></tr><tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] + '</td></tr>' \
+                     + '<tr><td colspan="2" style="border-bottom-width:0px;text-align:center;background:#c38a1c;padding:8px;font-size:16px;font-weight:bold;color:#fff;">[[file:Gold symbol.png|30px|link=]]&nbsp;' \
+                     + common_page.number_to_string(db['价格']['1']) + ''
+        if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
+            bt += '<span style="margin-left:1em;">[[file:items recipe.png|24px|link=]]&nbsp;' + common_page.number_to_string(db['卷轴价格']['1']) + '</span>'
+        bt += '</td></tr>'
+        for i, v in common_pro.items():
+            if i != '可拆分' or '组件' in db:
+                if i in db:
+                    bt += common_tag[0] + v[get_item_value(db[i])] + common_tag[1]
+                else:
+                    bt += common_tag[0] + v[0] + common_tag[1]
+        for i, v in db.items():
+            if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
+                bt += normal_tag[0] + v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + normal_tag[1]
+        if '升级' in db:
+            bt += '<tr><td colspan=2 style="background:#a03030;padding:4px;text-align:center;">' + '可合成</td></tr><tr><td colspan=2 style="background:#222;padding:6px;">'
+            for i, v in db['升级'].items():
+                if int(i) % 4 == 1 and int(i) > 1:
+                    bt += '<br><br>'
+                bt += ' [[file:' + v["图片"] + '|48px|link=' + v["物品名"] + ']] '
+            bt += '</td></tr>'
+        if '组件' in db:
+            bt += '<tr><td colspan=2 style="background:#a03030;padding:4px;text-align:center;">' + '配方</td></tr><tr><td colspan=2 style="background:#222;padding:6px;">'
+            for i, v in db['组件'].items():
+                if int(i) % 4 == 1 and int(i) > 1:
+                    bt += '<br><br>'
+                bt += ' [[file:' + v["图片"] + '|48px|link=' + v["物品名"] + ']] '
+            if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
+                bt += ' [[file:items recipe.png|48px|link=]] '
+            bt += '</td></tr>'
+        bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel" style="padding-left:0.25em">\'\'\' [[' + db["页面名"] + '|P]]  [[data:' + db[
+            "页面名"] + '.json|J]] \'\'\'</div><div style="float:right;color:#000;padding-right:0.25em">' + db['代码名'] + '</div></td></tr></table>'
+        db['简易展示'] = st
+        db['具体展示'] = bt
+
+def get_item_value(db):
+    if isinstance(db, dict):
+        return db['1']
+    else:
+        return db
 
 
 itempro_txt = [["商店标识", "ItemShopTags"]

@@ -1291,6 +1291,9 @@ class Main(QMainWindow):
                 else:
                     self.json_base['技能'][i]['技能召唤物'] = []
 
+            hero.fulfil_complex_and_simple_show(self.json_base)
+            item.fulfil_complex_and_simple_show(self.json_base)
+            ability.fulfil_complex_and_simple_show(self.json_base)
             unit.fulfil_complex_and_simple_show(self.json_base)
 
             # 生成单位组信息（怀疑是个时间耗费大户）

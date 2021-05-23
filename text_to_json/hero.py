@@ -172,6 +172,13 @@ def create_file(all_json):
         file.write(json.dumps(all_json[i]))
         file.close()
 
+def fulfil_complex_and_simple_show(all_json):
+    for i in all_json['英雄']:
+        db = all_json['英雄'][i]
+        bt = ''  # 完整显示
+        st = ''  # 缩略显示
+        db['简易展示'] = st
+        db['具体展示'] = bt
 
 heropro_txt = [["主属性", "AttributePrimary", {"DOTA_ATTRIBUTE_STRENGTH": "力量", "DOTA_ATTRIBUTE_AGILITY": "敏捷", "DOTA_ATTRIBUTE_INTELLECT": "智力"}]
     , ["近战远程", "AttackCapabilities", {"DOTA_UNIT_CAP_MELEE_ATTACK": "近战", "DOTA_UNIT_CAP_RANGED_ATTACK": "远程", "DOTA_UNIT_CAP_NO_ATTACK": "不攻击"}]

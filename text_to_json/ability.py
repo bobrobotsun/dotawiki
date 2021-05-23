@@ -1409,9 +1409,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
 
         if '条件复合属性' in conditions:
             for i in range(len(conditions['条件复合属性'])):
-                tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i][:-1], i, json, result, target, '条件复合属性')
-                if conditions['条件复合属性'][i][-1] in tempjson:
-                    another_info += '(' + common_page.create_upgrade_text(tempjson, conditions['条件复合属性'][i][-1], image_size='x18px') + ')'
+                tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i], i, json, result, target, '条件复合属性')
+                another_info += '(' + common_page.create_upgrade_text(tempjson, image_size='x18px') + ')'
         if '条件单一属性' in conditions:
             for i in range(len(conditions['条件单一属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件单一属性'][i], i, json, result, target, '条件单一属性')
@@ -1501,13 +1500,12 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                             traitlist.append(j)
         if '条件复合属性' in conditions:
             for i in range(len(conditions['条件复合属性'])):
-                tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i][:-2], i, json, result, target, '条件复合属性')
-                if conditions['条件复合属性'][i][-2] in tempjson:
-                    if '名称' in tempjson[conditions['条件复合属性'][i][-2]]:
-                        name = tempjson[conditions['条件复合属性'][i][-2]]['名称']
-                    else:
-                        name = conditions['条件复合属性'][i][-1]
-                    trait += '<div>' + conditions['条件复合属性'][i][-1] + '：' + common_page.create_upgrade_text(tempjson, conditions['条件复合属性'][i][-2], image_size='x18px') + '</div>'
+                tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i][:-1], i, json, result, target, '条件复合属性')
+                if '名称' in tempjson and tempjson['名称']!='':
+                    name = tempjson['名称']
+                else:
+                    name = conditions['条件复合属性'][i][-1]
+                trait += '<div>' + name + '：' + common_page.nocheck_create_upgrade_text(tempjson, image_size='x18px') + '</div>'
         if '条件单一属性' in conditions:
             for i in range(len(conditions['条件单一属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件单一属性'][i][:-1], i, json, result, target, '条件单一属性')
@@ -1728,6 +1726,7 @@ def check_the_json_meet_the_conditions(conditions, json, target):
 def check_the_json_meet_one_condition(condition, json, target, index):
     relist = [[]]
     all_bools = True
+    skip_cal=False
     tempjson = json
     ii = index[0]
     while True:
@@ -1741,22 +1740,28 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                         i.insert(0, '(')
                         i.append(')')
                     all_bools = one_bool
+                else:
+                    skip_cal=True
             elif i == '@and' or i == '@和':
-                if all_bools:  # true
+                if all_bools:
                     index[0] = ii + 1
                     half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
                     for j in half_result:
                         j.insert(0, i)
                     all_bools = one_bool
                     ii = index[0] - 1
+                else:
+                    skip_cal=True
             elif i == '@except' or i == '@除了':
-                if all_bools:  # true
+                if all_bools:
                     index[0] = ii + 1
                     half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
                     for j in half_result:
                         j.insert(0, i)
                     all_bools = not one_bool
                     ii = index[0] - 1
+                else:
+                    skip_cal=True
             elif i == '@or' or i == '@或':
                 index[0] = ii + 1
                 half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
@@ -1775,7 +1780,7 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                 all_bools = all_bools or one_bool
                 ii = index[0] - 1
             elif i == '@all':  # 在一系列数字作为key的键值中，必须全部满足
-                if all_bools:  # true
+                if all_bools:
                     has_one = False
                     one_bool = True
                     jj = 0
@@ -1794,8 +1799,10 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                                 break
                     all_bools = one_bool and has_one
                     ii = index[0] - 1
+                else:
+                    skip_cal=True
             elif i == '@one':  # 在一系列数字作为key的键值中，选择第一个有效的项
-                if all_bools:  # true
+                if all_bools:
                     one_bool = False
                     jj = 0
                     while True:
@@ -1815,8 +1822,26 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                                 break
                     all_bools = one_bool
                     ii = index[0] - 1
+                else:
+                    skip_cal=True
+            elif i=='@one_text':
+                if all_bools:
+                    one_bool = False
+                    for j in tempjson:
+                        index[0] = ii + 1
+                        one_half_result, one_half_bool = check_the_json_meet_one_condition(condition, tempjson[j], target, index)
+                        if one_half_bool:
+                            one_half_result[0] = [j] + one_half_result[0]
+                            half_result.append(one_half_result[0])
+                            one_bool = one_bool or one_half_bool
+                        if one_bool:
+                            break
+                    all_bools = one_bool
+                    ii = index[0] - 1
+                else:
+                    skip_cal=True
             elif i == '@list':  # 在一系列数字作为key的键值中，选择所有有效的项
-                if all_bools:  # true
+                if all_bools:
                     one_bool = False
                     jj = 0
                     while True:
@@ -1834,47 +1859,60 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                                 break
                     all_bools = one_bool
                     ii = index[0] - 1
-            elif i == '@has' or i == '@have':
-                all_bools = isinstance(tempjson, str) and tempjson != ''
-                half_result.append([i])
-            elif i == '@hasnot' or i == '@havenot':
-                all_bools = isinstance(tempjson, str) and tempjson == ''
-                half_result.append([i])
+                else:
+                    skip_cal=True
             elif i == '@combine' or i == '@复合':
-                combinetxt = ''
-                kk = 1
-                while True:
-                    k = str(kk)
-                    kk += 1
-                    if k in tempjson:
-                        if combinetxt != '':
-                            combinetxt += '/'
-                        combinetxt += number_to_string(tempjson[k])
-                    else:
-                        break
-                half_result.append([i, combinetxt])
-                tempjson = combinetxt
-                all_bools = True
+                if all_bools:
+                    combinetxt = ''
+                    kk = 1
+                    while True:
+                        k = str(kk)
+                        kk += 1
+                        if k in tempjson:
+                            if combinetxt != '':
+                                combinetxt += '/'
+                            combinetxt += number_to_string(tempjson[k])
+                        else:
+                            break
+                    half_result.append([i, combinetxt])
+                    tempjson = combinetxt
+            elif i == '@has' or i == '@have':
+                if skip_cal:
+                    skip_cal=False
+                else:
+                    all_bools = isinstance(tempjson, str) and tempjson != ''
+                    half_result.append([i])
+                ii+=1
+            elif i == '@hasnot' or i == '@havenot':
+                if skip_cal:
+                    skip_cal=False
+                else:
+                    all_bools = isinstance(tempjson, str) and tempjson == ''
+                    half_result.append([i])
+                ii+=1
             elif i[0] == '@':
                 if len(condition) >= ii + 2:
-                    if i == '@=' or i == '@==':
-                        all_bools = operation_number_str_equal(tempjson, condition[ii + 1])
-                    elif i == '@!=' or i == '@<>' or i == '@><':
-                        all_bools = not operation_number_str_equal(tempjson, condition[ii + 1])
-                    elif i == '@<' or i == '@<=' or i == '@>' or i == '@>=':
-                        all_bools = operation_number_check(tempjson, condition[ii + 1], i[1:])
-                    elif i == '@in':
-                        all_bools = isinstance(tempjson, dict) and condition[ii + 1] in tempjson
-                    elif i == '@notin':
-                        all_bools = isinstance(tempjson, dict) and condition[ii + 1] not in tempjson
-                    elif i == '@strin':
-                        all_bools = isinstance(tempjson, str) and condition[ii + 1] in tempjson
-                    elif i == '@notstrin':
-                        all_bools = isinstance(tempjson, str) and condition[ii + 1] not in tempjson
+                    if skip_cal:
+                        skip_cal=False
                     else:
-                        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
+                        if i == '@=' or i == '@==':
+                            all_bools = operation_number_str_equal(tempjson, condition[ii + 1])
+                        elif i == '@!=' or i == '@<>' or i == '@><':
+                            all_bools = not operation_number_str_equal(tempjson, condition[ii + 1])
+                        elif i == '@<' or i == '@<=' or i == '@>' or i == '@>=':
+                            all_bools = operation_number_check(tempjson, condition[ii + 1], i[1:])
+                        elif i == '@in':
+                            all_bools = isinstance(tempjson, dict) and condition[ii + 1] in tempjson
+                        elif i == '@notin':
+                            all_bools = isinstance(tempjson, dict) and condition[ii + 1] not in tempjson
+                        elif i == '@strin':
+                            all_bools = isinstance(tempjson, str) and condition[ii + 1] in tempjson
+                        elif i == '@notstrin':
+                            all_bools = isinstance(tempjson, str) and condition[ii + 1] not in tempjson
+                        else:
+                            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
+                        half_result.append([i, condition[ii]])
                     ii += 1
-                    half_result.append([i, condition[ii]])
                 else:
                     raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到符号”' + i + '“后的值，请检查代码错误还是输入缺失'))
             else:
@@ -2193,6 +2231,529 @@ def create_file(all_json):
         file = open("E:/json/pythonupload/" + i + '.json', mode="w")
         file.write(json.dumps(all_json[i]))
         file.close()
+
+def fulfil_complex_and_simple_show(all_json):
+    for i in all_json['技能']:
+        db = all_json['技能'][i]
+        if db['应用']>0:
+
+            bt = ''  # 完整显示
+            st = ''  # 缩略显示
+            bt += '<div style="display-block;clear:both;overflow: hidden;margin-bottom:1em;background-color: #d1d1d1;">' \
+                  + '<div style="float:left;">' \
+                  + '<div class="abilitybox full-width-xs" style="float:left;padding-bottom:1em;background:#222;color:#eee;width:400px;margin-right:8px;font-size:85%;">' \
+                  + '<div class="bg-primary" style="font-size:100%;background:'
+            if db["次级分类"] == "终极技能":
+                bt += '#6c3d83'
+            elif db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能" or db["次级分类"] == "魔晶技能":
+                bt += '#105aa7'
+            else:
+                bt += '#803024'
+            bt += ';padding:0.5em;">'
+            if db["传统按键"] != "":
+                bt += "<div style='background:#111;color:#fff;float:left;margin:0 0.1em;padding:0 0.2em;display:inline-block;border-radius:0px;' title='传统按键'>'''" + \
+                      db["传统按键"] + "'''</div>"
+            if db["默认按键"] != "":
+                bt += "<div style='background:#111;color:#fff;float:left;margin:0 0.1em;padding:0 0.2em;display:inline-block;border-radius:0px;' title='默认按键'>'''" + \
+                      db["默认按键"] + "'''</div>"
+            bt += '<h4 id="' + db["代码"] + '"  style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db[
+                "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%">\'\'\'[[Data:' + db[
+                      "数据来源"] + '/源.json|S]] [[Data:' + db[
+                      "页面名"] + '.json|J]]\'\'\'</span><br>' + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + \
+                  db[
+                      "中文名"] + '</span>' + '<span style="font-size:12px;color:#ccc;white-space: nowrap;padding: 2px; width:75px;overflow: hidden;text-overflow: ellipsis;text-align: center;"> ' + \
+                  db["英文名"] + '</span></div>'
+            bt += create_upgrade_cast_style(db["施法类型"])
+            bt += create_upgrade_cast_target(db["施法目标"])
+            bt += '<div>[[file:' + db["图片"] + '|160px|center|link=' + db['页面名'] + ']]</div>'
+            if db['描述'] != '':
+                bt += '<div style="background:#111133;padding:1em;">' + db['描述'] + '</div>'
+            if db['神杖信息'] != '':
+                bt += '<div style="background:#222266;padding:0.5em;">[[file:agha.png|x18px|link=]]：' + db['神杖信息'] + '</div>'
+            if db['魔晶信息'] != '':
+                bt += '<div style="background:#222266;padding:0.5em;">[[file:shard.png|x18px|link=]]：' + db['魔晶信息'] + '</div>'
+            if '技能升级信息' in db and '1' in db['技能升级信息']:
+                bt += '<div style="background:#222266;padding:0.25em;">'
+                ii = 0
+                while True:
+                    ii += 1
+                    i = str(ii)
+                    if i in db['技能升级信息']:
+                        v = db['技能升级信息'][i]
+                        bt += '<div style="padding:0.25em;">[[file:' + v['图片'] + '|x18px|link=' + v['技能名'] + ']] [[' + v[
+                            '技能名'] + ']]（' + v['中文名'] + ')</div>'
+                    else:
+                        break
+                bt += '</div>'
+            bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
+            ii = 0
+            while True:
+                ii += 1
+                i = str(ii)
+                if i in db["属性"]:
+                    v = db["属性"][i]
+                    if '名称' in v:
+                        v1 = v['名称']
+                    else:
+                        v1 = '名字没了'
+                    bt += '<div style="padding:0.5em 0.5em 0em 1em">' + v1 + '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
+                else:
+                    break
+            bt += create_upgrade_manacost(db['魔法消耗']) + create_upgrade_cooldown(db['冷却时间'])
+            if db['传说'] != '':
+                bt += '<div style="font-size:75%;padding:1em;border-top:1px solid #777;margin-top:1em;color:#bbb">「 ' + db[
+                    "传说"] + ' 」</div>'
+            if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
+                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
+            if db["次级分类"] == "魔晶技能":
+                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
+            bt += '</div>' \
+                  + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
+                  + '<span style="margin-top:0px;padding-top:0px;font-size:120%"><big>\'\'\'技能详情\'\'\'</big></span><div>'
+            ii = 0
+            while True:
+                ii += 1
+                i = str(ii)
+                if i in db['效果']:
+                    v = db['效果'][i]
+                    bt += create_upgrade_buff(v)
+                else:
+                    break
+            for v in ['技能免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域']:
+                jj = 0
+                while True:
+                    jj += 1
+                    j = str(jj)
+                    if j in db[v]:
+                        w = db[v][j]
+                        bt += create_upgrade_mech(w)
+                    else:
+                        break
+            ii = 0
+            while True:
+                ii += 1
+                i = str(ii)
+                if i in db['独立机制']:
+                    v = db['独立机制'][i]
+                    bt += create_independent_mech(v)
+                else:
+                    break
+            bt += '<div>'
+            uls = 0
+            if db['注释'] != '':
+                ii = 0
+                while True:
+                    ii += 1
+                    i = str(ii)
+                    if i in db['注释']:
+                        v = db['注释'][i]
+                        if v['序列级数'] > uls:
+                            for j in range(1, v['序列级数'] - uls + 1):
+                                bt += '<ul>'
+                            uls = v['序列级数']
+                        elif uls > v['序列级数']:
+                            for j in range(1, uls - v['序列级数'] + 1):
+                                bt += '</ul>'
+                            uls = v['序列级数']
+                        bt += '<li>' + v['文字'] + '</li>'
+                    else:
+                        break
+            for i in range(1, uls + 1):
+                bt += '</ul>'
+            bt += '</div></div></div></div>'
+            for i in db['技能召唤物']:
+                if i in all_json['非英雄单位']:
+                    bt += all_json['非英雄单位'][i]['简易展示']
+            bt += '</div>'
+            bt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + db['数据来源'] + '/源.json|' + db['数据来源'] + '/源]]<br>[[Data:' + db['页面名'] + '.json|' + db[
+                '页面名'] + ']]</div>'
+            db['简易展示'] = st
+            db['具体展示'] = bt
+
+
+def create_upgrade_cast_style(db):
+    retxt = ''
+    ii = 0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in db:
+            retxt += '<div style="padding:0.25em 0.5em;text-align:center;">'
+            if ii > 1:
+                jj = 0
+                while True:
+                    jj += 1
+                    j = str(jj)
+                    if j in db[i]["升级来源"]:
+                        w = db[i]["升级来源"][j]
+                        retxt += '[[file:' + w["图片"] + '|x22px|link=' + w["名称"] + ']]'
+                    else:
+                        break
+            jj = 0
+            while True:
+                jj += 1
+                j = str(jj)
+                if j in db[i]:
+                    w = db[i][j]
+                    retxt += '<span class="ability_indicator" style="background:#1166cc;color:white;">' + w[
+                        "值"] + '</span>'
+                else:
+                    break
+            retxt += '</div>'
+        else:
+            break
+    return retxt
+
+
+def create_upgrade_cast_target(db):
+    retxt = ''
+    hh = 0
+    while True:
+        hh += 1
+        h = str(hh)
+        if h in db:
+            arr = db[h]
+            retxt += '<div style="padding:0.25em 0.5em;text-align:center;">' \
+                     + '<table align="center"><tr><td style="padding:0.25em">'
+            if hh > 1:
+                retxt += '<td>'
+                ii = 0
+                while True:
+                    ii += 1
+                    i = str(ii)
+                    if i in arr["升级来源"]:
+                        v = arr["升级来源"][i]
+                        retxt += '[[file:' + v["图片"] + '|x22px|link=' + v["名称"] + ']]'
+                    else:
+                        break
+            retxt += '</td>'
+            for i in arr:
+                v = arr[i]
+                if len(v) > 0:
+                    bool = True
+                    if len(v) == 0:
+                        bool = False
+                    elif i == '不分类':
+                        retxt += '<td style="padding:0.25em 0em;">'
+                    elif i == '英雄':
+                        retxt += '<td style="background:#6666CC;cursor:help;padding:0.5em 0em;" title="被视为英雄">'
+                    elif i == '非英雄':
+                        retxt += '<td style="background:#66CC66;cursor:help;padding:0.5em 0em;" title="被视为普通单位">'
+                    else:
+                        bool = False
+                    if bool:
+                        jj = 0
+                        while True:
+                            jj += 1
+                            j = str(jj)
+                            if j in v:
+                                w = v[j]
+                                kk = 0
+                                while True:
+                                    kk += 1
+                                    k = str(kk)
+                                    if k in w:
+                                        x = w[k]
+                                        retxt += '<span class="ability_indicator" style="cursor:help;background:' + w[
+                                            "颜色"] + ';color:white;" title="(' + w["值"] + ')'
+                                        ll = 0
+                                        while True:
+                                            ll += 1
+                                            l = str(ll)
+                                            if l in x:
+                                                y = x[l]
+                                                if ll > 1:
+                                                    retxt += ','
+                                                retxt += y['值']
+                                            else:
+                                                break
+                                        retxt += '">'
+                                        if w['代码'] == 1 and x['代码'] == 1:
+                                            retxt += '自身'
+                                        else:
+                                            retxt += x["值"]
+                                        retxt += '</span>'
+                                    else:
+                                        break
+                            else:
+                                break
+                        retxt += '</td>'
+            retxt += '</tr></table></div>'
+        else:
+            if hh >= 1:
+                break
+    return retxt
+
+
+def create_upgrade_cast_point_backswing(arr1, arr2):
+    retxt = ''
+    ii = 0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in arr1:
+            v = arr1[i]
+            retxt += '<div style="padding:0.5em 0.5em 0em 1em">[[file:Ability cooldown.png|16px|link=]] 前后摇'
+            if v['名称'] != '':
+                retxt += '（' + v['名称'] + '）'
+            if i in arr2 and arr2[i]['名称'] != '':
+                retxt += '（' + arr2[i]['名称'] + '）'
+            retxt += '： ' + common_page.create_upgrade_text(arr1, i, lambda x: '',lambda x, y: x[y]["即时生效"]['图片']['图片'] if int(x[y]["即时生效"]['代码']) != 0 else '') + ' + ' \
+                     + common_page.create_upgrade_text(arr2, i) + '</div>'
+        else:
+            break
+    return retxt
+
+
+def create_upgrade_manacost(arr, outtip='div'):
+    retxt = ''
+    ii = 0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in arr:
+            v = arr[i]
+            retxt += '<' + outtip + ' style="padding:0.5em 0.5em 0em 1em">'
+            if v['名称'] != '':
+                retxt += v['名称']
+            retxt += '[[file:mana cost.png|16px|link=]] '
+            jj = 0
+            while True:
+                jj += 1
+                j = str(jj)
+                if j in v:
+                    w = v[j]
+                    if jj > 1:
+                        retxt += '+'
+                    retxt += '<span style="cursor:help;" title="' + w['1']['类型']['值'] + '">' \
+                             + common_page.create_upgrade_text(v, j, lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '') \
+                             + '</span>'
+                else:
+                    break
+            retxt += '</' + outtip + '>'
+        else:
+            break
+    return retxt
+
+
+def create_upgrade_cooldown(arr, outtip='div'):
+    retxt = ''
+    ii = 0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in arr:
+            v = arr[i]
+            retxt += '<' + outtip + ' style="padding:0.5em 0.5em 0em 1em;">'
+            if v['名称'] != '':
+                retxt += v['名称']
+            retxt += '<span style="cursor:help;" title="' + v['1']['类型']['值'] + '">[[file:' + v['1']['类型']['图片'] + '|16px|link=]]</span> '
+            jj = 0
+            while True:
+                jj += 1
+                j = str(jj)
+                if j in v['1']:
+                    if jj > 1:
+                        retxt += '/'
+                    retxt += number_to_string(v['1'][j])
+                else:
+                    break
+            if '2' in v:
+                retxt += '('
+                jj = 1
+                while True:
+                    jj += 1
+                    j = str(jj)
+                    if j in v:
+                        kk = 0
+                        while True:
+                            kk += 1
+                            k = str(kk)
+                            if k in v[j]['升级来源']:
+                                x = v[j]['升级来源'][k]
+                                retxt += '[[file:' + x['图片'] + '|x18px|link=' + x['名称'] + ']]'
+                            else:
+                                break
+                        retxt += '<span style="cursor:help;" title="' + v[j]['类型']['值'] + '">[[file:' + v[j]['类型']['图片'] + '|16px|link=]]</span>'
+                        kk = 0
+                        while True:
+                            kk += 1
+                            k = str(kk)
+                            if k in v[j]:
+                                x = v[j][k]
+                                if kk > 1:
+                                    retxt += '/'
+                                retxt += number_to_string(x)
+                            else:
+                                break
+                    else:
+                        break
+                retxt += ')'
+            retxt += '</' + outtip + '>'
+        else:
+            break
+    return retxt
+
+
+def create_upgrade_buff(json_dict):
+    buff_mech = ['技能免疫', '状态抗性', '无敌']
+    retxt = '<div style="paddin:0.5em;"><table>'
+    i = 0
+    compeat_descripe = []  # 检查简述中是否存在重复文字
+    while True:
+        i += 1
+        if str(i) in json_dict:
+            retxt += '<tr><td>'
+            if i > 1:
+                for j in json_dict[str(i)]['升级来源']:
+                    retxt += '[[file:' + re.sub(r'alent.png', lambda x: 'alentb.png',
+                                                json_dict[str(i)]['升级来源'][j]['图片']) + '|x22px|link=' + json_dict["名称"] + ']] '
+            retxt += '</td><td style="padding:0.25em>'
+            if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
+                retxt += '<span style="cursor:help;" title="' + json_dict[str(i)]['值'] + '">[[file:' + json_dict[str(i)]['图片'] + '|x22px|link=]]</span> '
+            for j in buff_mech:
+                if json_dict[str(i)][j]['代码'] != 0:
+                    retxt += '<span style="cursor:help;" title="' + json_dict[str(i)][j]['简述'] + '">[[file:' + json_dict[str(i)][j]['图片'] + '|x22px|link=]]</span> '
+            retxt += json_dict['名称'] + ' '
+            if json_dict[str(i)]['驱散']['代码'] != 0:
+                retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + json_dict[str(i)]['驱散']['简述'] + '">' + \
+                         json_dict[str(i)]['驱散']['值'] + '</span>'
+            for j in json_dict[str(i)]['叠加']:
+                if json_dict[str(i)]['叠加'][j]['代码1'] != 0:
+                    retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + json_dict[str(i)]['叠加'][j]['来源'] + '来源' + \
+                             json_dict[str(i)]['叠加'][j]['方式'] + '">' + json_dict[str(i)]['叠加'][j]['方式'] + '</span>'
+            for j in json_dict[str(i)]['标记']:
+                if json_dict[str(i)]['标记'][j]['代码'] != 0:
+                    retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'
+            if json_dict[str(i)]['生效从属']['代码'] > 1:
+                retxt += '<span class="ability_indicator" style="background:#009688;color:white;" title="' + json_dict[str(i)]['生效从属']['简述'] + '">' + json_dict[str(i)]['生效从属'][
+                    '值'] + '</span>'
+            for j in json_dict[str(i)]['生效目标']:
+                if len(json_dict[str(i)]['生效目标'][j]) > 0:
+                    target_dict = json_dict[str(i)]['生效目标'][j]
+                    if j == '不分类':
+                        retxt += '<span style="padding:0.25em 0em;">'
+                    elif j == '英雄':
+                        retxt += '<span style="background:#d1ffd1;cursor:help;padding:0.5em 0em;" title="被视为英雄">'
+                    elif j == '非英雄':
+                        retxt += '<span style="background:#ffd1d1;cursor:help;padding:0.5em 0em;" title="被视为普通单位">'
+                    kk = 0
+                    while True:
+                        kk += 1
+                        k = str(kk)
+                        if k in target_dict:
+                            ll = 0
+                            while True:
+                                ll += 1
+                                l = str(ll)
+                                if l in target_dict[k]:
+                                    retxt += '<span class="ability_indicator" style="cursor:help;background:' + \
+                                             target_dict[k]["颜色"] + ';color:white;" title="(' + target_dict[k][
+                                                 "值"] + ')'
+                                    mm = 0
+                                    while True:
+                                        mm += 1
+                                        m = str(mm)
+                                        if m in target_dict[k][l]:
+                                            if mm > 1:
+                                                retxt += ','
+                                            retxt += target_dict[k][l][m]['值']
+                                        else:
+                                            break
+                                    retxt += '">'
+                                    if target_dict[k]['代码'] == 1 and target_dict[k][l]['代码'] == 1:
+                                        retxt += '自身'
+                                    else:
+                                        retxt += target_dict[k][l]['值']
+                                    retxt += '</span>'
+                                else:
+                                    break
+                        else:
+                            break
+                    retxt += '</span>'
+            jj = 0
+            while True:
+                jj += 1
+                j = str(jj)
+                if j in json_dict[str(i)]:
+                    if json_dict[str(i)][j]['名称'] != '' and json_dict[str(i)][j]['名称'][0] != '#':
+                        if jj == 1:
+                            retxt += '：包含'
+                        else:
+                            retxt += '，'
+                        retxt += json_dict[str(i)][j]['名称']
+                else:
+                    break
+            retxt += '</td></tr>'
+            jj = 0
+            while True:
+                jj += 1
+                j = str(jj)
+                if j in json_dict[str(i)]:
+                    if json_dict[str(i)][j]['简述'] != '' and json_dict[str(i)][j]['简述'] not in compeat_descripe:
+                        compeat_descripe.append(json_dict[str(i)][j]['简述'])
+                        retxt += '<tr><td></td><td>'
+                        if json_dict[str(i)][j]['名称'][0] != '#':
+                            retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)][j]['名称'] + '</span>'
+                        retxt += json_dict[str(i)][j]['简述'] + '</td></tr>'
+                else:
+                    break
+        else:
+            if i > 1:
+                break
+    retxt += '</table></div>'
+    return retxt
+
+
+def create_upgrade_mech(json_dict):
+    retxt = '<div style="paddin:0.5em;"><table>'
+    ii = 0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in json_dict and json_dict[i]['代码'] != 0:
+            retxt += '<tr><td>'
+            if ii > 1:
+                for j in json_dict[i]['升级来源']:
+                    retxt += '[[file:' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
+            retxt += '</td><td style="padding:0.25em><span style="cursor:help;">[[file:' + json_dict[i]['图片'] + '|x22px|link=]]</span> (' + json_dict[i]['值'] + ') '
+            retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
+            kk = 0
+            while True:
+                kk += 1
+                k = str(kk)
+                if k in json_dict[i]:
+                    if int(json_dict[i][k]['代码']) != 0:
+                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i][k]['值'] + '</span>：' + json_dict[i][k][
+                            '简述'] + '</td></tr>'
+                else:
+                    break
+        else:
+            if ii > 1:
+                break
+    retxt += '</table></div>'
+    return retxt
+
+
+def create_independent_mech(json_dict):
+    retxt = '<div style="paddin:0.5em;"><table>'
+    ii = 0
+    while True:
+        ii += 1
+        i = str(ii)
+        if i in json_dict:
+            retxt += '<tr><td>'
+            if ii > 1:
+                for j in json_dict[i]['升级来源']:
+                    retxt += '[[file:' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|x22px|link=' + json_dict[i]['升级来源'][j]["名称"] + ']] '
+            retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
+            if json_dict[i]['简述'] == '。':
+                return ''
+        else:
+            if ii > 1:
+                break
+    retxt += '</table></div>'
+    return retxt
 
 
 abilitypro_num = [["a_cast_range", "AbilityCastRange"]

@@ -413,30 +413,75 @@ def fulfil_complex_and_simple_show(all_json):
         db = all_json['非英雄单位'][i]
         bt = ''  # 完整显示
         st = ''  # 缩略显示
+        bt='<table class="infobox" style="text-align:center;background:#222;width:300px;color:#fff;margin-top:12px;margin-right:12px;">' \
+           '<tr class="infobox-title"><th colspan=2 style="background:#000;padding:8px 16px 0 16px;text-align:center;">' \
+           '<span style="font-size:36px;">' \
+           + common_page.get_unit_value(db["中文名"]) + '</span><br><span style="font-size:24px;text-align:center;">'\
+           +common_page.get_unit_value(db["英文名"])+'</span></th></tr><tr><td class="dota_unit_simple_infobox_label" colspan=2>'
         st += '<table class="dota_unit_simple_infobox"><tr class="bg-primary"><th class="dota_unit_simple_infobox_title" colspan=3>' + i \
               + '</th></tr><tr><td class="dota_unit_simple_infobox_label" colspan=3>'
         if db["英雄级单位"]['1']['1'] == 1:
+            bt += '<span class="label bg-primary">英雄级</span>'
             st += '<span class="label bg-primary">英雄级</span>'
         else:
+            bt += '<span class="label bg-default">非英雄级</span>'
             st += '<span class="label bg-default">非英雄级</span>'
         if db["单位关系类型"]['1']['1'] == '守卫':
+            bt += ' <span class="label bg-warning">守卫</span>'
             st += ' <span class="label bg-warning">守卫</span>'
         else:
+            bt += ' <span class="label bg-default">非守卫</span>'
             st += ' <span class="label bg-default">非守卫</span>'
         if db["远古单位"]['1']['1'] == 1:
+            bt += ' <span class="label bg-warning">远古</span>'
             st += ' <span class="label bg-warning">远古</span>'
         else:
+            bt += ' <span class="label bg-default">非远古</span>'
             st += ' <span class="label bg-default">非远古</span>'
         if db["生命类型"] == '攻击次数':
+            bt += ' <span class="label bg-warning">攻击次数型</span>'
             st += ' <span class="label bg-warning">攻击次数型</span>'
         else:
+            bt += ' <span class="label bg-default">生命值型</span>'
             st += ' <span class="label bg-default">生命值型</span>'
+        bt += '</td></tr>' \
+              '<tr><td colspan=2 style="background:#fff">'
         st += '</td></tr>' \
               '<tr><td rowspan=7 style="background: linear-gradient(#000,#3a3a3a,#000);width:30%">'
         if db['图片'] == '':
             st += '[[' + i + '|暂无' + i + '图片]]'
         else:
+            bt+= '[[file:' + db['图片'] + '|200px|center|link=' + i + ']]'
             st += '[[file:' + db['图片'] + '|160px|center|link=' + i + ']]'
+        bt+='</td></tr>'
+        btlist = [['等级', [['等级']]], ['奖励金钱', [['金钱下限', '金钱上限']]], ['奖励经验', [['经验']]], ['生命值', [['生命值']]]
+            , ['魔法值', [['魔法值']]], ['生命恢复', [['生命恢复']]], ['魔法恢复', [['魔法恢复']]], ['攻击力<br>（攻击类型）', [['攻击下限', '攻击上限']], '<br>（', [['攻击类型']], '）']
+            , ['攻击距离+<br>不中断距离', [['攻击距离']], '+', [['攻击距离缓冲']]], ['攻击前摇', [['攻击前摇']]], ['基础攻击间隔', [['攻击间隔']]]
+            , ['远近程', [['近战远程']]], ['攻击警觉范围', [['警戒范围']]], ['弹道速度', [['弹道速度']]]
+            , ['护甲<br>（护甲类型）', [['护甲']], '<br>（', [['护甲类型']], '）'], ['魔法抗性', [['魔法抗性'], lambda x: '%']]
+            , ['移动速度', [['移动速度']]], ['移动类型', [['移动方式']]], ['转身速率', [['转身速率']]], ['跟随距离', [['跟随距离']]]
+            , ['白天视野', [['白天视野']]], ['夜晚视野', [['夜晚视野']]], ['碰撞体积', [['碰撞体积']]], ['边界体积', [['边界体积']]], ['模型大小', [['模型比例']]]]
+        btlabel = 'style="width:30%;border:1px solid white;padding:0px 8px;background:#000;text-align:right;"'
+        btdata = 'style="border:1px solid white;padding:0px 8px;background:#000;text-align:left;"'
+        for i in btlist:
+            if len(db[i[1][0][0]]) > 0:
+                bt += '<tr><td ' + btlabel + '>' + i[0] + '</td><td ' + btdata + '>'
+                for j in range(1, len(i)):
+                    if j % 2 == 1:
+                        if len(i[j][0]) == 1:
+                            if len(i[j]) == 1:
+                                bt += common_page.create_upgrade_text(db, i[j][0][0])
+                            else:
+                                bt += common_page.create_upgrade_text(db, i[j][0][0], i[j][1])
+                        else:
+                            if len(i[j]) == 1:
+                                bt += common_page.get_unit_upgrade_double(db[i[j][0][0]], db[i[j][0][1]])
+                            else:
+                                bt += common_page.get_unit_upgrade_double(db[i[j][0][0]], db[i[j][0][1]], i[j][1])
+                    else:
+                        bt += i[j]
+                bt += '</td></tr>'
+        bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel">\'\'\'[[data:' + db["页面名"] + '.json|J]] [[' + db["页面名"] + '|P]]\'\'\'</div></td></tr></table>'
         st += '</td><td class="bg-primary dota_unit_simple_infobox_trait_title">等级</td>' \
               '<td class="bg-primary dota_unit_simple_infobox_trait_title">攻击间隔</td></tr>' \
               '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '等级') \
