@@ -36,7 +36,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.29c'
+        self.version = '7.29d'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'http://dota.huijiwiki.com/w/api.php'
@@ -1675,9 +1675,9 @@ class Main(QMainWindow):
         if template_name in ['H','A','I','h','a','i']:
             if template_args[0] in name_list_tree:
                 pic_style=''
-                if len(template_args[0])>2 and template_args[0][:-2]=='天赋':
+                if len(template_args[0])>2 and template_args[0][-2:]=='天赋':
                     pic_style=''
-                if template_name in ['A','a']:
+                elif template_name in ['A','a']:
                     pic_style+=' class="ability_icon"'
                 elif template_name in ['I','i']:
                     pic_style+=' class="item_icon"'
