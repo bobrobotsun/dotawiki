@@ -26,6 +26,7 @@ from text_to_json import hero, ability, item, unit, mechnism, unitgroup, edit_js
 from text_to_json.WikiError import editerror
 import win32con
 import win32clipboard as wincld
+from xpinyin import Pinyin
 
 
 class Main(QMainWindow):
@@ -732,13 +733,15 @@ class Main(QMainWindow):
         try:
             self.resort()
             names = ['英雄', '非英雄单位', '技能', '技能源', '物品', '单位组', '机制', '机制源']
+            p = Pinyin()
             for i in names:
                 self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
                 self.mainlayout['列表'][i]['布局']['列表'].setIconSize(QSize(36, 28))
                 self.mainlayout['列表'][i]['布局']['列表'].clear()
                 for j in self.json_base[i]:
                     temp = QListWidgetItem()
-                    temp.setText(j)
+                    pinyin=p.get_pinyin(j)
+                    temp.setText('【'+pinyin[:2].upper()+'】'+j)
                     if self.json_base[i][j]['应用'] == 2:
                         temp.setBackground(self.green)
                     elif self.json_base[i][j]['应用'] != 1:
@@ -1906,7 +1909,7 @@ class Main(QMainWindow):
     def choose_mainlayout_change_edit_target(self, target_base=''):
         self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(target_base)
         self.edit_category_selected_changed()
-        target_name = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()
+        target_name = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()[4:]
         self.edit_target_selected_changed(target_name)
 
     def complex_dict_to_tree(self, tdict, edict, sdict):

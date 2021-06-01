@@ -154,9 +154,8 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
     # alllogs=[]
     for ijk in all_json['技能']:
         unit_dic = all_json['技能'][ijk]
-        # if unit_dic["次级分类"] not in alllogs:
-        #     alllogs.append(unit_dic["次级分类"])
-        #     print(ijk,alllogs)
+        if '图片类型' not in unit_dic:
+            unit_dic['图片类型']=''
         if 'A杖信息' in unit_dic:
             unit_dic.pop('A杖信息')
         unit_dic['页面名'] = ijk
@@ -194,19 +193,20 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 unit_dic["技能排序"] = "z"
         if unit_dic["数据来源"] in all_json['技能源']:
             temp1 = all_json['技能源'][unit_dic["数据来源"]]
-            if unit_dic["次级分类"] == "天赋技能":
-                unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
-                unit_dic["迷你图片"] = 'Talent.png'
-            elif unit_dic["次级分类"] == "物品技能":
-                if unit_dic["技能归属"] in all_json["物品"]:
-                    unit_dic["图片"] = all_json["物品"][unit_dic["技能归属"]]["图片"]
-                    unit_dic["迷你图片"] = all_json["物品"][unit_dic["技能归属"]]["迷你图片"]
+            if unit_dic['图片类型']!='手填':
+                if unit_dic["次级分类"] == "天赋技能":
+                    unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
+                    unit_dic["迷你图片"] = 'Talent.png'
+                elif unit_dic["次级分类"] == "物品技能":
+                    if unit_dic["技能归属"] in all_json["物品"]:
+                        unit_dic["图片"] = all_json["物品"][unit_dic["技能归属"]]["图片"]
+                        unit_dic["迷你图片"] = all_json["物品"][unit_dic["技能归属"]]["迷你图片"]
+                    else:
+                        unit_dic["图片"] = "Items_" + temp1["代码"] + ".png"
+                        unit_dic["迷你图片"] = "Items_" + temp1["代码"] + ".png"
                 else:
-                    unit_dic["图片"] = "Items_" + temp1["代码"] + ".png"
-                    unit_dic["迷你图片"] = "Items_" + temp1["代码"] + ".png"
-            else:
-                unit_dic["图片"] = "Spellicons_" + temp1["代码"] + ".png"
-                unit_dic["迷你图片"] = "Spellicons_" + temp1["代码"] + ".png"
+                    unit_dic["图片"] = "Spellicons_" + temp1["代码"] + ".png"
+                    unit_dic["迷你图片"] = "Spellicons_" + temp1["代码"] + ".png"
             for i in temp1:
                 if i in ability_trait_level[0]:
                     unit_dic[i] = temp1[i]
