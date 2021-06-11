@@ -1296,8 +1296,8 @@ class Main(QMainWindow):
 
             hero.fulfil_complex_and_simple_show(self.json_base)
             item.fulfil_complex_and_simple_show(self.json_base)
-            ability.fulfil_complex_and_simple_show(self.json_base)
             unit.fulfil_complex_and_simple_show(self.json_base)
+            ability.fulfil_complex_and_simple_show(self.json_base)
 
             # 生成单位组信息（怀疑是个时间耗费大户）
             unitgroup.get_source_to_data(self.json_base, self.version, self.text_base)

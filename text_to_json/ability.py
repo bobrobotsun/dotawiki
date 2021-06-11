@@ -1470,7 +1470,10 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 if i[0] in json:
                     another_info += '(' + number_to_string(json[i[0]]['1']) + json[i[0]]['后缀'] + ')'
 
-        retxt += pre_info + '[[file:' + json['迷你图片'] + '|x24px|link=]]' + another_image + '[[' + json['页面名'] + ']]' + another_name + another_info
+        retxt += pre_info
+        if json['迷你图片']!='':
+            retxt+='[[file:' + json['迷你图片'] + '|x24px|link=]]'
+        retxt+=another_image + '[[' + json['页面名'] + ']]' + another_name + another_info
     else:  # 普通的ability_desc
         another_image = ''
         another_name = ''
@@ -2209,9 +2212,10 @@ def combine_numbers_post_level(arr, post='', level=0, round=4):
     else:
         for i in range(len(arr)):
             if i > 0:
-                if i % 8 == 0:
-                    re += ' '
-                re += "/"
+                if i%4==0:
+                    re+='<span style="inline-block;">/</span>'
+                else:
+                    re += "/"
             re += better_float_to_text(arr[i], round)
             if len(re) > 0 and re[-1].isnumeric():
                 re += post
@@ -2231,144 +2235,6 @@ def create_file(all_json):
         file = open("E:/json/pythonupload/" + i + '.json', mode="w")
         file.write(json.dumps(all_json[i]))
         file.close()
-
-def fulfil_complex_and_simple_show(all_json):
-    for i in all_json['技能']:
-        db = all_json['技能'][i]
-        if db['应用']>0:
-
-            bt = ''  # 完整显示
-            st = ''  # 缩略显示
-            bt += '<div style="display-block;clear:both;overflow: hidden;margin-bottom:1em;background-color: #d1d1d1;">' \
-                  + '<div style="float:left;">' \
-                  + '<div class="abilitybox full-width-xs" style="float:left;padding-bottom:1em;background:#222;color:#eee;width:400px;margin-right:8px;font-size:85%;">' \
-                  + '<div class="bg-primary" style="font-size:100%;background:'
-            if db["次级分类"] == "终极技能":
-                bt += '#6c3d83'
-            elif db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能" or db["次级分类"] == "魔晶技能":
-                bt += '#105aa7'
-            else:
-                bt += '#803024'
-            bt += ';padding:0.5em;">'
-            if db["传统按键"] != "":
-                bt += "<div style='background:#111;color:#fff;float:left;margin:0 0.1em;padding:0 0.2em;display:inline-block;border-radius:0px;' title='传统按键'>'''" + \
-                      db["传统按键"] + "'''</div>"
-            if db["默认按键"] != "":
-                bt += "<div style='background:#111;color:#fff;float:left;margin:0 0.1em;padding:0 0.2em;display:inline-block;border-radius:0px;' title='默认按键'>'''" + \
-                      db["默认按键"] + "'''</div>"
-            bt += '<h4 id="' + db["代码"] + '"  style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db[
-                "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%">\'\'\'[[Data:' + db[
-                      "数据来源"] + '/源.json|S]] [[Data:' + db[
-                      "页面名"] + '.json|J]]\'\'\'</span><br>' + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + \
-                  db[
-                      "中文名"] + '</span>' + '<span style="font-size:12px;color:#ccc;white-space: nowrap;padding: 2px; width:75px;overflow: hidden;text-overflow: ellipsis;text-align: center;"> ' + \
-                  db["英文名"] + '</span></div>'
-            bt += create_upgrade_cast_style(db["施法类型"])
-            bt += create_upgrade_cast_target(db["施法目标"])
-            bt += '<div>[[file:' + db["图片"] + '|160px|center|link=' + db['页面名'] + ']]</div>'
-            if db['描述'] != '':
-                bt += '<div style="background:#111133;padding:1em;">' + db['描述'] + '</div>'
-            if db['神杖信息'] != '':
-                bt += '<div style="background:#222266;padding:0.5em;">[[file:agha.png|x18px|link=]]：' + db['神杖信息'] + '</div>'
-            if db['魔晶信息'] != '':
-                bt += '<div style="background:#222266;padding:0.5em;">[[file:shard.png|x18px|link=]]：' + db['魔晶信息'] + '</div>'
-            if '技能升级信息' in db and '1' in db['技能升级信息']:
-                bt += '<div style="background:#222266;padding:0.25em;">'
-                ii = 0
-                while True:
-                    ii += 1
-                    i = str(ii)
-                    if i in db['技能升级信息']:
-                        v = db['技能升级信息'][i]
-                        bt += '<div style="padding:0.25em;">[[file:' + v['图片'] + '|x18px|link=' + v['技能名'] + ']] [[' + v[
-                            '技能名'] + ']]（' + v['中文名'] + ')</div>'
-                    else:
-                        break
-                bt += '</div>'
-            bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
-            ii = 0
-            while True:
-                ii += 1
-                i = str(ii)
-                if i in db["属性"]:
-                    v = db["属性"][i]
-                    if '名称' in v:
-                        v1 = v['名称']
-                    else:
-                        v1 = '名字没了'
-                    bt += '<div style="padding:0.5em 0.5em 0em 1em">' + v1 + '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
-                else:
-                    break
-            bt += create_upgrade_manacost(db['魔法消耗']) + create_upgrade_cooldown(db['冷却时间'])
-            if db['传说'] != '':
-                bt += '<div style="font-size:75%;padding:1em;border-top:1px solid #777;margin-top:1em;color:#bbb">「 ' + db[
-                    "传说"] + ' 」</div>'
-            if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
-                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
-            if db["次级分类"] == "魔晶技能":
-                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
-            bt += '</div>' \
-                  + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
-                  + '<span style="margin-top:0px;padding-top:0px;font-size:120%"><big>\'\'\'技能详情\'\'\'</big></span><div>'
-            ii = 0
-            while True:
-                ii += 1
-                i = str(ii)
-                if i in db['效果']:
-                    v = db['效果'][i]
-                    bt += create_upgrade_buff(v)
-                else:
-                    break
-            for v in ['技能免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域']:
-                jj = 0
-                while True:
-                    jj += 1
-                    j = str(jj)
-                    if j in db[v]:
-                        w = db[v][j]
-                        bt += create_upgrade_mech(w)
-                    else:
-                        break
-            ii = 0
-            while True:
-                ii += 1
-                i = str(ii)
-                if i in db['独立机制']:
-                    v = db['独立机制'][i]
-                    bt += create_independent_mech(v)
-                else:
-                    break
-            bt += '<div>'
-            uls = 0
-            if db['注释'] != '':
-                ii = 0
-                while True:
-                    ii += 1
-                    i = str(ii)
-                    if i in db['注释']:
-                        v = db['注释'][i]
-                        if v['序列级数'] > uls:
-                            for j in range(1, v['序列级数'] - uls + 1):
-                                bt += '<ul>'
-                            uls = v['序列级数']
-                        elif uls > v['序列级数']:
-                            for j in range(1, uls - v['序列级数'] + 1):
-                                bt += '</ul>'
-                            uls = v['序列级数']
-                        bt += '<li>' + v['文字'] + '</li>'
-                    else:
-                        break
-            for i in range(1, uls + 1):
-                bt += '</ul>'
-            bt += '</div></div></div></div>'
-            for i in db['技能召唤物']:
-                if i in all_json['非英雄单位']:
-                    bt += all_json['非英雄单位'][i]['简易展示']
-            bt += '</div>'
-            bt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + db['数据来源'] + '/源.json|' + db['数据来源'] + '/源]]<br>[[Data:' + db['页面名'] + '.json|' + db[
-                '页面名'] + ']]</div>'
-            db['简易展示'] = st
-            db['具体展示'] = bt
 
 
 def create_upgrade_cast_style(db):
@@ -2754,6 +2620,177 @@ def create_independent_mech(json_dict):
                 break
     retxt += '</table></div>'
     return retxt
+
+def fulfil_complex_and_simple_show(all_json):
+    for i in all_json['技能']:
+        db = all_json['技能'][i]
+        if db['应用']>0:
+            bt = ''  # 完整显示
+            st = ''  # 缩略显示
+            bt += '<div style="display-block;clear:both;overflow: hidden;margin-bottom:1em;background-color: #d1d1d1;">' \
+                  + '<div style="float:left;">' \
+                  + '<div class="abilitybox full-width-xs" style="float:left;padding-bottom:1em;background:#222;color:#eee;width:400px;margin-right:8px;font-size:85%;">' \
+                  + '<div class="bg-primary" style="font-size:100%;background:'
+            st += '<table class="dota_simple_infobox"><tr><th style="text-align:center;" colspan=2>'
+            if db["次级分类"] == "终极技能":
+                bt += '#6c3d83'
+            elif db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能" or db["次级分类"] == "魔晶技能":
+                bt += '#105aa7'
+            else:
+                bt += '#803024'
+            bt += ';padding:0.5em;">'
+            if db["传统按键"] != "":
+                bt += "<div style='background:#111;color:#fff;float:left;margin:0 0.1em;padding:0 0.2em;display:inline-block;border-radius:0px;' title='传统按键'>'''" + \
+                      db["传统按键"] + "'''</div>"
+            if db["默认按键"] != "":
+                bt += "<div style='background:#111;color:#fff;float:left;margin:0 0.1em;padding:0 0.2em;display:inline-block;border-radius:0px;' title='默认按键'>'''" + \
+                      db["默认按键"] + "'''</div>"
+            bt += '<h4 id="' + db["代码"] + '"  style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db[
+                "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%">\'\'\'[[Data:' + db[
+                      "数据来源"] + '/源.json|S]] [[Data:' + db[
+                      "页面名"] + '.json|J]]\'\'\'</span><br>' + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + \
+                  db["中文名"] + '</span>' + '<span style="font-size:12px;color:#ccc;white-space: nowrap;padding: 2px; width:75px;overflow: hidden;text-overflow: ellipsis;text-align: center;"> ' + \
+                  db["英文名"] + '</span></div>'
+            bt += create_upgrade_cast_style(db["施法类型"])
+            bt += create_upgrade_cast_target(db["施法目标"])
+            if db["图片"]!='':
+                bt += '<div>[[file:' + db["图片"] + '|160px|center|link=' + db['页面名'] + ']]</div>'
+                st+='<div class="bg-primary" style="float:left;padding:0.5em">[[file:' + db["图片"] + '|100px|center|link=' + db['页面名'] + ']]</div>'
+            st += '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align: center;">'\
+                  +db["中文名"]+'</div><div class="bg-primary" style="font-size:100%;padding: 2px;text-align: center;">'\
+                  +db["英文名"] +'</div><div class="" style="font-size:100%;padding: 2px;text-align: center;">{{H|'+db['技能归属']+'}}</div>'\
+                  +create_upgrade_cast_style(db["施法类型"])+create_upgrade_cast_target(db["施法目标"])+'</th></tr>'
+            if db['描述'] != '':
+                bt += '<div style="background:#111133;padding:1em;">' + db['描述'] + '</div>'
+                st += '<tr><td colspan=2><div style="background:#111133;padding:1em;">' + db['描述'] + '</div></td></tr>'
+            if db['神杖信息'] != '':
+                bt += '<div style="background:#222266;padding:0.5em;">[[file:agha.png|x18px|link=]]：' + db['神杖信息'] + '</div>'
+                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">[[file:agha.png|x18px|link=]]：' + db['神杖信息'] + '</div></td></tr>'
+            if db['魔晶信息'] != '':
+                bt += '<div style="background:#222266;padding:0.5em;">[[file:shard.png|x18px|link=]]：' + db['魔晶信息'] + '</div>'
+                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">[[file:shard.png|x18px|link=]]：' + db['魔晶信息'] + '</div></td></tr>'
+            if '技能升级信息' in db and '1' in db['技能升级信息']:
+                bt += '<div style="background:#222266;padding:0.25em;">'
+                ii = 0
+                while True:
+                    ii += 1
+                    i = str(ii)
+                    if i in db['技能升级信息']:
+                        v = db['技能升级信息'][i]
+                        bt += '<div style="padding:0.25em;">[[file:' + v['图片'] + '|x18px|link=' + v['技能名'] + ']] [[' + v[
+                            '技能名'] + ']]（' + v['中文名'] + ')</div>'
+                    else:
+                        break
+                bt += '</div>'
+            bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
+            st+='<tr><td style="width:40%;max-width:40%;text-align:left;vertical-align:top;">'+create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
+            ii = 0
+            while True:
+                ii += 1
+                i = str(ii)
+                if i in db["属性"]:
+                    v = db["属性"][i]
+                    if '名称' in v:
+                        v1 = v['名称']
+                    else:
+                        v1 = '名字没了'
+                    bt += '<div style="padding:0.5em 0.5em 0em 1em">' + v1 + '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
+                    st += '<div style="padding:0.5em 0.5em 0em 1em">' + v1 + '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
+                else:
+                    break
+            bt += create_upgrade_manacost(db['魔法消耗']) + create_upgrade_cooldown(db['冷却时间'])
+            st += create_upgrade_manacost(db['魔法消耗']) + create_upgrade_cooldown(db['冷却时间'])
+            if db['传说'] != '':
+                bt += '<div style="font-size:75%;padding:1em;border-top:1px solid #777;margin-top:1em;color:#bbb">「 ' + db[
+                    "传说"] + ' 」</div>'
+            if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
+                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
+                st += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
+            if db["次级分类"] == "魔晶技能":
+                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
+                st += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
+            bt += '</div>' \
+                  + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
+                  + '<span style="margin-top:0px;padding-top:0px;font-size:120%"><big>\'\'\'技能详情\'\'\'</big></span><div>'
+            st +='</td><td class="dota_switch_content_by_click" data-display-number="3" style="width:60%;text-align:left;vertical-align:top;background:#ccc;color:#000;">'
+            ii = 0
+            while True:
+                ii += 1
+                i = str(ii)
+                if i in db['效果']:
+                    v = db['效果'][i]
+                    bt += create_upgrade_buff(v)
+                    if '名称' in v and v['名称'] != '':
+                        name=v['名称']
+                    else:
+                        name='效果'+i
+                    st += '<span class="dota_switch_content_by_click_button" data-check-key="'+name+'" style="margin:0.25em">'+name+'</span>'\
+                        +'<div class="dota_switch_content_by_click_content" data-check-key="'+name+'" data-display-type="block">'+create_upgrade_buff(v)+'</div>'
+                else:
+                    break
+            for v in ['技能免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域']:
+                jj = 0
+                while True:
+                    jj += 1
+                    j = str(jj)
+                    if j in db[v]:
+                        w = db[v][j]
+                        bt += create_upgrade_mech(w)
+                        if '1' in w and '图片' in w['1'] and w['1']['图片']!='':
+                            pic='[[file:'+w['1']['图片']+'|x22px|link=]]'
+                        else:
+                            pic=v
+                        st += '<span class="dota_switch_content_by_click_button" data-check-key="' + v + '" style="margin:0.25em">'+pic+'</span>' \
+                              + '<div class="dota_switch_content_by_click_content" data-check-key="' + v + '" data-display-type="block">' + create_upgrade_mech(w) + '</div>'
+                    else:
+                        break
+            ii = 0
+            while True:
+                ii += 1
+                i = str(ii)
+                if i in db['独立机制']:
+                    v = db['独立机制'][i]
+                    bt += create_independent_mech(v)
+                    if '1' in v and '机制名' in v['1'] and v['1']['机制名'] != '':
+                        name = v['1']['机制名']
+                    else:
+                        name = '独立机制'+i
+                    st += '<span class="dota_switch_content_by_click_button" data-check-key="' + name + '" style="margin:0.25em">' + name + '</span>' \
+                          + '<div class="dota_switch_content_by_click_content" data-check-key="' + name + '" data-display-type="block">' + create_independent_mech(v) + '</div>'
+                else:
+                    break
+            st+='</td></tr></table>'
+            bt += '<div>'
+            uls = 0
+            if db['注释'] != '':
+                ii = 0
+                while True:
+                    ii += 1
+                    i = str(ii)
+                    if i in db['注释']:
+                        v = db['注释'][i]
+                        if v['序列级数'] > uls:
+                            for j in range(1, v['序列级数'] - uls + 1):
+                                bt += '<ul>'
+                            uls = v['序列级数']
+                        elif uls > v['序列级数']:
+                            for j in range(1, uls - v['序列级数'] + 1):
+                                bt += '</ul>'
+                            uls = v['序列级数']
+                        bt += '<li>' + v['文字'] + '</li>'
+                    else:
+                        break
+            for i in range(1, uls + 1):
+                bt += '</ul>'
+            bt += '</div></div></div></div>'
+            for i in db['技能召唤物']:
+                if i in all_json['非英雄单位']:
+                    bt += all_json['非英雄单位'][i]['简易展示']
+            bt += '</div>'
+            bt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[Data:' + db['数据来源'] + '/源.json|' + db['数据来源'] + '/源]]<br>[[Data:' + db['页面名'] + '.json|' + db[
+                '页面名'] + ']]</div>'
+            db['简易展示'] = st
+            db['具体展示'] = bt
 
 
 abilitypro_num = [["a_cast_range", "AbilityCastRange"]

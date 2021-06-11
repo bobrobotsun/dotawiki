@@ -534,16 +534,12 @@ def create_page_unit(json_base, log_base, log_list, unit):
         retxt += '[['+db["单位关系类型"]["1"]["1"]+']]'
     if "简介" in db and db["简介"] != '':
         retxt += '<br>' + db["简介"]
-    if db["中立生物"]["1"]["1"] == 1:
-        # 这里有个东西，是关于野怪营地的东西，目前还没办法改动
-        retxt += '\n==营地==\n{{#arraymap:{{#ask:[[Creep type::' + db['页面名'] + ']]|link=none}}|,|@@@|[[{{#ask:[[has subobject::@@@]]|?name|mainlabel=-|headers=hide}}]]}}'
     if '1' in db['源技能']:
         retxt += '\n==召唤源技能==\n'
         for i, v in db['源技能'].items():
             if v in json_base['技能']:
                 sdb = json_base['技能'][v]
-                retxt += '<br><div>[[' + v + ']]<br>:[[file:' + sdb['图片'] + '|64px|link=' + sdb['页面名'] + '|left]]' + sdb['描述'] \
-                         + ability.create_upgrade_manacost(sdb['魔法消耗']) + ability.create_upgrade_cooldown(sdb['冷却时间']) + '</div>'
+                retxt += '<br>'+sdb['简易展示']
     unitgroup=[]
     for i,v in json_base['单位组'].items():
         if unit in v['全部单位']:
