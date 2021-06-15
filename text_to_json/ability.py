@@ -1281,6 +1281,7 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
     all_results_with_sort_mark = []
     conditions = change_json_to_condition_dict(json, target)
     seps = json['后缀']
+    #查询满足的条件并生成基本的文本信息
     for i in all_json:
         if i[-1] != '源':
             for j in all_json[i]:
@@ -1292,6 +1293,45 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
         retxt = str(len(all_results_with_sort_mark))  # 这个地方直接用=是为了防止之前加入一些奇怪的东西
     elif '非空' in conditions and len(all_results_with_sort_mark) == 0:
         retxt = '<span style="color:#c33">没有找到符合条件的内容！</span>'
+    elif '合并' in conditions:
+        if len(all_results_with_sort_mark) > 0:
+            display_num=1
+            if '合并展示数量' in conditions:
+                try:
+                    display_num=int(conditions['合并展示数量'][0][0])
+                except ValueError:
+                    display_num = 1
+            display_num=str(display_num)
+            sorttime = len(all_results_with_sort_mark[0])
+            for i in range(3, sorttime):
+                reverse = all_results_with_sort_mark[0][i][1] == '-'
+                all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
+            delete=[]
+            for i in range(len(all_results_with_sort_mark)-1):
+                if i not in delete:
+                    for j in range(i+1,len(all_results_with_sort_mark)):
+                        if j not in delete:
+                            if all_results_with_sort_mark[i][0]==all_results_with_sort_mark[j][0]:
+                                delete.append(j)
+                                all_results_with_sort_mark[i][1]+=all_results_with_sort_mark[j][1]
+                                all_results_with_sort_mark[i][2]+=all_results_with_sort_mark[j][2]
+            delete.sort(reverse=True)
+            for i in range(len(delete)):
+                all_results_with_sort_mark.pop(delete[i])
+            for i in range(len(all_results_with_sort_mark)):
+                if firstseps or i > 0:
+                    retxt += seps
+                if len(all_results_with_sort_mark[i][1])==1:
+                    retxt+='<div class="dota-ability-wrapper">' \
+                        '<div class="dota-ability-title">' + all_results_with_sort_mark[i][1][0] + '</div>' \
+                        '<div class="dota-ability-content">' + all_results_with_sort_mark[i][2][0] + '</div></div>'
+                elif len(all_results_with_sort_mark[i][1])>1:
+                    retxt+='<div class="dota-ability-wrapper dota_switch_content_by_click" data-display-number="'+display_num+'">'
+                    for j in range(len(all_results_with_sort_mark[i][1])):
+                        retxt+='<div class="dota-ability-title dota_switch_content_by_click_button" data-check-key="'+str(j)+'">'+all_results_with_sort_mark[i][1][j]+'</div>'\
+                            +'<div class="dota-ability-content dota_switch_content_by_click_content" data-check-key="'+str(j)+'" data-display-type="block">'\
+                               +all_results_with_sort_mark[i][2][j]+'</div>'
+                    retxt+='</div>'
     else:
         if len(all_results_with_sort_mark) > 0:
             sorttime = len(all_results_with_sort_mark[0])
@@ -1316,8 +1356,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         for i in all_json:
             if json['技能归属'] in all_json[i]:
                 if '迷你图片' in all_json[i][json['技能归属']] and all_json[i][json['技能归属']]['迷你图片'] != '':
-                    minisource = '[[file:' + all_json[i][json['技能归属']]['迷你图片'] + '|x24px|link=]]'
-                minisource += '[[' + json['技能归属'] + ']] - '
+                    minisource = '[[file:' + all_json[i][json['技能归属']]['迷你图片'] + '|x22px|link=]]'
+                minisource += json['技能归属']+' - '
     if '排序' in conditions:
         for i in range(len(conditions['排序'])):
             sort_mark += find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target, '排序')
@@ -1481,8 +1521,6 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         traitlist = []
         mech = ''
         note = ''
-        if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
-            another_name += '(' + json['中文名'] + ')'
 
         if '条件升级图片' in conditions:
             for i in range(len(conditions['条件升级图片'])):
@@ -1490,7 +1528,9 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
                         another_image += '[[file:' + tempjson['升级来源'][j]['图片'] + '|x22px|link=' + tempjson['升级来源'][j]['名称'] + ']]'
-        if '条件名称' in conditions:
+        if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
+            another_name += '(' + json['中文名'] + ')'
+        elif '条件名称' in conditions:
             for i in range(len(conditions['条件名称'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target, '条件名称')
                 if isinstance(tempjson, str):
@@ -1592,20 +1632,25 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             for i in range(len(conditions['条件注释'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件注释'][i], i, json, result, target, '条件注释')
                 if isinstance(tempjson, str) and tempjson != '':
-                    note += '<div>' + tempjson + '</div>'
+                    note += '<div style="color:#229;">' + tempjson + '</div>'
 
         if '次级分类' in json:
             if json['次级分类'] == '神杖技能':
-                note += '<div style="float:right;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
+                note += '<div style="text-align:right;color:#4189d4">[[file:Agha.png|x18px|link=]]&nbsp;由阿哈利姆神杖获得</div>'
             elif json['次级分类'] == '魔晶技能':
-                note += '<div style="float:right;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
+                note += '<div style="text-align:right;color:#4189d4">[[file:Shard.png|x18px|link=]]&nbsp;由阿哈利姆魔晶获得</div>'
 
-        retxt += '<div class="dota-ability-wrapper">' \
-                 '<span class="dota-ability-image">[[file:' + json['图片'] + '|72px|link=]]</span>' \
-                                                                           '<span class="dota-ability-right">' \
-                                                                           '<div class="dota-ability-title"><span>' + minisource + '[[' + json[
-                     '页面名'] + ']]' + another_image + another_name + '</span></div>' \
-                                                                    '<div class="dota-ability-desc">' + trait + mech + note + '</div></span></div>'
+        if '次级分类' in json and json['次级分类']=='天赋技能':
+            title=minisource + '[[' + json['页面名'] + '|'+json['页面名'][len(json['技能归属']):]+']]' + another_image + another_name
+        else:
+            title=minisource + '[[' + json['页面名'] + ']]' + another_image + another_name
+        content='<div class="dota-ability-image">[[file:' + json['图片'] + '|64px|link=]]</div><div class="dota-ability-desc">' + trait + mech + note + '</div>'
+        if '合并' in conditions and conditions['合并'][0][0]=='技能源':
+            return [json['数据来源'],[title],[content]] + sort_mark
+        else:
+            retxt += '<div class="dota-ability-wrapper">' \
+                 '<div class="dota-ability-title">' + title + '</div>' \
+                 '<div class="dota-ability-content">' + content + '</div></div>'
     return [retxt] + sort_mark
 
 
@@ -1732,6 +1777,7 @@ def check_the_json_meet_one_condition(condition, json, target, index):
     skip_cal=False
     tempjson = json
     ii = index[0]
+    logic=False#判断是否已经经历过逻辑判定，如果经历过一次逻辑判定，那么下一次逻辑判定将会终止结算
     while True:
         if ii < len(condition):
             i = condition[ii]
@@ -1746,6 +1792,10 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                 else:
                     skip_cal=True
             elif i == '@and' or i == '@和':
+                if logic:
+                    index[0] = ii
+                    return relist, all_bools
+                logic=True
                 if all_bools:
                     index[0] = ii + 1
                     half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
@@ -1756,6 +1806,10 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                 else:
                     skip_cal=True
             elif i == '@except' or i == '@除了':
+                if logic:
+                    index[0] = ii
+                    return relist, all_bools
+                logic=True
                 if all_bools:
                     index[0] = ii + 1
                     half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
@@ -1766,6 +1820,10 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                 else:
                     skip_cal=True
             elif i == '@or' or i == '@或':
+                if logic:
+                    index[0] = ii
+                    return relist, all_bools
+                logic=True
                 index[0] = ii + 1
                 half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
                 for j in half_result:
@@ -1776,6 +1834,10 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                     relist = relist + half_result
                     continue
             elif i == '@either' or i == '@要么':
+                if logic:
+                    index[0] = ii
+                    return relist, all_bools
+                logic=True
                 index[0] = ii + 1
                 half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
                 for j in half_result:
@@ -2081,6 +2143,36 @@ def change_json_to_condition_dict(json, target):
                 redict[key].append(change_one_condition_dict(json[i], [0]))
         else:
             break
+    #接下来将事先解析一些快速生成的内容
+    if '技能效果' in redict:
+        redict['满足']=[['分类','@=','技能']]
+        redict['排序']=redict['排序']+[['@技能']] if '排序' in redict else [['@技能']]
+        redict['条件名称']=redict['条件名称']+[['2-0','2-1','名称']] if '条件名称' in redict else [['2-0','2-1','名称']]
+        redict['条件升级图片']=redict['条件升级图片']+[['2-0','2-1','2-2']] if '条件升级图片' in redict else [['2-0','2-1','2-2']]
+        #需要随情况添加的
+        redict['条件属性']=redict['条件属性'] if '条件属性' in redict else []
+        redict['条件注释']=redict['条件注释'] if '条件注释' in redict else []
+        manzu=['效果','@list','@one']
+        for ii in range(len(redict['技能效果'][0])):
+            i=redict['技能效果'][0][ii]
+            if i[0]=='-':
+                if ii>0:
+                    manzu.append('@except')
+                manzu+=[['@list','名称','@=',i[1:]]]
+            elif i[0]=='+':
+                if ii>0:
+                    manzu.append('@either')
+                manzu+=[['@list','名称','@=',i[1:]]]
+                redict['条件属性']+=[['2-0','2-1','2-2','2-'+str(4+7*ii)]]
+                redict['条件注释']+=[['2-0','2-1','2-2','2-'+str(4+7*ii),'简述']]
+            else:
+                if ii>0:
+                    manzu.append('@and')
+                manzu+=[['@list','名称','@=',i]]
+                redict['条件属性']+=[['2-0','2-1','2-2','2-'+str(4+7*ii)]]
+                redict['条件注释']+=[['2-0','2-1','2-2','2-'+str(4+7*ii),'简述']]
+        redict['满足'].append(manzu)
+
     if '函数' not in redict:
         redict['函数'] = [['']]
     if '满足' not in redict:
