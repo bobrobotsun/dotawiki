@@ -1679,7 +1679,7 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
             if indexlist[0] < len(result) and indexlist[1] < len(result[indexlist[0]]):
                 the_key = result[indexlist[0]][indexlist[1]]
             else:
-                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项时，检查到序数超标了，请检查是否填写错误'))
+                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i+1) + '条【' + condition_name + '】第' + str(j+1) + '项'+condition[j]+'时，检查到序数超标了，请检查是否填写错误'))
         elif condition[j] == '@average' or condition[j] == '@平均' or condition[j] == '@min' or condition[j] == '@最小' or condition[j] == '@max' or condition[j] == '@最大':
             _sum, count, _min, _max = 0, 0, float('inf'), float('-inf')
             kk = 0
@@ -1744,7 +1744,7 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
         if the_key in tempjson:
             tempjson = tempjson[the_key]
         else:
-            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项“'+condition[j]+'”时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
     return tempjson
 
 
@@ -1771,13 +1771,13 @@ def check_the_json_meet_the_conditions(conditions, json, target):
     return relist, all_bools
 
 
-def check_the_json_meet_one_condition(condition, json, target, index):
+def check_the_json_meet_one_condition(condition, json, target, index,logic=False):
     relist = [[]]
     all_bools = True
     skip_cal=False
     tempjson = json
     ii = index[0]
-    logic=False#判断是否已经经历过逻辑判定，如果经历过一次逻辑判定，那么下一次逻辑判定将会终止结算
+    #logic判断是否因为逻辑判定进入，如果是因为逻辑判定进入，那么将不会继续结算逻辑判定
     while True:
         if ii < len(condition):
             i = condition[ii]
@@ -1795,10 +1795,9 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                 if logic:
                     index[0] = ii
                     return relist, all_bools
-                logic=True
                 if all_bools:
                     index[0] = ii + 1
-                    half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                    half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index, True)
                     for j in half_result:
                         j.insert(0, i)
                     all_bools = one_bool
@@ -1809,10 +1808,9 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                 if logic:
                     index[0] = ii
                     return relist, all_bools
-                logic=True
                 if all_bools:
                     index[0] = ii + 1
-                    half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                    half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index, True)
                     for j in half_result:
                         j.insert(0, i)
                     all_bools = not one_bool
@@ -1823,9 +1821,8 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                 if logic:
                     index[0] = ii
                     return relist, all_bools
-                logic=True
                 index[0] = ii + 1
-                half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index, True)
                 for j in half_result:
                     j.insert(0, i)
                 all_bools = all_bools or one_bool
@@ -1837,9 +1834,8 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                 if logic:
                     index[0] = ii
                     return relist, all_bools
-                logic=True
                 index[0] = ii + 1
-                half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index)
+                half_result, one_bool = check_the_json_meet_one_condition(condition, json, target, index, True)
                 for j in half_result:
                     j.insert(0, i)
                 all_bools = all_bools or one_bool
@@ -1976,7 +1972,7 @@ def check_the_json_meet_one_condition(condition, json, target, index):
                             all_bools = isinstance(tempjson, str) and condition[ii + 1] not in tempjson
                         else:
                             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
-                        half_result.append([i, condition[ii]])
+                        half_result.append([i, condition[ii+1]])
                     ii += 1
                 else:
                     raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到符号”' + i + '“后的值，请检查代码错误还是输入缺失'))
@@ -2144,14 +2140,19 @@ def change_json_to_condition_dict(json, target):
         else:
             break
     #接下来将事先解析一些快速生成的内容
+    if '满足' not in redict:
+        redict['满足']=[]
     if '技能效果' in redict:
-        redict['满足']=[['分类','@=','技能']]
+        redict['满足'].append(['分类','@=','技能'])
+        index=str(len(redict['满足'])+1)
         redict['排序']=redict['排序']+[['@技能']] if '排序' in redict else [['@技能']]
-        redict['条件名称']=redict['条件名称']+[['2-0','2-1','名称']] if '条件名称' in redict else [['2-0','2-1','名称']]
-        redict['条件升级图片']=redict['条件升级图片']+[['2-0','2-1','2-2']] if '条件升级图片' in redict else [['2-0','2-1','2-2']]
+        redict['条件名称']=redict['条件名称']+[[index+'-0',index+'-1','名称']] if '条件名称' in redict else [[index+'-0',index+'-1','名称']]
+        redict['条件升级图片']=redict['条件升级图片']+[[index+'-0',index+'-1',index+'-2']] if '条件升级图片' in redict else [[index+'-0',index+'-1',index+'-2']]
         #需要随情况添加的
-        redict['条件属性']=redict['条件属性'] if '条件属性' in redict else []
-        redict['条件注释']=redict['条件注释'] if '条件注释' in redict else []
+        if '条件属性' not in redict:
+            redict['条件属性']=[]
+        if '条件注释' not in redict:
+            redict['条件注释']=[]
         manzu=['效果','@list','@one']
         for ii in range(len(redict['技能效果'][0])):
             i=redict['技能效果'][0][ii]
@@ -2159,18 +2160,41 @@ def change_json_to_condition_dict(json, target):
                 if ii>0:
                     manzu.append('@except')
                 manzu+=[['@list','名称','@=',i[1:]]]
-            elif i[0]=='+':
-                if ii>0:
-                    manzu.append('@either')
-                manzu+=[['@list','名称','@=',i[1:]]]
-                redict['条件属性']+=[['2-0','2-1','2-2','2-'+str(4+7*ii)]]
-                redict['条件注释']+=[['2-0','2-1','2-2','2-'+str(4+7*ii),'简述']]
             else:
                 if ii>0:
                     manzu.append('@and')
                 manzu+=[['@list','名称','@=',i]]
-                redict['条件属性']+=[['2-0','2-1','2-2','2-'+str(4+7*ii)]]
-                redict['条件注释']+=[['2-0','2-1','2-2','2-'+str(4+7*ii),'简述']]
+                redict['条件属性']+=[[index+'-0',index+'-1',index+'-2',index+'-'+str(4+7*ii)]]
+                redict['条件注释']+=[[index+'-0',index+'-1',index+'-2',index+'-'+str(4+7*ii),'简述']]
+        redict['满足'].append(manzu)
+    if '技能机制' in redict:
+        redict['满足'].insert(0,['分类','@=','技能'])
+        redict['排序']=redict['排序']+[['@技能']] if '排序' in redict else [['@技能']]
+        #需要随情况添加的
+        if '条件升级图片' not in redict:
+            redict['条件升级图片']=[]
+        if '条件机制' not in redict:
+            redict['条件机制']=[]
+        manzu=[]
+        index=str(len(redict['满足'])+1)
+        ii=-1
+        while True:
+            ii+=1
+            if 2*ii+1<len(redict['技能机制'][0]):
+                i=redict['技能机制'][0][2*ii]
+                j=redict['技能机制'][0][2*ii+1]
+                if i[0] == '-':
+                    if ii > 0:
+                        manzu.append('@except')
+                    manzu += [[i[1:], '@list','@one','代码', '@=', j]]
+                else:
+                    if ii > 0:
+                        manzu.append('@and')
+                    manzu += [[i, '@list','@one','代码', '@=', j]]
+                    redict['条件升级图片'] += [[index+'-' + str(1 + 8 * ii),index+'-' + str(2 + 8 * ii),index+'-' + str(3 + 8 * ii)]]
+                    redict['条件机制'] += [[index+'-' + str(1 + 8 * ii),index+'-' + str(2 + 8 * ii),index+'-' + str(3 + 8 * ii)]]
+            else:
+                break
         redict['满足'].append(manzu)
 
     if '函数' not in redict:

@@ -165,6 +165,25 @@ def fulfill_hero_json(base_txt, all_json, version,name_base):
                     if namej != i:
                         all_json[i]['曾用名'].append(namej)
 
+def fulfil_talent_show(all_json):
+    for i in all_json['英雄']:
+        db = all_json['英雄'][i]
+        talent={}
+        talent['全天赋']='<div class="dota_hero_talent_simple_show_complete">'
+        for jj in [25,20,15,10]:
+            j=str(jj)
+            colorcontent=str(160-4*jj)+','+str(160-4*jj)+','+str(160-4*jj)
+            colorlevel='0,'+str(250-5*jj)+','+str(8*jj)
+            talent[j]=''
+            talent[j]+='<div class="dota_hero_talent_simple_show_row" style="background:rgb('+colorcontent\
+                       +');"><div class="dota_hero_talent_simple_show_talent_left">' \
+                       +all_json['技能'][i+j+'级左天赋']['中文名']+'</div>' \
+                       '<div class="dota_hero_talent_simple_show_level" style="background:rgb('+colorlevel+');><b>'+j\
+                      +'</b></div><div class="dota_hero_talent_simple_show_talent_right">'\
+                      +all_json['技能'][i+j+'级右天赋']['中文名']+'</div></div>'
+            talent['全天赋']+=talent[j]
+        talent['全天赋'] +='</div>'
+        db['天赋展示']=talent
 
 def create_file(all_json):
     for i in all_json:
