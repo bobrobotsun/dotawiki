@@ -412,9 +412,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
     retxt += '&nbsp;<span class="dota_get_image_by_image_name" data-image-name="heroes_' + db["代码名"] + '.png" data-image-height="48"></span>' \
              + '<span class="dota_get_image_by_image_name" data-image-name="heroes_' + db["代码名"] + '_alt1.png" data-image-height="48"></span></div></div>' \
              + "<p><b>" + db["中文名"] + "</b>（" + db["英文名"] + '）是Dota2中的一位' + db["主属性"]['1'] + '<span class="dota_create_link_to_wiki_page">英雄</span>。</p>' \
-             + '{{#invoke:hero data|heroheroheader|' + db["中文名"] + '}}<div class="center"><span class="dota_get_image_by_image_name" data-image-name="npc dota hero ' + db["代码名"] \
-             + '.webm" data-image-width="300"></span></div>{{#invoke:hero data|heroherodata|' + db["中文名"] \
-             + '}}{{#invoke:hero data|heroherojs}}[[category:' + db["主属性"]['1'] + '英雄]]' \
+             + db["具体展示"] + '[[category:' + db["主属性"]['1'] + '英雄]]' \
              + '<div style="line-height: 200%;">' \
              + '<h2>简介</h2>' \
              + db["简介"] \

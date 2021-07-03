@@ -1676,7 +1676,7 @@ class Main(QMainWindow):
 
     def change_all_template_link_to_html(self,gettxt):
         retxt=re.sub(r'\{\{(.*?)\|(.*?)\}\}', lambda x: self.upload_text_template(x), gettxt)
-        retxt=re.sub(r'\[\[([^#:]*?)\]\]', lambda x: self.upload_text_link(x), retxt)
+        retxt=re.sub(r'\[\[((?!#)[^:]*?)\]\]', lambda x: self.upload_text_link(x), retxt)
         return retxt
 
     def upload_text_link(self,x):

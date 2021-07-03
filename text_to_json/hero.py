@@ -195,7 +195,8 @@ def create_file(all_json):
 def fulfil_complex_and_simple_show(all_json,html_function):
     for i in all_json['英雄']:
         db = all_json['英雄'][i]
-        bt = ''  # 完整显示
+        bt = '{{#invoke:hero data|heroheroheader|' + db["中文名"] + '}}[[file:npc_dota_hero_' + db["代码名"] + '.webm|center|300px|link=]]{{#invoke:hero data|heroherodata|' + db["中文名"] \
+             + '}}{{#invoke:hero data|heroherojs}}'  # 完整显示
         st = ''  # 缩略显示
         db['简易展示'] = html_function(st)
         db['具体展示'] = html_function(bt)
