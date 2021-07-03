@@ -1294,11 +1294,11 @@ class Main(QMainWindow):
                 else:
                     self.json_base['技能'][i]['技能召唤物'] = []
 
-            hero.fulfil_complex_and_simple_show(self.json_base)
-            item.fulfil_complex_and_simple_show(self.json_base)
-            unit.fulfil_complex_and_simple_show(self.json_base)
-            ability.fulfil_complex_and_simple_show(self.json_base)
-            hero.fulfil_talent_show(self.json_base)
+            hero.fulfil_complex_and_simple_show(self.json_base,self.change_all_template_link_to_html)
+            item.fulfil_complex_and_simple_show(self.json_base,self.change_all_template_link_to_html)
+            unit.fulfil_complex_and_simple_show(self.json_base,self.change_all_template_link_to_html)
+            ability.fulfil_complex_and_simple_show(self.json_base,self.change_all_template_link_to_html)
+            hero.fulfil_talent_show(self.json_base,self.change_all_template_link_to_html)
 
             # 生成单位组信息（怀疑是个时间耗费大户）
             unitgroup.get_source_to_data(self.json_base, self.version, self.text_base)
@@ -1320,7 +1320,9 @@ class Main(QMainWindow):
         try:
             time_show = time.time()
             allupdate = []
+            loop_time=1
             if target == '':
+                loop_time=2
                 for i in self.json_base['机制']:
                     if i not in allupdate:
                         allupdate.append(i)
@@ -1329,7 +1331,7 @@ class Main(QMainWindow):
                         allupdate.append(i)
             else:
                 allupdate.append(target)
-            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base)
+            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base,loop_time)
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
@@ -1618,7 +1620,7 @@ class Main(QMainWindow):
     def upload_page(self, pagename, content,name_list_tree, bot=False):
         download_data = {'action': 'parse', 'prop': 'wikitext', 'page': pagename, 'format': 'json'}
         #这里会对文字进行一个提纯操作
-        upcontent = re.sub(r'\{\{(.*?)\|(.*?)\}\}', lambda x: self.upload_text_template(x,name_list_tree), content)+'\n{{全部格式}}'
+        upcontent = self.change_all_template_link_to_html(content)+'\n{{全部格式}}'
         #本地处理好后再进行上传
         k = 0
         while True:
@@ -1672,26 +1674,35 @@ class Main(QMainWindow):
         else:
             return [json.dumps(upload_info.json()), 0]
 
-    def upload_text_template(self,x,name_list_tree):
+    def change_all_template_link_to_html(self,gettxt):
+        retxt=re.sub(r'\{\{(.*?)\|(.*?)\}\}', lambda x: self.upload_text_template(x), gettxt)
+        retxt=re.sub(r'\[\[([^#:]*?)\]\]', lambda x: self.upload_text_link(x), retxt)
+        return retxt
+
+    def upload_text_link(self,x):
+        retxt=''
+        link=x.group(1).split('|',1)
+        if len(link)>1:
+            retxt='<span class="dota_create_link_to_wiki_page" data-link-page-name="'+link[0]+'">'+link[1]+'</span>'
+        else:
+            retxt='<span class="dota_create_link_to_wiki_page" data-link-page-name="'+link[0]+'">'+link[0]+'</span>'
+        return retxt
+
+    def upload_text_template(self, x):
         retxt=''
         template_name=x.group(1)
         template_args=x.group(2).split('|')
         if template_name in ['H','A','I','h','a','i']:
-            if template_args[0] in name_list_tree:
-                pic_style=''
-                if len(template_args[0])>2 and template_args[0][-2:]=='天赋':
-                    pic_style=''
-                elif template_name in ['A','a']:
-                    pic_style+=' class="ability_icon"'
-                elif template_name in ['I','i']:
-                    pic_style+=' class="item_icon"'
-                for i in name_list_tree[template_args[0]]:
-                    if i[2]!='':
-                        retxt+='<span'+pic_style+'>[[file:'+i[2]+'|x24px|link='+i[0]+']]</span>'
-                retxt+='[['+name_list_tree[template_args[0]][0][0]+'|'+template_args[0]+']]'
-                return retxt
-            else:
-                return x.group(0)
+            pic_style = ''
+            if len(template_args[0]) > 2 and template_args[0][-2:] == '天赋':
+                pic_style = ''
+            elif template_name in ['A', 'a']:
+                pic_style += ' data-image-class="ability_icon"'
+            elif template_name in ['I', 'i']:
+                pic_style += ' data-image-class="item_icon"'
+            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[
+                0] + '" data-image-mini="1" data-image-link="1" data-text-link="1"' + pic_style + '></span>'
+            return retxt
         else:
             return x.group(0)
 
@@ -3000,7 +3011,7 @@ class Main(QMainWindow):
             for i in ['主属性', '近战远程', '阵营']:
                 rere += db[i]['1'] + '，'
             for i in [['力量', 'Strength_Icon'], ['敏捷', 'Agility_Icon'], ['智力', 'Intelligence_Icon']]:
-                rere += '[[file:' + i[1] + '.png|20px]]' + common_page.number_to_string(db[i[0]]['1']) + '+' + common_page.number_to_string(db[i[0] + '成长']['1'])
+                rere += '<span class="dota_get_image_by_image_name" data-image-name="' + i[1] + '.png"></span>' + common_page.number_to_string(db[i[0]]['1']) + '+' + common_page.number_to_string(db[i[0] + '成长']['1'])
             rere += '，' + common_page.number_to_string(db['生命值']['1'] + db['力量']['1'] * 20) + '血，' + common_page.number_to_string(db['生命恢复']['1'] + db['力量']['1'] * 0.1) + '回血，'
             rere += common_page.number_to_string(db['魔法值']['1'] + db['智力']['1'] * 12) + '蓝，' + common_page.number_to_string(db['魔法恢复']['1'] + db['智力']['1'] * 0.05) + '回蓝，'
             rere += common_page.number_to_string(db['攻击下限']['1'] + db[db['主属性']['1']]['1']) + '~' + common_page.number_to_string(db['攻击上限']['1'] + db[db['主属性']['1']]['1']) + '攻击力，'
@@ -3014,9 +3025,9 @@ class Main(QMainWindow):
                 if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '叠加' in v and '1' in v:
                     rere += v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + '，'
             if db['价格']['1'] != '中立生物掉落':
-                rere += '[[file:Gold symbol.png|20px|link=]]' + common_page.number_to_string(db['价格']['1'])
+                rere += '<span class="dota_get_image_by_image_name" data-image-name="Gold symbol.png"></span>' + common_page.number_to_string(db['价格']['1'])
             if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
-                rere += '[[file:items recipe.png|20px|link=]]&nbsp;' + common_page.number_to_string(db['卷轴价格']['1'])
+                rere += '<span class="dota_get_image_by_image_name" data-image-name="items recipe.png"></span>&nbsp;' + common_page.number_to_string(db['卷轴价格']['1'])
             if '可拆分' in db and '组件' in db and db['可拆分'] == 1:
                 rere += '，可拆分'
             if rere[-1] == '，':

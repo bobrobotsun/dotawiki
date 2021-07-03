@@ -26,11 +26,11 @@ def create_upgrade_cast_text(numjsons,k):
         retext = ''
         for i in numjson:
             if i == "2" or i == "4":
-                retext += '[[file:agha.png|x22px|link=阿哈利姆神杖]]'
+                retext += '<span class="dota_get_image_by_image_name" data-image-name="file:agha.png" data-image-link="阿哈利姆神杖"></span>'
             if i == "3" or i == "4":
                 for j in numjson[i]['升级来源']:
-                    retext += '[[file:' + numjson[i]['升级来源'][j]["图片"] + '|x22px|link=' + numjson[i]['升级来源'][j][
-                        "名称"] + ']]'
+                    retext += '<span class="dota_get_image_by_image_name" data-image-name="' + numjson[i]['升级来源'][j]["图片"] + '" data-image-link="' \
+                              + numjson[i]['升级来源'][j]["名称"] + '"></span>'
             j = 1
             while True:
                 if str(j) in numjson[i]:

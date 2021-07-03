@@ -408,7 +408,7 @@ def create_file(all_json):
         file.close()
 
 
-def fulfil_complex_and_simple_show(all_json):
+def fulfil_complex_and_simple_show(all_json,html_function):
     for i in all_json['非英雄单位']:
         db = all_json['非英雄单位'][i]
         bt = ''  # 完整显示
@@ -445,15 +445,16 @@ def fulfil_complex_and_simple_show(all_json):
             bt += ' <span class="label bg-default">生命值型</span>'
             st += ' <span class="label bg-default">生命值型</span>'
         bt += '</td></tr>' \
-              '<tr><td colspan=2 style="background:#fff">'
+              '<tr><td colspan=2 style="background:#fff"><div class="center">'
         st += '</td></tr>' \
-              '<tr><td rowspan=7 style="background: linear-gradient(#000,#3a3a3a,#000);width:30%">'
+              '<tr><td rowspan=7 style="background: linear-gradient(#000,#3a3a3a,#000);width:30%"><div class="center">'
         if db['图片'] == '':
-            st += '[[' + i + '|暂无' + i + '图片]]'
+            st += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + i + '">暂无' + i + '图片</span>'
         else:
-            bt+= '[[file:' + db['图片'] + '|200px|center|link=' + i + ']]'
-            st += '[[file:' + db['图片'] + '|160px|center|link=' + i + ']]'
-        bt+='</td></tr>'
+            bt+= '<span class="dota_get_image_by_image_name center" data-image-name="' + db['图片'] + '" data-image-width="200" data-image-link="' + i + '"></span>'
+            st += '<span class="dota_get_image_by_image_name center" data-image-name="' + db['图片'] + '" data-image-width="160" data-image-link="' + i + '"></span>'
+        bt+='</div></td></tr>'
+        st+='</div></td>'
         btlist = [['等级', [['等级']]], ['奖励金钱', [['金钱下限', '金钱上限']]], ['奖励经验', [['经验']]], ['生命值', [['生命值']]]
             , ['魔法值', [['魔法值']]], ['生命恢复', [['生命恢复']]], ['魔法恢复', [['魔法恢复']]], ['攻击力<br>(攻击类型)', [['攻击下限', '攻击上限']], '<br>（', [['攻击类型']], '）']
             , ['攻击距离+<br>不中断距离', [['攻击距离']], '+', [['攻击距离缓冲']]], ['攻击前摇', [['攻击前摇']]], ['基础攻击间隔', [['攻击间隔']]]
@@ -481,8 +482,10 @@ def fulfil_complex_and_simple_show(all_json):
                     else:
                         bt += i[j]
                 bt += '</td></tr>'
-        bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel">\'\'\'[[data:' + db["页面名"] + '.json|J]] [[' + db["页面名"] + '|P]]\'\'\'</div></td></tr></table>'
-        st += '</td><td class="bg-primary dota_unit_simple_infobox_trait_title">等级</td>' \
+        bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel">\'\'\'' \
+              '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] \
+              + '.json">J</span> <span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] + '">P</span>\'\'\'</div></td></tr></table>'
+        st += '<td class="bg-primary dota_unit_simple_infobox_trait_title">等级</td>' \
               '<td class="bg-primary dota_unit_simple_infobox_trait_title">攻击间隔</td></tr>' \
               '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '等级') \
               + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '攻击间隔') \
@@ -527,8 +530,8 @@ def fulfil_complex_and_simple_show(all_json):
               + '</td><td class="bg-primary dota_unit_simple_infobox_trait_title">经验</td></tr>' \
                 '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '经验') \
               + '</td></tr></table>'
-        db['简易展示'] = st
-        db['具体展示'] = bt
+        db['简易展示'] = html_function(st)
+        db['具体展示'] = html_function(bt)
 
 
 def change_combine_numbers_to_str(s1, s2, post=''):

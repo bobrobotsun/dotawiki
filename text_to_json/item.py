@@ -272,7 +272,7 @@ def create_file(all_json):
         file.write(json.dumps(all_json[i]))
         file.close()
 
-def fulfil_complex_and_simple_show(all_json):
+def fulfil_complex_and_simple_show(all_json,html_function):
     for i in all_json['物品']:
         db = all_json['物品'][i]
         bt = ''  # 完整显示
@@ -284,12 +284,13 @@ def fulfil_complex_and_simple_show(all_json):
         bt += '<table class="infobox" style="text-align:center;background:#fff;width:300px;color:#fff;"><tr class="infobox-title">' + '<th colspan=2 style="background: #a03030;padding: 0.5em 1em;;text-align:center;">' + '<span style="font-size:125%">' + \
                 db["中文名"] + '</span><div style="text-align:center;">' + db["英文名"] + '</div>' + '</th></tr>'
         if db["图片"] != '':
-            bt += '<tr><td colspan=2 style="background:#222">[[file:' + db["图片"] + '|100px|center|link=' + db["页面名"] \
-                     + ']]</td></tr><tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] + '</td></tr>' \
-                     + '<tr><td colspan="2" style="border-bottom-width:0px;text-align:center;background:#c38a1c;padding:8px;font-size:16px;font-weight:bold;color:#fff;">[[file:Gold symbol.png|30px|link=]]&nbsp;' \
+            bt += '<tr><td colspan=2 style="background:#222"><div class="center"><span class="dota_get_image_by_image_name" data-image-name="' + db["图片"] + '" data-image-width="100" data-image-link="' + db["页面名"] \
+                     + '"></span></div></td></tr><tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] + '</td></tr>' \
+                     + '<tr><td colspan="2" style="border-bottom-width:0px;text-align:center;background:#c38a1c;padding:8px;font-size:16px;font-weight:bold;color:#fff;">' \
+                       '<span class="dota_get_image_by_image_name" data-image-name="Gold symbol.png" data-image-width="30"></span>&nbsp;' \
                      + common_page.number_to_string(db['价格']['1']) + ''
         if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
-            bt += '<span style="margin-left:1em;">[[file:items recipe.png|24px|link=]]&nbsp;' + common_page.number_to_string(db['卷轴价格']['1']) + '</span>'
+            bt += '<span style="margin-left:1em;"><span class="dota_get_image_by_image_name" data-image-name="items recipe.png" data-image-width="24"></span>&nbsp;' + common_page.number_to_string(db['卷轴价格']['1']) + '</span>'
         bt += '</td></tr>'
         for i, v in common_pro.items():
             if i != '可拆分' or '组件' in db:
@@ -305,21 +306,23 @@ def fulfil_complex_and_simple_show(all_json):
             for i, v in db['升级'].items():
                 if int(i) % 4 == 1 and int(i) > 1:
                     bt += '<br><br>'
-                bt += ' [[file:' + v["图片"] + '|48px|link=' + v["物品名"] + ']] '
+                bt += ' <span class="dota_get_image_by_image_name" data-image-name="' + v["图片"] + '" data-image-width="48" data-image-link="' + v["物品名"] + '"></span> '
             bt += '</td></tr>'
         if '组件' in db:
             bt += '<tr><td colspan=2 style="background:#a03030;padding:4px;text-align:center;">' + '配方</td></tr><tr><td colspan=2 style="background:#222;padding:6px;">'
             for i, v in db['组件'].items():
                 if int(i) % 4 == 1 and int(i) > 1:
                     bt += '<br><br>'
-                bt += ' [[file:' + v["图片"] + '|48px|link=' + v["物品名"] + ']] '
+                bt += ' <span class="dota_get_image_by_image_name" data-image-name="' + v["图片"] + '" data-image-width="48" data-image-link="' + v["物品名"] + '"></span> '
             if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
-                bt += ' [[file:items recipe.png|48px|link=]] '
+                bt += ' <span class="dota_get_image_by_image_name" data-image-name="items recipe.png" data-image-width="48"></span> '
             bt += '</td></tr>'
-        bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel" style="padding-left:0.25em">\'\'\' [[' + db["页面名"] + '|P]]  [[data:' + db[
-            "页面名"] + '.json|J]] \'\'\'</div><div style="float:right;color:#000;padding-right:0.25em">' + db['代码名'] + '</div></td></tr></table>'
-        db['简易展示'] = st
-        db['具体展示'] = bt
+        bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel" style="padding-left:0.25em">\'\'\' ' \
+              '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] \
+              + '">P</span>  <span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] \
+              + '.json">J</span> \'\'\'</div><div style="float:right;color:#000;padding-right:0.25em">' + db['代码名'] + '</div></td></tr></table>'
+        db['简易展示'] = html_function(st)
+        db['具体展示'] = html_function(bt)
 
 def get_item_value(db):
     if isinstance(db, dict):

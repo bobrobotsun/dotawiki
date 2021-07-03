@@ -165,7 +165,7 @@ def fulfill_hero_json(base_txt, all_json, version,name_base):
                     if namej != i:
                         all_json[i]['曾用名'].append(namej)
 
-def fulfil_talent_show(all_json):
+def fulfil_talent_show(all_json,html_function):
     for i in all_json['英雄']:
         db = all_json['英雄'][i]
         talent={}
@@ -181,6 +181,7 @@ def fulfil_talent_show(all_json):
                        '<div class="dota_hero_talent_simple_show_level" style="background:rgb('+colorlevel+');><b>'+j\
                       +'</b></div><div class="dota_hero_talent_simple_show_talent_right">'\
                       +all_json['技能'][i+j+'级右天赋']['中文名']+'</div></div>'
+            talent[j]=html_function(talent[j])
             talent['全天赋']+=talent[j]
         talent['全天赋'] +='</div>'
         db['天赋展示']=talent
@@ -191,13 +192,13 @@ def create_file(all_json):
         file.write(json.dumps(all_json[i]))
         file.close()
 
-def fulfil_complex_and_simple_show(all_json):
+def fulfil_complex_and_simple_show(all_json,html_function):
     for i in all_json['英雄']:
         db = all_json['英雄'][i]
         bt = ''  # 完整显示
         st = ''  # 缩略显示
-        db['简易展示'] = st
-        db['具体展示'] = bt
+        db['简易展示'] = html_function(st)
+        db['具体展示'] = html_function(bt)
 
 heropro_txt = [["主属性", "AttributePrimary", {"DOTA_ATTRIBUTE_STRENGTH": "力量", "DOTA_ATTRIBUTE_AGILITY": "敏捷", "DOTA_ATTRIBUTE_INTELLECT": "智力"}]
     , ["近战远程", "AttackCapabilities", {"DOTA_UNIT_CAP_MELEE_ATTACK": "近战", "DOTA_UNIT_CAP_RANGED_ATTACK": "远程", "DOTA_UNIT_CAP_NO_ATTACK": "不攻击"}]

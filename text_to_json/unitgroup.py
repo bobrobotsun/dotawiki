@@ -23,10 +23,10 @@ def get_source_to_data(all_json, version, text_base):
                 members.pop('小表格')
             extra_attribute=confirm_extra_attribute(members['额外属性'],all_json,i,j)
             #bt大表格
-            bt='<table class="wikitable" style="width:100%;text-align:right;"><tr><td colspan="2" style="text-align:center;">[['\
-               +i+']]（'+members['名称']+'）</td></tr><tr><td rowspan="5" style="text-align:center;">'
-            st='<table class="wikitable" style="width:100%;text-align:center;"><tr><td>[['\
-               +i+']]（'+members['名称']+'）</td></tr><tr><td>'
+            bt='<table class="wikitable" style="width:100%;text-align:right;"><tr><td colspan="2" style="text-align:center;"><span class="dota_create_link_to_wiki_page">'\
+               +i+'</span>（'+members['名称']+'）</td></tr><tr><td rowspan="5" style="text-align:center;">'
+            st='<table class="wikitable" style="width:100%;text-align:center;"><tr><td><span class="dota_create_link_to_wiki_page">'\
+               +i+'</span>（'+members['名称']+'）</td></tr><tr><td>'
             #st小表格
             # 成员数量，生命值，金钱，经验，物理生命，魔法生命
             result = {'数量': [[[0], {}]], '生命值': [[[0], {}]], '金钱上限': [[[0], {}]], '金钱下限': [[[0], {}]], '平均金钱': [[[0], {}]], '经验': [[[0], {}]], '物理生命': [[[0], {}]], '魔法生命': [[[0], {}]]}
@@ -41,7 +41,10 @@ def get_source_to_data(all_json, version, text_base):
                             all_units.append(members[k]['单位名'])
                         one_result = {}
                         one_result['数量'] = ability.one_combine_txt_numbers(members[k]['数量']['代码'], all_json, text_base, ['单位组', i, '成员', '数量'])
-                        bt+='<div style="display:inline-block;padding:0 0.25em;"><div>[[file:'+one_member['图片']+'|x100px|center|link='+one_member['页面名']+']]</div><div>[['+one_member['页面名']+']]×'+change_combine_numbers_to_str(one_result['数量'])+'</div></div>'
+                        bt+='<div style="display:inline-block;padding:0 0.25em;"><div><span class="dota_get_image_by_image_name" data-image-name="'\
+                            +one_member['图片']+'" data-image-height="100" data-image-link="'+one_member['页面名']\
+                            +'" data-image-center="1"></span></div><div><span class="dota_create_link_to_wiki_page">'\
+                            +one_member['页面名']+'</span>×'+change_combine_numbers_to_str(one_result['数量'])+'</div></div>'
                         st+='<div>{{H|' + one_member['页面名'] + '}}×'+change_combine_numbers_to_str(one_result['数量'])+'</div>'
                         codes = {'0': '升级属性', '1': '非英雄单位', '2': members[k]['单位名']}
                         for l in ['生命值', '护甲', '魔法抗性', '经验', '金钱上限', '金钱下限']:
@@ -141,7 +144,7 @@ def change_combine_numbers_to_str(slist):
         rere += "("
         for l in range(1, len(slist)):
             for m in slist[l][1]:
-                rere += "[[file:" + slist[l][1][m] + "|x18px|link=" + m + "]]"
+                rere += '<span class="dota_get_image_by_image_name" data-image-name="' + slist[l][1][m] + '" data-image-height="18" data-image-link="'+m+'"></span>'
             rere += ability.combine_numbers_post_level(slist[l][0],round=1)
         rere += ")"
     return rere
@@ -153,7 +156,7 @@ def change_double_combine_numbers_to_str(slist1,slist2,linkop='~'):
         rere += "("
         for l in range(1, len(slist1)):
             for m in slist1[l][1]:
-                rere += "[[file:" + slist1[l][1][m] + "|x18px|link=" + m + "]]"
+                rere += '<span class="dota_get_image_by_image_name" data-image-name="' + slist1[l][1][m] + '" data-image-height="18" data-image-link="'+m+'"></span>'
             rere += ability.combine_numbers_post_level(slist1[l][0],round=1)+linkop+ability.combine_numbers_post_level(slist2[l][0],round=1)
         rere += ")"
     return rere
