@@ -155,7 +155,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
     for ijk in all_json['技能']:
         unit_dic = all_json['技能'][ijk]
         if '图片类型' not in unit_dic:
-            unit_dic['图片类型']=''
+            unit_dic['图片类型'] = ''
         if 'A杖信息' in unit_dic:
             unit_dic.pop('A杖信息')
         unit_dic['页面名'] = ijk
@@ -193,7 +193,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 unit_dic["技能排序"] = "z"
         if unit_dic["数据来源"] in all_json['技能源']:
             temp1 = all_json['技能源'][unit_dic["数据来源"]]
-            if unit_dic['图片类型']!='手填':
+            if unit_dic['图片类型'] != '手填':
                 if unit_dic["次级分类"] == "天赋技能":
                     unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
                     unit_dic["迷你图片"] = 'Talent.png'
@@ -870,7 +870,7 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                                     returntxt += temp[j][1][k]
                                 else:
                                     returntxt += temp[j][1][k].replace('Talent.png', 'Talentb.png')
-                                returntxt += '  data-image-height="18" data-image-link="'+k+'"></span>'
+                                returntxt += '  data-image-height="18" data-image-link="' + k + '"></span>'
                             returntxt += combine_numbers_post_level(temp[j][0], post, level)
                         returntxt += ")"
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
@@ -1025,7 +1025,8 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
         rere[0][0].append(temptext)
     elif json['0'] == '图片链接':
         temp = all_json[json["1"]][json["2"]]
-        rere[0][0].append('<span class="dota_get_image_by_json_name" data-json-name="' + temp['页面名'] + '" data-image-height="' + json['3'] + '" data-image-mini="1" data-text-link="1"></span>')
+        rere[0][0].append(
+            '<span class="dota_get_image_by_json_name" data-json-name="' + temp['页面名'] + '" data-image-height="' + json['3'] + '" data-image-mini="1" data-text-link="1"></span>')
     elif json["0"] == "手填":
         j = 0
         while True:
@@ -1281,7 +1282,7 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
     all_results_with_sort_mark = []
     conditions = change_json_to_condition_dict(json, target)
     seps = json['后缀']
-    #查询满足的条件并生成基本的文本信息
+    # 查询满足的条件并生成基本的文本信息
     for i in all_json:
         if i[-1] != '源':
             for j in all_json[i]:
@@ -1295,43 +1296,45 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
         retxt = '<span style="color:#c33">没有找到符合条件的内容！</span>'
     elif '合并' in conditions:
         if len(all_results_with_sort_mark) > 0:
-            display_num=1
+            display_num = 1
             if '合并展示数量' in conditions:
                 try:
-                    display_num=int(conditions['合并展示数量'][0][0])
+                    display_num = int(conditions['合并展示数量'][0][0])
                 except ValueError:
                     display_num = 1
-            display_num=str(display_num)
+            display_num = str(display_num)
             sorttime = len(all_results_with_sort_mark[0])
             for i in range(3, sorttime):
                 reverse = all_results_with_sort_mark[0][i][1] == '-'
                 all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
-            delete=[]
-            for i in range(len(all_results_with_sort_mark)-1):
+            delete = []
+            for i in range(len(all_results_with_sort_mark) - 1):
                 if i not in delete:
-                    for j in range(i+1,len(all_results_with_sort_mark)):
+                    for j in range(i + 1, len(all_results_with_sort_mark)):
                         if j not in delete:
-                            if all_results_with_sort_mark[i][0]==all_results_with_sort_mark[j][0]:
+                            if all_results_with_sort_mark[i][0] == all_results_with_sort_mark[j][0]:
                                 delete.append(j)
-                                all_results_with_sort_mark[i][1]+=all_results_with_sort_mark[j][1]
-                                all_results_with_sort_mark[i][2]+=all_results_with_sort_mark[j][2]
+                                all_results_with_sort_mark[i][1] += all_results_with_sort_mark[j][1]
+                                all_results_with_sort_mark[i][2] += all_results_with_sort_mark[j][2]
             delete.sort(reverse=True)
             for i in range(len(delete)):
                 all_results_with_sort_mark.pop(delete[i])
             for i in range(len(all_results_with_sort_mark)):
                 if firstseps or i > 0:
                     retxt += seps
-                if len(all_results_with_sort_mark[i][1])==1:
-                    retxt+='<div class="dota-ability-wrapper">' \
-                        '<div class="dota-ability-title">' + all_results_with_sort_mark[i][1][0] + '</div>' \
-                        '<div class="dota-ability-content">' + all_results_with_sort_mark[i][2][0] + '</div></div>'
-                elif len(all_results_with_sort_mark[i][1])>1:
-                    retxt+='<div class="dota-ability-wrapper dota_switch_content_by_click" data-display-number="'+display_num+'">'
+                if len(all_results_with_sort_mark[i][1]) == 1:
+                    retxt += '<div class="dota-ability-wrapper">' \
+                             '<div class="dota-ability-title">' + all_results_with_sort_mark[i][1][0] + '</div>' \
+                                                                                                        '<div class="dota-ability-content">' + all_results_with_sort_mark[i][2][
+                                 0] + '</div></div>'
+                elif len(all_results_with_sort_mark[i][1]) > 1:
+                    retxt += '<div class="dota-ability-wrapper dota_switch_content_by_click" data-display-number="' + display_num + '">'
                     for j in range(len(all_results_with_sort_mark[i][1])):
-                        retxt+='<div class="dota-ability-title dota_switch_content_by_click_button" data-check-key="'+str(j)+'">'+all_results_with_sort_mark[i][1][j]+'</div>'\
-                            +'<div class="dota-ability-content dota_switch_content_by_click_content" data-check-key="'+str(j)+'" data-display-type="block">'\
-                               +all_results_with_sort_mark[i][2][j]+'</div>'
-                    retxt+='</div>'
+                        retxt += '<div class="dota-ability-title dota_switch_content_by_click_button" data-check-key="' + str(j) + '">' + all_results_with_sort_mark[i][1][
+                            j] + '</div>' \
+                                 + '<div class="dota-ability-content dota_switch_content_by_click_content" data-check-key="' + str(j) + '" data-display-type="block">' \
+                                 + all_results_with_sort_mark[i][2][j] + '</div>'
+                    retxt += '</div>'
     else:
         if len(all_results_with_sort_mark) > 0:
             sorttime = len(all_results_with_sort_mark[0])
@@ -1357,7 +1360,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             if json['技能归属'] in all_json[i]:
                 if '迷你图片' in all_json[i][json['技能归属']] and all_json[i][json['技能归属']]['迷你图片'] != '':
                     minisource = '<span class="dota_get_image_by_image_name" data-image-name="' + all_json[i][json['技能归属']]['迷你图片'] + '"></span>'
-                minisource += json['技能归属']+' - '
+                minisource += json['技能归属'] + ' - '
     if '排序' in conditions:
         for i in range(len(conditions['排序'])):
             sort_mark += find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target, '排序')
@@ -1426,7 +1429,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                         if '技能归属' in all_json['技能'][v]:
                             if all_json['技能'][v]['技能归属'] not in prelist:
                                 prelist.append(all_json['技能'][v]['技能归属'])
-        if len(prelist)>0:
+        if len(prelist) > 0:
             for i in prelist:
                 for j in all_json:
                     if i in all_json[j]:
@@ -1509,9 +1512,9 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     another_info += '(' + number_to_string(json[i[0]]['1']) + json[i[0]]['后缀'] + ')'
 
         retxt += pre_info
-        if json['迷你图片']!='':
-            retxt+='<span class="dota_get_image_by_image_name" data-image-name="' + json['迷你图片'] + '"></span>'
-        retxt+=another_image + '<span class="dota_create_link_to_wiki_page">' + json['页面名'] + '</span>' + another_name + another_info
+        if json['迷你图片'] != '':
+            retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + json['迷你图片'] + '"></span>'
+        retxt += another_image + '<span class="dota_create_link_to_wiki_page">' + json['页面名'] + '</span>' + another_name + another_info
     else:  # 普通的ability_desc
         another_image = ''
         another_name = ''
@@ -1525,7 +1528,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target, '条件升级图片')
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
-                        another_image += '<span class="dota_get_image_by_json_name" data-json-name="' + tempjson['升级来源'][j]['名称'] + '" data-image-mini="1" data-text-link="1"></span>'
+                        another_image += '<span class="dota_get_image_by_json_name" data-json-name="' + tempjson['升级来源'][j][
+                            '名称'] + '" data-image-mini="1" data-text-link="1"></span>'
         if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
             another_name += '(' + json['中文名'] + ')'
         elif '条件名称' in conditions:
@@ -1542,7 +1546,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         if '条件复合属性' in conditions:
             for i in range(len(conditions['条件复合属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i][:-1], i, json, result, target, '条件复合属性')
-                if '名称' in tempjson and tempjson['名称']!='':
+                if '名称' in tempjson and tempjson['名称'] != '':
                     name = tempjson['名称']
                 else:
                     name = conditions['条件复合属性'][i][-1]
@@ -1638,22 +1642,24 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             elif json['次级分类'] == '魔晶技能':
                 note += '<div style="text-align:right;color:#4189d4"><span class="dota_get_image_by_image_name" data-image-name="Shard.png" data-image-height="18"></span>&nbsp;由阿哈利姆魔晶获得</div>'
 
-        if '次级分类' in json and json['次级分类']=='天赋技能':
-            title=minisource + '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + json['页面名'] + '">'+json['页面名'][len(json['技能归属']):]+'</span>' + another_image + another_name
+        if '次级分类' in json and json['次级分类'] == '天赋技能':
+            title = minisource + '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + json['页面名'] + '">' + json['页面名'][len(
+                json['技能归属']):] + '</span>' + another_image + another_name
         else:
-            title=minisource + '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + json['页面名'] + '">'+json['页面名']+'</span>' + another_image + another_name
-        content='<div class="dota-ability-image"><span class="dota_get_image_by_image_name" data-image-name="' + json['图片'] + '" data-image-width="64"></span></div><div class="dota-ability-desc">' + trait + mech + note + '</div>'
+            title = minisource + '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + json['页面名'] + '">' + json['页面名'] + '</span>' + another_image + another_name
+        content = '<div class="dota-ability-image"><span class="dota_get_image_by_image_name" data-image-name="' + json[
+            '图片'] + '" data-image-width="64"></span></div><div class="dota-ability-desc">' + trait + mech + note + '</div>'
         if '合并' in conditions:
-            para=''
-            if conditions['合并'][0][0]=='技能源' or conditions['合并'][0][0]=='数据来源':
-                para=json['数据来源']
-            elif conditions['合并'][0][0]=='技能归属' or conditions['合并'][0][0]=='归属' or conditions['合并'][0][0]=='单位' or conditions['合并'][0][0]=='英雄':
-                para=json['技能归属']
-            return [para,[title],[content]] + sort_mark
+            para = ''
+            if conditions['合并'][0][0] == '技能源' or conditions['合并'][0][0] == '数据来源':
+                para = json['数据来源']
+            elif conditions['合并'][0][0] == '技能归属' or conditions['合并'][0][0] == '归属' or conditions['合并'][0][0] == '单位' or conditions['合并'][0][0] == '英雄':
+                para = json['技能归属']
+            return [para, [title], [content]] + sort_mark
         else:
             retxt += '<div class="dota-ability-wrapper">' \
-                 '<div class="dota-ability-title">' + title + '</div>' \
-                 '<div class="dota-ability-content">' + content + '</div></div>'
+                     '<div class="dota-ability-title">' + title + '</div>' \
+                                                                  '<div class="dota-ability-content">' + content + '</div></div>'
     return [retxt] + sort_mark
 
 
@@ -1661,7 +1667,8 @@ def ability_desc_show_one_mech(json, upgrade=False):
     retxt = '<div>'
     if upgrade and '升级来源' in json:
         for i in json['升级来源']:
-            retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + json['升级来源'][i]['图片'] + '" data-image-height="18" data-image-link="' + json['升级来源'][i]['名称'] + '"></span>'
+            retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + json['升级来源'][i]['图片'] + '" data-image-height="18" data-image-link="' + json['升级来源'][i][
+                '名称'] + '"></span>'
     if '图片' in json:
         retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + json['图片'] + '" data-image-height="18"></span>'
     if '值' in json:
@@ -1682,7 +1689,8 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
             if indexlist[0] < len(result) and indexlist[1] < len(result[indexlist[0]]):
                 the_key = result[indexlist[0]][indexlist[1]]
             else:
-                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i+1) + '条【' + condition_name + '】第' + str(j+1) + '项'+condition[j]+'时，检查到序数超标了，请检查是否填写错误'))
+                raise (editerror(target[0], target[1],
+                                 '→'.join(target[2:]) + '：\n在调用第' + str(i + 1) + '条【' + condition_name + '】第' + str(j + 1) + '项' + condition[j] + '时，检查到序数超标了，请检查是否填写错误'))
         elif condition[j] == '@average' or condition[j] == '@平均' or condition[j] == '@min' or condition[j] == '@最小' or condition[j] == '@max' or condition[j] == '@最大':
             _sum, count, _min, _max = 0, 0, float('inf'), float('-inf')
             kk = 0
@@ -1710,7 +1718,7 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
                 p = Pinyin()
                 list1 = [tempjson['技能排序'], '+']
                 list2 = [p.get_pinyin(tempjson['技能归属']), '+']
-                indexdict = {'英雄技能': 1,'神杖技能': 1,'魔晶技能': 1, '非英雄单位技能': 2, '物品技能': 3, '天赋技能': 4}
+                indexdict = {'英雄技能': 1, '神杖技能': 1, '魔晶技能': 1, '非英雄单位技能': 2, '物品技能': 3, '天赋技能': 4}
                 indexkey = tempjson['次级分类']
                 list3 = []
                 if indexkey in indexdict:
@@ -1747,7 +1755,8 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
         if the_key in tempjson:
             tempjson = tempjson[the_key]
         else:
-            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项“'+condition[j]+'”时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
+            raise (editerror(target[0], target[1],
+                             '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项“' + condition[j] + '”时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
     return tempjson
 
 
@@ -1774,13 +1783,13 @@ def check_the_json_meet_the_conditions(conditions, json, target):
     return relist, all_bools
 
 
-def check_the_json_meet_one_condition(condition, json, target, index,logic=False):
+def check_the_json_meet_one_condition(condition, json, target, index, logic=False):
     relist = [[]]
     all_bools = True
-    skip_cal=False
+    skip_cal = False
     tempjson = json
     ii = index[0]
-    #logic判断是否因为逻辑判定进入，如果是因为逻辑判定进入，那么将不会继续结算逻辑判定
+    # logic判断是否因为逻辑判定进入，如果是因为逻辑判定进入，那么将不会继续结算逻辑判定
     while True:
         if ii < len(condition):
             i = condition[ii]
@@ -1793,7 +1802,7 @@ def check_the_json_meet_one_condition(condition, json, target, index,logic=False
                         i.append(')')
                     all_bools = one_bool
                 else:
-                    skip_cal=True
+                    skip_cal = True
             elif i == '@and' or i == '@和':
                 if logic:
                     index[0] = ii
@@ -1806,7 +1815,7 @@ def check_the_json_meet_one_condition(condition, json, target, index,logic=False
                     all_bools = one_bool
                     ii = index[0] - 1
                 else:
-                    skip_cal=True
+                    skip_cal = True
             elif i == '@except' or i == '@除了':
                 if logic:
                     index[0] = ii
@@ -1819,7 +1828,7 @@ def check_the_json_meet_one_condition(condition, json, target, index,logic=False
                     all_bools = not one_bool
                     ii = index[0] - 1
                 else:
-                    skip_cal=True
+                    skip_cal = True
             elif i == '@or' or i == '@或':
                 if logic:
                     index[0] = ii
@@ -1864,7 +1873,7 @@ def check_the_json_meet_one_condition(condition, json, target, index,logic=False
                     all_bools = one_bool and has_one
                     ii = index[0] - 1
                 else:
-                    skip_cal=True
+                    skip_cal = True
             elif i == '@one':  # 在一系列数字作为key的键值中，选择第一个有效的项
                 if all_bools:
                     one_bool = False
@@ -1887,8 +1896,8 @@ def check_the_json_meet_one_condition(condition, json, target, index,logic=False
                     all_bools = one_bool
                     ii = index[0] - 1
                 else:
-                    skip_cal=True
-            elif i=='@one_text':
+                    skip_cal = True
+            elif i == '@one_text':
                 if all_bools:
                     one_bool = False
                     for j in tempjson:
@@ -1903,7 +1912,7 @@ def check_the_json_meet_one_condition(condition, json, target, index,logic=False
                     all_bools = one_bool
                     ii = index[0] - 1
                 else:
-                    skip_cal=True
+                    skip_cal = True
             elif i == '@list':  # 在一系列数字作为key的键值中，选择所有有效的项
                 if all_bools:
                     one_bool = False
@@ -1924,7 +1933,7 @@ def check_the_json_meet_one_condition(condition, json, target, index,logic=False
                     all_bools = one_bool
                     ii = index[0] - 1
                 else:
-                    skip_cal=True
+                    skip_cal = True
             elif i == '@combine' or i == '@复合':
                 if all_bools:
                     combinetxt = ''
@@ -1942,22 +1951,22 @@ def check_the_json_meet_one_condition(condition, json, target, index,logic=False
                     tempjson = combinetxt
             elif i == '@has' or i == '@have':
                 if skip_cal:
-                    skip_cal=False
+                    skip_cal = False
                 else:
                     all_bools = isinstance(tempjson, str) and tempjson != ''
                     half_result.append([i])
-                ii+=1
+                ii += 1
             elif i == '@hasnot' or i == '@havenot':
                 if skip_cal:
-                    skip_cal=False
+                    skip_cal = False
                 else:
                     all_bools = isinstance(tempjson, str) and tempjson == ''
                     half_result.append([i])
-                ii+=1
+                ii += 1
             elif i[0] == '@':
                 if len(condition) >= ii + 2:
                     if skip_cal:
-                        skip_cal=False
+                        skip_cal = False
                     else:
                         if i == '@=' or i == '@==':
                             all_bools = operation_number_str_equal(tempjson, condition[ii + 1])
@@ -1975,7 +1984,7 @@ def check_the_json_meet_one_condition(condition, json, target, index,logic=False
                             all_bools = isinstance(tempjson, str) and condition[ii + 1] not in tempjson
                         else:
                             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
-                        half_result.append([i, condition[ii+1]])
+                        half_result.append([i, condition[ii + 1]])
                     ii += 1
                 else:
                     raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到符号”' + i + '“后的值，请检查代码错误还是输入缺失'))
@@ -2029,12 +2038,12 @@ def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, 
             for i in all_results_with_sort_mark:
                 check_bool = False
                 for j in range(len(combined_result)):
-                    equalbool=True
-                    for k in range(1,len(i)):
-                        if isinstance(i[k],list):
+                    equalbool = True
+                    for k in range(1, len(i)):
+                        if isinstance(i[k], list):
                             break
                         else:
-                            equalbool=equalbool and i[k]==combined_result[j][k]
+                            equalbool = equalbool and i[k] == combined_result[j][k]
                     if equalbool:
                         check_bool = True
                         combined_result[j][0] += '、' + i[0]
@@ -2142,88 +2151,88 @@ def change_json_to_condition_dict(json, target):
                 redict[key].append(change_one_condition_dict(json[i], [0]))
         else:
             break
-    #接下来将事先解析一些快速生成的内容
+    # 接下来将事先解析一些快速生成的内容
     if '满足' not in redict:
-        redict['满足']=[]
+        redict['满足'] = []
     if '技能效果' in redict:
-        redict['满足'].append(['分类','@=','技能'])
-        index=str(len(redict['满足'])+1)
-        redict['排序']=redict['排序']+[['@技能']] if '排序' in redict else [['@技能']]
-        redict['条件名称']=redict['条件名称']+[[index+'-0',index+'-1','名称']] if '条件名称' in redict else [[index+'-0',index+'-1','名称']]
-        redict['条件升级图片']=redict['条件升级图片']+[[index+'-0',index+'-1',index+'-2']] if '条件升级图片' in redict else [[index+'-0',index+'-1',index+'-2']]
-        #需要随情况添加的
+        redict['满足'].append(['分类', '@=', '技能'])
+        index = str(len(redict['满足']) + 1)
+        redict['排序'] = redict['排序'] + [['@技能']] if '排序' in redict else [['@技能']]
+        redict['条件名称'] = redict['条件名称'] + [[index + '-0', index + '-1', '名称']] if '条件名称' in redict else [[index + '-0', index + '-1', '名称']]
+        redict['条件升级图片'] = redict['条件升级图片'] + [[index + '-0', index + '-1', index + '-2']] if '条件升级图片' in redict else [[index + '-0', index + '-1', index + '-2']]
+        # 需要随情况添加的
         if '条件属性' not in redict:
-            redict['条件属性']=[]
+            redict['条件属性'] = []
         if '条件注释' not in redict:
-            redict['条件注释']=[]
-        manzu=['效果','@list','@one']
+            redict['条件注释'] = []
+        manzu = ['效果', '@list', '@one']
         for ii in range(len(redict['技能效果'][0])):
-            i=redict['技能效果'][0][ii]
-            if i[0]=='-':
-                if ii>0:
+            i = redict['技能效果'][0][ii]
+            if i[0] == '-':
+                if ii > 0:
                     manzu.append('@except')
-                manzu+=[['@list','名称','@=',i[1:]]]
+                manzu += [['@list', '名称', '@=', i[1:]]]
             else:
-                if ii>0:
+                if ii > 0:
                     manzu.append('@and')
-                manzu+=[['@list','名称','@=',i]]
-                redict['条件属性']+=[[index+'-0',index+'-1',index+'-2',index+'-'+str(4+7*ii)]]
-                redict['条件注释']+=[[index+'-0',index+'-1',index+'-2',index+'-'+str(4+7*ii),'简述']]
+                manzu += [['@list', '名称', '@=', i]]
+                redict['条件属性'] += [[index + '-0', index + '-1', index + '-2', index + '-' + str(4 + 7 * ii)]]
+                redict['条件注释'] += [[index + '-0', index + '-1', index + '-2', index + '-' + str(4 + 7 * ii), '简述']]
         redict['满足'].append(manzu)
     if '技能机制' in redict:
-        redict['满足'].append(['分类','@=','技能'])
-        redict['排序']=redict['排序']+[['@技能']] if '排序' in redict else [['@技能']]
-        #需要随情况添加的
+        redict['满足'].append(['分类', '@=', '技能'])
+        redict['排序'] = redict['排序'] + [['@技能']] if '排序' in redict else [['@技能']]
+        # 需要随情况添加的
         if '条件升级图片' not in redict:
-            redict['条件升级图片']=[]
+            redict['条件升级图片'] = []
         if '条件机制' not in redict:
-            redict['条件机制']=[]
-        manzu=[]
-        index=str(len(redict['满足'])+1)
-        ii=-1
+            redict['条件机制'] = []
+        manzu = []
+        index = str(len(redict['满足']) + 1)
+        ii = -1
         while True:
-            ii+=1
-            if 2*ii+1<len(redict['技能机制'][0]):
-                i=redict['技能机制'][0][2*ii]
-                j=redict['技能机制'][0][2*ii+1]
+            ii += 1
+            if 2 * ii + 1 < len(redict['技能机制'][0]):
+                i = redict['技能机制'][0][2 * ii]
+                j = redict['技能机制'][0][2 * ii + 1]
                 if i[0] == '-':
                     if ii > 0:
                         manzu.append('@except')
-                    manzu += [[i[1:], '@list','@one','代码', '@=', j]]
+                    manzu += [[i[1:], '@list', '@one', '代码', '@=', j]]
                 else:
                     if ii > 0:
                         manzu.append('@and')
-                    manzu += [[i, '@list','@one','代码', '@=', j]]
-                    redict['条件升级图片'] += [[index+'-' + str(1 + 8 * ii),index+'-' + str(2 + 8 * ii),index+'-' + str(3 + 8 * ii)]]
-                    redict['条件机制'] += [[index+'-' + str(1 + 8 * ii),index+'-' + str(2 + 8 * ii),index+'-' + str(3 + 8 * ii)]]
+                    manzu += [[i, '@list', '@one', '代码', '@=', j]]
+                    redict['条件升级图片'] += [[index + '-' + str(1 + 8 * ii), index + '-' + str(2 + 8 * ii), index + '-' + str(3 + 8 * ii)]]
+                    redict['条件机制'] += [[index + '-' + str(1 + 8 * ii), index + '-' + str(2 + 8 * ii), index + '-' + str(3 + 8 * ii)]]
             else:
                 break
         redict['满足'].append(manzu)
     if '技能效果机制' in redict:
-        redict['满足'].append(['分类','@=','技能'])
-        index=str(len(redict['满足'])+1)
-        redict['排序']=redict['排序']+[['@技能']] if '排序' in redict else [['@技能']]
-        redict['条件名称']=redict['条件名称']+[[index+'-0',index+'-1','名称']] if '条件名称' in redict else [[index+'-0',index+'-1','名称']]
-        redict['条件升级图片']=redict['条件升级图片']+[[index+'-0',index+'-1',index+'-2']] if '条件升级图片' in redict else [[index+'-0',index+'-1',index+'-2']]
-        #需要随情况添加的
+        redict['满足'].append(['分类', '@=', '技能'])
+        index = str(len(redict['满足']) + 1)
+        redict['排序'] = redict['排序'] + [['@技能']] if '排序' in redict else [['@技能']]
+        redict['条件名称'] = redict['条件名称'] + [[index + '-0', index + '-1', '名称']] if '条件名称' in redict else [[index + '-0', index + '-1', '名称']]
+        redict['条件升级图片'] = redict['条件升级图片'] + [[index + '-0', index + '-1', index + '-2']] if '条件升级图片' in redict else [[index + '-0', index + '-1', index + '-2']]
+        # 需要随情况添加的
         if '条件机制' not in redict:
-            redict['条件机制']=[]
-        manzu=['效果','@list','@one']
-        ii=-1
+            redict['条件机制'] = []
+        manzu = ['效果', '@list', '@one']
+        ii = -1
         while True:
-            ii+=1
-            if 2*ii+1<len(redict['技能效果机制'][0]):
-                i=redict['技能效果机制'][0][2*ii]
-                j=redict['技能效果机制'][0][2*ii+1]
+            ii += 1
+            if 2 * ii + 1 < len(redict['技能效果机制'][0]):
+                i = redict['技能效果机制'][0][2 * ii]
+                j = redict['技能效果机制'][0][2 * ii + 1]
                 if i[0] == '-':
                     if ii > 0:
                         manzu.append('@except')
-                    manzu += [[i[1:],'代码', '@=', j]]
+                    manzu += [[i[1:], '代码', '@=', j]]
                 else:
                     if ii > 0:
                         manzu.append('@and')
-                    manzu += [[i,'代码', '@=', j]]
-                    redict['条件机制'] += [[index+'-0',index+'-1',index+'-2',index+'-' + str(4 + 7 * ii)]]
+                    manzu += [[i, '代码', '@=', j]]
+                    redict['条件机制'] += [[index + '-0', index + '-1', index + '-2', index + '-' + str(4 + 7 * ii)]]
             else:
                 break
         redict['满足'].append(manzu)
@@ -2358,8 +2367,8 @@ def combine_numbers_post_level(arr, post='', level=0, round=4):
     else:
         for i in range(len(arr)):
             if i > 0:
-                if i%4==0:
-                    re+='<span style="inline-block;">/</span>'
+                if i % 4 == 0:
+                    re += '<span style="inline-block;">/</span>'
                 else:
                     re += "/"
             re += better_float_to_text(arr[i], round)
@@ -2510,7 +2519,7 @@ def create_upgrade_cast_point_backswing(arr1, arr2):
                 retxt += '（' + v['名称'] + '）'
             if i in arr2 and arr2[i]['名称'] != '':
                 retxt += '（' + arr2[i]['名称'] + '）'
-            retxt += '： ' + common_page.create_upgrade_text(arr1, i, lambda x: '',lambda x, y: x[y]["即时生效"]['图片']['图片'] if int(x[y]["即时生效"]['代码']) != 0 else '') + ' + ' \
+            retxt += '： ' + common_page.create_upgrade_text(arr1, i, lambda x: '', lambda x, y: x[y]["即时生效"]['图片']['图片'] if int(x[y]["即时生效"]['代码']) != 0 else '') + ' + ' \
                      + common_page.create_upgrade_text(arr2, i) + '</div>'
         else:
             break
@@ -2559,7 +2568,8 @@ def create_upgrade_cooldown(arr, outtip='div'):
             retxt += '<' + outtip + ' style="padding:0.5em 0.5em 0em 1em;">'
             if v['名称'] != '':
                 retxt += v['名称']
-            retxt += '<span style="cursor:help;" title="' + v['1']['类型']['值'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + v['1']['类型']['图片'] + '" data-image-height="16"></span></span> '
+            retxt += '<span style="cursor:help;" title="' + v['1']['类型']['值'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + v['1']['类型'][
+                '图片'] + '" data-image-height="16"></span></span> '
             jj = 0
             while True:
                 jj += 1
@@ -2583,10 +2593,12 @@ def create_upgrade_cooldown(arr, outtip='div'):
                             k = str(kk)
                             if k in v[j]['升级来源']:
                                 x = v[j]['升级来源'][k]
-                                retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + x['图片'] + '" data-image-height="18" data-image-link="' + x['名称'] + '"></span>'
+                                retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + x['图片'] + '" data-image-height="18" data-image-link="' + x[
+                                    '名称'] + '"></span>'
                             else:
                                 break
-                        retxt += '<span style="cursor:help;" title="' + v[j]['类型']['值'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + v[j]['类型']['图片'] + '" data-image-height="16"></span></span>'
+                        retxt += '<span style="cursor:help;" title="' + v[j]['类型']['值'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + v[j]['类型'][
+                            '图片'] + '" data-image-height="16"></span></span>'
                         kk = 0
                         while True:
                             kk += 1
@@ -2619,13 +2631,16 @@ def create_upgrade_buff(json_dict):
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
                     retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + re.sub(r'alent.png', lambda x: 'alentb.png',
-                                                json_dict[str(i)]['升级来源'][j]['图片']) + '" data-image-link="' + json_dict["名称"] + '"></span> '
+                                                                                                     json_dict[str(i)]['升级来源'][j]['图片']) + '" data-image-link="' + json_dict[
+                                 "名称"] + '"></span> '
             retxt += '</td><td style="padding:0.25em>'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
-                retxt += '<span style="cursor:help;" title="' + json_dict[str(i)]['值'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + json_dict[str(i)]['图片'] + '"></span></span> '
+                retxt += '<span style="cursor:help;" title="' + json_dict[str(i)]['值'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + json_dict[str(i)][
+                    '图片'] + '"></span></span> '
             for j in buff_mech:
                 if json_dict[str(i)][j]['代码'] != 0:
-                    retxt += '<span style="cursor:help;" title="' + json_dict[str(i)][j]['简述'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + json_dict[str(i)][j]['图片'] + '"></span></span> '
+                    retxt += '<span style="cursor:help;" title="' + json_dict[str(i)][j]['简述'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + \
+                             json_dict[str(i)][j]['图片'] + '"></span></span> '
             retxt += json_dict['名称'] + ' '
             if json_dict[str(i)]['驱散']['代码'] != 0:
                 retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + json_dict[str(i)]['驱散']['简述'] + '">' + \
@@ -2730,7 +2745,8 @@ def create_upgrade_mech(json_dict):
                     retxt += '<span class="dota_get_image_by_image_name" data-image-name="' \
                              + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) \
                              + '" data-image-link="' + json_dict[i]['升级来源'][j]["名称"] + '"></span> '
-            retxt += '</td><td style="padding:0.25em"><span style="cursor:help;"><span class="dota_get_image_by_image_name" data-image-name="' + json_dict[i]['图片'] + '"></span></span> (' + json_dict[i]['值'] + ') '
+            retxt += '</td><td style="padding:0.25em"><span style="cursor:help;"><span class="dota_get_image_by_image_name" data-image-name="' + json_dict[i][
+                '图片'] + '"></span></span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
             kk = 0
             while True:
@@ -2759,7 +2775,9 @@ def create_independent_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '" data-image-link="' + json_dict[i]['升级来源'][j]["名称"] + '"></span> '
+                    retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + re.sub(r'alent.png', lambda x: 'alentb.png',
+                                                                                                     json_dict[i]['升级来源'][j]["图片"]) + '" data-image-link="' + \
+                             json_dict[i]['升级来源'][j]["名称"] + '"></span> '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
             if json_dict[i]['简述'] == '。':
                 return ''
@@ -2769,10 +2787,11 @@ def create_independent_mech(json_dict):
     retxt += '</table></div>'
     return retxt
 
-def fulfil_complex_and_simple_show(all_json,html_function):
+
+def fulfil_complex_and_simple_show(all_json, html_function):
     for i in all_json['技能']:
         db = all_json['技能'][i]
-        if db['应用']>0:
+        if db['应用'] > 0:
             bt = ''  # 完整显示
             st = ''  # 缩略显示
             bt += '<div style="display-block;clear:both;overflow: hidden;margin-bottom:1em;background-color: #d1d1d1;">' \
@@ -2797,27 +2816,33 @@ def fulfil_complex_and_simple_show(all_json,html_function):
                 "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%"><b><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + db[
                       "数据来源"] + '/源.json">S</span> <span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + db[
                       "页面名"] + '.json">J</span></b></span><br>' + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + \
-                  db["中文名"] + '</span>' + '<span style="font-size:12px;color:#ccc;white-space: nowrap;padding: 2px; width:75px;overflow: hidden;text-overflow: ellipsis;text-align:center;"> ' + \
+                  db[
+                      "中文名"] + '</span>' + '<span style="font-size:12px;color:#ccc;white-space: nowrap;padding: 2px; width:75px;overflow: hidden;text-overflow: ellipsis;text-align:center;"> ' + \
                   db["英文名"] + '</span></div>'
             bt += create_upgrade_cast_style(db["施法类型"])
             bt += create_upgrade_cast_target(db["施法目标"])
-            if db["图片"]!='':
-                bt += '<span class="dota_get_image_by_image_name" data-image-name="' + db["图片"] + '" data-image-width="160" data-image-link="' + db['页面名'] + '" data-image-center="1"></span>'
-                st+='<div class="bg-primary" style="float:left;padding:0.5em"><span class="dota_get_image_by_image_name" data-image-name="' \
-                    + db["图片"] + '" data-image-width="100" data-image-link="' + db['页面名'] + '" data-image-center="1"></span></div>'
-            st += '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">'\
-                  +db["中文名"]+'</div><div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">'\
-                  +db["英文名"] +'</div><div class="" style="font-size:100%;padding: 2px;text-align:center;">{{H|'+db['技能归属']+'}}</div>'\
-                  +create_upgrade_cast_style(db["施法类型"])+create_upgrade_cast_target(db["施法目标"])+'</th></tr>'
+            if db["图片"] != '':
+                bt += '<span class="dota_get_image_by_image_name" data-image-name="' + db["图片"] + '" data-image-width="160" data-image-link="' + db[
+                    '页面名'] + '" data-image-center="1"></span>'
+                st += '<div class="bg-primary" style="float:left;padding:0.5em"><span class="dota_get_image_by_image_name" data-image-name="' \
+                      + db["图片"] + '" data-image-width="100" data-image-link="' + db['页面名'] + '" data-image-center="1"></span></div>'
+            st += '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">' \
+                  + db["中文名"] + '</div><div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' \
+                  + db["英文名"] + '</div><div class="" style="font-size:100%;padding: 2px;text-align:center;">{{H|' + db['技能归属'] + '}}</div>' \
+                  + create_upgrade_cast_style(db["施法类型"]) + create_upgrade_cast_target(db["施法目标"]) + '</th></tr>'
             if db['描述'] != '':
                 bt += '<div style="background:#111133;padding:1em;">' + db['描述'] + '</div>'
                 st += '<tr><td colspan=2><div style="background:#111133;padding:1em;">' + db['描述'] + '</div></td></tr>'
             if db['神杖信息'] != '':
-                bt += '<div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="agha.png" data-image-height="18"></span>：' + db['神杖信息'] + '</div>'
-                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="agha.png" data-image-height="18"></span>：' + db['神杖信息'] + '</div></td></tr>'
+                bt += '<div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="agha.png" data-image-height="18"></span>：' + db[
+                    '神杖信息'] + '</div>'
+                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="agha.png" data-image-height="18"></span>：' + \
+                      db['神杖信息'] + '</div></td></tr>'
             if db['魔晶信息'] != '':
-                bt += '<div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="shard.png" data-image-height="18"></span>：' + db['魔晶信息'] + '</div>'
-                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="shard.png" data-image-height="18"></span>：' + db['魔晶信息'] + '</div></td></tr>'
+                bt += '<div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="shard.png" data-image-height="18"></span>：' + db[
+                    '魔晶信息'] + '</div>'
+                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="shard.png" data-image-height="18"></span>：' + \
+                      db['魔晶信息'] + '</div></td></tr>'
             if '技能升级信息' in db and '1' in db['技能升级信息']:
                 bt += '<div style="background:#222266;padding:0.25em;">'
                 ii = 0
@@ -2826,13 +2851,13 @@ def fulfil_complex_and_simple_show(all_json,html_function):
                     i = str(ii)
                     if i in db['技能升级信息']:
                         v = db['技能升级信息'][i]
-                        bt += '<div style="padding:0.25em;"><span class="dota_get_image_by_image_name" data-image-name="' + v['图片'] + '" data-image-height="18" data-image-link="'
-                        + v['技能名'] + '"></span>' +'<span class="dota_create_link_to_wiki_page">'+v['技能名'] + '</span>（' + v['中文名'] + ')</div>'
+                        bt += '<div style="padding:0.25em;"><span class="dota_get_image_by_image_name" data-image-name="' + v['图片'] + '" data-image-height="18" data-image-link="'\
+                              + v['技能名'] + '"></span>' + '<span class="dota_create_link_to_wiki_page">' + v['技能名'] + '</span>（' + v['中文名'] + ')</div>'
                     else:
                         break
-                bt += '</div>'
+            bt += '</div>'
             bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
-            st+='<tr><td style="width:40%;max-width:40%;text-align:left;vertical-align:top;">'+create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
+            st += '<tr><td style="width:160px;max-width:160px;text-align:left;vertical-align:top;">' + create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
             ii = 0
             while True:
                 ii += 1
@@ -2861,7 +2886,7 @@ def fulfil_complex_and_simple_show(all_json,html_function):
             bt += '</div>' \
                   + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
                   + '<span style="margin-top:0px;padding-top:0px;font-size:120%"><big><b>技能详情</b></big></span><div>'
-            st +='</td><td class="dota_switch_content_by_click" data-display-number="3" style="width:60%;text-align:left;vertical-align:top;background:#ccc;color:#000;">'
+            st += '</td><td class="dota_switch_content_by_click" data-display-number="3" style="width:240px;text-align:left;vertical-align:top;background:#ccc;color:#000;">'
             ii = 0
             while True:
                 ii += 1
@@ -2870,11 +2895,11 @@ def fulfil_complex_and_simple_show(all_json,html_function):
                     v = db['效果'][i]
                     bt += create_upgrade_buff(v)
                     if '名称' in v and v['名称'] != '':
-                        name=v['名称']
+                        name = v['名称']
                     else:
-                        name='效果'+i
-                    st += '<span class="dota_switch_content_by_click_button" data-check-key="'+name+'" style="margin:0.25em">'+name+'</span>'\
-                        +'<div class="dota_switch_content_by_click_content" data-check-key="'+name+'" data-display-type="block">'+create_upgrade_buff(v)+'</div>'
+                        name = '效果' + i
+                    st += '<span class="dota_switch_content_by_click_button" data-check-key="' + name + '" style="margin:0.25em">' + name + '</span>' \
+                          + '<div class="dota_switch_content_by_click_content" data-check-key="' + name + '" data-display-type="block">' + create_upgrade_buff(v) + '</div>'
                 else:
                     break
             for v in ['技能免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域']:
@@ -2885,11 +2910,11 @@ def fulfil_complex_and_simple_show(all_json,html_function):
                     if j in db[v]:
                         w = db[v][j]
                         bt += create_upgrade_mech(w)
-                        if '1' in w and '图片' in w['1'] and w['1']['图片']!='':
-                            pic='<span class="dota_get_image_by_image_name" data-image-name="'+w['1']['图片']+'"></span>'
+                        if '1' in w and '图片' in w['1'] and w['1']['图片'] != '':
+                            pic = '<span class="dota_get_image_by_image_name" data-image-name="' + w['1']['图片'] + '"></span>'
                         else:
-                            pic=v
-                        st += '<span class="dota_switch_content_by_click_button" data-check-key="' + v + '" style="margin:0.25em">'+pic+'</span>' \
+                            pic = v
+                        st += '<span class="dota_switch_content_by_click_button" data-check-key="' + v + '" style="margin:0.25em">' + pic + '</span>' \
                               + '<div class="dota_switch_content_by_click_content" data-check-key="' + v + '" data-display-type="block">' + create_upgrade_mech(w) + '</div>'
                     else:
                         break
@@ -2902,13 +2927,15 @@ def fulfil_complex_and_simple_show(all_json,html_function):
                     bt += create_independent_mech(v)
                     if '1' in v and '机制名' in v['1'] and v['1']['机制名'] != '':
                         name = v['1']['机制名']
+                    elif '2' in v and '机制名' in v['2'] and v['2']['机制名'] != '':
+                        name = v['2']['机制名']
                     else:
-                        name = '独立机制'+i
+                        name = '独立机制' + i
                     st += '<span class="dota_switch_content_by_click_button" data-check-key="' + name + '" style="margin:0.25em">' + name + '</span>' \
                           + '<div class="dota_switch_content_by_click_content" data-check-key="' + name + '" data-display-type="block">' + create_independent_mech(v) + '</div>'
                 else:
                     break
-            st+='</td></tr></table>'
+            st += '</td></tr></table>'
             bt += '<div>'
             uls = 0
             if db['注释'] != '':
