@@ -2855,7 +2855,6 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                               + v['技能名'] + '"></span>' + '<span class="dota_create_link_to_wiki_page">' + v['技能名'] + '</span>（' + v['中文名'] + ')</div>'
                     else:
                         break
-            bt += '</div>'
             bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
             st += '<tr><td style="width:160px;max-width:160px;text-align:left;vertical-align:top;">' + create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
             ii = 0
