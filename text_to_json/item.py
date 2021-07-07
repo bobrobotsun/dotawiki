@@ -316,6 +316,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
             if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
                 bt += normal_tag[0] + v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + normal_tag[1]
                 st += normal_s_tag[0] + v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + normal_s_tag[1]
+        for i in db['技能']:
+            st+=normal_s_tag[0] + '<span class="dota_get_image_by_json_name" data-json-name="'+i+'" data-image-mini="1" data-text-link="1"></span>' + normal_s_tag[1]
         bt+='<tr><td colspan=2><div class="dota_item_recipe_upgrade_show" data-item-json-name="'+db["中文名"]+'" data-click-find-text-in-json-and-show="1"></div></td></tr>'
         st+='<td style="width:240px;text-align:left;vertical-align:top;"><div class="dota_item_recipe_upgrade_show" data-item-json-name="'+db["中文名"]\
             +'" data-click-find-text-in-json-and-show="0"></div></td></tr></table>'

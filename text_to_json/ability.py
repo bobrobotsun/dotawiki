@@ -1441,7 +1441,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target, '条件升级图片')
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
-                        another_image += '<span class="dota_get_image_by_image_name" data-image-name="' + tempjson['升级来源'][j]['图片'] + '"></span>'
+                        another_image += '<span class="dota_get_image_by_image_name" data-image-name="' + tempjson['升级来源'][j]['图片'] + '" title="' + tempjson['升级来源'][j]['图片'] + '"></span>'
         if '条件名称' in conditions:
             for i in range(len(conditions['条件名称'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target, '条件名称')
@@ -1529,7 +1529,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
                         another_image += '<span class="dota_get_image_by_json_name" data-json-name="' + tempjson['升级来源'][j][
-                            '名称'] + '" data-image-mini="1" data-text-link="1"></span>'
+                            '名称'] + '" data-image-mini="1" title="' + tempjson['升级来源'][j]['名称'] + '"></span>'
         if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
             another_name += '(' + json['中文名'] + ')'
         elif '条件名称' in conditions:
