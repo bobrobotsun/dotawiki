@@ -52,8 +52,6 @@ def number_to_string(number, rr=4):
 
 
 def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '', image_size='22'):
-    if 'p' in image_size:
-        print(image_size)
     if k in numjsons:
         numjson = numjsons[k]
         retext = ''

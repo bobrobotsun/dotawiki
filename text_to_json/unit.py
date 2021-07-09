@@ -415,46 +415,45 @@ def fulfil_complex_and_simple_show(all_json,html_function):
         st = ''  # 缩略显示
         bt='<table class="infobox" style="text-align:center;background:#222;width:300px;color:#fff;margin-top:12px;margin-right:12px;">' \
            '<tr class="infobox-title"><th colspan=2 style="background:#000;padding:8px 16px 0 16px;text-align:center;">' \
-           '<span style="font-size:36px;">' \
-           + common_page.get_unit_value(db["中文名"]) + '</span><br><span style="font-size:24px;text-align:center;">'\
-           +common_page.get_unit_value(db["英文名"])+'</span></th></tr><tr><td class="dota_unit_simple_infobox_label" colspan=2>'
-        st += '<table class="dota_unit_simple_infobox"><tr class="bg-primary"><th class="dota_unit_simple_infobox_title" colspan=3>' + i \
-              + '</th></tr><tr><td class="dota_unit_simple_infobox_label" colspan=3>'
+           '<span style="font-size:36px;"> ' \
+           + common_page.get_unit_value(db["中文名"]) + ' </span><br><span style="font-size:24px;text-align:center;"> '\
+           +common_page.get_unit_value(db["英文名"])+' </span></th></tr><tr><td class="dota_unit_simple_infobox_label" colspan=2>'
+        st += '<div class="dota_simple_infobox"><div style="text-align:center;min-height:100px">' \
+              '<div class="bg-primary" style="float:left;">' \
+              '<span class="dota_get_image_by_json_name" data-json-name="'+i+'" data-image-height="100" data-image-link="1" data-image-center="1"></span></div>'\
+              +'<div class="bg-primary" style="font-size:200%;font-weight:normal;padding:0.25em;"> '+common_page.get_unit_value(db["中文名"])+' </div>'\
+              +'<div class="bg-primary" style="font-size:150%;padding:0.25em;text-align:center;"> '+common_page.get_unit_value(db["英文名"])+' </div><div style="padding:0.25em;">'
         if db["英雄级单位"]['1']['1'] == 1:
             bt += '<span class="label bg-primary">英雄级</span>'
-            st += '<span class="label bg-primary">英雄级</span>'
+            st += '<span class="ability_indicator bg-primary">英雄级</span>'
         else:
             bt += '<span class="label bg-default">非英雄级</span>'
-            st += '<span class="label bg-default">非英雄级</span>'
+            st += '<span class="ability_indicator bg-default">非英雄级</span>'
         if db["单位关系类型"]['1']['1'] == '守卫':
             bt += ' <span class="label bg-warning">守卫</span>'
-            st += ' <span class="label bg-warning">守卫</span>'
+            st += ' <span class="ability_indicator bg-warning">守卫</span>'
         else:
             bt += ' <span class="label bg-default">非守卫</span>'
-            st += ' <span class="label bg-default">非守卫</span>'
+            st += ' <span class="ability_indicator bg-default">非守卫</span>'
         if db["远古单位"]['1']['1'] == 1:
             bt += ' <span class="label bg-warning">远古</span>'
-            st += ' <span class="label bg-warning">远古</span>'
+            st += ' <span class="ability_indicator bg-warning">远古</span>'
         else:
             bt += ' <span class="label bg-default">非远古</span>'
-            st += ' <span class="label bg-default">非远古</span>'
+            st += ' <span class="ability_indicator bg-default">非远古</span>'
         if db["生命类型"] == '攻击次数':
             bt += ' <span class="label bg-warning">攻击次数型</span>'
-            st += ' <span class="label bg-warning">攻击次数型</span>'
+            st += ' <span class="ability_indicator bg-warning">攻击次数型</span>'
         else:
             bt += ' <span class="label bg-default">生命值型</span>'
-            st += ' <span class="label bg-default">生命值型</span>'
+            st += ' <span class="ability_indicator bg-default">生命值型</span>'
         bt += '</td></tr>' \
               '<tr><td colspan=2 style="background:#fff"><div class="center">'
-        st += '</td></tr>' \
-              '<tr><td rowspan=7 style="background: linear-gradient(#000,#3a3a3a,#000);width:30%"><div class="center">'
-        if db['图片'] == '':
-            st += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + i + '">暂无' + i + '图片</span>'
-        else:
+        st += '</div></div>' \
+              '<div style="display:flex;flex-wrap:wrap;justify-content:space-around;">'
+        if db['图片'] != '':
             bt+= '<span class="dota_get_image_by_image_name center" data-image-name="' + db['图片'] + '" data-image-width="200" data-image-link="' + i + '"></span>'
-            st += '<span class="dota_get_image_by_image_name center" data-image-name="' + db['图片'] + '" data-image-width="160" data-image-link="' + i + '"></span>'
         bt+='</div></td></tr>'
-        st+='</div></td>'
         btlist = [['等级', [['等级']]], ['奖励金钱', [['金钱下限', '金钱上限']]], ['奖励经验', [['经验']]], ['生命值', [['生命值']]]
             , ['魔法值', [['魔法值']]], ['生命恢复', [['生命恢复']]], ['魔法恢复', [['魔法恢复']]], ['攻击力<br>(攻击类型)', [['攻击下限', '攻击上限']], '<br>（', [['攻击类型']], '）']
             , ['攻击距离+<br>不中断距离', [['攻击距离']], '+', [['攻击距离缓冲']]], ['攻击前摇', [['攻击前摇']]], ['基础攻击间隔', [['攻击间隔']]]
@@ -464,75 +463,84 @@ def fulfil_complex_and_simple_show(all_json,html_function):
             , ['白天视野', [['白天视野']]], ['夜晚视野', [['夜晚视野']]], ['碰撞体积', [['碰撞体积']]], ['边界体积', [['边界体积']]], ['模型大小', [['模型比例']]]]
         btlabel = 'style="width:30%;border:1px solid white;padding:0px 8px;background:#000;text-align:right;"'
         btdata = 'style="border:1px solid white;padding:0px 8px;background:#000;text-align:left;"'
-        for i in btlist:
-            if len(db[i[1][0][0]]) > 0:
-                bt += '<tr><td ' + btlabel + '>' + i[0] + '</td><td ' + btdata + '>'
-                for j in range(1, len(i)):
+        for ii in btlist:
+            if len(db[ii[1][0][0]]) > 0:
+                bt += '<tr><td ' + btlabel + '>' + ii[0] + '</td><td ' + btdata + '>'
+                for j in range(1, len(ii)):
                     if j % 2 == 1:
-                        if len(i[j][0]) == 1:
-                            if len(i[j]) == 1:
-                                bt += common_page.create_upgrade_text(db, i[j][0][0])
+                        if len(ii[j][0]) == 1:
+                            if len(ii[j]) == 1:
+                                bt += common_page.create_upgrade_text(db, ii[j][0][0])
                             else:
-                                bt += common_page.create_upgrade_text(db, i[j][0][0], i[j][1])
+                                bt += common_page.create_upgrade_text(db, ii[j][0][0], ii[j][1])
                         else:
                             if len(i[j]) == 1:
-                                bt += common_page.get_unit_upgrade_double(db[i[j][0][0]], db[i[j][0][1]])
+                                bt += common_page.get_unit_upgrade_double(db[ii[j][0][0]], db[ii[j][0][1]])
                             else:
-                                bt += common_page.get_unit_upgrade_double(db[i[j][0][0]], db[i[j][0][1]], i[j][1])
+                                bt += common_page.get_unit_upgrade_double(db[ii[j][0][0]], db[ii[j][0][1]], ii[j][1])
                     else:
-                        bt += i[j]
+                        bt += ii[j]
                 bt += '</td></tr>'
         bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel">\'\'\'' \
-              '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] \
+              '<span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["页面名"] \
               + '.json">J</span> <span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] + '">P</span>\'\'\'</div></td></tr></table>'
-        st += '<td class="bg-primary dota_unit_simple_infobox_trait_title">等级</td>' \
-              '<td class="bg-primary dota_unit_simple_infobox_trait_title">攻击间隔</td></tr>' \
-              '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '等级') \
-              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '攻击间隔') \
-              + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">生命值</td>' \
-                '<td class="bg-primary dota_unit_simple_infobox_trait_title">生命恢复</td></tr>' \
-                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '生命值') \
-              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '生命恢复') \
-              + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">魔法值</td>' \
-                '<td class="bg-primary dota_unit_simple_infobox_trait_title">魔法恢复</td></tr>' \
-                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '魔法值') \
-              + '</td><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '魔法恢复') \
-              + '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">攻击力</td>' \
-                '<td class="bg-primary dota_unit_simple_infobox_trait_title">'
-        if db['生命类型'] == '生命值':
-            st += '护甲/魔法抗性'
-        elif db['生命类型'] == '攻击次数':
-            st += '攻击造成伤害'
-        st += '</td></tr>'
-        if len(db['技能']) == 0:
-            st += '<tr><td class="dota_unit_simple_infobox_skill" rowspan=6>无技能</td>'
-        else:
-            st += '<tr><td class="dota_unit_simple_infobox_skill" rowspan=6>'
-            for j in range(len(db['技能'])):
-                if j > 0:
-                    st += '<br>'
-                st += '{{A|' + db['技能'][j] + '}}'
-            st += '</td>'
-        st += '<td class="dota_unit_simple_infobox_trait_value">' + change_double_combine_numbers_to_str(db['攻击下限'], db['攻击上限']) \
-              + '<br/>(' + change_combine_numbers_to_str(db, '攻击类型') \
-              + ')</td><td class="dota_unit_simple_infobox_trait_value">'
-        if db['生命类型'] == '生命值':
-            st += change_combine_numbers_to_str(db, '护甲') + '<br/>(' + change_combine_numbers_to_str(db, '护甲类型') + ')<br/>' + change_combine_numbers_to_str(db, '魔法抗性', '%')
-        elif db['生命类型'] == '攻击次数':
-            st += change_combine_numbers_to_str(db, '英雄攻击伤害') + '(英雄)<br/>' + change_combine_numbers_to_str(db, '非英雄攻击伤害') + '(非英雄)'
-        st += '</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">移动速度</td>' \
-              '<td class="bg-primary dota_unit_simple_infobox_trait_title">攻击距离</td></tr>' \
-              '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '移动速度') \
-              + '</td><td class="dota_unit_simple_infobox_trait_value" rowspan=2>' + change_combine_numbers_to_str(db, '攻击距离') \
-              + '<br/>(' + change_combine_numbers_to_str(db, '近战远程') \
-              + ')</td></tr><tr><td class="bg-primary dota_unit_simple_infobox_trait_title">金钱</td></tr>' \
-                '<tr><td class="dota_unit_simple_infobox_trait_value" rowspan=2>' + change_double_combine_numbers_to_str(db['金钱下限'], db['金钱上限']) \
-              + '</td><td class="bg-primary dota_unit_simple_infobox_trait_title">经验</td></tr>' \
-                '<tr><td class="dota_unit_simple_infobox_trait_value">' + change_combine_numbers_to_str(db, '经验') \
-              + '</td></tr></table>'
+        st_flex_list=[['等级','',['等级'],''],['生命值','',['生命值'],''],['生命恢复','',['生命恢复'],''],['魔法值','',['魔法值'],''],['魔法恢复','',['魔法恢复'],'']
+                ,['攻击力','攻击类型',['攻击下限','攻击上限'],''],['攻击间隔','',['攻击间隔'],''],['攻击距离','攻击类型',['攻击距离'],'']]
+        if db['生命类型']=='生命值':
+            st_flex_list+=[['护甲','护甲类型',['护甲'],''],['魔法抗性','',['魔法抗性'],'%']]
+        elif db['生命类型']=='攻击次数':
+            st_flex_list+=[['英雄攻击伤害','',['英雄攻击伤害'],''],['非英雄攻击伤害','',['非英雄攻击伤害'],'']]
+        st_flex_list +=[['移动速度','',['移动速度'],''],['白天视野','',['白天视野'],''],['夜晚视野','',['夜晚视野'],''],['金钱','',['金钱下限','金钱上限'],''],['经验','',['经验'],'']]
+        for j in st_flex_list:
+            st+=flex_div(j[0],j[1],db,j[2],j[3])
+        st+='</div><div style="display:flex;flex-wrap:wrap;justify-content:space-around;">'
+        if len(db['技能'])>0:
+            st+='<div class="border_white" style="padding:0.25em;flex-grow:1;"><div>拥有技能：</div>'
+            for j in db['技能']:
+                st += unit_ability_image_with_click_infomation(j,'简易展示')
+            st+='</div>'
+        if '1' in db['源技能']:
+            st+='<div class="border_white" style="padding:0.25em;flex-grow:1;"><div>源技能：</div>'
+            for j in db['源技能']:
+                st += unit_ability_image_with_click_infomation(db['源技能'][j],'简易展示')
+            st+='</div>'
+        unitgroup = []
+        for j,w in all_json['单位组'].items():
+            if i in w['全部单位']:
+                unitgroup.append(j)
+        if len(unitgroup) > 0:
+            st+='<div class="border_white" style="padding:0.25em;flex-grow:1;"><div>所属单位组：</div>'
+            for j in unitgroup:
+                st += unit_ability_image_with_click_infomation(j,'成员，1，简易展示')
+            st+='</div>'
+        st+='</div></div>'
         db['简易展示'] = html_function(st)
         db['具体展示'] = html_function(bt)
 
+def flex_div(name,name2,db,strtar,post):
+    nickname=common_page.create_upgrade_text(db, name2, lambda x: post, lambda x, y: '<br>' if str(1 + int(y)) in x else '')
+    value=''
+    if nickname!='':
+        nickname='('+nickname+')'
+    if len(strtar)==1:
+        value=common_page.create_upgrade_text(db, strtar[0], lambda x: post, lambda x, y: '<br>' if str(1 + int(y)) in x else '')
+        if value=='':
+            return ''
+    elif len(strtar)==2:
+        if db[strtar[0]] and db[strtar[1]]:
+            value=change_double_combine_numbers_to_str(db[strtar[0]],db[strtar[1]])
+        else:
+            return ''
+    return '<div style="padding:0.25em;flex-grow:1;"><div class="bgc_white">'+name+nickname+'</div><div class="border_white">'+value+'</div></div>'
+
+def unit_ability_image_with_click_infomation(name,tar):
+    retxt='<span class="dota_click_absolute_additional_infomation_frame dota_click_find_text_in_json_and_show">' \
+            '<span class="dota_get_image_by_json_name dota_click_absolute_additional_infomation_frame_button" data-json-name="' + name \
+            + '" data-image-height="40"></span>' \
+            '<div class="dota_click_absolute_additional_infomation_frame_frame dota_click_find_text_in_json_and_show_textarea">' \
+            '<div class="dota_click_find_text_in_json_and_show_button" data-find-text-in-json-address="' + name + '，'+tar+'">点击显示《' \
+            + name + '》详细信息</div></div></span>'
+    return retxt
 
 def change_combine_numbers_to_str(s1, s2, post=''):
     return common_page.create_upgrade_text(s1, s2, lambda x: post, lambda x, y: '<br>' if str(1 + int(y)) in x else '')

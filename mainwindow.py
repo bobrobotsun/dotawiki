@@ -3258,7 +3258,7 @@ class Main(QMainWindow):
                             tname = j + l + '级左天赋'
                             if tname in self.json_base['技能'] and '图片' in self.json_base['技能'][tname] and '迷你图片' in self.json_base['技能'][tname]:
                                 self.name_base['衍生'].append({'名称': oname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']})
-        for i in ['物品', '非英雄单位', '技能', '机制']:
+        for i in ['物品', '非英雄单位', '技能', '机制','单位组']:
             for j in self.json_base[i]:
                 if '图片' in self.json_base[i][j] and '迷你图片' in self.json_base[i][j]:
                     self.name_base['原生'].append({'名称': j, '页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
