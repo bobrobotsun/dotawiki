@@ -1535,8 +1535,10 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         elif '条件名称' in conditions:
             for i in range(len(conditions['条件名称'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target, '条件名称')
-                if isinstance(tempjson, str):
-                    another_name += '(' + tempjson + ')'
+                try:
+                    another_name += '(' + str(tempjson) + ')'
+                except Exception:
+                    raise (editerror(target[0], target[1],'→'.join(target[2:]) + '：\n在调用第' + str(i + 1) + '条【条件名称】时，得到的结果不能转换为文字'))
         if '属性名' in conditions:
             for i in conditions['属性名'][0]:
                 for j in json['属性']:
@@ -1609,9 +1611,9 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i, image_size='18') + '</div>'
 
         if '条件物品属性' in conditions:
-            for i in conditions['条件物品属性']:
-                if i[0] in json:
-                    trait += '<div>' + i[0] + '：' + number_to_string(json[i[0]]['1']) + json[i[0]]['后缀'] + '</div>'
+            for i in range(len(conditions['条件物品属性'])):
+                tempjson,tempkey = find_json_by_condition_with_result(conditions['条件物品属性'][i], i, json, result, target, '条件物品属性',True)
+                trait += '<div>' + tempkey[0] + '：' + number_to_string(tempjson['1']) + tempjson['后缀'] + '</div>'
 
         if '条件机制' in conditions:
             for i in range(len(conditions['条件机制'])):
@@ -1655,6 +1657,9 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 para = json['数据来源']
             elif conditions['合并'][0][0] == '技能归属' or conditions['合并'][0][0] == '归属' or conditions['合并'][0][0] == '单位' or conditions['合并'][0][0] == '英雄':
                 para = json['技能归属']
+            else:
+                for i in range(len(conditions['合并'])):
+                    para+=find_json_by_condition_with_result(conditions['合并'][i], i, json, result, target, '合并')
             return [para, [title], [content]] + sort_mark
         else:
             retxt += '<div class="dota-ability-wrapper">' \
@@ -1679,7 +1684,8 @@ def ability_desc_show_one_mech(json, upgrade=False):
     return retxt
 
 
-def find_json_by_condition_with_result(condition, i, tempjson, result, target, condition_name=''):
+def find_json_by_condition_with_result(condition, i, tempjson, result, target, condition_name='',bool_rekey=False):
+    rekey=[]
     for j in range(len(condition)):
         the_key = ''
         if '@' not in condition[j] and '-' in condition[j]:
@@ -1750,14 +1756,21 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
                 return [[indexkey[tempjson], '+']]
             else:
                 return [[indexkey['英雄技能'], '+']]
+        elif condition[j] == '@key':
+            tempjson=rekey[-1]
+            break
         else:
             the_key = condition[j]
         if the_key in tempjson:
             tempjson = tempjson[the_key]
+            rekey.append(the_key)
         else:
             raise (editerror(target[0], target[1],
                              '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项“' + condition[j] + '”时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
-    return tempjson
+    if bool_rekey:
+        return tempjson,rekey
+    else:
+        return tempjson
 
 
 def calculate_json_by_condition_with_result(condition, i, tempjson, result, target, condition_name=''):
@@ -1934,6 +1947,20 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                     ii = index[0] - 1
                 else:
                     skip_cal = True
+            elif i == '@dict':  # 在包括数字文字作为key的键值中，选择所有有效的项
+                if all_bools:
+                    one_bool = False
+                    for j in tempjson:
+                        index[0] = ii + 1
+                        one_half_result, one_half_bool = check_the_json_meet_one_condition(condition, tempjson[j], target, index)
+                        if one_half_bool:
+                            one_half_result[0] = [j] + one_half_result[0]
+                            half_result = half_result + one_half_result
+                            one_bool = one_bool or one_half_bool
+                    all_bools = one_bool
+                    ii = index[0] - 1
+                else:
+                    skip_cal = True
             elif i == '@combine' or i == '@复合':
                 if all_bools:
                     combinetxt = ''
@@ -1953,14 +1980,14 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                 if skip_cal:
                     skip_cal = False
                 else:
-                    all_bools = isinstance(tempjson, str) and tempjson != ''
+                    all_bools = all_bools and isinstance(tempjson, str) and tempjson != ''
                     half_result.append([i])
                 ii += 1
             elif i == '@hasnot' or i == '@havenot':
                 if skip_cal:
                     skip_cal = False
                 else:
-                    all_bools = isinstance(tempjson, str) and tempjson == ''
+                    all_bools = all_bools and isinstance(tempjson, str) and tempjson == ''
                     half_result.append([i])
                 ii += 1
             elif i[0] == '@':
@@ -1996,6 +2023,8 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                             tempjson = tempjson[i]
                     else:
                         all_bools = False
+                else:
+                    all_bools = False
             if all_bools:
                 k1 = len(relist)
                 k2 = len(half_result)
