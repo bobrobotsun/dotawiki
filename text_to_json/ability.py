@@ -1854,6 +1854,7 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                 ii = index[0] - 1
                 if one_bool:
                     relist = relist + half_result
+                    ii+=1
                     continue
             elif i == '@either' or i == '@要么':
                 if logic:
@@ -1982,14 +1983,12 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                 else:
                     all_bools = all_bools and isinstance(tempjson, str) and tempjson != ''
                     half_result.append([i])
-                ii += 1
             elif i == '@hasnot' or i == '@havenot':
                 if skip_cal:
                     skip_cal = False
                 else:
                     all_bools = all_bools and isinstance(tempjson, str) and tempjson == ''
                     half_result.append([i])
-                ii += 1
             elif i[0] == '@':
                 if len(condition) >= ii + 2:
                     if skip_cal:
@@ -2025,15 +2024,14 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                         all_bools = False
                 else:
                     all_bools = False
-            if all_bools:
-                k1 = len(relist)
-                k2 = len(half_result)
-                if k2 > 0:
-                    combinejson = [0 for _ in range(k1 * k2)]
-                    for m in range(k1):
-                        for n in range(k2):
-                            combinejson[m * k2 + n] = relist[m] + half_result[n]
-                    relist = combinejson
+            k1 = len(relist)
+            k2 = len(half_result)
+            if k2 > 0:
+                combinejson = [0 for _ in range(k1 * k2)]
+                for m in range(k1):
+                    for n in range(k2):
+                        combinejson[m * k2 + n] = relist[m] + half_result[n]
+                relist = combinejson
             ii += 1
         else:
             break
