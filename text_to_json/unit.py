@@ -485,7 +485,7 @@ def fulfil_complex_and_simple_show(all_json,html_function):
               '<span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["页面名"] \
               + '.json">J</span> <span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] + '">P</span>\'\'\'</div></td></tr></table>'
         st_flex_list=[['等级','',['等级'],''],['生命值','',['生命值'],''],['生命恢复','',['生命恢复'],''],['魔法值','',['魔法值'],''],['魔法恢复','',['魔法恢复'],'']
-                ,['攻击力','攻击类型',['攻击下限','攻击上限'],''],['攻击间隔','',['攻击间隔'],''],['攻击距离','攻击类型',['攻击距离'],'']]
+                ,['攻击力','攻击类型',['攻击下限','攻击上限'],''],['攻击间隔','',['攻击间隔'],''],['攻击距离','近战远程',['攻击距离'],'']]
         if db['生命类型']=='生命值':
             st_flex_list+=[['护甲','护甲类型',['护甲'],''],['魔法抗性','',['魔法抗性'],'%']]
         elif db['生命类型']=='攻击次数':

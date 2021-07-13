@@ -2808,6 +2808,8 @@ def create_independent_mech(json_dict):
                                                                                                      json_dict[i]['升级来源'][j]["图片"]) + '" data-image-link="' + \
                              json_dict[i]['升级来源'][j]["名称"] + '"></span> '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
+            if json_dict[i]['机制名'][0] == '#':
+                return ''
             if json_dict[i]['简述'] == '。':
                 return ''
         else:
