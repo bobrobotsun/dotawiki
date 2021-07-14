@@ -2462,9 +2462,8 @@ def create_upgrade_cast_target(db):
         if h in db:
             arr = db[h]
             retxt += '<div style="padding:0.25em 0.5em;text-align:center;">' \
-                     + '<table align="center"><tr><td style="padding:0.25em">'
+                     + '<table align="center"><tr><td style="padding:0 0.25em">'
             if hh > 1:
-                retxt += '<td>'
                 ii = 0
                 while True:
                     ii += 1
