@@ -870,7 +870,7 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                                     returntxt += temp[j][1][k]
                                 else:
                                     returntxt += temp[j][1][k].replace('Talent.png', 'Talentb.png')
-                                returntxt += '  data-image-height="18" data-image-link="' + k + '"></span>'
+                                returntxt += '"  data-image-height="18" data-image-link="' + k + '"></span>'
                             returntxt += combine_numbers_post_level(temp[j][0], post, level)
                         returntxt += ")"
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
@@ -2665,22 +2665,31 @@ def create_upgrade_buff(json_dict):
                     '图片'] + '"></span></span> '
             for j in buff_mech:
                 if json_dict[str(i)][j]['代码'] != 0:
-                    retxt += '<span style="cursor:help;" title="' + json_dict[str(i)][j]['简述'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + \
-                             json_dict[str(i)][j]['图片'] + '"></span></span> '
+                    retxt += '<span class="dota_click_absolute_additional_infomation_frame">'\
+                             +'<span class="dota_get_image_by_image_name dota_click_absolute_additional_infomation_frame_button" data-image-name="' \
+                             + json_dict[str(i)][j]['图片'] + '"></span>'\
+                             +'<div class="dota_click_absolute_additional_infomation_frame_frame">' + json_dict[str(i)][j]['简述'] + '</div></span> '
             retxt += json_dict['名称'] + ' '
             if json_dict[str(i)]['驱散']['代码'] != 0:
-                retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + json_dict[str(i)]['驱散']['简述'] + '">' + \
-                         json_dict[str(i)]['驱散']['值'] + '</span>'
+                retxt += '<span class="dota_click_absolute_additional_infomation_frame">'\
+                         +'<span class="ability_indicator dota_click_absolute_additional_infomation_frame_button" style="background:#2266dd;color:white;">' + \
+                         json_dict[str(i)]['驱散']['值'] + '</span>'\
+                         +'<div class="dota_click_absolute_additional_infomation_frame_frame">' + json_dict[str(i)]['驱散']['简述'] + '</div></span> '
             for j in json_dict[str(i)]['叠加']:
                 if json_dict[str(i)]['叠加'][j]['代码1'] != 0:
-                    retxt += '<span class="ability_indicator" style="cursor:help;background:#2266dd;color:white;" title="' + json_dict[str(i)]['叠加'][j]['来源'] + '来源' + \
-                             json_dict[str(i)]['叠加'][j]['方式'] + '">' + json_dict[str(i)]['叠加'][j]['方式'] + '</span>'
+                    retxt += '<span class="dota_click_absolute_additional_infomation_frame">'\
+                             +'<span class="ability_indicator dota_click_absolute_additional_infomation_frame_button" style="background:#2266dd;color:white;">' \
+                             + json_dict[str(i)]['叠加'][j]['方式'] + '</span>'\
+                             +'<div class="dota_click_absolute_additional_infomation_frame_frame">' + json_dict[str(i)]['叠加'][j]['来源'] + '来源' + \
+                             json_dict[str(i)]['叠加'][j]['方式'] + '</div></span> '
             for j in json_dict[str(i)]['标记']:
                 if json_dict[str(i)]['标记'][j]['代码'] != 0:
                     retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'
             if json_dict[str(i)]['生效从属']['代码'] > 1:
-                retxt += '<span class="ability_indicator" style="background:#009688;color:white;" title="' + json_dict[str(i)]['生效从属']['简述'] + '">' + json_dict[str(i)]['生效从属'][
-                    '值'] + '</span>'
+                retxt += '<span class="dota_click_absolute_additional_infomation_frame">'\
+                         +'<span class="ability_indicator dota_click_absolute_additional_infomation_frame_button" style="background:#009688;color:white;">' \
+                         + json_dict[str(i)]['生效从属']['值'] + '</span>'\
+                         +'<div class="dota_click_absolute_additional_infomation_frame_frame">' + json_dict[str(i)]['生效从属']['简述'] + '</div></span> '
             for j in json_dict[str(i)]['生效目标']:
                 if len(json_dict[str(i)]['生效目标'][j]) > 0:
                     target_dict = json_dict[str(i)]['生效目标'][j]
