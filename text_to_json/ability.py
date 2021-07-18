@@ -821,12 +821,18 @@ def change_combine_txt(json, ii, data, all_json, name, target):
         i += 1
         if str(i) in json[ii]["混合文字"]:
             if isinstance(json[ii]["混合文字"][str(i)], dict):
-                if json[ii]["混合文字"][str(i)]['类型'] == '' or json[ii]["混合文字"][str(i)]['类型'] == '数据' or json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
+                if json[ii]["混合文字"][str(i)]['类型'] == '' or json[ii]["混合文字"][str(i)]['类型'] == '数据' or json[ii]["混合文字"][str(i)]['类型'][:2] == '切换'\
+                        or json[ii]["混合文字"][str(i)]['类型'][:8] == '缩放点击切换内容':
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
                         if len(json[ii]["混合文字"][str(i)]['类型']) <= 2 or json[ii]["混合文字"][str(i)]['类型'][2] == '0':
                             returntxt += '<div class="dota_rotatey_transform_switch_content0">'
                         else:
                             returntxt += '<div class="dota_rotatey_transform_switch_content1">'
+                    if json[ii]["混合文字"][str(i)]['类型'][:8] == '缩放点击切换内容':
+                        if len(json[ii]["混合文字"][str(i)]['类型'])<=8 or json[ii]["混合文字"][str(i)]['类型'][8]=='0':
+                            returntxt += '<span class="dota_switch_content_by_click_button" data-check-key="'+json[ii]["混合文字"][str(i)]['后缀']+'">'
+                        else:
+                            returntxt += '<span class="dota_switch_content_by_click_content" data-check-key="'+json[ii]["混合文字"][str(i)]['后缀']+'">'
                     j = 0
                     while True:
                         j += 1
@@ -875,6 +881,8 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                         returntxt += ")"
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
                         returntxt += '</div>'
+                    if json[ii]["混合文字"][str(i)]['类型'][:8] == '缩放点击切换内容':
+                        returntxt += '</span>'
                 elif json[ii]["混合文字"][str(i)]['类型'] == '机制切换':
                     re0 = ''
                     re1 = ''
@@ -908,6 +916,22 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                     ttarget = copy.deepcopy(target)
                     ttarget.append(str(i))
                     returntxt += find_the_target_value_jsons_by_conditions_and_show_in_table(json[ii]["混合文字"][str(i)], all_json, ttarget)
+                elif json[ii]["混合文字"][str(i)]['类型'] == '缩放点击切换器':
+                    diplay_number=json[ii]["混合文字"][str(i)]['1']['0']
+                    default_display=json[ii]["混合文字"][str(i)]['1']['1']
+                    returntxt += '<div class="dota_change_attri_by_input">'\
+                                 +'<span class="dota_switch_content_by_click dota_change_attri_by_input_target" data-display-number="'+diplay_number+'"'\
+                                 +' data-default-display="'+default_display+'" >'\
+                                 +'<span class="dota_compound_number_input dota_change_attri_by_input_input" data-number-input-attri-dict="步长=1；当前='+diplay_number+'；"'\
+                                 +'  data-set-value-function="function_dota_change_attri_by_input_change" data-target-attri="data-display-number"'\
+                                 +' data-final-javascript="function_dota_switch_content_by_click_check_display_child"></span>'
+                    k=i
+                    while True:
+                        k+=1
+                        kk=str(k)
+                        if kk not in json[ii]["混合文字"]:
+                            json[ii]["混合文字"][kk]='</span></div>'
+                            break
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:
