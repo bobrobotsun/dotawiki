@@ -283,6 +283,21 @@ def fulfil_complex_and_simple_show(all_json,html_function):
         db['简易展示'] = html_function(st)
         db['具体展示'] = html_function(bt)
 
+def create_html_data_page(all_json):
+    retxt = '<script>\ndota_json_hero_data={'
+    for i in all_json['英雄']:
+        retxt += '\n"' + i + '":{'
+        for j in [['主属性'],['近战远程'],['阵营'],['碰撞体积'],['边界体积'],['体质类型']]+heropro_num:
+            retxt += '"'+j[0]+'":'
+            if isinstance(all_json['英雄'][i][j[0]]['1'],str):
+                retxt+='"'+all_json['英雄'][i][j[0]]['1']+'",'
+            else:
+                retxt += str(all_json['英雄'][i][j[0]]['1']) + ','
+        retxt += '},'
+    retxt += '};\n</script>'
+    return retxt
+
+
 heropro_txt = [["主属性", "AttributePrimary", {"DOTA_ATTRIBUTE_STRENGTH": "力量", "DOTA_ATTRIBUTE_AGILITY": "敏捷", "DOTA_ATTRIBUTE_INTELLECT": "智力"}]
     , ["近战远程", "AttackCapabilities", {"DOTA_UNIT_CAP_MELEE_ATTACK": "近战", "DOTA_UNIT_CAP_RANGED_ATTACK": "远程", "DOTA_UNIT_CAP_NO_ATTACK": "不攻击"}]
     , ["阵营", "Team", {"Good": "天辉", "Bad": "夜魇", "good": "天辉", "bad": "夜魇"}]

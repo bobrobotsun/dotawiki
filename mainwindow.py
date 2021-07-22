@@ -835,6 +835,9 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传《单位组》页面'].triggered.connect(lambda: self.upload_common_page('单位组'))
         self.ml['高级功能']['上传《机制》页面'] = self.ml['高级功能'][0].addAction('上传《机制》页面')
         self.ml['高级功能']['上传《机制》页面'].triggered.connect(lambda: self.upload_common_page('机制'))
+        self.ml['高级功能'][0].addSeparator()
+        self.ml['高级功能']['上传HTML数据页面'] = self.ml['高级功能'][0].addAction('上传HTML数据页面')
+        self.ml['高级功能']['上传HTML数据页面'].triggered.connect(lambda:self.upload_html_data_page())
         """
         下载上传的内容
         """
@@ -1261,7 +1264,7 @@ class Main(QMainWindow):
                 else:
                     raise (editerror('技能', i, "你没有书写数据来源，请立刻书写"))
                 if self.json_base["技能"][i]['应用'] > 0:
-                    ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target)  # 花费时间过久9s+
+                    ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target,self.change_all_template_link_to_html)  # 花费时间过久9s+
 
             ability.confirm_upgrade_info(self.json_base['技能'])
             # 增加拥有技能
@@ -1331,7 +1334,7 @@ class Main(QMainWindow):
                         allupdate.append(i)
             else:
                 allupdate.append(target)
-            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base,loop_time)
+            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base,self.change_all_template_link_to_html,loop_time)
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
@@ -1421,6 +1424,23 @@ class Main(QMainWindow):
             self.w.addtext(self.upload_page(all_redirect[i][0], all_redirect[i][1], False), i + len(all_upload))
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+
+    def upload_html_data_page(self, chosen=''):
+        self.w = upload_text('开始上传数据')
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+        self.w.setWindowIcon(self.icon)
+        self.w.setWindowTitle('上传统一制作页面中……')
+        QApplication.processEvents()
+        all_upload = []
+        if chosen == '' or chosen == '英雄':
+            all_upload.append(['英雄数据',hero.create_html_data_page(self.json_base)])
+        total_num = len(all_upload)
+        self.w.confirm_numbers(total_num)
+        for i in range(len(all_upload)):
+            self.w.addtext(self.upload_html(all_upload[i][0], all_upload[i][1]), i)
+            QApplication.processEvents()
+        QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+
 
     def get_the_wiki_image_with_hashmd5(self, image_name):
         hashmd5 = hashlib.md5(image_name.encode("utf-8")).hexdigest()
@@ -1704,13 +1724,22 @@ class Main(QMainWindow):
             return [json.dumps(upload_info.json()), 0]
 
     def change_all_template_link_to_html(self,gettxt):
-        retxt=re.sub(r'\{\{(.*?)\|(.*?)\}\}', lambda x: self.upload_text_template(x), gettxt)
+        retxt=gettxt
+        findlen=0
+        findnow=0
+        while True:
+            findnow=len(re.findall(r'\{\{([^\{\}]*?)\}\}',retxt))
+            if findnow==findlen:
+                break
+            else:
+                findlen=findnow
+            retxt=re.sub(r'\{\{([^\{\}]*?)\}\}', lambda x: self.upload_text_template(x), retxt)
         retxt=re.sub(r'\[\[((?!#)[^:]*?)\]\]', lambda x: self.upload_text_link(x), retxt)
         return retxt
 
     def upload_text_link(self,x):
         retxt=''
-        link=x.group(1).split('|',1)
+        link=x.group(1).split('|')
         if len(link)>1:
             retxt='<span class="dota_create_link_to_wiki_page" data-link-page-name="'+link[0]+'">'+link[1]+'</span>'
         else:
@@ -1719,18 +1748,61 @@ class Main(QMainWindow):
 
     def upload_text_template(self, x):
         retxt=''
-        template_name=x.group(1)
-        template_args=x.group(2).split('|')
-        if template_name in ['H','A','I','h','a','i']:
+        template_args=x.group(1).split('|')
+        if template_args[0] in ['H','A','I','h','a','i']:
+            size=''
             pic_style = ''
-            if len(template_args[0]) > 2 and template_args[0][-2:] == '天赋':
+            for i in range(2, len(template_args)):
+                if template_args[i][0] == 'w':
+                    size = ' data-image-width="' + template_args[i][1:] + '"'
+                elif template_args[i][0] == 'h':
+                    size = ' data-image-height="' + template_args[i][1:] + '"'
+            if len(template_args[1]) > 2 and template_args[1][-2:] == '天赋':
                 pic_style = ''
-            elif template_name in ['A', 'a']:
+            elif template_args[0] in ['A', 'a']:
                 pic_style += ' data-image-class="ability_icon"'
-            elif template_name in ['I', 'i']:
+            elif template_args[0] in ['I', 'i']:
                 pic_style += ' data-image-class="item_icon"'
-            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[
-                0] + '" data-image-mini="1" data-image-link="1" data-text-link="1"' + pic_style + '></span>'
+            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" '\
+                     +'data-text-link="1"' + size+pic_style + '></span>'
+            return retxt
+        elif '图片' in template_args[0]:
+            size=''
+            center=''
+            link=''
+            image_class=''
+            for i in range(2,len(template_args)):
+                if template_args[i] == 'left':
+                    center = ' data-image-center="left"'
+                elif template_args[i]=='right':
+                    center=' data-image-center="right"'
+                elif template_args[i]=='center':
+                    center=' data-image-center="center"'
+                elif template_args[i][0]=='w':
+                    size=' data-image-width="'+template_args[i][1:]+'"'
+                elif template_args[i][0]=='h':
+                    size=' data-image-height="'+template_args[i][1:]+'"'
+                elif template_args[i][:5]=='link=':
+                    link=' data-image-link="'+template_args[i][5:]+'"'
+                elif template_args[i][:6]=='class=':
+                    image_class=' data-image-class="'+template_args[i][6:]+'"'
+            if template_args[0]=='图片':
+                retxt='<span class="dota_get_image_by_image_name" data-image-name="'+template_args[1]+'"'+size+center+link+image_class+'></span>'
+            elif template_args[0]=='大图片':
+                retxt='<span class="dota_get_image_by_json_name" data-json-name="'+template_args[1]+'"'+size+center+link+image_class+'></span>'
+            elif template_args[0]=='小图片':
+                retxt='<span class="dota_get_image_by_json_name" data-json-name="'+template_args[1]+'"'+size+center+link+image_class+' data-image-mini="1"></span>'
+            return retxt
+        elif template_args[0].lower()=='额外信息框':
+            retxt+='<span class="dota_click_absolute_additional_infomation_frame">'\
+                   +'<span class="dota_click_absolute_additional_infomation_frame_button">'+template_args[1]+'</span>'\
+                   +'<div class="dota_click_absolute_additional_infomation_frame_frame">'+template_args[2]+'</div></span> '
+            return retxt
+        elif template_args[0]=='链接':
+            if len(template_args) > 2:
+                retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[2] + '</span>'
+            else:
+                retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
             return retxt
         else:
             return x.group(0)
@@ -3040,7 +3112,7 @@ class Main(QMainWindow):
             for i in ['主属性', '近战远程', '阵营']:
                 rere += db[i]['1'] + '，'
             for i in [['力量', 'Strength_Icon'], ['敏捷', 'Agility_Icon'], ['智力', 'Intelligence_Icon']]:
-                rere += '<span class="dota_get_image_by_image_name" data-image-name="' + i[1] + '.png"></span>' + common_page.number_to_string(db[i[0]]['1']) + '+' + common_page.number_to_string(db[i[0] + '成长']['1'])
+                rere += '{{图片|' + i[1] + '.png}}' + common_page.number_to_string(db[i[0]]['1']) + '+' + common_page.number_to_string(db[i[0] + '成长']['1'])
             rere += '，' + common_page.number_to_string(db['生命值']['1'] + db['力量']['1'] * 20) + '血，' + common_page.number_to_string(db['生命恢复']['1'] + db['力量']['1'] * 0.1) + '回血，'
             rere += common_page.number_to_string(db['魔法值']['1'] + db['智力']['1'] * 12) + '蓝，' + common_page.number_to_string(db['魔法恢复']['1'] + db['智力']['1'] * 0.05) + '回蓝，'
             rere += common_page.number_to_string(db['攻击下限']['1'] + db[db['主属性']['1']]['1']) + '~' + common_page.number_to_string(db['攻击上限']['1'] + db[db['主属性']['1']]['1']) + '攻击力，'
@@ -3054,9 +3126,9 @@ class Main(QMainWindow):
                 if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '叠加' in v and '1' in v:
                     rere += v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + '，'
             if db['价格']['1'] != '中立生物掉落':
-                rere += '<span class="dota_get_image_by_image_name" data-image-name="Gold symbol.png"></span>' + common_page.number_to_string(db['价格']['1'])
+                rere += '{{图片|Gold symbol.png}}' + common_page.number_to_string(db['价格']['1'])
             if '卷轴价格' in db and db['卷轴价格']['1'] != 0:
-                rere += '<span class="dota_get_image_by_image_name" data-image-name="items recipe.png"></span>&nbsp;' + common_page.number_to_string(db['卷轴价格']['1'])
+                rere += '{{图片|items recipe.png}}&nbsp;' + common_page.number_to_string(db['卷轴价格']['1'])
             if '可拆分' in db and '组件' in db and db['可拆分'] == 1:
                 rere += '，可拆分'
             if rere[-1] == '，':

@@ -7,7 +7,7 @@ import time
 from text_to_json import common_page, ability
 from text_to_json.WikiError import editerror
 
-def get_source_to_data(all_json, tlist, version, text_base,loop_time=1):
+def get_source_to_data(all_json, tlist, version, text_base,change_all_template_link_to_html,loop_time=1):
     # 一定报错的内容
     for i in tlist:
         if i not in all_json['机制']:
@@ -61,7 +61,7 @@ def get_source_to_data(all_json, tlist, version, text_base,loop_time=1):
                 ttarget = ['机制源', target, i]
                 if isinstance(todict[i], dict):
                     if "混合文字" in todict[i]:
-                        ability.change_combine_txt(todict, i, text_base, all_json, target, ttarget + ['混合文字'])
+                        ability.change_combine_txt(todict, i, text_base, all_json, target, ttarget + ['混合文字'],change_all_template_link_to_html)
                     else:
                         ability.loop_check(todict[i], text_base, all_json, target, ttarget)
             for i in ["属性", "简单条目", "具体条目"]:
@@ -69,11 +69,11 @@ def get_source_to_data(all_json, tlist, version, text_base,loop_time=1):
                     ttarget = ['机制源', target, i, j]
                     if isinstance(todict[i][j], dict):
                         if "混合文字" in todict[i][j]:
-                            ability.change_combine_txt(todict[i], j, text_base, all_json, target, ttarget + ['混合文字'])
+                            ability.change_combine_txt(todict[i], j, text_base, all_json, target, ttarget + ['混合文字'],change_all_template_link_to_html)
                         else:
-                            ability.loop_check(todict[i][j], text_base, all_json, target, ttarget)
+                            ability.loop_check(todict[i][j], text_base, all_json, target, ttarget,change_all_template_link_to_html)
             # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
-            ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, target, ['机制源', target, '内容'])
+            ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, target, ['机制源', target, '内容'],change_all_template_link_to_html)
             # 上面将文字全部转化掉
             # 下面把序列级数合并成为一串文字，以方便调用
             for i in all_json['机制'][target]['内容']:

@@ -802,19 +802,19 @@ def mech_others(json, mech):
                     json["施法前摇"][i][j]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i][j]["即时生效"]["代码"])]
 
 
-def loop_check(json, data, all_json, name, target):
+def loop_check(json, data, all_json, name, target,change_all_template_link_to_html):
     for i in json:
         ttarget = copy.deepcopy(target)
         ttarget.append(i)
         if isinstance(json[i], dict):
             if "混合文字" in json[i]:
                 ttarget.append("混合文字")
-                change_combine_txt(json, i, data, all_json, name, ttarget)
+                change_combine_txt(json, i, data, all_json, name, ttarget,change_all_template_link_to_html)
             else:
-                loop_check(json[i], data, all_json, name, ttarget)
+                loop_check(json[i], data, all_json, name, ttarget,change_all_template_link_to_html)
 
 
-def change_combine_txt(json, ii, data, all_json, name, target):
+def change_combine_txt(json, ii, data, all_json, name, target,change_all_template_link_to_html):
     returntxt = ""
     i = 0
     while True:
@@ -871,12 +871,12 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                         returntxt += "("
                         for j in range(1, len(temp)):
                             for k in temp[j][1]:
-                                returntxt += '<span class="dota_get_image_by_image_name" data-image-name="'
+                                returntxt += '{{图片|'
                                 if target[2] == '描述':
                                     returntxt += temp[j][1][k]
                                 else:
                                     returntxt += temp[j][1][k].replace('Talent.png', 'Talentb.png')
-                                returntxt += '"  data-image-height="18" data-image-link="' + k + '"></span>'
+                                returntxt += '|h18|link=' + k + '}}'
                             returntxt += combine_numbers_post_level(temp[j][0], post, level)
                         returntxt += ")"
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
@@ -936,7 +936,7 @@ def change_combine_txt(json, ii, data, all_json, name, target):
                 returntxt += json[ii]["混合文字"][str(i)]
         else:
             break
-    json[ii] = returntxt
+    json[ii] = change_all_template_link_to_html(returntxt)
 
 
 def combine_txt_numbers(json, index, all_json, base_txt, target):
@@ -1050,7 +1050,7 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
     elif json['0'] == '图片链接':
         temp = all_json[json["1"]][json["2"]]
         rere[0][0].append(
-            '<span class="dota_get_image_by_json_name" data-json-name="' + temp['页面名'] + '" data-image-height="' + json['3'] + '" data-image-mini="1" data-text-link="1"></span>')
+            '{{H|' + temp['页面名'] + '|h' + json['3'] + '}}')
     elif json["0"] == "手填":
         j = 0
         while True:
@@ -1348,17 +1348,46 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
                     retxt += seps
                 if len(all_results_with_sort_mark[i][1]) == 1:
                     retxt += '<div class="dota-ability-wrapper">' \
-                             '<div class="dota-ability-title">' + all_results_with_sort_mark[i][1][0] + '</div>' \
-                                                                                                        '<div class="dota-ability-content">' + all_results_with_sort_mark[i][2][
-                                 0] + '</div></div>'
+                             '<div class="dota-ability-title">' + all_results_with_sort_mark[i][1][0] + '</div>'\
+                             +'<div class="dota-ability-content">' + all_results_with_sort_mark[i][2][0] + '</div></div>'
                 elif len(all_results_with_sort_mark[i][1]) > 1:
                     retxt += '<div class="dota-ability-wrapper dota_switch_content_by_click" data-display-number="' + display_num + '">'
                     for j in range(len(all_results_with_sort_mark[i][1])):
-                        retxt += '<div class="dota-ability-title dota_switch_content_by_click_button" data-check-key="' + str(j) + '">' + all_results_with_sort_mark[i][1][
-                            j] + '</div>' \
+                        retxt += '<div class="dota-ability-title dota_switch_content_by_click_button" data-check-key="' + str(j) + '">' \
+                                 + all_results_with_sort_mark[i][1][j] + '</div>' \
                                  + '<div class="dota-ability-content dota_switch_content_by_click_content" data-check-key="' + str(j) + '" data-display-type="block">' \
                                  + all_results_with_sort_mark[i][2][j] + '</div>'
                     retxt += '</div>'
+    elif '点击切换' in conditions:
+        if len(all_results_with_sort_mark) > 0:
+            sorttime = len(all_results_with_sort_mark[0])
+            for i in range(2, sorttime):
+                reverse = all_results_with_sort_mark[0][i][1] == '-'
+                all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
+            all_check_key=[]
+            for i in all_results_with_sort_mark:
+                if i[0] not in all_check_key:
+                    all_check_key.append(i[0])
+            display_num = len(all_check_key)
+            if '点击切换展示数量' in conditions:
+                try:
+                    display_num = int(conditions['点击切换展示数量'][0][0])
+                except ValueError:
+                    display_num = 1
+            display_num = str(display_num)
+            retxt+='<div class="dota_change_attri_by_input">'\
+                   +'<div class="dota_switch_content_by_click dota_change_attri_by_input_target" data-display-number="'+display_num+'"><div>'\
+                   +'<span class="dota_compound_number_input dota_change_attri_by_input_input" data-number-input-attri-dict="步长=1；当前='+display_num+'；"'\
+                   +'  data-set-value-function="function_dota_change_attri_by_input_change" data-target-attri="data-display-number"'\
+                   +' data-final-javascript="function_dota_switch_content_by_click_check_display_child"></span>'
+            for i in all_check_key:
+                retxt+='<div class="dota_switch_content_by_click_button" data-check-key="'+i+'">'+i+'</div>'
+            retxt+='</div>'
+            for i in range(len(all_results_with_sort_mark)):
+                if firstseps or i > 0:
+                    retxt += seps
+                retxt += all_results_with_sort_mark[i][1]
+            retxt+='</div></div>'
     else:
         if len(all_results_with_sort_mark) > 0:
             sorttime = len(all_results_with_sort_mark[0])
@@ -1378,12 +1407,12 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
     miniimage = ''
     minisource = ''
     if '迷你图片' in json and json['迷你图片'] != '':
-        miniimage = '<span class="dota_get_image_by_image_name" data-image-name="' + json['迷你图片'] + '"></span>'
+        miniimage = '{{图片|' + json['迷你图片'] + '}}'
     if '技能归属' in json:
         for i in all_json:
             if json['技能归属'] in all_json[i]:
                 if '迷你图片' in all_json[i][json['技能归属']] and all_json[i][json['技能归属']]['迷你图片'] != '':
-                    minisource = '<span class="dota_get_image_by_image_name" data-image-name="' + all_json[i][json['技能归属']]['迷你图片'] + '"></span>'
+                    minisource = '{{图片|' + all_json[i][json['技能归属']]['迷你图片'] + '}}'
                 minisource += json['技能归属'] + ' - '
     if '排序' in conditions:
         for i in range(len(conditions['排序'])):
@@ -1457,7 +1486,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             for i in prelist:
                 for j in all_json:
                     if i in all_json[j]:
-                        pre_info += '<span class="dota_get_image_by_json_name" data-json-name="' + i + '" data-image-mini="1" data-text-link="1"></span>'
+                        pre_info += '{{小图片|' + i + '}}'
             pre_info += '：'
 
         if '条件升级图片' in conditions:
@@ -1465,7 +1494,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target, '条件升级图片')
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
-                        another_image += '<span class="dota_get_image_by_image_name" data-image-name="' + tempjson['升级来源'][j]['图片'] + '" title="' + tempjson['升级来源'][j]['图片'] + '"></span>'
+                        another_image += '{{额外信息框|{{图片|' + tempjson['升级来源'][j]['图片'] + '}}|' + tempjson['升级来源'][j]['图片'] + '}}'
         if '条件名称' in conditions:
             for i in range(len(conditions['条件名称'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target, '条件名称')
@@ -1537,8 +1566,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
 
         retxt += pre_info
         if json['迷你图片'] != '':
-            retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + json['迷你图片'] + '"></span>'
-        retxt += another_image + '<span class="dota_create_link_to_wiki_page">' + json['页面名'] + '</span>' + another_name + another_info
+            retxt += '{{图片|' + json['迷你图片'] + '}}'
+        retxt += another_image + '[[' + json['页面名'] + ']]' + another_name + another_info
     else:  # 普通的ability_desc
         another_image = ''
         another_name = ''
@@ -1552,8 +1581,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target, '条件升级图片')
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
-                        another_image += '<span class="dota_get_image_by_json_name" data-json-name="' + tempjson['升级来源'][j][
-                            '名称'] + '" data-image-mini="1" title="' + tempjson['升级来源'][j]['名称'] + '"></span>'
+                        another_image += '{{额外信息框|{{小图片|' + tempjson['升级来源'][j]['名称'] + '}}|' + tempjson['升级来源'][j]['名称'] + '}}'
         if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
             another_name += '(' + json['中文名'] + ')'
         elif '条件名称' in conditions:
@@ -1664,17 +1692,15 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
 
         if '次级分类' in json:
             if json['次级分类'] == '神杖技能':
-                note += '<div style="text-align:right;color:#4189d4"><span class="dota_get_image_by_image_name" data-image-name="Agha.png" data-image-height="18"></span>&nbsp;由阿哈利姆神杖获得</div>'
+                note += '<div style="text-align:right;color:#4189d4">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div>'
             elif json['次级分类'] == '魔晶技能':
-                note += '<div style="text-align:right;color:#4189d4"><span class="dota_get_image_by_image_name" data-image-name="Shard.png" data-image-height="18"></span>&nbsp;由阿哈利姆魔晶获得</div>'
+                note += '<div style="text-align:right;color:#4189d4">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div>'
 
         if '次级分类' in json and json['次级分类'] == '天赋技能':
-            title = minisource + '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + json['页面名'] + '">' + json['页面名'][len(
-                json['技能归属']):] + '</span>' + another_image + another_name
+            title = minisource + '[[' + json['页面名'] + '|' + json['页面名'][len(json['技能归属']):] + ']]' + another_image + another_name
         else:
-            title = minisource + '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + json['页面名'] + '">' + json['页面名'] + '</span>' + another_image + another_name
-        content = '<div class="dota-ability-image"><span class="dota_get_image_by_image_name" data-image-name="' + json[
-            '图片'] + '" data-image-width="64"></span></div><div class="dota-ability-desc">' + trait + mech + note + '</div>'
+            title = minisource + '[[' + json['页面名'] + ']]' + another_image + another_name
+        content = '<div class="dota-ability-image">{{图片|' + json['图片'] + '|w64}}</div><div class="dota-ability-desc">' + trait + mech + note + '</div>'
         if '合并' in conditions:
             para = ''
             if conditions['合并'][0][0] == '技能源' or conditions['合并'][0][0] == '数据来源':
@@ -1685,10 +1711,22 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 for i in range(len(conditions['合并'])):
                     para+=find_json_by_condition_with_result(conditions['合并'][i], i, json, result, target, '合并')
             return [para, [title], [content]] + sort_mark
+        elif '点击切换' in conditions:
+            check_key=''
+            for i in range(len(conditions['点击切换'])):
+                tempjson = find_json_by_condition_with_result(conditions['点击切换'][i][:-1], i, json, result, target, '点击切换')
+                if conditions['点击切换'][i][-1] in tempjson:
+                    check_key+='+'+conditions['点击切换'][i][-1]
+            while len(check_key)>0 and check_key[0]=='+':
+                check_key=check_key[1:]
+            if check_key=='':
+                check_key='默认'
+            retxt += '<span class="dota_switch_content_by_click_content" data-check-key="'+check_key+'"><div class="dota-ability-wrapper">' \
+                     +'<div class="dota-ability-title">' + title + '</div>' + '<div class="dota-ability-content">' + content + '</div></div></span>'
+            return [check_key,retxt]+ sort_mark
         else:
             retxt += '<div class="dota-ability-wrapper">' \
-                     '<div class="dota-ability-title">' + title + '</div>' \
-                                                                  '<div class="dota-ability-content">' + content + '</div></div>'
+                     +'<div class="dota-ability-title">' + title + '</div>'+'<div class="dota-ability-content">' + content + '</div></div>'
     return [retxt] + sort_mark
 
 
@@ -1696,10 +1734,9 @@ def ability_desc_show_one_mech(json, upgrade=False):
     retxt = '<div>'
     if upgrade and '升级来源' in json:
         for i in json['升级来源']:
-            retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + json['升级来源'][i]['图片'] + '" data-image-height="18" data-image-link="' + json['升级来源'][i][
-                '名称'] + '"></span>'
+            retxt += '{{图片|' + json['升级来源'][i]['图片'] + '|h18|link=' + json['升级来源'][i]['名称'] + '}}'
     if '图片' in json:
-        retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + json['图片'] + '" data-image-height="18"></span>'
+        retxt += '{{图片|' + json['图片'] + '|h18}}'
     if '值' in json:
         retxt += json['值']
     if '简述' in json:
@@ -2154,9 +2191,9 @@ def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions,
     sort_mark = []
     relist = []
     if '迷你图片' in json and json['迷你图片'] != '':
-        relist.append('<span class="dota_get_image_by_json_name" data-json-name="' + json['页面名'] + '" data-image-mini="1" data-text-link="1"></span>')
+        relist.append('{{小图片|' + json['页面名'] + '}}')
     else:
-        relist.append('<span class="dota_create_link_to_wiki_page">' + json['页面名'] + '</span>')
+        relist.append('[[' + json['页面名'] + ']]')
     if '排序' in conditions:
         for i in range(len(conditions['排序'])):
             sort_mark += find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target, '排序')
@@ -2458,7 +2495,7 @@ def create_upgrade_cast_style(db):
                     j = str(jj)
                     if j in db[i]["升级来源"]:
                         w = db[i]["升级来源"][j]
-                        retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + w["图片"] + '" data-image-link="' + w["名称"] + '"></span>'
+                        retxt += '{{图片|' + w["图片"] + '|link=' + w["名称"] + '}}'
                     else:
                         break
             jj = 0
@@ -2494,7 +2531,7 @@ def create_upgrade_cast_target(db):
                     i = str(ii)
                     if i in arr["升级来源"]:
                         v = arr["升级来源"][i]
-                        retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + v["图片"] + '" data-image-link="' + v["名称"] + '"></span>'
+                        retxt += '{{图片|' + v["图片"] + '|link=' + v["名称"] + '}}'
                     else:
                         break
             retxt += '</td>'
@@ -2525,8 +2562,14 @@ def create_upgrade_cast_target(db):
                                     k = str(kk)
                                     if k in w:
                                         x = w[k]
-                                        retxt += '<span class="ability_indicator" style="cursor:help;background:' + w[
-                                            "颜色"] + ';color:white;" title="(' + w["值"] + ')'
+                                        retxt += '{{额外信息框|<span class="ability_indicator" style="background:' + w[
+                                            "颜色"] + ';color:white;">'
+                                        if w['代码'] == 1 and x['代码'] == 1:
+                                            retxt += '自身'
+                                        else:
+                                            retxt += x["值"]
+                                        retxt += '</span>'
+                                        retxt +='|(' + w["值"] + ')'
                                         ll = 0
                                         while True:
                                             ll += 1
@@ -2538,12 +2581,7 @@ def create_upgrade_cast_target(db):
                                                 retxt += y['值']
                                             else:
                                                 break
-                                        retxt += '">'
-                                        if w['代码'] == 1 and x['代码'] == 1:
-                                            retxt += '自身'
-                                        else:
-                                            retxt += x["值"]
-                                        retxt += '</span>'
+                                        retxt += '}}'
                                     else:
                                         break
                             else:
@@ -2564,7 +2602,7 @@ def create_upgrade_cast_point_backswing(arr1, arr2):
         i = str(ii)
         if i in arr1:
             v = arr1[i]
-            retxt += '<div style="padding:0.5em 0.5em 0em 1em"><span class="dota_get_image_by_image_name" data-image-name="Ability cooldown.png" data-image-height="16"></span> 前后摇'
+            retxt += '<div style="padding:0.5em 0.5em 0em 1em">{{图片|Ability cooldown.png|h16}} 前后摇'
             if v['名称'] != '':
                 retxt += '（' + v['名称'] + '）'
             if i in arr2 and arr2[i]['名称'] != '':
@@ -2587,7 +2625,7 @@ def create_upgrade_manacost(arr, outtip='div'):
             retxt += '<' + outtip + ' style="padding:0.5em 0.5em 0em 1em">'
             if v['名称'] != '':
                 retxt += v['名称']
-            retxt += '<span class="dota_get_image_by_image_name" data-image-name="mana cost.png" data-image-height="16"></span> '
+            retxt += '{{图片|mana cost.png|h16}} '
             jj = 0
             while True:
                 jj += 1
@@ -2596,9 +2634,8 @@ def create_upgrade_manacost(arr, outtip='div'):
                     w = v[j]
                     if jj > 1:
                         retxt += '+'
-                    retxt += '<span style="cursor:help;" title="' + w['1']['类型']['值'] + '">' \
-                             + common_page.create_upgrade_text(v, j, lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '') \
-                             + '</span>'
+                    retxt += '{{额外信息框|'+ common_page.create_upgrade_text(v, j, lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '') \
+                             + '|' + w['1']['类型']['值'] + '}}'
                 else:
                     break
             retxt += '</' + outtip + '>'
@@ -2618,8 +2655,7 @@ def create_upgrade_cooldown(arr, outtip='div'):
             retxt += '<' + outtip + ' style="padding:0.5em 0.5em 0em 1em;">'
             if v['名称'] != '':
                 retxt += v['名称']
-            retxt += '<span style="cursor:help;" title="' + v['1']['类型']['值'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + v['1']['类型'][
-                '图片'] + '" data-image-height="16"></span></span> '
+            retxt += '{{额外信息框|{{图片|' + v['1']['类型']['图片'] + '|h16}}|' + v['1']['类型']['值'] + '}} '
             jj = 0
             while True:
                 jj += 1
@@ -2643,12 +2679,10 @@ def create_upgrade_cooldown(arr, outtip='div'):
                             k = str(kk)
                             if k in v[j]['升级来源']:
                                 x = v[j]['升级来源'][k]
-                                retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + x['图片'] + '" data-image-height="18" data-image-link="' + x[
-                                    '名称'] + '"></span>'
+                                retxt += '{{图片|' + x['图片'] + '|h18|link=' + x['名称'] + '}}'
                             else:
                                 break
-                        retxt += '<span style="cursor:help;" title="' + v[j]['类型']['值'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + v[j]['类型'][
-                            '图片'] + '" data-image-height="16"></span></span>'
+                        retxt += '{{额外信息框|{{图片|' + v[j]['类型']['图片'] + '|h16}}|' + v[j]['类型']['值'] + '}}'
                         kk = 0
                         while True:
                             kk += 1
@@ -2680,40 +2714,27 @@ def create_upgrade_buff(json_dict):
             retxt += '<tr><td>'
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
-                    retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + re.sub(r'alent.png', lambda x: 'alentb.png',
-                                                                                                     json_dict[str(i)]['升级来源'][j]['图片']) + '" data-image-link="' + json_dict[
-                                 "名称"] + '"></span> '
+                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png',json_dict[str(i)]['升级来源'][j]['图片']) + '|link=' + json_dict["名称"] + '}} '
             retxt += '</td><td style="padding:0.25em>'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
-                retxt += '<span style="cursor:help;" title="' + json_dict[str(i)]['值'] + '"><span class="dota_get_image_by_image_name" data-image-name="' + json_dict[str(i)][
-                    '图片'] + '"></span></span> '
+                retxt += '{{额外信息框|{{图片|' + json_dict[str(i)]['图片'] + '}}|' + json_dict[str(i)]['值'] + '}} '
             for j in buff_mech:
                 if json_dict[str(i)][j]['代码'] != 0:
-                    retxt += '<span class="dota_click_absolute_additional_infomation_frame">'\
-                             +'<span class="dota_get_image_by_image_name dota_click_absolute_additional_infomation_frame_button" data-image-name="' \
-                             + json_dict[str(i)][j]['图片'] + '"></span>'\
-                             +'<div class="dota_click_absolute_additional_infomation_frame_frame">' + json_dict[str(i)][j]['简述'] + '</div></span> '
+                    retxt += '{{额外信息框|{{图片|'+ json_dict[str(i)][j]['图片'] +'}}|' + json_dict[str(i)][j]['简述'] + '}} '
             retxt += json_dict['名称'] + ' '
             if json_dict[str(i)]['驱散']['代码'] != 0:
-                retxt += '<span class="dota_click_absolute_additional_infomation_frame">'\
-                         +'<span class="ability_indicator dota_click_absolute_additional_infomation_frame_button" style="background:#2266dd;color:white;">' + \
-                         json_dict[str(i)]['驱散']['值'] + '</span>'\
-                         +'<div class="dota_click_absolute_additional_infomation_frame_frame">' + json_dict[str(i)]['驱散']['简述'] + '</div></span> '
+                retxt += '{{额外信息框|<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['驱散']['值'] + '</span>|' \
+                         + json_dict[str(i)]['驱散']['简述'] + '}}'
             for j in json_dict[str(i)]['叠加']:
                 if json_dict[str(i)]['叠加'][j]['代码1'] != 0:
-                    retxt += '<span class="dota_click_absolute_additional_infomation_frame">'\
-                             +'<span class="ability_indicator dota_click_absolute_additional_infomation_frame_button" style="background:#2266dd;color:white;">' \
-                             + json_dict[str(i)]['叠加'][j]['方式'] + '</span>'\
-                             +'<div class="dota_click_absolute_additional_infomation_frame_frame">' + json_dict[str(i)]['叠加'][j]['来源'] + '来源' + \
-                             json_dict[str(i)]['叠加'][j]['方式'] + '</div></span> '
+                    retxt += '{{额外信息框|<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['叠加'][j]['方式'] + '</span>'\
+                             +'|' + json_dict[str(i)]['叠加'][j]['来源'] + '来源' + json_dict[str(i)]['叠加'][j]['方式'] + '}} '
             for j in json_dict[str(i)]['标记']:
                 if json_dict[str(i)]['标记'][j]['代码'] != 0:
                     retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'
             if json_dict[str(i)]['生效从属']['代码'] > 1:
-                retxt += '<span class="dota_click_absolute_additional_infomation_frame">'\
-                         +'<span class="ability_indicator dota_click_absolute_additional_infomation_frame_button" style="background:#009688;color:white;">' \
-                         + json_dict[str(i)]['生效从属']['值'] + '</span>'\
-                         +'<div class="dota_click_absolute_additional_infomation_frame_frame">' + json_dict[str(i)]['生效从属']['简述'] + '</div></span> '
+                retxt += '{{额外信息框|<span class="ability_indicator" style="background:#009688;color:white;">' + json_dict[str(i)]['生效从属']['值'] + '</span>'\
+                         +'|' + json_dict[str(i)]['生效从属']['简述'] + '}} '
             for j in json_dict[str(i)]['生效目标']:
                 if len(json_dict[str(i)]['生效目标'][j]) > 0:
                     target_dict = json_dict[str(i)]['生效目标'][j]
@@ -2733,9 +2754,12 @@ def create_upgrade_buff(json_dict):
                                 ll += 1
                                 l = str(ll)
                                 if l in target_dict[k]:
-                                    retxt += '<span class="ability_indicator" style="cursor:help;background:' + \
-                                             target_dict[k]["颜色"] + ';color:white;" title="(' + target_dict[k][
-                                                 "值"] + ')'
+                                    retxt += '{{额外信息框|<span class="ability_indicator" style="background:' + target_dict[k]["颜色"] + ';color:white;">'
+                                    if target_dict[k]['代码'] == 1 and target_dict[k][l]['代码'] == 1:
+                                        retxt += '自身'
+                                    else:
+                                        retxt += target_dict[k][l]['值']
+                                    retxt += '</span>|(' + target_dict[k]["值"] + ')'
                                     mm = 0
                                     while True:
                                         mm += 1
@@ -2746,12 +2770,7 @@ def create_upgrade_buff(json_dict):
                                             retxt += target_dict[k][l][m]['值']
                                         else:
                                             break
-                                    retxt += '">'
-                                    if target_dict[k]['代码'] == 1 and target_dict[k][l]['代码'] == 1:
-                                        retxt += '自身'
-                                    else:
-                                        retxt += target_dict[k][l]['值']
-                                    retxt += '</span>'
+                                    retxt += '}}'
                                 else:
                                     break
                         else:
@@ -2801,11 +2820,8 @@ def create_upgrade_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '<span class="dota_get_image_by_image_name" data-image-name="' \
-                             + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) \
-                             + '" data-image-link="' + json_dict[i]['升级来源'][j]["名称"] + '"></span> '
-            retxt += '</td><td style="padding:0.25em"><span style="cursor:help;"><span class="dota_get_image_by_image_name" data-image-name="' + json_dict[i][
-                '图片'] + '"></span></span> (' + json_dict[i]['值'] + ') '
+                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|link="' + json_dict[i]['升级来源'][j]["名称"] + '}} '
+            retxt += '</td><td style="padding:0.25em"><span style="cursor:help;">{{图片|' + json_dict[i]['图片'] + '}}</span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
             kk = 0
             while True:
@@ -2813,8 +2829,8 @@ def create_upgrade_mech(json_dict):
                 k = str(kk)
                 if k in json_dict[i]:
                     if int(json_dict[i][k]['代码']) != 0:
-                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i][k]['值'] + '</span>：' + json_dict[i][k][
-                            '简述'] + '</td></tr>'
+                        retxt += '<tr><td></td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i][k]['值'] + '</span>：' \
+                                 + json_dict[i][k]['简述'] + '</td></tr>'
                 else:
                     break
         else:
@@ -2834,9 +2850,7 @@ def create_independent_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + re.sub(r'alent.png', lambda x: 'alentb.png',
-                                                                                                     json_dict[i]['升级来源'][j]["图片"]) + '" data-image-link="' + \
-                             json_dict[i]['升级来源'][j]["名称"] + '"></span> '
+                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png',json_dict[i]['升级来源'][j]["图片"]) + '|link=' + json_dict[i]['升级来源'][j]["名称"] + '}} '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
             if json_dict[i]['机制名'][0] == '#':
                 return ''
@@ -2874,19 +2888,16 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 bt += "<div style='background:#111;color:#fff;float:left;margin:0 0.1em;padding:0 0.2em;display:inline-block;border-radius:0px;' title='默认按键'><b>" + \
                       db["默认按键"] + "</b></div>"
             bt += '<h4 id="' + db["代码"] + '"  style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db[
-                "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%"><b><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + db[
-                      "数据来源"] + '/源.json">S</span> <span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + db[
-                      "页面名"] + '.json">J</span></b></span><br>' + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + \
-                  db[
-                      "中文名"] + '</span>' + '<span style="font-size:12px;color:#ccc;white-space: nowrap;padding: 2px; width:75px;overflow: hidden;text-overflow: ellipsis;text-align:center;"> ' + \
-                  db["英文名"] + '</span></div>'
+                "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%"><b>{{链接|Data:' + db["数据来源"] + '/源.json|S}}'\
+                  +' {{链接|Data:' + db["页面名"] + '.json|J}}</b></span><br>' \
+                  + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db["中文名"] + '</span>' \
+                  + '<span style="font-size:12px;color:#ccc;white-space: nowrap;padding: 2px; width:75px;overflow: hidden;text-overflow: ellipsis;text-align:center;"> ' \
+                  + db["英文名"] + '</span></div>'
             bt += create_upgrade_cast_style(db["施法类型"])
             bt += create_upgrade_cast_target(db["施法目标"])
             if db["图片"] != '':
-                bt += '<span class="dota_get_image_by_image_name" data-image-name="' + db["图片"] + '" data-image-width="160" data-image-link="' + db[
-                    '页面名'] + '" data-image-center="1"></span>'
-                st += '<div class="bg-primary" style="float:left;padding:0.5em"><span class="dota_get_image_by_image_name" data-image-name="' \
-                      + db["图片"] + '" data-image-width="100" data-image-link="' + db['页面名'] + '" data-image-center="1"></span></div>'
+                bt += '{{图片|' + db["图片"] + '|w160|link="' + db['页面名'] + '|center}}'
+                st += '<div class="bg-primary" style="float:left;padding:0.5em">{{图片|' + db["图片"] + '|w100|link="' + db['页面名'] + '|center}}</div>'
             st += '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">' \
                   + db["中文名"] + '</div><div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' \
                   + db["英文名"] + '</div><div class="" style="font-size:100%;padding: 2px;text-align:center;">{{H|' + db['技能归属'] + '}}</div>' \
@@ -2895,15 +2906,11 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 bt += '<div style="background:#111133;padding:1em;">' + db['描述'] + '</div>'
                 st += '<tr><td colspan=2><div style="background:#111133;padding:1em;">' + db['描述'] + '</div></td></tr>'
             if db['神杖信息'] != '':
-                bt += '<div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="agha.png" data-image-height="18"></span>：' + db[
-                    '神杖信息'] + '</div>'
-                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="agha.png" data-image-height="18"></span>：' + \
-                      db['神杖信息'] + '</div></td></tr>'
+                bt += '<div style="background:#222266;padding:0.5em;">{{图片|agha.png|h18}}：' + db['神杖信息'] + '</div>'
+                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">{{图片|agha.png|h18}}：' + db['神杖信息'] + '</div></td></tr>'
             if db['魔晶信息'] != '':
-                bt += '<div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="shard.png" data-image-height="18"></span>：' + db[
-                    '魔晶信息'] + '</div>'
-                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="shard.png" data-image-height="18"></span>：' + \
-                      db['魔晶信息'] + '</div></td></tr>'
+                bt += '<div style="background:#222266;padding:0.5em;">{{图片|shard.png|h18}}：' + db['魔晶信息'] + '</div>'
+                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">{{图片|shard.png|h18}}：' + db['魔晶信息'] + '</div></td></tr>'
             if '技能升级信息' in db and '1' in db['技能升级信息']:
                 bt += '<div style="background:#222266;padding:0.25em;">'
                 ii = 0
@@ -2912,8 +2919,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                     i = str(ii)
                     if i in db['技能升级信息']:
                         v = db['技能升级信息'][i]
-                        bt += '<div style="padding:0.25em;"><span class="dota_get_image_by_image_name" data-image-name="' + v['图片'] + '" data-image-height="18" data-image-link="'\
-                              + v['技能名'] + '"></span>' + '<span class="dota_create_link_to_wiki_page">' + v['技能名'] + '</span>（' + v['中文名'] + ')</div>'
+                        bt += '<div style="padding:0.25em;">{{图片|' + v['图片'] + '|h18|link='+ v['技能名'] + '}}[[' + v['技能名'] + ']]（' + v['中文名'] + ')</div>'
                     else:
                         break
             bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
@@ -2938,11 +2944,11 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 bt += '<div style="font-size:75%;padding:1em;border-top:1px solid #777;margin-top:1em;color:#bbb">「 ' + db[
                     "传说"] + ' 」</div>'
             if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
-                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4"><span class="dota_get_image_by_image_name" data-image-name="Agha.png" data-image-height="18"></span>&nbsp;由阿哈利姆神杖获得</div>'
-                st += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4"><span class="dota_get_image_by_image_name" data-image-name="Agha.png" data-image-height="18"></span>&nbsp;由阿哈利姆神杖获得</div>'
+                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div>'
+                st += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div>'
             if db["次级分类"] == "魔晶技能":
-                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4"><span class="dota_get_image_by_image_name" data-image-name="Shard.png" data-image-height="18"></span>&nbsp;由阿哈利姆魔晶获得</div>'
-                st += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4"><span class="dota_get_image_by_image_name" data-image-name="Shard.png" data-image-height="18"></span>&nbsp;由阿哈利姆魔晶获得</div>'
+                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div>'
+                st += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div>'
             bt += '</div>' \
                   + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
                   + '<span style="margin-top:0px;padding-top:0px;font-size:120%"><big><b>技能详情</b></big></span><div>'
@@ -2971,7 +2977,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                         w = db[v][j]
                         bt += create_upgrade_mech(w)
                         if '1' in w and '图片' in w['1'] and w['1']['图片'] != '':
-                            pic = '<span class="dota_get_image_by_image_name" data-image-name="' + w['1']['图片'] + '"></span>'
+                            pic = '{{图片|' + w['1']['图片'] + '}}'
                         else:
                             pic = v
                         st += '<span class="dota_switch_content_by_click_button" data-check-key="' + v + '" style="margin:0.25em">' + pic + '</span>' \
@@ -3024,8 +3030,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                     bt += all_json['非英雄单位'][i]['简易展示']
             bt += '</div>'
             bt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">' \
-                  '<span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + db['数据来源'] + '/源.json">' + db['数据来源'] \
-                  + '/源</span><br><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + db['数据来源'] + '.json">' + db['数据来源'] + '</span></div>'
+                  '{{链接|Data:' + db['数据来源'] + '/源.json|' + db['数据来源'] + '/源}}<br>{{链接|Data:' + db['数据来源'] + '.json|' + db['数据来源'] + '}}</div>'
             db['简易展示'] = html_function(st)
             db['具体展示'] = html_function(bt)
 
