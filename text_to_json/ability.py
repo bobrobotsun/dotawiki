@@ -2941,11 +2941,11 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 bt += '<div style="font-size:75%;padding:1em;border-top:1px solid #777;margin-top:1em;color:#bbb">「 ' + db[
                     "传说"] + ' 」</div>'
             if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
-                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div>'
-                st += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div>'
+                bt += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div></div>'
+                st += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div></div>'
             if db["次级分类"] == "魔晶技能":
-                bt += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div>'
-                st += '<div style="padding:0px 1em 0px 0px;float:right;font-size:14px;color:#4189d4">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div>'
+                bt += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div></div>'
+                st += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div></div>'
             bt += '</div>' \
                   + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
                   + '<span style="margin-top:0px;padding-top:0px;font-size:120%"><big><b>技能详情</b></big></span><div>'
