@@ -1765,7 +1765,6 @@ class Main(QMainWindow):
                 pic_style += ' data-image-class="item_icon"'
             retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" '\
                      +'data-text-link="1"' + size+pic_style + '></span>'
-            return retxt
         elif '图片' in template_args[0]:
             size=''
             center=''
@@ -1792,20 +1791,18 @@ class Main(QMainWindow):
                 retxt='<span class="dota_get_image_by_json_name" data-json-name="'+template_args[1]+'"'+size+center+link+image_class+'></span>'
             elif template_args[0]=='小图片':
                 retxt='<span class="dota_get_image_by_json_name" data-json-name="'+template_args[1]+'"'+size+center+link+image_class+' data-image-mini="1"></span>'
-            return retxt
         elif template_args[0].lower()=='额外信息框':
             retxt+='<span class="dota_click_absolute_additional_infomation_frame">'\
                    +'<span class="dota_click_absolute_additional_infomation_frame_button">'+template_args[1]+'</span>'\
-                   +'<div class="dota_click_absolute_additional_infomation_frame_frame">'+template_args[2]+'</div></span> '
-            return retxt
+                   +'<span class="dota_click_absolute_additional_infomation_frame_frame">'+template_args[2]+'</span></span> '
         elif template_args[0]=='链接':
             if len(template_args) > 2:
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[2] + '</span>'
             else:
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
-            return retxt
         else:
             return x.group(0)
+        return retxt
 
 
 

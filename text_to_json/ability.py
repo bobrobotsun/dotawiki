@@ -1494,7 +1494,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target, '条件升级图片')
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
-                        another_image += '{{额外信息框|{{图片|' + tempjson['升级来源'][j]['图片'] + '}}|' + tempjson['升级来源'][j]['图片'] + '}}'
+                        another_image += '{{额外信息框|{{图片|' + tempjson['升级来源'][j]['图片'] + '}}|' + tempjson['升级来源'][j]['名称'] + '}}'
         if '条件名称' in conditions:
             for i in range(len(conditions['条件名称'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件名称'][i], i, json, result, target, '条件名称')
@@ -2190,10 +2190,7 @@ def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, 
 def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions, result, json, all_json, target):
     sort_mark = []
     relist = []
-    if '迷你图片' in json and json['迷你图片'] != '':
-        relist.append('{{小图片|' + json['页面名'] + '}}')
-    else:
-        relist.append('[[' + json['页面名'] + ']]')
+    relist.append('{{H|' + json['页面名'] + '}}')
     if '排序' in conditions:
         for i in range(len(conditions['排序'])):
             sort_mark += find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target, '排序')
