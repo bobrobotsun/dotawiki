@@ -1364,10 +1364,9 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
             for i in range(2, sorttime):
                 reverse = all_results_with_sort_mark[0][i][1] == '-'
                 all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
-            all_check_key=[]
-            for i in all_results_with_sort_mark:
-                if i[0] not in all_check_key:
-                    all_check_key.append(i[0])
+            all_check_key=['默认']
+            for i in range(len(conditions['点击切换'])):
+                all_check_key.append(conditions['点击切换'][i][-1])
             display_num = len(all_check_key)
             if '点击切换展示数量' in conditions:
                 try:
@@ -1375,14 +1374,10 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
                 except ValueError:
                     display_num = 1
             display_num = str(display_num)
-            retxt+='<div class="dota_change_attri_by_input">'\
-                   +'<div class="dota_switch_content_by_click dota_change_attri_by_input_target" data-display-number="'+display_num+'"><div>'\
-                   +'<span class="dota_compound_number_input dota_change_attri_by_input_input" data-number-input-attri-dict="步长=1；当前='+display_num+'；"'\
-                   +'  data-set-value-function="function_dota_change_attri_by_input_change" data-target-attri="data-display-number"'\
-                   +' data-final-javascript="function_dota_switch_content_by_click_check_display_child"></span>'
+            retxt+='<div class="dota_dict_label_switch_content_by_click" data-display-dict="默认=1；"><div>'
             for i in all_check_key:
-                retxt+='<div class="dota_switch_content_by_click_button" data-check-key="'+i+'">'+i+'</div>'
-            retxt+='</div>'
+                retxt+='<div class="dota_dict_label_switch_content_by_click_button" data-check-key="'+i+'">'+i+'</div>'
+            retxt+='</div><div>'
             for i in range(len(all_results_with_sort_mark)):
                 if firstseps or i > 0:
                     retxt += seps
@@ -1713,15 +1708,16 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             return [para, [title], [content]] + sort_mark
         elif '点击切换' in conditions:
             check_key=''
+            sortkey=''
+            for i in range(len(sort_mark)-1,-1,-1):
+                sortkey+=str(sort_mark[i][0])
             for i in range(len(conditions['点击切换'])):
                 tempjson = find_json_by_condition_with_result(conditions['点击切换'][i][:-1], i, json, result, target, '点击切换')
                 if conditions['点击切换'][i][-1] in tempjson:
-                    check_key+='+'+conditions['点击切换'][i][-1]
-            while len(check_key)>0 and check_key[0]=='+':
-                check_key=check_key[1:]
+                    check_key+=conditions['点击切换'][i][-1]+'='+sortkey+'；'
             if check_key=='':
                 check_key='默认'
-            retxt += '<span class="dota_switch_content_by_click_content" data-check-key="'+check_key+'"><div class="dota-ability-wrapper">' \
+            retxt += '<span class="dota_dict_label_switch_content_by_click_content" data-check-key="'+check_key+'"><div class="dota-ability-wrapper">' \
                      +'<div class="dota-ability-title">' + title + '</div>' + '<div class="dota-ability-content">' + content + '</div></div></span>'
             return [check_key,retxt]+ sort_mark
         else:

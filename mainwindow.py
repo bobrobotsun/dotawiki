@@ -1728,7 +1728,7 @@ class Main(QMainWindow):
         findlen=0
         findnow=0
         while True:
-            findnow=len(re.findall(r'\{\{([^\{\}]*?)\}\}',retxt))
+            findnow='+'.join(re.findall(r'\{\{([^\{\}]*?)\}\}',retxt))
             if findnow==findlen:
                 break
             else:
@@ -1791,7 +1791,7 @@ class Main(QMainWindow):
                 retxt='<span class="dota_get_image_by_json_name" data-json-name="'+template_args[1]+'"'+size+center+link+image_class+'></span>'
             elif template_args[0]=='小图片':
                 retxt='<span class="dota_get_image_by_json_name" data-json-name="'+template_args[1]+'"'+size+center+link+image_class+' data-image-mini="1"></span>'
-        elif template_args[0].lower()=='额外信息框':
+        elif template_args[0]=='额外信息框':
             retxt+='<span class="dota_click_absolute_additional_infomation_frame">'\
                    +'<span class="dota_click_absolute_additional_infomation_frame_button">'+template_args[1]+'</span>'\
                    +'<span class="dota_click_absolute_additional_infomation_frame_frame">'+template_args[2]+'</span></span> '
@@ -2853,7 +2853,7 @@ class Main(QMainWindow):
                             temp1[k] = edit_json.one_version_name_sort(self.version_base[i][j][k])
                     self.version_base[i][j] = copy.deepcopy(temp1)
             all_upload.append([i + '.json', self.version_base[i]])
-            all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'], name_upload_base)])
+            all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'])])
         name_list_tree=self.name_create_tree_list_name()
         num1 = len(all_upload)
         num2 = len(all_upload_page)

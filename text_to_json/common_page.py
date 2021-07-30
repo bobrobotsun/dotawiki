@@ -238,7 +238,7 @@ def create_navboxunit(json_base):
     return retxt
 
 
-def create_page_logs(title, log_base, log_list, name_base):
+def create_page_logs(title, log_base, log_list):
     retxt = ''
     retxt += '<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;">\n<tr><th colspan=2>' + title + '</th></tr>' + '\n<tr><td>游戏本体</td><td>' + \
              log_base['游戏本体'] + '</td></tr>' + '\n<tr><td>更新日期</td><td>' + log_base['更新日期'] + '</td></tr>'
