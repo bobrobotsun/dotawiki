@@ -1783,6 +1783,8 @@ class Main(QMainWindow):
                     size=' data-image-height="'+template_args[i][1:]+'"'
                 elif template_args[i][:5]=='link=':
                     link=' data-image-link="'+template_args[i][5:]+'"'
+                elif template_args[i][:5]=='text=':
+                    image_class=' data-text-link="'+template_args[i][5:]+'"'
                 elif template_args[i][:6]=='class=':
                     image_class=' data-image-class="'+template_args[i][6:]+'"'
             if template_args[0]=='图片':
@@ -1800,6 +1802,8 @@ class Main(QMainWindow):
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[2] + '</span>'
             else:
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
+        elif template_args[0]=='物品分类查询':
+            retxt=common_page.create_item_choose_element(self.json_base,template_args[1:])
         else:
             return x.group(0)
         return retxt
