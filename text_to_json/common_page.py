@@ -390,11 +390,12 @@ def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
         retxt += '<b><span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">完整的更新内容请点此处查看……</span></b>'
     return retxt
 
+
 def create_switch_log(log_base, log_list, name, limit=3):
     retxt = ''
-    button=''
-    content=''
-    log_len=0
+    button = ''
+    content = ''
+    log_len = 0
     for i in range(len(log_list) - 1, -1, -1):
         for j in range(len(log_list[i]) - 1, -1, -1):
             if j > 0:
@@ -418,9 +419,9 @@ def create_switch_log(log_base, log_list, name, limit=3):
                                     showit = showit and x[l]['文字'] != ''
                                     if showit:
                                         if current_ul == 0:
-                                            button+='<div class="dota_switch_content_by_click_button" data-check-key="'+log_name+'">'+log_name+'</div>'
-                                            content+='<div class="dota_switch_content_by_click_content" data-check-key="'+log_name+'" data-display-type="block">'
-                                            log_len+=1
+                                            button += '<div class="dota_switch_content_by_click_button" data-check-key="' + log_name + '">' + log_name + '</div>'
+                                            content += '<div class="dota_switch_content_by_click_content" data-check-key="' + log_name + '" data-display-type="block">'
+                                            log_len += 1
                                             content += '<h3><span class="dota_create_link_to_wiki_page">' + log_name + '</span>\t<small>' + v['更新日期'] + '</small></h3>'
                                         if x[l]['序列级数'] > current_ul:
                                             for m in range(x[l]['序列级数'] - current_ul):
@@ -431,24 +432,26 @@ def create_switch_log(log_base, log_list, name, limit=3):
                                                 content += '</ul>'
                                             current_ul = x[l]['序列级数']
                                         content += '<li>' + x[l]['文字'] + '</li>'
-                if current_ul>0:
+                if current_ul > 0:
                     for m in range(current_ul):
                         content += '</ul>'
                     content += '</div>'
-    limit=max(1,limit)
-    limit=min(limit,log_len)
-    if limit>0:
-        retxt+='<div class="dota_change_attri_by_input">'\
-           +'<span class="dota_switch_content_by_click dota_change_attri_by_input_target" data-display-number="'+str(limit)+'">'\
-           +'<span class="dota_compound_number_input dota_change_attri_by_input_input" data-number-input-attri-dict="最小=1；步长=1；当前='+str(limit)+'；最大='+str(log_len)+'；"'\
-           +' data-set-value-function="function_dota_change_attri_by_input_change" data-target-attri="data-display-number"'\
-           +' data-final-javascript="function_dota_switch_content_by_click_check_display_child"></span>'\
-           +button+content+'</span></div>'\
-           +'您可以点击上面的版本号按钮来快速查看更新日志，或者您可以'\
-           +'<b><span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">点此处查看完整的日志页面……</span></b>'
+    limit = max(1, limit)
+    limit = min(limit, log_len)
+    if limit > 0:
+        retxt += '<div class="dota_change_attri_by_input">' \
+                 + '<span class="dota_switch_content_by_click dota_change_attri_by_input_target" data-display-number="' + str(limit) + '">' \
+                 + '<span class="dota_compound_number_input dota_change_attri_by_input_input" data-number-input-attri-dict="最小=1；步长=1；当前=' + str(limit) + '；最大=' + str(
+            log_len) + '；"' \
+                 + ' data-set-value-function="function_dota_change_attri_by_input_change" data-target-attri="data-display-number"' \
+                 + ' data-final-javascript="function_dota_switch_content_by_click_check_display_child"></span>' \
+                 + button + content + '</span></div>' \
+                 + '您可以点击上面的版本号按钮来快速查看更新日志，或者您可以' \
+                 + '<b><span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">点此处查看完整的日志页面……</span></b>'
     else:
-        retxt+='没有查询到<span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">《' + name[0] + '》的更新日志</span>'
+        retxt += '没有查询到<span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">《' + name[0] + '》的更新日志</span>'
     return retxt
+
 
 def create_page_hero(json_base, log_base, log_list, hero):
     db = json_base['英雄'][hero]
@@ -721,27 +724,25 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
         retxt += '[[分类:' + db['次级分类'] + ']]\n'
         if len(db['次级分类']) >= 4 and db['次级分类'][-4:] == '中立营地':
             retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']
-    retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + unitgroup + '.json">' + unitgroup + '</span></div>'
-
+    retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' \
+             + unitgroup + '.json">' + unitgroup + '</span></div>'
     return retxt
 
 
-def create_item_choose_element(json_base,args):
-    args.insert(1,'')
+def create_item_choose_element(json_base, args):
+    args.insert(1, '')
     retxt = ''
-    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；商店=1；'
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="商店=1；价格=1；'
     # for i in range(len(edit_json.item_shop)-1,-1,-1):
     #    retxt += edit_json.item_shop[i] + '=1；'
-    retxt += '"><span class="dota_compound_list_select_input_button_empty">删除全部内容</span>' \
-             + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="当前=' + str(len(edit_json.item_shop) + 2) + '；步长=0.2；">' \
-             + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
-             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格">价格</span>' \
-             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="商店">商店</span>'
+    retxt += '"><div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
+             + '<span class="dota_dict_label_switch_content_by_click_button" data-check-key="商店">商店</span>' \
+             + '<span class="dota_dict_label_switch_content_by_click_button" data-check-key="价格">价格</span>'
     for i in edit_json.item_shop:
-        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="' + i + '">' + i + '</span>'
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button" data-check-key="' + i + '">' + i + '</span>'
     for i in edit_json.edit_adition['物品属性']:
-        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="' + i + '">' + i + '</span>'
-    retxt += '</span><div>'
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button" data-check-key="' + i + '">' + i + '</span>'
+    retxt += '<div>'
     for i in json_base['物品']:
         if json_base['物品'][i]['应用'] == 1:
             retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
@@ -754,8 +755,10 @@ def create_item_choose_element(json_base,args):
             for j in edit_json.edit_adition['物品属性']:
                 if j in json_base['物品'][i]:
                     retxt += j + '=' + ability.better_float_to_text(json_base['物品'][i][j]['1']) + '；'
-            args[1]=i
-            retxt += '" style="border:1px black solid;margin:2px;text-align:center;">{{'+'|'.join(args)+'}}</span>'
+            args[1] = i
+            retxt += '" style="border:1px black solid;margin:2px;text-align:center;">{{' + '|'.join(args) + '}}' \
+                     + '<span class="dota_dict_label_switch_content_by_click_content_value" data-show-transform-function="transform_function_prefix_postfix"' \
+                     + ' data-transform-prefix-postfix="(，)"></span></span>'
     retxt += '</div></div>'
     return retxt
 

@@ -1433,6 +1433,8 @@ class Main(QMainWindow):
         all_upload = []
         if chosen == '' or chosen == '英雄':
             all_upload.append(['英雄数据',hero.create_html_data_page(self.json_base)])
+        if chosen == '' or chosen == '物品':
+            all_upload.append(['物品数据',item.create_html_data_page(self.json_base)])
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):

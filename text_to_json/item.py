@@ -2,7 +2,7 @@ import json
 import hashlib
 import re
 import math
-from text_to_json import edit_json, common_page
+from text_to_json import ability, edit_json, common_page
 from text_to_json.WikiError import editerror
 
 
@@ -281,10 +281,10 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         common_tag = ['<tr><td colspan=2 style="background:#ccc;', '</td></tr>']
         common_pro = {'共享': ['color:#a03030;"><i class="fa fa-times" aria-hidden="true"></i>不可以给队友共享', ';color:#229944;"><i class="fa fa-check" aria-hidden="true"></i>可以给队友共享'],
                       '可拆分': ['color:#a03030;"><i class="fa fa-times" aria-hidden="true"></i>合成10秒后不可拆分', ';color:#229944;"><i class="fa fa-check" aria-hidden="true"></i>永久可以拆分']}
-        common_s_pro={'共享': ['<span class="ability_indicator" style="background:#a03030;color:white;"><i class="fa fa-times" aria-hidden="true"></i>不共享</span>'
-                        , '<span class="ability_indicator" style="background:#229944;color:white;"><i class="fa fa-times" aria-hidden="true"></i>可共享</span>'],
-                      '可拆分': ['<span class="ability_indicator" style="background:#a03030;color:white;"><i class="fa fa-times" aria-hidden="true"></i>不拆分</span>'
-                          , '<span class="ability_indicator" style="background:#229944;color:white;"><i class="fa fa-times" aria-hidden="true"></i>不拆分</span>']}
+        common_s_pro = {'共享': ['<span class="ability_indicator" style="background:#a03030;color:white;"><i class="fa fa-times" aria-hidden="true"></i>不共享</span>'
+            , '<span class="ability_indicator" style="background:#229944;color:white;"><i class="fa fa-times" aria-hidden="true"></i>可共享</span>'],
+                        '可拆分': ['<span class="ability_indicator" style="background:#a03030;color:white;"><i class="fa fa-times" aria-hidden="true"></i>不拆分</span>'
+                            , '<span class="ability_indicator" style="background:#229944;color:white;"><i class="fa fa-times" aria-hidden="true"></i>不拆分</span>']}
         normal_tag = ['<tr><td colspan=2 style="background:#ddd;color:#000;margin:6px;font-size:1em;">', '</td></tr>']
         normal_s_tag = ['<div style="padding:0.5em 0.5em 0em 1em">', '</div>']
         bt += '<table class="infobox" style="text-align:center;background:#fff;width:300px;color:#fff;"><tr class="infobox-title">' \
@@ -308,25 +308,57 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 else:
                     bt += common_tag[0] + v[0] + common_tag[1]
                     st += common_s_pro[i][0]
-        st+='</div></th></tr>'
-        if '传说' in db and db['传说']!='':
-            st+='<tr><td colspan=2><div class="bg-primary" style="padding:1em;">'+db['传说']+'</div></td></tr>'
-        st+='<tr><td style="width:160px;max-width:160px;text-align:left;vertical-align:top;background:#ccc;color:#000;">'
+        st += '</div></th></tr>'
+        if '传说' in db and db['传说'] != '':
+            st += '<tr><td colspan=2><div class="bg-primary" style="padding:1em;">' + db['传说'] + '</div></td></tr>'
+        st += '<tr><td style="width:160px;max-width:160px;text-align:left;vertical-align:top;background:#ccc;color:#000;">'
         for i, v in db.items():
             if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
                 bt += normal_tag[0] + v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + normal_tag[1]
                 st += normal_s_tag[0] + v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + normal_s_tag[1]
         for i in db['技能']:
-            st+=normal_s_tag[0] + '<span class="dota_get_image_by_json_name" data-json-name="'+i+'" data-image-mini="1" data-text-link="1"></span>' + normal_s_tag[1]
-        bt+='<tr><td colspan=2><div class="dota_item_recipe_upgrade_show" data-item-json-name="'+db["中文名"]+'" data-click-find-text-in-json-and-show="1"></div></td></tr>'
-        st+='<td style="width:240px;text-align:left;vertical-align:top;"><div class="dota_item_recipe_upgrade_show" data-item-json-name="'+db["中文名"]\
-            +'" data-click-find-text-in-json-and-show="0"></div></td></tr></table>'
+            st += normal_s_tag[0] + '<span class="dota_get_image_by_json_name" data-json-name="' + i + '" data-image-mini="1" data-text-link="1"></span>' + normal_s_tag[1]
+        bt += '<tr><td colspan=2><div class="dota_item_recipe_upgrade_show" data-item-json-name="' + db["中文名"] + '" data-click-find-text-in-json-and-show="1"></div></td></tr>'
+        st += '<td style="width:240px;text-align:left;vertical-align:top;"><div class="dota_item_recipe_upgrade_show" data-item-json-name="' + db["中文名"] \
+              + '" data-click-find-text-in-json-and-show="0"></div></td></tr></table>'
         bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel" style="padding-left:0.25em"><b> ' \
               '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] \
               + '">P</span>  <span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["页面名"] \
               + '.json">J</span></b></div><div style="float:right;color:#000;padding-right:0.25em">' + db['代码名'] + '</div></td></tr></table>'
         db['简易展示'] = html_function(st)
         db['具体展示'] = html_function(bt)
+
+
+def create_html_data_page(all_json):
+    retxt = '<script>\ndota_json_item_data={'
+    for i in all_json['物品']:
+        retxt += '\n"' + i + '":{"商店":['
+        for j in all_json['物品'][i]['商店']:
+            retxt += '"' + all_json['物品'][i]['商店'][j] + '",'
+        retxt = retxt.rstrip(',') + '],'
+        for j in ['价格', '卷轴价格']:
+            if j in all_json['物品'][i]:
+                retxt += '"' + j + '":'
+                if isinstance(all_json['物品'][i][j]['1'], str):
+                    retxt += '"' + all_json['物品'][i][j]['1'] + '",'
+                else:
+                    retxt += ability.better_float_to_text(all_json['物品'][i][j]['1']) + ','
+        for j in edit_json.edit_adition['物品属性']:
+            if j in all_json['物品'][i]:
+                retxt += '"' + j + '":'
+                if isinstance(all_json['物品'][i][j]['1'], str):
+                    retxt += '"' + all_json['物品'][i][j]['1'] + '",'
+                else:
+                    retxt += ability.better_float_to_text(all_json['物品'][i][j]['1']) + ','
+        for j in ['升级', '组件']:
+            if j in all_json['物品'][i]:
+                retxt += '"' + j + '":['
+                for k in all_json['物品'][i][j]:
+                    retxt += '"' + all_json['物品'][i][j][k]['物品名'] + '",'
+                retxt = retxt.rstrip(',') + '],'
+        retxt = retxt.rstrip(',') + '},'
+    retxt = retxt.rstrip(',') + '};\n</script>'
+    return retxt
 
 
 def get_item_value(db):
