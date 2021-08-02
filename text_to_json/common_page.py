@@ -390,6 +390,65 @@ def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
         retxt += '<b><span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">完整的更新内容请点此处查看……</span></b>'
     return retxt
 
+def create_switch_log(log_base, log_list, name, limit=3):
+    retxt = ''
+    button=''
+    content=''
+    log_len=0
+    for i in range(len(log_list) - 1, -1, -1):
+        for j in range(len(log_list[i]) - 1, -1, -1):
+            if j > 0:
+                log_name = log_list[i][0] + '/' + log_list[i][j]
+            else:
+                log_name = log_list[i][j]
+            if log_name in log_base:
+                v = log_base[log_name]
+                current_ul = 0
+                for j, w in v.items():
+                    if isinstance(w, dict):
+                        for j2, w2 in w.items():
+                            for k, x in w2.items():
+                                showit = False
+                                for l in range(2, len(x)):
+                                    if x[0] != '' and x[0] in name:
+                                        showit = True
+                                    else:
+                                        for m in range(len(x[l]['目标'])):
+                                            showit = showit and x[l]['目标'][m] in name
+                                    showit = showit and x[l]['文字'] != ''
+                                    if showit:
+                                        if current_ul == 0:
+                                            button+='<div class="dota_switch_content_by_click_button" data-check-key="'+log_name+'">'+log_name+'</div>'
+                                            content+='<div class="dota_switch_content_by_click_content" data-check-key="'+log_name+'" data-display-type="block">'
+                                            log_len+=1
+                                            content += '<h3><span class="dota_create_link_to_wiki_page">' + log_name + '</span>\t<small>' + v['更新日期'] + '</small></h3>'
+                                        if x[l]['序列级数'] > current_ul:
+                                            for m in range(x[l]['序列级数'] - current_ul):
+                                                content += '<ul>'
+                                            current_ul = x[l]['序列级数']
+                                        elif x[l]['序列级数'] < current_ul:
+                                            for m in range(current_ul - x[l]['序列级数']):
+                                                content += '</ul>'
+                                            current_ul = x[l]['序列级数']
+                                        content += '<li>' + x[l]['文字'] + '</li>'
+                if current_ul>0:
+                    for m in range(current_ul):
+                        content += '</ul>'
+                    content += '</div>'
+    limit=max(1,limit)
+    limit=min(limit,log_len)
+    if limit>0:
+        retxt+='<div class="dota_change_attri_by_input">'\
+           +'<span class="dota_switch_content_by_click dota_change_attri_by_input_target" data-display-number="'+str(limit)+'">'\
+           +'<span class="dota_compound_number_input dota_change_attri_by_input_input" data-number-input-attri-dict="最小=1；步长=1；当前='+str(limit)+'；最大='+str(log_len)+'；"'\
+           +' data-set-value-function="function_dota_change_attri_by_input_change" data-target-attri="data-display-number"'\
+           +' data-final-javascript="function_dota_switch_content_by_click_check_display_child"></span>'\
+           +button+content+'</span></div>'\
+           +'您可以点击上面的版本号按钮来快速查看更新日志，或者您可以'\
+           +'<b><span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">点此处查看完整的日志页面……</span></b>'
+    else:
+        retxt+='没有查询到<span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">《' + name[0] + '》的更新日志</span>'
+    return retxt
 
 def create_page_hero(json_base, log_base, log_list, hero):
     db = json_base['英雄'][hero]
@@ -438,7 +497,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
     retxt += '\n==历史更新==\n' \
-             + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
+             + create_switch_log(log_base, log_list, all_the_names(db, json_base)) \
              + '\n==饰品==\n' \
              + '<span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["中文名"] + '/equipment">点击进入查看饰品信息</span>' \
              + json_base['机制']['通用']['简单条目']['英雄导航']
@@ -452,7 +511,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
             elif retxt[i + 1] == 'b' and retxt[i + 2] == 'r':
                 nums += 0
             else:
-                if retxt[i + 1] == 't' or retxt[i + 1] == 'd' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
+                if retxt[i + 1] == 't' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
                     rere += '\n'
                     for j in range(nums):
                         rere += '\t'
@@ -503,7 +562,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
         retxt += '[[分类:士兵]]'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
-    retxt += '\n==历史更新==\n' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) \
+    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base)) \
              + '<div>' + json_base['机制']['通用']['简单条目']['非英雄单位导航'] + '</div>[[分类:非英雄单位]]'
     retxt += thanks_for_the_audience()
     rere = ''
@@ -515,7 +574,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
             elif retxt[i + 1] == 'b' and retxt[i + 2] == 'r':
                 nums += 0
             else:
-                if retxt[i + 1] == 't' or retxt[i + 1] == 'd' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
+                if retxt[i + 1] == 't' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
                     rere += '\n'
                     for j in range(nums):
                         rere += '\t'
@@ -560,7 +619,7 @@ def create_page_item(json_base, log_base, log_list, item):
             retxt += '。'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
-    retxt += '\n==历史更新==\n' + create_2nd_logs(json_base, log_base, log_list, all_the_names(db, json_base), 10) + '[[分类:物品]]'
+    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base)) + '[[分类:物品]]'
     retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
@@ -571,7 +630,7 @@ def create_page_item(json_base, log_base, log_list, item):
             elif retxt[i + 1] == 'b' and retxt[i + 2] == 'r':
                 nums += 0
             else:
-                if retxt[i + 1] == 't' or retxt[i + 1] == 'd' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
+                if retxt[i + 1] == 't' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
                     rere += '\n'
                     for j in range(nums):
                         rere += '\t'
@@ -631,7 +690,7 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
             elif retxt[i + 1] == 'b' and retxt[i + 2] == 'r':
                 nums += 0
             else:
-                if retxt[i + 1] == 't' or retxt[i + 1] == 'd' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
+                if retxt[i + 1] == 't' or retxt[i + 1] == 'h' or retxt[i + 1] == 'l':
                     rere += '\n'
                     for j in range(nums):
                         rere += '\t'

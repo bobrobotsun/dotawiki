@@ -1305,7 +1305,6 @@ class Main(QMainWindow):
 
             # 生成单位组信息（怀疑是个时间耗费大户）
             unitgroup.get_source_to_data(self.json_base, self.version, self.text_base)
-
             # self.resort() #这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
             self.file_save_all()
         except editerror as err:
