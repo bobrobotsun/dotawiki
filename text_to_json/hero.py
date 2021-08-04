@@ -229,11 +229,10 @@ def fulfil_complex_and_simple_show(all_json, html_function):
              '<div style="text-align:center;"><div class="bg-primary" style="float:left;padding:0.5em">' \
              '<span class="dota_get_image_by_json_name" data-json-name="' + i \
              + '" data-image-height="72" data-image-link="1" data-image-center="1"></span></div>' \
-               '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">' + db["中文名"] \
-             + '</div><div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' + db["英文名"] \
-             + '</div>' \
-               '<div style="padding:0.25em 0.5em;text-align:center;">' \
-               '<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["阵营"]['1'] \
+               '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">[[' + db["页面名"] + '|' + db["中文名"] + ']]</div>'\
+             +'<div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' + db["英文名"] + '</div>'\
+             +'<div style="padding:0.25em;text-align:center;">'\
+             +'<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["阵营"]['1'] \
              + '" data-text-link="0"></span></span>' \
                '<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["主属性"]['1'] \
              + '" data-text-link="0"></span></span>' \
@@ -252,8 +251,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
              + '<div style="padding:0.25em;"><div class="bgc_black">生命恢复</div><div class="border_black">' + str(all_attri['生命恢复']) + '</div></div>' \
              + '<div style="padding:0.25em;"><div class="bgc_black">魔法值</div><div class="border_black">' + str(all_attri['魔法值']) + '</div></div>' \
              + '<div style="padding:0.25em;"><div class="bgc_black">魔法恢复</div><div class="border_black">' + str(all_attri['魔法恢复']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">攻击力</div><div class="border_black">' + str(all_attri['攻击力']) + '(' + str(all_attri['攻击下限']) + '~' + str(
-            all_attri['攻击上限']) + ')</div></div>' \
+             + '<div style="padding:0.25em;"><div class="bgc_black">攻击力</div><div class="border_black">' + str(all_attri['攻击力']) \
+             + '(' + str(all_attri['攻击下限']) + '~' + str(all_attri['攻击上限']) + ')</div></div>' \
              + '<div style="padding:0.25em;"><div class="bgc_black">攻击速度</div><div class="border_black">' + str(all_attri['攻击速度']) + '(' + str(db['攻击速度']['1']) + ')</div></div>' \
              + '<div style="padding:0.25em;"><div class="bgc_black">攻击间隔</div><div class="border_black">' + str(all_attri['攻击间隔']) + '(' + str(db['攻击间隔']['1']) + ')</div></div>' \
              + '<div style="padding:0.25em;"><div class="bgc_black">攻击前摇</div><div class="border_black">' + str(all_attri['攻击前摇']) + '(' + str(db['攻击前摇']['1']) + ')</div></div>' \
@@ -266,7 +265,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
              + '<div style="padding:0.25em;"><div class="bgc_black">白天视野</div><div class="border_black">' + str(db['白天视野']['1']) + '</div></div>' \
              + '<div style="padding:0.25em;"><div class="bgc_black">夜晚视野</div><div class="border_black">' + str(db['夜晚视野']['1']) + '</div></div>' \
              + '</div>' \
-               '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(60px,1fr));gap:2px;place-content:center center;">'
+               '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(55px,1fr));gap:2px;place-content:center center;">'
         for ii in range(len(db['技能']) - 8):
             v = db['技能'][ii]
             st += '<div class="dota_click_absolute_additional_infomation_frame dota_click_find_text_in_json_and_show">' \

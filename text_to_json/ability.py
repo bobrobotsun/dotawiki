@@ -2884,16 +2884,16 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%"><b>{{链接|Data:' + db["数据来源"] + '/源.json|S}}'\
                   +' {{链接|Data:' + db["页面名"] + '.json|J}}</b></span><br>' \
                   + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db["中文名"] + '</span>' \
-                  + '<span style="font-size:12px;color:#ccc;white-space: nowrap;padding: 2px; width:75px;overflow: hidden;text-overflow: ellipsis;text-align:center;"> ' \
+                  + '<span style="font-size:12px;color:#ccc;white-space:nowrap;padding:2px;width:75px;overflow:hidden;text-overflow:ellipsis;text-align:center;"> ' \
                   + db["英文名"] + '</span></div>'
             bt += create_upgrade_cast_style(db["施法类型"])
             bt += create_upgrade_cast_target(db["施法目标"])
             if db["图片"] != '':
                 bt += '{{图片|' + db["图片"] + '|w160|link="' + db['页面名'] + '|center}}'
-                st += '<div class="bg-primary" style="float:left;padding:0.5em">{{图片|' + db["图片"] + '|w100|link="' + db['页面名'] + '|center}}</div>'
-            st += '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">' \
-                  + db["中文名"] + '</div><div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' \
-                  + db["英文名"] + '</div><div class="" style="font-size:100%;padding: 2px;text-align:center;">{{H|' + db['技能归属'] + '}}</div>' \
+                st += '<div class="bg-primary" style="float:left;padding:0.5em">{{图片|' + db["图片"] + '|h100|center}}</div>'
+            st += '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">[['+ db["页面名"] + '|'+ db["中文名"] + ']]</div>'\
+                  +'<div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">'+ db["英文名"] + '</div>'\
+                  +'<div class="" style="font-size:100%;padding: 2px;text-align:center;">{{H|' + db['技能归属'] + '}}</div>' \
                   + create_upgrade_cast_style(db["施法类型"]) + create_upgrade_cast_target(db["施法目标"]) + '</th></tr>'
             if db['描述'] != '':
                 bt += '<div style="background:#111133;padding:1em;">' + db['描述'] + '</div>'
@@ -2916,7 +2916,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                     else:
                         break
             bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
-            st += '<tr><td style="width:160px;max-width:160px;text-align:left;vertical-align:top;">' + create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
+            st += '<tr><td style="width:140px;max-width:140px;text-align:left;vertical-align:top;">' + create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
             ii = 0
             while True:
                 ii += 1
@@ -2945,7 +2945,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
             bt += '</div>' \
                   + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
                   + '<span style="margin-top:0px;padding-top:0px;font-size:120%"><big><b>技能详情</b></big></span><div>'
-            st += '</td><td class="dota_switch_content_by_click" data-display-number="3" style="width:240px;text-align:left;vertical-align:top;background:#ccc;color:#000;">'
+            st += '</td><td class="dota_switch_content_by_click" data-display-number="3" style="width:210px;text-align:left;vertical-align:top;background:#ccc;color:#000;">'
             ii = 0
             while True:
                 ii += 1
@@ -2990,8 +2990,9 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                         name = v['2']['机制名']
                     else:
                         name = '独立机制' + i
-                    st += '<span class="dota_switch_content_by_click_button" data-check-key="' + name + '" style="margin:0.25em">' + name + '</span>' \
-                          + '<div class="dota_switch_content_by_click_content" data-check-key="' + name + '" data-display-type="block">' + create_independent_mech(v) + '</div>'
+                    if name[0]!='#':
+                        st += '<span class="dota_switch_content_by_click_button" data-check-key="' + name + '" style="margin:0.25em">' + name + '</span>'\
+                              + '<div class="dota_switch_content_by_click_content" data-check-key="' + name + '" data-display-type="block">' + create_independent_mech(v) + '</div>'
                 else:
                     break
             st += '</td></tr></table>'

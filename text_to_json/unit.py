@@ -421,7 +421,7 @@ def fulfil_complex_and_simple_show(all_json,html_function):
         st += '<div class="dota_simple_infobox"><div style="text-align:center;min-height:100px">' \
               '<div class="bg-primary" style="float:left;">' \
               '<span class="dota_get_image_by_json_name" data-json-name="'+i+'" data-image-height="100" data-image-link="1" data-image-center="1"></span></div>'\
-              +'<div class="bg-primary" style="font-size:200%;font-weight:normal;padding:0.25em;"> '+common_page.get_unit_value(db["中文名"])+' </div>'\
+              +'<div class="bg-primary" style="font-size:200%;font-weight:normal;padding:0.25em;">[['+db["页面名"]+'|'+common_page.get_unit_value(db["中文名"])+']]</div>'\
               +'<div class="bg-primary" style="font-size:150%;padding:0.25em;text-align:center;"> '+common_page.get_unit_value(db["英文名"])+' </div><div style="padding:0.25em;">'
         if db["英雄级单位"]['1']['1'] == 1:
             bt += '<span class="label bg-primary">英雄级</span>'

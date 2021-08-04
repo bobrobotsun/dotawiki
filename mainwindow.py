@@ -1391,17 +1391,17 @@ class Main(QMainWindow):
         if chosen == '' or chosen == '英雄':
             for i in self.json_base['英雄']:
                 all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'],
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
                                                                             common_page.all_the_names(self.json_base['英雄'][i], self.json_base), 0)])
         if chosen == '' or chosen == '非英雄单位':
             for i in self.json_base['非英雄单位']:
                 all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'],
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
                                                                             common_page.all_the_names(self.json_base['非英雄单位'][i], self.json_base), 0)])
         if chosen == '' or chosen == '物品':
             for i in self.json_base['物品']:
                 all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'],
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
                                                                             common_page.all_the_names(self.json_base['物品'][i], self.json_base), 0)])
         if chosen == '' or chosen == '单位组':
             for i in self.json_base['单位组']:
@@ -1566,17 +1566,17 @@ class Main(QMainWindow):
                 if k in self.json_base['英雄']:
                     all_upload.append([k + '.json', self.json_base['英雄'][k]])
                     all_page.append([k, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'],
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
                                                                               common_page.all_the_names(self.json_base['英雄'][k], self.json_base), 0)])
                 elif k in self.json_base['物品']:
                     all_upload.append([k + '.json', self.json_base['物品'][k]])
                     all_page.append([k, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'],
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
                                                                               common_page.all_the_names(self.json_base['物品'][k], self.json_base), 0)])
                 elif k in self.json_base['非英雄单位']:
                     all_upload.append([k + '.json', self.json_base['非英雄单位'][k]])
                     all_page.append([k, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_2nd_logs(self.json_base, self.version_base, self.version_list['版本'],
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
                                                                               common_page.all_the_names(self.json_base['非英雄单位'][k], self.json_base), 0)])
                 if k in self.json_base['机制源']:
                     all_upload.append([k + '/源.json', self.json_base['机制源'][k]])
@@ -1804,7 +1804,19 @@ class Main(QMainWindow):
             else:
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
         elif template_args[0]=='物品分类查询':
-            retxt=common_page.create_item_choose_element(self.json_base,template_args[1:])
+            post=''
+            dict=''
+            should_be_delete=[]
+            for i in range(1,len(template_args)):
+                if template_args[i][:5] == 'post=':
+                    post = template_args[i][5:]
+                    should_be_delete.insert(0,i)
+                if template_args[i][:5] == 'dict=':
+                    dict = template_args[i][5:]
+                    should_be_delete.insert(0,i)
+            for i in should_be_delete:
+                template_args.pop(i)
+            retxt=common_page.create_item_choose_element(self.json_base,template_args[1:],dict,post)
         else:
             return x.group(0)
         return retxt

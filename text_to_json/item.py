@@ -282,24 +282,24 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         common_pro = {'共享': ['color:#a03030;"><i class="fa fa-times" aria-hidden="true"></i>不可以给队友共享', ';color:#229944;"><i class="fa fa-check" aria-hidden="true"></i>可以给队友共享'],
                       '可拆分': ['color:#a03030;"><i class="fa fa-times" aria-hidden="true"></i>合成10秒后不可拆分', ';color:#229944;"><i class="fa fa-check" aria-hidden="true"></i>永久可以拆分']}
         common_s_pro = {'共享': ['<span class="ability_indicator" style="background:#a03030;color:white;"><i class="fa fa-times" aria-hidden="true"></i>不共享</span>'
-            , '<span class="ability_indicator" style="background:#229944;color:white;"><i class="fa fa-times" aria-hidden="true"></i>可共享</span>'],
+            , '<span class="ability_indicator" style="background:#229944;color:white;"><i class="fa fa-check" aria-hidden="true"></i>可共享</span>'],
                         '可拆分': ['<span class="ability_indicator" style="background:#a03030;color:white;"><i class="fa fa-times" aria-hidden="true"></i>不拆分</span>'
-                            , '<span class="ability_indicator" style="background:#229944;color:white;"><i class="fa fa-times" aria-hidden="true"></i>不拆分</span>']}
+                            , '<span class="ability_indicator" style="background:#229944;color:white;"><i class="fa fa-check" aria-hidden="true"></i>可拆分</span>']}
         normal_tag = ['<tr><td colspan=2 style="background:#ddd;color:#000;margin:6px;font-size:1em;">', '</td></tr>']
         normal_s_tag = ['<div style="padding:0.5em 0.5em 0em 1em">', '</div>']
         bt += '<table class="infobox" style="text-align:center;background:#fff;width:300px;color:#fff;"><tr class="infobox-title">' \
-              + '<th colspan=2 style="background: #a03030;padding: 0.5em 1em;;text-align:center;">' + '<span style="font-size:125%">' + \
+              + '<th colspan=2 style="background: #a03030;padding: 0.5em 1em;text-align:center;">' + '<span style="font-size:125%">' + \
               db["中文名"] + '</span><div style="text-align:center;">' + db["英文名"] + '</div></th></tr>' \
               + '<tr><td colspan=2 style="background:#222"><div class="center"><span class="dota_get_image_by_image_name" data-image-name="' \
               + db["图片"] + '" data-image-width="100" data-image-link="' + db["页面名"] \
               + '"></span></div></td></tr><tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] \
               + '</td></tr>'
         st += '<table class="dota_simple_infobox"><tr><th style="text-align:center;" colspan=2>' \
-              '<div class="bg-primary" style="padding:0.5em"><span class="dota_get_image_by_image_name" data-image-name="' \
-              + db["图片"] + '" data-image-width="100" data-image-link="' + db["页面名"] \
-              + '" data-image-center="left"></span></div><div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">' + \
-              db["中文名"] + '</div><div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' + db["英文名"] \
-              + '</div><div style="padding:0.25em 0.5em;text-align:center;">'
+              '<div class="bg-primary" style="padding:0.5em">'\
+              +'<span class="dota_get_image_by_image_name" data-image-name="'+ db["图片"] + '" data-image-height="72" data-image-center="left"></span>'\
+              +'<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:0.25em;text-align:center;">[[' + db["页面名"] + '|' + db["中文名"] + ']]</div>'\
+              +'<div class="bg-primary" style="font-size:100%;padding:0.25em;text-align:center;">' + db["英文名"] + '</div></div>'\
+              +'<div style="padding:0.25em 0.5em;text-align:center;">'
         for i, v in common_pro.items():
             if i != '可拆分' or '组件' in db:
                 if i in db:
@@ -311,15 +311,20 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         st += '</div></th></tr>'
         if '传说' in db and db['传说'] != '':
             st += '<tr><td colspan=2><div class="bg-primary" style="padding:1em;">' + db['传说'] + '</div></td></tr>'
-        st += '<tr><td style="width:160px;max-width:160px;text-align:left;vertical-align:top;background:#ccc;color:#000;">'
+        st += '<tr><td style="width:140px;max-width:160px;text-align:left;vertical-align:top;background:#ccc;color:#000;">'
         for i, v in db.items():
             if isinstance(v, dict) and '代码' in v and '后缀' in v and '展示前缀' in v and '展示后缀' in v and '1' in v:
                 bt += normal_tag[0] + v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + normal_tag[1]
                 st += normal_s_tag[0] + v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + normal_s_tag[1]
         for i in db['技能']:
-            st += normal_s_tag[0] + '<span class="dota_get_image_by_json_name" data-json-name="' + i + '" data-image-mini="1" data-text-link="1"></span>' + normal_s_tag[1]
+            st += normal_s_tag[0] +'<div class="dota_click_absolute_additional_infomation_frame dota_click_find_text_in_json_and_show">' \
+                  '<div class="dota_get_image_by_json_name dota_click_absolute_additional_infomation_frame_button" data-json-name="' + i \
+                  + '" data-image-mini="1" data-text-link="0"></div>' \
+                    '<div class="dota_click_absolute_additional_infomation_frame_frame dota_click_find_text_in_json_and_show_textarea">' \
+                    '<div class="dota_click_find_text_in_json_and_show_button" data-find-text-in-json-address="' + i + '，简易展示">点击显示《' + i + '》详细信息</div></div></div>'\
+                  + normal_s_tag[1]
         bt += '<tr><td colspan=2><div class="dota_item_recipe_upgrade_show" data-item-json-name="' + db["中文名"] + '" data-click-find-text-in-json-and-show="1"></div></td></tr>'
-        st += '<td style="width:240px;text-align:left;vertical-align:top;"><div class="dota_item_recipe_upgrade_show" data-item-json-name="' + db["中文名"] \
+        st += '<td style="width:210px;text-align:left;vertical-align:top;"><div class="dota_item_recipe_upgrade_show" data-item-json-name="' + db["中文名"] \
               + '" data-click-find-text-in-json-and-show="0"></div></td></tr></table>'
         bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel" style="padding-left:0.25em"><b> ' \
               '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] \
