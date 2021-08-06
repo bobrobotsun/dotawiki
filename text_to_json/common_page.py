@@ -1,6 +1,6 @@
 import re
 import math
-from text_to_json import ability, edit_json
+from text_to_json import hero,ability, edit_json
 
 target_url = 'http://dota.huijiwiki.com/w/api.php'
 
@@ -734,12 +734,36 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     return retxt
 
 
+
+
+def create_hero_choose_element(json_base, args,dict,post):
+    args.insert(1, '')
+    retxt = ''
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="总力量=1；">'\
+             +'<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>'\
+             +'<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="'+dict+'">'\
+             +'<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>'
+    for i in ['力量天辉','敏捷天辉','智力天辉','力量夜魇','敏捷夜魇','智力夜魇','近战','远程']:
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"'\
+                 +' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
+    for i in ['力量','敏捷','智力','生命值','魔法值','生命恢复','魔法恢复','攻击力','攻击速度','攻击前摇','护甲','移动速度','弹道速度']:
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"'\
+                 +' data-check-key="总' + i + '" data-display-len="3">' + i + '</span>'
+    retxt += '</span><div>'
+    for i in json_base['英雄']:
+        if json_base['英雄'][i]['应用'] == 1:
+            args[1]=i
+            retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content dota_hero_comprehensive_attri_dict_hero"'\
+                     +' data-select-input-text="' + i + '"  data-check-key-name="hero-comprehensive-attri-dict" data-hero-name="' + i + '"'\
+                     +' style="border:1px black solid;margin:2px;text-align:center;">'\
+                     +'{{' + '|'.join(args) + '}}' +post+ '</span>'
+    retxt += '</div></div>'
+    return retxt
+
 def create_item_choose_element(json_base, args,dict,post):
     args.insert(1, '')
     retxt = ''
     retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；'
-    # for i in range(len(edit_json.item_shop)-1,-1,-1):
-    #    retxt += edit_json.item_shop[i] + '=1；'
     retxt += '"><div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>'\
              +'<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="'+dict+'">'\
              +'<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \

@@ -1803,11 +1803,11 @@ class Main(QMainWindow):
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[2] + '</span>'
             else:
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
-        elif template_args[0]=='物品分类查询':
+        elif template_args[0]=='分类查询':
             post=''
             dict=''
             should_be_delete=[]
-            for i in range(1,len(template_args)):
+            for i in range(2,len(template_args)):
                 if template_args[i][:5] == 'post=':
                     post = template_args[i][5:]
                     should_be_delete.insert(0,i)
@@ -1816,7 +1816,10 @@ class Main(QMainWindow):
                     should_be_delete.insert(0,i)
             for i in should_be_delete:
                 template_args.pop(i)
-            retxt=common_page.create_item_choose_element(self.json_base,template_args[1:],dict,post)
+            if template_args[1]=='英雄':
+                retxt=common_page.create_hero_choose_element(self.json_base,template_args[2:],dict,post)
+            elif template_args[1]=='物品':
+                retxt=common_page.create_item_choose_element(self.json_base,template_args[2:],dict,post)
         else:
             return x.group(0)
         return retxt

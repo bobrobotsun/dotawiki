@@ -200,11 +200,23 @@ def create_file(all_json):
         file.close()
 
 
+def fulfil_complex_and_simple_show_attri_1(name, value):
+    return '<div style="padding:1px;"><div class="bgc_black">' + name + '</div><div class="border_black">' + value + '</div></div>'
+
+
+def fulfil_complex_and_simple_show_attri_2(name, value, prepost=''):
+    retxt = '<span class="dota_hero_comprehensive_attri_dict_hero_attri_text" data-hero-attri-name="' + name + '"'
+    if prepost != '':
+        retxt += ' data-show-transform-function="transform_function_prefix_postfix" data-transform-prefix-postfix="' + prepost + '"'
+    retxt += '>' + value + '</span>'
+    return retxt
+
+
 def fulfil_complex_and_simple_show(all_json, html_function):
     for i in all_json['英雄']:
         db = all_json['英雄'][i]
-        bt = '{{#invoke:hero data|heroheroheader|' + db["中文名"] + '}}[[file:npc_dota_hero_' + db["代码名"] + '.webm|center|300px|link=]]{{#invoke:hero data|heroherodata|' + db["中文名"] \
-             + '}}{{#invoke:hero data|heroherojs}}'  # 完整显示
+        bt = '{{#invoke:hero data|heroheroheader|' + db["中文名"] + '}}[[file:npc_dota_hero_' + db["代码名"] + '.webm|center|300px|link=]]' \
+             + '{{#invoke:hero data|heroherodata|' + db["中文名"] + '}}{{#invoke:hero data|heroherojs}}'  # 完整显示
         main_attri = {'力量': '', '敏捷': '', '智力': ''}
         main_attri[db["主属性"]['1']] = 'background-color:#ff6;'
         all_attri = {}
@@ -225,14 +237,14 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         for ii in all_attri:
             if not isinstance(all_attri[ii], str):
                 all_attri[ii] = round(all_attri[ii], 2)
-        st = '<div class="dota_simple_infobox bgc_white">' \
-             '<div style="text-align:center;"><div class="bg-primary" style="float:left;padding:0.5em">' \
-             '<span class="dota_get_image_by_json_name" data-json-name="' + i \
+        st = '<div class="dota_simple_infobox bgc_white dota_hero_comprehensive_attri_dict_hero" data-hero-name="' + i + '">' \
+                                                                                                                         '<div style="text-align:center;"><div class="bg-primary" style="float:left;padding:0.5em">' \
+                                                                                                                         '<span class="dota_get_image_by_json_name" data-json-name="' + i \
              + '" data-image-height="72" data-image-link="1" data-image-center="1"></span></div>' \
-               '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">[[' + db["页面名"] + '|' + db["中文名"] + ']]</div>'\
-             +'<div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' + db["英文名"] + '</div>'\
-             +'<div style="padding:0.25em;text-align:center;">'\
-             +'<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["阵营"]['1'] \
+               '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">[[' + db["页面名"] + '|' + db["中文名"] + ']]</div>' \
+             + '<div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' + db["英文名"] + '</div>' \
+             + '<div style="padding:0.25em;text-align:center;">' \
+             + '<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["阵营"]['1'] \
              + '" data-text-link="0"></span></span>' \
                '<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["主属性"]['1'] \
              + '" data-text-link="0"></span></span>' \
@@ -241,29 +253,32 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                '<div style="display:flex;flex-wrap:wrap;justify-content:space-around;">' \
                '<div style="padding:0.25em;border:1px #333 solid;' + main_attri['力量'] \
              + '"><span class="dota_get_image_by_json_name" data-json-name="力量" title="力量"></span>' + str(db['力量']['1']) + '+' + str(db['力量成长']['1']) \
-             + '</div><div style="padding:0.25em;border:1px #333 solid;' + main_attri['敏捷'] \
+             + fulfil_complex_and_simple_show_attri_2('总力量', '', '=，') + '</div><div style="padding:0.25em;border:1px #333 solid;' + main_attri['敏捷'] \
              + '"><span class="dota_get_image_by_json_name" data-json-name="敏捷" title="敏捷"></span>' + str(db['敏捷']['1']) + '+' + str(db['敏捷成长']['1']) \
-             + '</div><div style="padding:0.25em;border:1px #333 solid;' + main_attri['智力'] \
+             + fulfil_complex_and_simple_show_attri_2('总敏捷', '', '=，') + '</div><div style="padding:0.25em;border:1px #333 solid;' + main_attri['智力'] \
              + '"><span class="dota_get_image_by_json_name" data-json-name="智力" title="智力"></span>' + str(db['智力']['1']) + '+' + str(db['智力成长']['1']) \
+             + fulfil_complex_and_simple_show_attri_2('总智力', '', '=，') \
              + '</div></div>' \
-               '<div style="display: grid;grid-template-columns:repeat(4,1fr);place-content:center center;background:#ccc;color:#000;">' \
-               '<div style="padding:0.25em;"><div class="bgc_black">生命值</div><div class="border_black">' + str(all_attri['生命值']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">生命恢复</div><div class="border_black">' + str(all_attri['生命恢复']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">魔法值</div><div class="border_black">' + str(all_attri['魔法值']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">魔法恢复</div><div class="border_black">' + str(all_attri['魔法恢复']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">攻击力</div><div class="border_black">' + str(all_attri['攻击力']) \
-             + '(' + str(all_attri['攻击下限']) + '~' + str(all_attri['攻击上限']) + ')</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">攻击速度</div><div class="border_black">' + str(all_attri['攻击速度']) + '(' + str(db['攻击速度']['1']) + ')</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">攻击间隔</div><div class="border_black">' + str(all_attri['攻击间隔']) + '(' + str(db['攻击间隔']['1']) + ')</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">攻击前摇</div><div class="border_black">' + str(all_attri['攻击前摇']) + '(' + str(db['攻击前摇']['1']) + ')</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">攻击距离</div><div class="border_black">' + str(db['攻击距离']['1']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">弹道速度</div><div class="border_black">' + str(db['弹道速度']['1']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">护甲</div><div class="border_black">' + str(all_attri['护甲']) + '(' + str(all_attri['物理抗性']) + '%)</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">魔法抗性</div><div class="border_black">' + str(db['魔法抗性']['1']) + '%</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">移动速度</div><div class="border_black">' + str(db['移动速度']['1']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">转身速率</div><div class="border_black">' + str(db['转身速率']['1']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">白天视野</div><div class="border_black">' + str(db['白天视野']['1']) + '</div></div>' \
-             + '<div style="padding:0.25em;"><div class="bgc_black">夜晚视野</div><div class="border_black">' + str(db['夜晚视野']['1']) + '</div></div>' \
+             + '<div style="display: grid;grid-template-columns:repeat(4,1fr);place-content:center center;background:#ccc;color:#000;">' \
+             + fulfil_complex_and_simple_show_attri_1('生命值', fulfil_complex_and_simple_show_attri_2('总生命值', str(all_attri['生命值']))) \
+             + fulfil_complex_and_simple_show_attri_1('生命恢复', fulfil_complex_and_simple_show_attri_2('总生命恢复', str(all_attri['生命恢复']))) \
+             + fulfil_complex_and_simple_show_attri_1('魔法值', fulfil_complex_and_simple_show_attri_2('总魔法值', str(all_attri['魔法值']))) \
+             + fulfil_complex_and_simple_show_attri_1('魔法恢复', fulfil_complex_and_simple_show_attri_2('总魔法恢复', str(all_attri['魔法恢复']))) \
+             + fulfil_complex_and_simple_show_attri_1('攻击力', fulfil_complex_and_simple_show_attri_2('总攻击力', ability.better_float_to_text(all_attri['攻击力'])) \
+                                                      + '(' + fulfil_complex_and_simple_show_attri_2('总攻击下限', str(all_attri['攻击下限'])) \
+                                                      + '~' + fulfil_complex_and_simple_show_attri_2('总攻击上限', str(all_attri['攻击上限'])) + ')') \
+             + fulfil_complex_and_simple_show_attri_1('攻击速度', fulfil_complex_and_simple_show_attri_2('总攻击速度', str(all_attri['攻击速度'])) + '(' + str(db['攻击速度']['1']) + ')') \
+             + fulfil_complex_and_simple_show_attri_1('攻击间隔', fulfil_complex_and_simple_show_attri_2('总攻击间隔', str(all_attri['攻击间隔'])) + '(' + str(db['攻击间隔']['1']) + ')') \
+             + fulfil_complex_and_simple_show_attri_1('攻击前摇', fulfil_complex_and_simple_show_attri_2('总攻击前摇', str(all_attri['攻击前摇'])) + '(' + str(db['攻击前摇']['1']) + ')') \
+             + fulfil_complex_and_simple_show_attri_1('攻击距离', fulfil_complex_and_simple_show_attri_2('总攻击距离', str(db['攻击距离']['1']))) \
+             + fulfil_complex_and_simple_show_attri_1('弹道速度', fulfil_complex_and_simple_show_attri_2('总弹道速度', str(db['弹道速度']['1']))) \
+             + fulfil_complex_and_simple_show_attri_1('护甲', fulfil_complex_and_simple_show_attri_2('总护甲', str(all_attri['护甲'])) \
+                                                      + '(' + fulfil_complex_and_simple_show_attri_2('总物理抗性', str(all_attri['物理抗性']) + '%', '，%') + ')') \
+             + fulfil_complex_and_simple_show_attri_1('魔法抗性', fulfil_complex_and_simple_show_attri_2('总魔法抗性', str(db['魔法抗性']['1']) + '%', '，%')) \
+             + fulfil_complex_and_simple_show_attri_1('移动速度', fulfil_complex_and_simple_show_attri_2('总移动速度', str(db['移动速度']['1']))) \
+             + fulfil_complex_and_simple_show_attri_1('转身速率', fulfil_complex_and_simple_show_attri_2('总转身速率', str(db['转身速率']['1']))) \
+             + fulfil_complex_and_simple_show_attri_1('白天视野', fulfil_complex_and_simple_show_attri_2('总白天视野', str(db['白天视野']['1']))) \
+             + fulfil_complex_and_simple_show_attri_1('夜晚视野', fulfil_complex_and_simple_show_attri_2('总夜晚视野', str(db['夜晚视野']['1']))) \
              + '</div>' \
                '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(55px,1fr));gap:2px;place-content:center center;">'
         for ii in range(len(db['技能']) - 8):

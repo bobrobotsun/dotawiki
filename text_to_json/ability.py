@@ -2708,7 +2708,7 @@ def create_upgrade_buff(json_dict):
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
                     retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png',json_dict[str(i)]['升级来源'][j]['图片']) + '|link=' + json_dict["名称"] + '}} '
-            retxt += '</td><td style="padding:0.25em>'
+            retxt += '</td><td style="padding:0.25em;">'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
                 retxt += '{{额外信息框|{{图片|' + json_dict[str(i)]['图片'] + '}}|' + json_dict[str(i)]['值'] + '}} '
             for j in buff_mech:
@@ -2814,7 +2814,7 @@ def create_upgrade_mech(json_dict):
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
                     retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|link="' + json_dict[i]['升级来源'][j]["名称"] + '}} '
-            retxt += '</td><td style="padding:0.25em"><span style="cursor:help;">{{图片|' + json_dict[i]['图片'] + '}}</span> (' + json_dict[i]['值'] + ') '
+            retxt += '</td><td style="padding:0.25em;"><span style="cursor:help;">{{图片|' + json_dict[i]['图片'] + '}}</span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
             kk = 0
             while True:
@@ -2889,7 +2889,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
             bt += create_upgrade_cast_style(db["施法类型"])
             bt += create_upgrade_cast_target(db["施法目标"])
             if db["图片"] != '':
-                bt += '{{图片|' + db["图片"] + '|w160|link="' + db['页面名'] + '|center}}'
+                bt += '{{图片|' + db["图片"] + '|w160|center}}'
                 st += '<div class="bg-primary" style="float:left;padding:0.5em">{{图片|' + db["图片"] + '|h100|center}}</div>'
             st += '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">[['+ db["页面名"] + '|'+ db["中文名"] + ']]</div>'\
                   +'<div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">'+ db["英文名"] + '</div>'\
