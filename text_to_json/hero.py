@@ -280,7 +280,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
              + fulfil_complex_and_simple_show_attri_1('白天视野', fulfil_complex_and_simple_show_attri_2('总白天视野', str(db['白天视野']['1']))) \
              + fulfil_complex_and_simple_show_attri_1('夜晚视野', fulfil_complex_and_simple_show_attri_2('总夜晚视野', str(db['夜晚视野']['1']))) \
              + '</div>' \
-               '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(55px,1fr));gap:2px;place-content:center center;">'
+               '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(48px,1fr));gap:2px;place-content:center center;">'
         for ii in range(len(db['技能']) - 8):
             v = db['技能'][ii]
             st += '<div class="dota_click_absolute_additional_infomation_frame dota_click_find_text_in_json_and_show">' \
