@@ -24,7 +24,7 @@ def get_source_to_data(all_json, tlist, version, text_base,change_all_template_l
             todict['分类'] = '机制'
             todict['页面名'] = target
             todict["版本"] = version
-            for i in ["图片", "迷你图片", "简述"]:
+            for i in ["图片", "迷你图片", "图片大小", "简述"]:
                 todict[i] = fromdict[i]
             todict['属性'] = {}
             for i in fromdict['属性']:

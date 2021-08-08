@@ -681,7 +681,7 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
     retxt = ''
     if db['次级分类'] != '引用机制':
         if db['图片'] != '':
-            retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + db['图片'] + '" data-image-width="120" data-image-center="right"></span>'
+            retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + db['图片'] + '" data-image-width="' + db['图片大小'] + '" data-image-center="right"></span>'
     retxt += db['简述'] + create_all_chapter_page_mechnism(db)
     if db['次级分类'] != '引用机制':
         retxt += thanks_for_the_audience()
