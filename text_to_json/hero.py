@@ -2,6 +2,7 @@ import json
 import hashlib
 import re
 import copy
+from xpinyin import Pinyin
 from text_to_json import ability
 from text_to_json.WikiError import editerror
 
@@ -309,8 +310,9 @@ def fulfil_complex_and_simple_show(all_json, html_function):
 
 def create_html_data_page(all_json):
     retxt = '<script>\ndota_json_hero_data={'
+    p = Pinyin()
     for i in all_json['英雄']:
-        retxt += '\n"' + i + '":{'
+        retxt += '\n"' + i + '":{"拼音":"'+p.get_pinyin(i).replace('-','')+'","英文":"'+all_json['英雄'][i]['英文名']+'","代码":"'+all_json['英雄'][i]['代码名']+'",'
         for j in [['主属性'], ['近战远程'], ['阵营'], ['碰撞体积'], ['边界体积'], ['体质类型']] + heropro_num:
             retxt += '"' + j[0] + '":'
             if isinstance(all_json['英雄'][i][j[0]]['1'], str):

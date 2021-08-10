@@ -16,6 +16,8 @@ def get_source_to_data(all_json, tlist, version, text_base,change_all_template_l
             raise (editerror('机制', i, "在【机制源】中缺少关于【" + i + '】的信息，请及时补充'))
     for loop in range(loop_time):
         for target in tlist:
+            if "图片大小" not in all_json['机制源'][target]:
+                all_json['机制源'][target]["图片大小"]='120'
             fromdict = copy.deepcopy(all_json['机制源'][target])
             all_json['机制源'][target]['分类'] = '机制源'
             all_json['机制源'][target]['页面名'] = target

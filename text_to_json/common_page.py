@@ -1,5 +1,6 @@
 import re
 import math
+from xpinyin import Pinyin
 from text_to_json import hero,ability, edit_json
 
 target_url = 'http://dota.huijiwiki.com/w/api.php'
@@ -739,10 +740,13 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
 def create_hero_choose_element(json_base, args,dict,post):
     args.insert(1, '')
     retxt = ''
-    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="总力量=1；">'\
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="简易拼音=1；">'\
              +'<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>'\
              +'<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="'+dict+'">'\
-             +'<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>'
+             +'<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>'\
+             +'<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>'\
+             +'<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整英文" data-display-len="3">英文</span>'\
+             +'<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
     for i in ['力量天辉','敏捷天辉','智力天辉','力量夜魇','敏捷夜魇','智力夜魇','近战','远程']:
         retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"'\
                  +' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'

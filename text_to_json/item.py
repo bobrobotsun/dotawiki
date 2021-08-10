@@ -296,7 +296,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
               + '</td></tr>'
         st += '<table class="dota_simple_infobox"><tr><th style="text-align:center;" colspan=2>' \
               '<div class="bg-primary" style="padding:0.5em">'\
-              +'<span class="dota_get_image_by_image_name" data-image-name="'+ db["图片"] + '" data-image-height="72" data-image-center="left"></span>'\
+              +'<span class="dota_get_image_by_json_name" data-json-name="'+ db["页面名"] + '" data-image-height="72" data-image-center="left" data-image-link="1"></span>'\
               +'<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:0.25em;text-align:center;">[[' + db["页面名"] + '|' + db["中文名"] + ']]</div>'\
               +'<div class="bg-primary" style="font-size:100%;padding:0.25em;text-align:center;">' + db["英文名"] + '</div></div>'\
               +'<div style="padding:0.25em 0.5em;text-align:center;">'
