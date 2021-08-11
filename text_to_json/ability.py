@@ -47,7 +47,7 @@ def dict_to_list_first_1(dic):
     return rere
 
 
-# 将数字转化为文字，取消小数点和无用末尾0
+# 将数字转化为文字，取消小数点和无用末尾0@
 def better_float_to_text(x, rounds=4):
     if isinstance(x, float):
         if int(x) == x:
@@ -1741,7 +1741,7 @@ def ability_desc_show_one_mech(json, upgrade=False):
     return retxt
 
 
-def find_json_by_condition_with_result(condition, i, tempjson, result, target, condition_name='',bool_rekey=False):
+def find_json_by_condition_with_result(condition, i, tempjson, result, target, condition_name='',bool_rekey=False,hasnot=False):
     rekey=[]
     for j in range(len(condition)):
         the_key = ''
@@ -1821,6 +1821,8 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
         if the_key in tempjson:
             tempjson = tempjson[the_key]
             rekey.append(the_key)
+        elif hasnot:
+            tempjson=''
         else:
             raise (editerror(target[0], target[1],
                              '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项“' + condition[j] + '”时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
@@ -2186,14 +2188,23 @@ def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, 
 def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions, result, json, all_json, target):
     sort_mark = []
     relist = []
-    relist.append('{{H|' + json['页面名'] + '}}')
+    search_name='{{H|' + json['页面名'] + '}}'
     if '排序' in conditions:
         for i in range(len(conditions['排序'])):
             sort_mark += find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target, '排序')
     if True:
+        if '检索名称' in conditions:
+            if '技能归属' in conditions['检索名称'][0]:
+                search_name='{{H|' + json['技能归属'] + '}}'+search_name
+        relist.append(search_name)
+        if '条件尝试值' in conditions:
+            for i in range(len(conditions['条件尝试值'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件尝试值'][i], i, json, result, target, '条件尝试值',hasnot=True)
+                if not isinstance(tempjson, dict):
+                    relist.append(better_float_to_text(tempjson))
         if '条件值' in conditions:
-            for i in range(len(conditions['条件数组'])):
-                tempjson = find_json_by_condition_with_result(conditions['条件数组'][i], i, json, result, target, '条件数组')
+            for i in range(len(conditions['条件值'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件值'][i], i, json, result, target, '条件值')
                 if not isinstance(tempjson, dict):
                     relist.append(better_float_to_text(tempjson))
         if '条件数组' in conditions:
@@ -2213,8 +2224,8 @@ def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions,
                 relist.append(one_text)
         if '条件复合数组' in conditions:
             for i in range(len(conditions['条件复合数组'])):
-                tempjson = find_json_by_condition_with_result(conditions['条件复合数组'][i][:-1], i, json, result, target, '条件复合数组')
-                relist.append(re.sub(r'alent.png', lambda x: 'alentb.png', common_page.create_upgrade_text(tempjson, conditions['条件复合数组'][i][-1])))
+                tempjson = find_json_by_condition_with_result(conditions['条件复合数组'][i], i, json, result, target, '条件复合数组')
+                relist.append(re.sub(r'alent.png', lambda x: 'alentb.png', common_page.nocheck_create_upgrade_text(tempjson)))
     return relist + sort_mark
 
 

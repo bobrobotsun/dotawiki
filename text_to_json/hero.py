@@ -290,14 +290,14 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                     '<div class="dota_click_absolute_additional_infomation_frame_frame dota_click_find_text_in_json_and_show_textarea">' \
                     '<div class="dota_click_find_text_in_json_and_show_button" data-find-text-in-json-address="' + v + '，简易展示">点击显示《' + v + '》详细信息</div></div></div>'
         st += '</div><div style="display:grid;grid-template-columns:1fr 30px 1fr;">' \
-              '<div class="border_black">' + all_json['技能'][i + '10级左天赋']['中文名'] \
-              + '</div><div class="bgc_black">10</div><div class="border_black">' + all_json['技能'][i + '10级右天赋']['中文名'] + '</div>' \
-              + '<div class="border_black">' + all_json['技能'][i + '15级左天赋']['中文名'] \
-              + '</div><div class="bgc_black">15</div><div class="border_black">' + all_json['技能'][i + '15级右天赋']['中文名'] + '</div>' \
-              + '<div class="border_black">' + all_json['技能'][i + '20级左天赋']['中文名'] \
-              + '</div><div class="bgc_black">20</div><div class="border_black">' + all_json['技能'][i + '20级右天赋']['中文名'] + '</div>' \
               + '<div class="border_black">' + all_json['技能'][i + '25级左天赋']['中文名'] \
               + '</div><div class="bgc_black">25</div><div class="border_black">' + all_json['技能'][i + '25级右天赋']['中文名'] + '</div>' \
+              + '<div class="border_black">' + all_json['技能'][i + '20级左天赋']['中文名'] \
+              + '</div><div class="bgc_black">20</div><div class="border_black">' + all_json['技能'][i + '20级右天赋']['中文名'] + '</div>' \
+              + '<div class="border_black">' + all_json['技能'][i + '15级左天赋']['中文名'] \
+              + '</div><div class="bgc_black">15</div><div class="border_black">' + all_json['技能'][i + '15级右天赋']['中文名'] + '</div>' \
+              '<div class="border_black">' + all_json['技能'][i + '10级左天赋']['中文名'] \
+              + '</div><div class="bgc_black">10</div><div class="border_black">' + all_json['技能'][i + '10级右天赋']['中文名'] + '</div>' \
               + '</div>'
         if db['全属性黄点'] > 0:
             st += '<div class="dota_ability_level_point_change_show" data-ability-level-point-level-max=' + str(db['全属性黄点']) \

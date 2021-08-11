@@ -34,7 +34,7 @@ def all_the_names(db, json_base):
     if '源技能' in db:
         for i in db['源技能']:
             v = db['源技能'][i]
-            if v in db['技能']:
+            if v in json_base['技能']:
                 relist.append(v)
                 if '曾用名' in json_base['技能'][v]:
                     for j in json_base['技能'][v]['曾用名']:
@@ -302,8 +302,7 @@ def create_page_logs(title, log_base, log_list):
                         retxt += '\n' + titles + j0 + titles
                     for j, w in w0.items():
                         if w[0] != '':
-                            retxt += '\n====<span class="dota_get_image_by_json_name" data-json-name="' + w[
-                                0] + '" data-image-height="36" data-image-link="1" data-text-link="1"></span>===='
+                            retxt += '\n===={{大图片|' + w[0] + '|h36}}[[' + w[0] + ']]===='
                         current_ul = 0
                         for k in range(2, len(w)):
                             x = w[k]
@@ -407,6 +406,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
             if log_name in log_base:
                 v = log_base[log_name]
                 current_ul = 0
+                new_log=True
                 for j, w in v.items():
                     if isinstance(w, dict):
                         for j2, w2 in w.items():
@@ -417,16 +417,17 @@ def create_switch_log(log_base, log_list, name, limit=10):
                                         showit = True
                                     else:
                                         for m in range(len(x[l]['目标'])):
-                                            showit = showit and x[l]['目标'][m] in name
+                                            showit = showit or x[l]['目标'][m] in name
                                     showit = showit and x[l]['文字'] != ''
                                     if showit:
-                                        if current_ul == 0:
+                                        if new_log:
                                             button += '<div class="dota_dict_label_switch_content_by_click_button" data-display-len="2" data-check-key="' + log_name + '">' \
                                                       + log_name + '</div>'
                                             content += '<div class="dota_dict_label_switch_content_by_click_content" data-check-key="' + log_name + '=1；" data-display-type="block">'\
                                                        +'<h3><span class="dota_create_link_to_wiki_page">' + log_name + '</span>\t<small>' + v['更新日期'] + '</small></h3>'
                                             if log_len<limit or limit<=0:
                                                 log_show_list.insert(0,log_name)
+                                            new_log=False
                                         log_len += 1
                                         if x[l]['序列级数'] > current_ul:
                                             for m in range(x[l]['序列级数'] - current_ul):
@@ -440,6 +441,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
                 if current_ul > 0:
                     for m in range(current_ul):
                         content += '</ul>'
+                if not new_log:
                     content += '</div>'
     if log_len > 0:
         retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="'

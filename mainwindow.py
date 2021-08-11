@@ -628,7 +628,6 @@ class Main(QMainWindow):
 
     def download_and_upload_single_pages(self):
         info_txt = ''
-        info_txt += page.ability_cast_point_and_backswing(self.seesion, self.json_base, self.csrf_token)
         info_txt += page.armor_physic_resistance_page148237(self.seesion, self.csrf_token)
         QMessageBox.information(self, '更改完毕', info_txt, QMessageBox.Yes, QMessageBox.Yes)
 
@@ -1412,7 +1411,7 @@ class Main(QMainWindow):
             for i in self.json_base['技能']:
                 page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                 all_redirect.append([i, page_link_content])
-        if chosen == '机制':
+        if chosen == '' or chosen == '机制':
             for i in self.json_base['机制']:
                 if self.json_base['机制'][i]['次级分类'] == '引用机制':
                     all_copy_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
@@ -3099,35 +3098,43 @@ class Main(QMainWindow):
             text = re.sub(r'(?<!\|)shard(?<!\})', lambda x: '{{upgrade|shard}}', text)
             text = re.sub(r'(?<!\|)agha(?<!\})', lambda x: '{{upgrade|agha}}', text)
             text = re.sub(r'(?<!\|)talent(?<!\})', lambda x: '{{upgrade|talent}}', text)
-            text = re.sub(r'\{\{A\|([0-9]+?)\}\}', lambda x: '{{A|' + hero_text + x.group(1) + '级天赋}}', text)
+            text = re.sub(r'\{\{([AHI])\|([0-9]+?)\}\}', lambda x: '{{' + x.group(1) + '|' + hero_text + x.group(2) + '级天赋}}', text)
             text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
             text = re.sub(r'{{{(.+?)[:：](.+?)}}}', lambda x: self.version_input_text_template_simple_txt(x.group(1), x.group(2)), text)
             text = re.sub(r'{{{{(.+?)}}}}', lambda x: self.version_input_text_simple_introduce(x.group(1)), text)
             item.set_value(text)
-            if item.parent() != None:
+            if item.parent() != None and item.parent().parent() != None:
                 iparent = item.parent()
-                icount = iparent.childCount()
-                if iparent.child(icount - 1).text(0) == '目标':
-                    ipattern = re.compile(r'{{[ahi]\|.+?}}', re.I)
-                    iresult = ipattern.findall(text)
-                    for i in iresult:
-                        ibool = True
-                        itarget = iparent.child(icount - 1)
-                        for j in range(itarget.childCount()):
-                            if itarget.child(j).text(1) == i[4:-2]:
-                                ibool = False
-                                break
-                        if ibool:
-                            new = VersionItemEdit(iparent.child(icount - 1))
-                            new.itemtype = 'list_text'
-                            new.set_value(i[4:-2])
+                igrandpa=iparent.parent()
+                nowindex=igrandpa.indexOfChild(iparent)
+                allcount = igrandpa.childCount()
 
-                if item.parent() != None and item.parent().parent() != None:
-                    ipp = item.parent().parent()
-                    if ipp.itemtype == 'tree3' and ipp.child(ipp.childCount() - 1).child(1).text(1) != '':
-                        self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(ipp)
-                        self.version_button_tree3_add_tree_list()
-                        self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
+                ipattern = re.compile(r'{{[ahi]\|.+?}}', re.I)
+                iresult = ipattern.findall(text)
+                ilevel=int(iparent.child(0).text(1))
+
+                for h in range(nowindex,allcount):
+                    nowparent=igrandpa.child(h)
+                    icount = nowparent.childCount()
+                    if int(nowparent.child(0).text(1))>ilevel or nowindex==h:
+                        if nowparent.child(icount - 1).text(0) == '目标':
+                            for i in iresult:
+                                ibool = True
+                                itarget = nowparent.child(icount - 1)
+                                for j in range(itarget.childCount()):
+                                    if itarget.child(j).text(1) == i[4:-2]:
+                                        ibool = False
+                                        break
+                                if ibool:
+                                    new = VersionItemEdit(nowparent.child(icount - 1))
+                                    new.itemtype = 'list_text'
+                                    new.set_value(i[4:-2])
+                    else:
+                        break
+                if igrandpa.itemtype == 'tree3' and igrandpa.child(allcount - 1).child(1).text(1) != '':
+                    self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(igrandpa)
+                    self.version_button_tree3_add_tree_list(str(ilevel))
+                    self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
 
     def version_input_text_template_simple_txt(self, trait, name):
         for i in [['英雄', 'H'], ['非英雄单位', 'H'], ['物品', 'I'], ['技能', 'A']]:
@@ -3275,7 +3282,7 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(parent)
         self.version_edit_all_button_clicked()
 
-    def version_button_tree3_add_tree_list(self):
+    def version_button_tree3_add_tree_list(self,level='1'):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         new3 = VersionItemEdit(item)
         new3.itemtype = 'tree_list'
@@ -3283,7 +3290,7 @@ class Main(QMainWindow):
         new6 = VersionItemEdit(new3)
         new6.itemtype = 'text'
         new6.setText(0, '序列级数')
-        new6.set_value('1')
+        new6.set_value(level)
         new4 = VersionItemEdit(new3)
         new4.itemtype = 'text'
         new4.setText(0, '文字')
