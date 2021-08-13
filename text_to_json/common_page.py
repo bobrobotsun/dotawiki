@@ -411,8 +411,8 @@ def create_switch_log(log_base, log_list, name, limit=10):
                     if isinstance(w, dict):
                         for j2, w2 in w.items():
                             for k, x in w2.items():
-                                showit = False
                                 for l in range(2, len(x)):
+                                    showit = False
                                     if x[0] != '' and x[0] in name:
                                         showit = True
                                     else:
