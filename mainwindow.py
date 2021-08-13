@@ -3087,14 +3087,11 @@ class Main(QMainWindow):
         ori_text = item.text(1)
         if item.parent() != None and item.parent().parent() != None:
             hero_text = item.parent().parent().text(0)
-        ori_text = re.sub(r'[\(\)（）\[\]【】<>《》]', lambda x: '\\' + x.group(0), ori_text)
+        ori_text = re.sub(r'[\[\]【】]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
-            text = re.sub(r'(?<!\\)([（）]{2})', lambda x: '\\' + x.group(1)[0], text)
-            text = re.sub(r'(?<!\\)([\[\]]{2})', lambda x: '\\' + x.group(1)[0] + '\\' + x.group(1)[0], text)
+            text = re.sub(r'(?<!\\)([\[\]【】]{2})', lambda x: '\\' + x.group(1)[0] + '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{H|' + x.group(1) + '}}', text)
-            text = re.sub(r'(?<!\\)[\(（](.+?)(?<!\\)[\)）]', lambda x: '{{A|' + x.group(1) + '}}', text)
-            text = re.sub(r'(?<!\\)[<《](.+?)(?<!\\)[>》]', lambda x: '{{I|' + x.group(1) + '}}', text)
             text = re.sub(r'(?<!\|)shard(?<!\})', lambda x: '{{upgrade|shard}}', text)
             text = re.sub(r'(?<!\|)agha(?<!\})', lambda x: '{{upgrade|agha}}', text)
             text = re.sub(r'(?<!\|)talent(?<!\})', lambda x: '{{upgrade|talent}}', text)
