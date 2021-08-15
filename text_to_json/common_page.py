@@ -1,7 +1,7 @@
 import re
 import math
 from xpinyin import Pinyin
-from text_to_json import hero,ability, edit_json
+from text_to_json import hero, ability, edit_json
 
 target_url = 'http://dota.huijiwiki.com/w/api.php'
 
@@ -20,25 +20,28 @@ def analyse_upload_json(text, upload_info):
 
 
 # 获得所有该单位+技能的名字和曾用名的list
-def all_the_names(db, json_base):
+def all_the_names(db, json_base, bool=True):
     relist = [db['页面名']]
     if '曾用名' in db:
         for i in db['曾用名']:
             relist.append(i)
     if '技能' in db:
         for i in db['技能']:
-            relist.append(i)
-            if '曾用名' in json_base['技能'][i]:
-                for j in json_base['技能'][i]['曾用名']:
-                    relist.append(j)
-    if '源技能' in db:
+            if i not in relist:
+                relist += all_the_names(json_base['技能'][i], json_base, False)
+    if bool and '源技能' in db:
         for i in db['源技能']:
-            v = db['源技能'][i]
-            if v in json_base['技能']:
-                relist.append(v)
-                if '曾用名' in json_base['技能'][v]:
-                    for j in json_base['技能'][v]['曾用名']:
-                        relist.append(j)
+            v = db['源技能'][i].lstrip('#')
+            if v in json_base['技能'] and v not in relist:
+                relist += all_the_names(json_base['技能'][v], json_base, bool)
+    if '技能召唤物' in db:
+        for i in db['技能召唤物']:
+            if i not in relist:
+                relist += all_the_names(json_base['非英雄单位'][i], json_base, False)
+    if bool and '技能归属' in db and db['技能归属'] in json_base['物品']:
+        v = db['技能归属']
+        if v not in relist:
+            relist += all_the_names(json_base['物品'][v], json_base, False)
     return relist
 
 
@@ -396,7 +399,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
     button = ''
     content = ''
     log_len = 0
-    log_show_list=[]
+    log_show_list = []
     for i in range(len(log_list) - 1, -1, -1):
         for j in range(len(log_list[i]) - 1, -1, -1):
             if j > 0:
@@ -406,7 +409,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
             if log_name in log_base:
                 v = log_base[log_name]
                 current_ul = 0
-                new_log=True
+                new_log = True
                 for j, w in v.items():
                     if isinstance(w, dict):
                         for j2, w2 in w.items():
@@ -423,11 +426,11 @@ def create_switch_log(log_base, log_list, name, limit=10):
                                         if new_log:
                                             button += '<div class="dota_dict_label_switch_content_by_click_button" data-display-len="2" data-check-key="' + log_name + '">' \
                                                       + log_name + '</div>'
-                                            content += '<div class="dota_dict_label_switch_content_by_click_content" data-check-key="' + log_name + '=1；" data-display-type="block">'\
-                                                       +'<h3><span class="dota_create_link_to_wiki_page">' + log_name + '</span>\t<small>' + v['更新日期'] + '</small></h3>'
-                                            if log_len<limit or limit<=0:
-                                                log_show_list.insert(0,log_name)
-                                            new_log=False
+                                            content += '<div class="dota_dict_label_switch_content_by_click_content" data-check-key="' + log_name + '=1；" data-display-type="block">' \
+                                                       + '<h3><span class="dota_create_link_to_wiki_page">' + log_name + '</span>\t<small>' + v['更新日期'] + '</small></h3>'
+                                            if log_len < limit or limit <= 0:
+                                                log_show_list.insert(0, log_name)
+                                            new_log = False
                                         log_len += 1
                                         if x[l]['序列级数'] > current_ul:
                                             for m in range(x[l]['序列级数'] - current_ul):
@@ -446,16 +449,16 @@ def create_switch_log(log_base, log_list, name, limit=10):
     if log_len > 0:
         retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="'
         for i in log_show_list:
-            retxt+=i+'=1；'
-        retxt+='" data-need-new-tip="1">'+ button +'<div>'+ content + '</div></div>'
-        if limit==0:
-            retxt +='您可以点击上面的版本号按钮来快速查看对应的更新日志。'
+            retxt += i + '=1；'
+        retxt += '" data-need-new-tip="1">' + button + '<div>' + content + '</div></div>'
+        if limit == 0:
+            retxt += '您可以点击上面的版本号按钮来快速查看对应的更新日志。'
         else:
-            retxt+= '您可以点击上面的版本号按钮来快速查看对应的更新日志，或者您可以' \
-                    + '<b><span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">点此处查看完整的日志页面……</span></b>'
-    elif limit==0:
-        retxt+='你看，我说<span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '">《' + name[0] + '》</span>没有更新日志，您还不信。<br>'\
-               +'实在不行，要不您先看看<span class="dota_create_link_to_wiki_page" data-link-page-name="' + log_list[-1][0] + '">最新的更新日志：' + log_list[-1][0] + '</span>'
+            retxt += '您可以点击上面的版本号按钮来快速查看对应的更新日志，或者您可以' \
+                     + '<b><span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">点此处查看完整的日志页面……</span></b>'
+    elif limit == 0:
+        retxt += '你看，我说<span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '">《' + name[0] + '》</span>没有更新日志，您还不信。<br>' \
+                 + '实在不行，要不您先看看<span class="dota_create_link_to_wiki_page" data-link-page-name="' + log_list[-1][0] + '">最新的更新日志：' + log_list[-1][0] + '</span>'
     else:
         retxt += '没有查询到<span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">《' + name[0] + '》的更新日志</span>'
     return retxt
@@ -737,49 +740,48 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     return retxt
 
 
-
-
-def create_hero_choose_element(json_base, args,dict,post):
+def create_hero_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
-    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="简易拼音=1；">'\
-             +'<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>'\
-             +'<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="'+dict+'">'\
-             +'<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>'\
-             +'<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>'\
-             +'<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整英文" data-display-len="3">英文</span>'\
-             +'<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
-    for i in ['力量天辉','敏捷天辉','智力天辉','力量夜魇','敏捷夜魇','智力夜魇','近战','远程']:
-        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"'\
-                 +' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
-    for i in ['力量','敏捷','智力','生命值','魔法值','生命恢复','魔法恢复','攻击力','攻击速度','攻击前摇','护甲','移动速度','弹道速度']:
-        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"'\
-                 +' data-check-key="总' + i + '" data-display-len="3">' + i + '</span>'
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="简易拼音=1；">' \
+             + '<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
+             + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
+             + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>' \
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整英文" data-display-len="3">英文</span>' \
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
+    for i in ['力量天辉', '敏捷天辉', '智力天辉', '力量夜魇', '敏捷夜魇', '智力夜魇', '近战', '远程']:
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
+                 + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
+    for i in ['力量', '敏捷', '智力', '生命值', '魔法值', '生命恢复', '魔法恢复', '攻击力', '攻击速度', '攻击前摇', '护甲', '移动速度', '弹道速度']:
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
+                 + ' data-check-key="总' + i + '" data-display-len="3">' + i + '</span>'
     retxt += '</span><div>'
     for i in json_base['英雄']:
         if json_base['英雄'][i]['应用'] == 1:
-            args[1]=i
-            retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content dota_hero_comprehensive_attri_dict_hero"'\
-                     +' data-select-input-text="' + i + '"  data-check-key-name="hero-comprehensive-attri-dict" data-hero-name="' + i + '"'\
-                     +' style="border:1px black solid;margin:2px;text-align:center;">'\
-                     +'{{' + '|'.join(args) + '}}' +post+ '</span>'
+            args[1] = i
+            retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content dota_hero_comprehensive_attri_dict_hero"' \
+                     + ' data-select-input-text="' + i + '"  data-check-key-name="hero-comprehensive-attri-dict" data-hero-name="' + i + '"' \
+                     + ' style="border:1px black solid;margin:2px;text-align:center;">' \
+                     + '{{' + '|'.join(args) + '}}' + post + '</span>'
     retxt += '</div></div>'
     return retxt
 
-def create_item_choose_element(json_base, args,dict,post):
+
+def create_item_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
     retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；'
-    retxt += '"><div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>'\
-             +'<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="'+dict+'">'\
-             +'<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
+    retxt += '"><div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
+             + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
+             + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">价格</span>'
     for i in edit_json.item_shop:
-        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"'\
-                 +' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
+                 + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
     for i in edit_json.edit_adition['物品属性']:
-        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"'\
-                 +' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
+                 + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
     retxt += '</span><div>'
     for i in json_base['物品']:
         if json_base['物品'][i]['应用'] == 1:
@@ -791,7 +793,7 @@ def create_item_choose_element(json_base, args,dict,post):
                 if j in json_base['物品'][i]:
                     retxt += j + '=' + ability.better_float_to_text(json_base['物品'][i][j]['1']) + '；'
             args[1] = i
-            retxt += '" style="border:1px black solid;margin:2px;text-align:center;">{{' + '|'.join(args) + '}}' +post+ '</span>'
+            retxt += '" style="border:1px black solid;margin:2px;text-align:center;">{{' + '|'.join(args) + '}}' + post + '</span>'
     retxt += '</div></div>'
     return retxt
 

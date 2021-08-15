@@ -1286,7 +1286,7 @@ class Main(QMainWindow):
             unit_own = {}
             for i in self.json_base['非英雄单位']:
                 for j in self.json_base['非英雄单位'][i]['源技能']:
-                    w = self.json_base['非英雄单位'][i]['源技能'][j]
+                    w = self.json_base['非英雄单位'][i]['源技能'][j].lstrip('#')
                     if w not in unit_own:
                         unit_own[w] = []
                     unit_own[w].append(i)
