@@ -1779,7 +1779,7 @@ class Main(QMainWindow):
             elif template_args[0] in ['I', 'i']:
                 pic_style += ' data-image-class="item_icon"'
             retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" ' \
-                     + 'data-text-link="1"' + size + pic_style + '></span>'
+                     + ' data-image-link="1" data-text-link="1"' + size + pic_style + '></span>'
         elif '图片' in template_args[0]:
             size = ''
             center = ''
@@ -3529,7 +3529,8 @@ class Main(QMainWindow):
         return retxt
 
     def test_inputwindow(self):
-        print(MoInputWindow.get_item_and_content(self, [1, 2, 3, 4, 5, 6, 7, 8, 9, 0], ['int', 'number']))
+        for i in self.version_base:
+            print(i)
 
 
 class upload_text(QWidget):
