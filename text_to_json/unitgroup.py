@@ -8,7 +8,7 @@ from text_to_json import common_page, ability
 from text_to_json.WikiError import editerror
 
 
-def get_source_to_data(all_json, version, text_base):
+def get_source_to_data(all_json, version, text_base,name_base):
     for i in all_json['单位组']:
         all_json['单位组'][i]['页面名'] = i
         all_json['单位组'][i]['分类'] = '单位组'
@@ -118,6 +118,11 @@ def get_source_to_data(all_json, version, text_base):
             st += '</table>'
             members['简易展示'] = st
             members['具体展示'] = bt
+        all_json['单位组'][i]['曾用名'] = []
+        if i in name_base:
+            for namej in name_base[i]:
+                if namej != i:
+                    all_json['单位组'][i]['曾用名'].append(namej)
         all_json['单位组'][i]['全部单位']=all_units
 
 def combine_numbers_back_to_json(slist):

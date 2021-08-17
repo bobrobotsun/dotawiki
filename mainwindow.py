@@ -1303,7 +1303,7 @@ class Main(QMainWindow):
             hero.fulfil_talent_show(self.json_base, self.change_all_template_link_to_html)
 
             # 生成单位组信息（怀疑是个时间耗费大户）
-            unitgroup.get_source_to_data(self.json_base, self.version, self.text_base)
+            unitgroup.get_source_to_data(self.json_base, self.version, self.text_base,reversed_name_dict_list)
             # self.resort() #这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
             self.file_save_all()
         except editerror as err:
@@ -1332,7 +1332,8 @@ class Main(QMainWindow):
                         allupdate.append(i)
             else:
                 allupdate.append(target)
-            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, self.change_all_template_link_to_html, loop_time)
+            reversed_name_dict_list = self.reversed_name_create_tree_list_name()
+            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base,reversed_name_dict_list, self.change_all_template_link_to_html, loop_time)
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])

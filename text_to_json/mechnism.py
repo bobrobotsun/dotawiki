@@ -7,7 +7,7 @@ import time
 from text_to_json import common_page, ability
 from text_to_json.WikiError import editerror
 
-def get_source_to_data(all_json, tlist, version, text_base,change_all_template_link_to_html,loop_time=1):
+def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_template_link_to_html,loop_time=1):
     # 一定报错的内容
     for i in tlist:
         if i not in all_json['机制']:
@@ -77,6 +77,11 @@ def get_source_to_data(all_json, tlist, version, text_base,change_all_template_l
             # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
             ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, target, ['机制源', target, '内容'],change_all_template_link_to_html)
             # 上面将文字全部转化掉
+            all_json['机制'][target]['曾用名'] = []
+            if target in name_base:
+                for namej in name_base[target]:
+                    if namej != target:
+                        all_json['机制'][target]['曾用名'].append(namej)
             # 下面把序列级数合并成为一串文字，以方便调用
             for i in all_json['机制'][target]['内容']:
                 for j in all_json['机制'][target]['内容'][i]['内容']:
