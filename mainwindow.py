@@ -1406,7 +1406,8 @@ class Main(QMainWindow):
         if chosen == '' or chosen == '单位组':
             for i in self.json_base['单位组']:
                 all_upload.append([i, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], i)])
-
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
+                                                                              common_page.all_the_names(self.json_base['单位组'][i], self.json_base), 0)])
         if chosen == '技能':
             for i in self.json_base['技能']:
                 page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
@@ -1417,6 +1418,8 @@ class Main(QMainWindow):
                     all_copy_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
                 else:
                     all_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
+                    all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
+                                                                              common_page.all_the_names(self.json_base['机制'][i], self.json_base), 0)])
         total_num = len(all_upload) + len(all_copy_upload)+ len(all_redirect)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
@@ -1592,10 +1595,13 @@ class Main(QMainWindow):
                         all_copy_page.append([k, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], k)])
                     else:
                         all_page.append([k, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], k)])
-
+                        all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
+                                                                                common_page.all_the_names(self.json_base['机制'][k], self.json_base), 0)])
                 if k in self.json_base['单位组']:
                     all_upload.append([k + '.json', self.json_base['单位组'][k]])
                     all_page.append([k, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], k)])
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
+                                                                                common_page.all_the_names(self.json_base['单位组'][k], self.json_base), 0)])
         total_num = len(all_upload) + len(all_page) + len(all_copy_page) + len(all_redirect)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
@@ -3092,9 +3098,9 @@ class Main(QMainWindow):
         if ok:
             text = re.sub(r'(?<!\\)([\[\]【】]{2})', lambda x: '\\' + x.group(1)[0] + '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{H|' + x.group(1) + '}}', text)
-            text = re.sub(r'(?<!\|)shard(?<!\})', lambda x: '{{upgrade|shard}}', text)
-            text = re.sub(r'(?<!\|)agha(?<!\})', lambda x: '{{upgrade|agha}}', text)
-            text = re.sub(r'(?<!\|)talent(?<!\})', lambda x: '{{upgrade|talent}}', text)
+            text = re.sub(r'(?<!\|)shard(?<!\})', lambda x: '{{H|魔晶升级}}', text)
+            text = re.sub(r'(?<!\|)agha(?<!\})', lambda x: '{{H|神杖升级}}', text)
+            text = re.sub(r'(?<!\|)talent(?<!\})', lambda x: '{{H|天赋升级}}', text)
             text = re.sub(r'^(.+?)：：', lambda x: '{{H|' + x.group(1) + '}}：', text)
             text = re.sub(r'\{\{([AHI])\|([0-9]+?)\}\}', lambda x: '{{' + x.group(1) + '|' + hero_text + x.group(2) + '级天赋}}', text)
             text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
@@ -3529,8 +3535,30 @@ class Main(QMainWindow):
         return retxt
 
     def test_inputwindow(self):
-        for i in self.version_base:
-            print(i)
+        for i1 in self.version_base:
+            v1=self.version_base[i1]
+            for i2 in v1:
+                v2 = v1[i2]
+                if isinstance(v2,dict):
+                    for i3 in v2:
+                        v3 = v2[i3]
+                        for i4 in v3:
+                            v4 = v3[i4]
+                            for i5 in range(2,len(v4)):
+                                v5 = v4[i5]
+                                for m in [['agha','神杖'],['shard','魔晶']]:
+                                    if '{{upgrade|'+m[0]+'}}' in v5['文字']:
+                                        v5['文字']=v5['文字'].replace('{{upgrade|'+m[0]+'}}','{{H|'+m[1]+'升级}}')
+                                        index=v5['序列级数']
+                                        for j in range(i5,len(v4)):
+                                            w=v4[j]
+                                            if j==i5 or w['序列级数']>index:
+                                                if m[1]+'升级' not in w['目标']:
+                                                    w['目标'].append(m[1]+'升级')
+                                            else:
+                                                break
+
+
 
 
 class upload_text(QWidget):

@@ -690,6 +690,7 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
             retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + db['图片'] + '" data-image-width="' + db['图片大小'] + '" data-image-center="right"></span>'
     retxt += db['简述'] + create_all_chapter_page_mechnism(db)
     if db['次级分类'] != '引用机制':
+        retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
         retxt += thanks_for_the_audience()
         if db['次级分类'] != '':
             retxt += '[[分类:' + db['次级分类'] + ']]'
@@ -729,6 +730,7 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     for i in db['全部单位']:
         if i in json_base['非英雄单位']:
             retxt += json_base['非英雄单位'][i]['简易展示']
+    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
     retxt += thanks_for_the_audience()
     retxt += '[[分类:单位组]]'
     if db['次级分类'] != '':
