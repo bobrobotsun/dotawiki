@@ -3097,7 +3097,8 @@ class Main(QMainWindow):
         ori_text = re.sub(r'[\[\]【】]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
-            text = re.sub(r'(?<!\\)([\[\]【】]{2})', lambda x: '\\' + x.group(1)[0] + '\\' + x.group(1)[0], text)
+            text = re.sub(r'(?<!\\)([\[【]{2})', lambda x: '\\' + x.group(1)[0], text)
+            text = re.sub(r'(?<!\\)([\]】]{2})', lambda x: '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{H|' + x.group(1) + '}}', text)
             text = re.sub(r'(?<!\|)shard(?<!\})', lambda x: '{{H|魔晶升级}}', text)
             text = re.sub(r'(?<!\|)agha(?<!\})', lambda x: '{{H|神杖升级}}', text)

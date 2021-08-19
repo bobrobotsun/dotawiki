@@ -304,10 +304,15 @@ def input_upgrade(all_json, upgrade_json):
                         temp[upstr][k] = copy.deepcopy(upgrade_json[i][upname][j]["值"][k])
                 else:
                     temp[upstr] = upgrade_json[i][upname][j]["值"]
+                tarname=upgrade_json[i][upname][j]["目标"]["2"]
                 if upname == '神杖':
                     temp[upstr]["升级来源"] = {"1": {"名称": '阿哈利姆神杖', '图片': 'agha.png'}}
+                    if i != tarname and i in all_json['技能']:
+                        temp[upstr]["升级来源"]['2']={"名称": i, '图片': all_json['技能'][i]['迷你图片']}
                 elif upname == '魔晶':
                     temp[upstr]["升级来源"] = {"1": {"名称": '阿哈利姆魔晶', '图片': 'shard.png'}}
+                    if i != tarname and i in all_json['技能']:
+                        temp[upstr]["升级来源"]['2']={"名称": i, '图片': all_json['技能'][i]['迷你图片']}
                 elif upname == '技能':
                     temp[upstr]["升级来源"] = {"1": {"名称": i, '图片': all_json['技能'][i]['迷你图片']}}
     for i in all_json["技能"]:
@@ -1576,7 +1581,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件升级图片'][i], i, json, result, target, '条件升级图片')
                 if '升级来源' in tempjson:
                     for j in tempjson['升级来源']:
-                        another_image += '{{额外信息框|{{小图片|' + tempjson['升级来源'][j]['名称'] + '}}|' + tempjson['升级来源'][j]['名称'] + '}}'
+                        another_image += '{{额外信息框|{{图片|' + tempjson['升级来源'][j]['图片'] + '}}|' + tempjson['升级来源'][j]['名称'] + '}}'
         if ('中文名' not in conditions or conditions['中文名'][0][0] != '0') and '次级分类' in json and json['次级分类'] == '天赋技能' and isinstance(json['中文名'], str):
             another_name += '(' + json['中文名'] + ')'
         elif '条件名称' in conditions:
@@ -2718,7 +2723,7 @@ def create_upgrade_buff(json_dict):
             retxt += '<tr><td>'
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
-                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png',json_dict[str(i)]['升级来源'][j]['图片']) + '|link=' + json_dict["名称"] + '}} '
+                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png',json_dict[str(i)]['升级来源'][j]['图片']) + '|link='+json_dict[str(i)]['升级来源'][j]['名称']+'}} '
             retxt += '</td><td style="padding:0.25em;">'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
                 retxt += '{{额外信息框|{{图片|' + json_dict[str(i)]['图片'] + '}}|' + json_dict[str(i)]['值'] + '}} '
@@ -2824,7 +2829,7 @@ def create_upgrade_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|link="' + json_dict[i]['升级来源'][j]["名称"] + '}} '
+                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|link='+json_dict[i]['升级来源'][j]["名称"]+'}} '
             retxt += '</td><td style="padding:0.25em;"><span style="cursor:help;">{{图片|' + json_dict[i]['图片'] + '}}</span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
             kk = 0
@@ -2854,7 +2859,7 @@ def create_independent_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png',json_dict[i]['升级来源'][j]["图片"]) + '|link=' + json_dict[i]['升级来源'][j]["名称"] + '}} '
+                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png',json_dict[i]['升级来源'][j]["图片"]) + '|link='+json_dict[i]['升级来源'][j]["名称"]+'}} '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
             if json_dict[i]['机制名'][0] == '#':
                 return ''

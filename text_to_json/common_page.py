@@ -67,8 +67,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
             if i in numjson:
                 if ii > 1:
                     for j in numjson[i]['升级来源']:
-                        retext += '<span class="dota_get_image_by_image_name" data-image-name="' + numjson[i]['升级来源'][j]["图片"] + '" data-image-height="' \
-                                  + image_size + '" data-image-link="' + numjson[i]['升级来源'][j]["名称"] + '"></span>'
+                        retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] + '|h'+image_size+'|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
                 jj = 0
                 while True:
                     jj += 1
@@ -98,8 +97,7 @@ def nocheck_create_upgrade_text(numjson, post_each=lambda x: x['后缀'] if '后
         if i in numjson:
             if ii > 1:
                 for j in numjson[i]['升级来源']:
-                    retext += '<span class="dota_get_image_by_image_name" data-image-name="' + numjson[i]['升级来源'][j]["图片"] + '" data-image-height="' \
-                              + image_size + '" data-image-link="' + numjson[i]['升级来源'][j]["名称"] + '"></span>'
+                    retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] + '|h'+image_size+'|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
             jj = 0
             while True:
                 jj += 1
@@ -140,7 +138,7 @@ def get_unit_upgrade_double(db1, db2, combine='~', post=''):
             if ii > 1:
                 retxt += '<br>'
                 for j, w in db1[i]['升级来源'].items():
-                    retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + w["图片"] + '" data-image-height="16" data-image-link="' + w["名称"] + '"></span>'
+                    retxt += '{{图片|' + w["图片"] + '|h16|link=' + w["名称"] + '}}'
             jj = 0
             while True:
                 jj += 1
