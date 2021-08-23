@@ -679,6 +679,12 @@ def create_one_chapter_content_page_mechnism(db):
         retxt += db['内容'][j]['内容'] + '\n'
     return retxt
 
+def create_page_old_ability(json_base, log_base, log_list, ability):
+    db = json_base['技能'][ability]
+    retxt=''
+    retxt+='您当前进入的页面是一个陈旧的、被删除的技能。考虑到它可能无法呈现在{{H|'+db['技能归属']+'}}的页面上，因此我们将其所有的信息保存在它们自己的页面上。您将在此看到这个技能在删除前的最后一个版本的数据，和它的更新日志。\n\n'+db['具体展示']\
+           +'\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base),0)+thanks_for_the_audience()
+    return retxt
 
 def create_page_mechnism(json_base, log_base, log_list, mech):
     db = json_base['机制'][mech]

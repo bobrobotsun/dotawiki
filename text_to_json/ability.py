@@ -141,9 +141,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
         all_json['技能源'][i]['页面名'] = i
         all_json['技能源'][i]['分类'] = '技能源'
         if 'A杖信息' in all_json['技能源'][i]:
-            all_json['技能源'][i]['神杖信息']=all_json['技能源'][i]['A杖信息']
-        if '魔晶信息' not in all_json['技能源'][i]:
-            all_json['技能源'][i]['魔晶信息']=''
+            all_json['技能源'][i].pop('A杖信息')
         if '升级' in all_json['技能源'][i]:
             if 'A杖' in all_json['技能源'][i]['升级']:
                 all_json['技能源'][i]['升级']['神杖'] = copy.deepcopy(all_json['技能源'][i]['升级']['A杖'])

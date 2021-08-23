@@ -577,6 +577,7 @@ class Main(QMainWindow):
         self.name_base = self.download_json('name_base.json')
         self.name_initial_name_base()
         self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
+        QMessageBox.information(self, '下载曾用名库完成', '下载曾用名库完成，请继续操作')
 
     def update_json_name(self, list):
         for i in list:
@@ -837,6 +838,8 @@ class Main(QMainWindow):
         self.ml['高级功能'][0].addSeparator()
         self.ml['高级功能']['上传HTML数据页面'] = self.ml['高级功能'][0].addAction('上传HTML数据页面')
         self.ml['高级功能']['上传HTML数据页面'].triggered.connect(lambda: self.upload_html_data_page())
+        self.ml['高级功能']['完全上传json+page'] = self.ml['高级功能'][0].addAction('完全上传json+page')
+        self.ml['高级功能']['完全上传json+page'].triggered.connect(lambda: self.upload_all_json_and_page())
         """
         下载上传的内容
         """
@@ -1303,7 +1306,7 @@ class Main(QMainWindow):
             hero.fulfil_talent_show(self.json_base, self.change_all_template_link_to_html)
 
             # 生成单位组信息（怀疑是个时间耗费大户）
-            unitgroup.get_source_to_data(self.json_base, self.version, self.text_base,reversed_name_dict_list)
+            unitgroup.get_source_to_data(self.json_base, self.version, self.text_base, reversed_name_dict_list)
             # self.resort() #这里不resort了就是因为太消耗时间了，而且实际帮助已经不大了
             self.file_save_all()
         except editerror as err:
@@ -1333,7 +1336,7 @@ class Main(QMainWindow):
             else:
                 allupdate.append(target)
             reversed_name_dict_list = self.reversed_name_create_tree_list_name()
-            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base,reversed_name_dict_list, self.change_all_template_link_to_html, loop_time)
+            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time)
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
@@ -1357,6 +1360,7 @@ class Main(QMainWindow):
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传json中……')
+        QApplication.processEvents()
         all_upload = []
         all_upload.append(['版本.json', {'版本': self.version}])
         if chosen == '':
@@ -1385,6 +1389,7 @@ class Main(QMainWindow):
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
         self.w.setWindowTitle('上传统一制作页面中……')
+        self.w.add_info_text('正在分析数据中……')
         QApplication.processEvents()
         all_upload = []
         all_copy_upload = []
@@ -1392,37 +1397,52 @@ class Main(QMainWindow):
         if chosen == '' or chosen == '英雄':
             for i in self.json_base['英雄']:
                 all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
-                                                                              common_page.all_the_names(self.json_base['英雄'][i], self.json_base), 0)])
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base), 0)])
+            self.w.add_info_text('【英雄】页面已经分析完毕！')
+            QApplication.processEvents()
         if chosen == '' or chosen == '非英雄单位':
             for i in self.json_base['非英雄单位']:
                 all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
-                                                                              common_page.all_the_names(self.json_base['非英雄单位'][i], self.json_base), 0)])
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][i], self.json_base), 0)])
+            self.w.add_info_text('【非英雄单位】页面已经分析完毕！')
+            QApplication.processEvents()
         if chosen == '' or chosen == '物品':
             for i in self.json_base['物品']:
                 all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
-                                                                              common_page.all_the_names(self.json_base['物品'][i], self.json_base), 0)])
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][i], self.json_base), 0)])
+            self.w.add_info_text('【物品】页面已经分析完毕！')
+            QApplication.processEvents()
         if chosen == '' or chosen == '单位组':
             for i in self.json_base['单位组']:
                 all_upload.append([i, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
-                                                                              common_page.all_the_names(self.json_base['单位组'][i], self.json_base), 0)])
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['单位组'][i], self.json_base), 0)])
+            self.w.add_info_text('【单位组】页面已经分析完毕！')
+            QApplication.processEvents()
         if chosen == '技能':
             for i in self.json_base['技能']:
-                page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
-                all_redirect.append([i, page_link_content])
+                if self.json_base['技能'][i]['应用'] == 0:
+                    all_upload.append([i, common_page.create_page_old_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
+                else:
+                    page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
+                    all_redirect.append([i, page_link_content])
+            self.w.add_info_text('【技能】页面已经分析完毕！')
+            QApplication.processEvents()
         if chosen == '' or chosen == '机制':
             for i in self.json_base['机制']:
                 if self.json_base['机制'][i]['次级分类'] == '引用机制':
                     all_copy_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
                 else:
                     all_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
-                    all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
-                                                                              common_page.all_the_names(self.json_base['机制'][i], self.json_base), 0)])
-        total_num = len(all_upload) + len(all_copy_upload)+ len(all_redirect)
+                    all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['机制'][i], self.json_base), 0)])
+            self.w.add_info_text('【机制】页面已经分析完毕！')
+            QApplication.processEvents()
+        self.w.add_info_text('所有页面已经分析完毕！现在开始上传全部内容…………')
+        QApplication.processEvents()
+        total_num = len(all_upload) + len(all_copy_upload) + len(all_redirect)
         self.w.confirm_numbers(total_num)
+        self.w.setWindowTitle('一共需要上传共计' + str(total_num) + '个页面，其中：普通页面' + str(len(all_upload)) + '个（1~' + str(len(all_upload)) + '），'
+                              + '引用机制页面' + str(len(all_copy_upload)) + '个（' + str(1 + len(all_upload)) + '~' + str(len(all_upload) + len(all_copy_upload)) + '），'
+                              + '重定向页面' + str(len(all_redirect)) + '个（' + str(1 + len(all_upload) + len(all_copy_upload)) + '~' + str(total_num) + '）')
         for i in range(len(all_upload)):
             self.w.addtext(self.upload_page(all_upload[i][0], all_upload[i][1]), i)
             QApplication.processEvents()
@@ -1449,6 +1469,85 @@ class Main(QMainWindow):
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
             self.w.addtext(self.upload_html(all_upload[i][0], all_upload[i][1]), i)
+            QApplication.processEvents()
+        QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+
+    def upload_all_json_and_page(self):
+        self.w = upload_text('开始上传数据')
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+        self.w.setWindowIcon(self.icon)
+        self.w.setWindowTitle('上传json+page中……')
+        self.w.add_info_text('正在分析数据中……')
+        QApplication.processEvents()
+        all_json_upload = []
+        all_page_upload = []
+        all_copy_upload = []
+        all_redirect = []
+        all_json_upload.append(['版本.json', {'版本': self.version}])
+        for i in self.json_base:
+            for j in self.json_base[i]:
+                if i[-1] == '源':
+                    all_json_upload.append([j + '/源.json', self.json_base[i][j]])
+                else:
+                    all_json_upload.append([j + '.json', self.json_base[i][j]])
+        self.w.add_info_text('【json】部分已经生成完毕！')
+        QApplication.processEvents()
+        for i in self.json_base['英雄']:
+            all_page_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
+            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base), 0)])
+        self.w.add_info_text('【英雄】页面已经分析完毕！')
+        QApplication.processEvents()
+        for i in self.json_base['非英雄单位']:
+            all_page_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
+            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][i], self.json_base), 0)])
+        self.w.add_info_text('【非英雄单位】页面已经分析完毕！')
+        QApplication.processEvents()
+        for i in self.json_base['物品']:
+            all_page_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
+            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][i], self.json_base), 0)])
+        self.w.add_info_text('【物品】页面已经分析完毕！')
+        QApplication.processEvents()
+        for i in self.json_base['单位组']:
+            all_page_upload.append([i, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], i)])
+            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['单位组'][i], self.json_base), 0)])
+        self.w.add_info_text('【单位组】页面已经分析完毕！')
+        QApplication.processEvents()
+        for i in self.json_base['技能']:
+            if self.json_base['技能'][i]['应用'] == 0:
+                all_page_upload.append([i, common_page.create_page_old_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
+            else:
+                page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
+                all_redirect.append([i, page_link_content])
+        self.w.add_info_text('【技能】页面已经分析完毕！')
+        QApplication.processEvents()
+        for i in self.json_base['机制']:
+            if self.json_base['机制'][i]['次级分类'] == '引用机制':
+                all_copy_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
+            else:
+                all_page_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
+                all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['机制'][i], self.json_base), 0)])
+        self.w.add_info_text('【机制】页面已经分析完毕！')
+        QApplication.processEvents()
+        self.w.add_info_text('所有页面已经分析完毕！现在开始上传全部内容…………')
+        QApplication.processEvents()
+        total_num = len(all_json_upload) + len(all_page_upload) + len(all_copy_upload) + len(all_redirect)
+        self.w.confirm_numbers(total_num)
+        self.w.setWindowTitle('一共需要上传共计' + str(total_num) + '个页面，其中：json页面' + str(len(all_json_upload)) + '个（1~' + str(len(all_json_upload)) + '），'
+                              + '普通页面' + str(len(all_page_upload)) + '个（' + str(1 + len(all_json_upload)) + '~' + str(len(all_json_upload) + len(all_page_upload)) + '），'
+                              + '引用机制页面' + str(len(all_copy_upload)) + '个（' + str(1 + len(all_json_upload) + len(all_page_upload)) + '~' + str(len(all_json_upload) + len(all_page_upload) + len(all_copy_upload)) + '），'
+                              + '重定向页面' + str(len(all_redirect)) + '个（' + str(1 + len(all_json_upload) + len(all_page_upload) + len(all_copy_upload)) + '~' + str(total_num) + '）')
+        QApplication.processEvents()
+        for i in range(len(all_json_upload)):
+            self.w.addtext(self.upload_json(all_json_upload[i][0], all_json_upload[i][1]), i)
+            QApplication.processEvents()
+        for i in range(len(all_page_upload)):
+            self.w.addtext(self.upload_page(all_page_upload[i][0], all_page_upload[i][1]), i + len(all_json_upload))
+            QApplication.processEvents()
+        for i in range(len(all_copy_upload)):
+            self.w.addtext(self.upload_page(all_copy_upload[i][0], all_copy_upload[i][1], 2), i + len(all_json_upload) + len(all_page_upload))
+            QApplication.processEvents()
+        for i in range(len(all_redirect)):
+            self.w.addtext(self.upload_page(all_redirect[i][0], all_redirect[i][1], 0), i + len(all_json_upload) + len(all_page_upload) + len(all_copy_upload))
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
@@ -1597,7 +1696,7 @@ class Main(QMainWindow):
                     else:
                         all_page.append([k, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], k)])
                         all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
-                                                                                common_page.all_the_names(self.json_base['机制'][k], self.json_base), 0)])
+                                                                                    common_page.all_the_names(self.json_base['机制'][k], self.json_base), 0)])
                 if k in self.json_base['单位组']:
                     all_upload.append([k + '.json', self.json_base['单位组'][k]])
                     all_page.append([k, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], k)])
@@ -2797,7 +2896,7 @@ class Main(QMainWindow):
                             self.w.addtext([title + '版本json下载失败。请重新检查网络后重新下载', 0], i)
                             break
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
-        QMessageBox.information(self, '下载成功', '所有版本号已经下载并保存完毕。')
+        QMessageBox.information(self.w, '下载成功', '所有版本号已经下载并保存完毕。')
 
     def version_edit_loop_update(self):
         for i in range(self.versionlayout['版本列表']['横排版']['列表'].topLevelItemCount()):
@@ -3111,18 +3210,18 @@ class Main(QMainWindow):
             item.set_value(text)
             if item.parent() != None and item.parent().parent() != None:
                 iparent = item.parent()
-                igrandpa=iparent.parent()
-                nowindex=igrandpa.indexOfChild(iparent)
+                igrandpa = iparent.parent()
+                nowindex = igrandpa.indexOfChild(iparent)
                 allcount = igrandpa.childCount()
 
                 ipattern = re.compile(r'{{[ahi]\|.+?}}', re.I)
                 iresult = ipattern.findall(text)
-                ilevel=int(iparent.child(0).text(1))
+                ilevel = int(iparent.child(0).text(1))
 
-                for h in range(nowindex,allcount):
-                    nowparent=igrandpa.child(h)
+                for h in range(nowindex, allcount):
+                    nowparent = igrandpa.child(h)
                     icount = nowparent.childCount()
-                    if int(nowparent.child(0).text(1))>ilevel or nowindex==h:
+                    if int(nowparent.child(0).text(1)) > ilevel or nowindex == h:
                         if nowparent.child(icount - 1).text(0) == '目标':
                             for i in iresult:
                                 ibool = True
@@ -3288,7 +3387,7 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(parent)
         self.version_edit_all_button_clicked()
 
-    def version_button_tree3_add_tree_list(self,level='1'):
+    def version_button_tree3_add_tree_list(self, level='1'):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         new3 = VersionItemEdit(item)
         new3.itemtype = 'tree_list'
@@ -3537,30 +3636,48 @@ class Main(QMainWindow):
         return retxt
 
     def test_inputwindow(self):
-        for i1 in self.version_base:
-            v1=self.version_base[i1]
-            for i2 in v1:
-                v2 = v1[i2]
-                if isinstance(v2,dict):
-                    for i3 in v2:
-                        v3 = v2[i3]
-                        for i4 in v3:
-                            v4 = v3[i4]
-                            for i5 in range(2,len(v4)):
-                                v5 = v4[i5]
-                                for m in [['agha','神杖'],['shard','魔晶']]:
-                                    if '{{upgrade|'+m[0]+'}}' in v5['文字']:
-                                        v5['文字']=v5['文字'].replace('{{upgrade|'+m[0]+'}}','{{H|'+m[1]+'升级}}')
-                                        index=v5['序列级数']
-                                        for j in range(i5,len(v4)):
-                                            w=v4[j]
-                                            if j==i5 or w['序列级数']>index:
-                                                if m[1]+'升级' not in w['目标']:
-                                                    w['目标'].append(m[1]+'升级')
-                                            else:
-                                                break
+        i=i+1
 
+    def test_inputwindow_loop_check(self, json):
+        for i in json:
+            if isinstance(json[i], dict):
+                if "混合文字" in json[i]:
+                    self.test_inputwindow_change_it(json[i]['混合文字'])
+                else:
+                    self.test_inputwindow_loop_check(json[i])
 
+    def test_inputwindow_change_it(self, json):
+        ii = 0
+        while True:
+            ii += 1
+            i = str(ii)
+            if i in json:
+                if isinstance(json[i], dict) and '1' in json[i] and '0' in json[i]['1'] and json[i]['1']['0'] == '图片链接':
+                    text = '{{H|' + json[i]['1']['2'] + '}}'
+                    index = ii
+                    pops = 0
+                    if str(ii - 1) in json and isinstance(json[str(ii - 1)], str):
+                        index = ii - 1
+                        text = json[str(ii - 1)] + text
+                        json.pop(str(ii))
+                        pops += 1
+                    if str(ii + 1) in json and isinstance(json[str(ii + 1)], str):
+                        text += json[str(ii + 1)]
+                        json.pop(str(ii + 1))
+                        pops += 1
+                    json[str(index)] = text
+                    if pops > 0:
+                        jj = index + pops
+                        while True:
+                            jj += 1
+                            j = str(jj)
+                            if j in json:
+                                json[str(jj - pops)] = json[j]
+                                json.pop(j)
+                            else:
+                                break
+            else:
+                break
 
 
 class upload_text(QWidget):
@@ -3577,6 +3694,11 @@ class upload_text(QWidget):
 
     def confirm_numbers(self, num):
         self.maxmax = num
+
+    def add_info_text(self, content):
+        self.b.append('【' + QTime.currentTime().toString() + '】' + content)
+        self.cursor = self.b.textCursor()
+        self.b.moveCursor(self.b.textCursor().End)
 
     def addtext(self, content=['', 0], num=-1, threads=''):
         self.success[content[1]] += 1
