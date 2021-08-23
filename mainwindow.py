@@ -43,7 +43,7 @@ class Main(QMainWindow):
         self.target_url = 'http://dota.huijiwiki.com/w/api.php'
         self.image_url = 'http://huiji-public.huijistatic.com/dota/uploads'
         self.seesion = requests.session()
-        self.header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.66'}
+        self.header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'}
         self.get_login_token_data = {'action': 'query', 'meta': 'tokens', 'type': 'login', 'format': 'json'}
         self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'http://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
         self.get_csrf_token_data = {'action': 'query', 'meta': 'tokens', 'format': 'json'}
@@ -1262,7 +1262,7 @@ class Main(QMainWindow):
                     target.append(self.json_base["技能"][i]['数据来源'])
                 else:
                     raise (editerror('技能', i, "你没有书写数据来源，请立刻书写"))
-                if self.json_base["技能"][i]['应用'] > 0:
+                if self.json_base["技能"][i]['应用'] >= 0:
                     ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target, self.change_all_template_link_to_html)  # 花费时间过久9s+
 
             ability.confirm_upgrade_info(self.json_base['技能'])

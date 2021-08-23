@@ -140,6 +140,10 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
     for i in all_json['技能源']:
         all_json['技能源'][i]['页面名'] = i
         all_json['技能源'][i]['分类'] = '技能源'
+        if 'A杖信息' in all_json['技能源'][i]:
+            all_json['技能源'][i]['神杖信息']=all_json['技能源'][i]['A杖信息']
+        if '魔晶信息' not in all_json['技能源'][i]:
+            all_json['技能源'][i]['魔晶信息']=''
         if '升级' in all_json['技能源'][i]:
             if 'A杖' in all_json['技能源'][i]['升级']:
                 all_json['技能源'][i]['升级']['神杖'] = copy.deepcopy(all_json['技能源'][i]['升级']['A杖'])
@@ -356,7 +360,7 @@ def input_upgrade(all_json, upgrade_json):
 
 def complete_upgrade(all_json, base_txt):
     for i in all_json:
-        if all_json[i]['应用'] > 0:
+        if all_json[i]['应用'] >= 0:
             for j in all_json[i]["属性"]:
                 if fulfil(all_json[i]["属性"][j], all_json[i]):
                     one_upgrade(all_json[i]["属性"][j], base_txt, i, '第' + str(j) + '个【属性】')
@@ -2875,7 +2879,7 @@ def create_independent_mech(json_dict):
 def fulfil_complex_and_simple_show(all_json, html_function):
     for i in all_json['技能']:
         db = all_json['技能'][i]
-        if db['应用'] > 0:
+        if db['应用'] >= 0:
             bt = ''  # 完整显示
             st = ''  # 缩略显示
             bt += '<div style="display-block;clear:both;overflow: hidden;margin-bottom:1em;background-color: #d1d1d1;">' \
