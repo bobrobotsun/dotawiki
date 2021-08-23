@@ -3636,7 +3636,7 @@ class Main(QMainWindow):
         return retxt
 
     def test_inputwindow(self):
-        i=i+1
+        i=1
 
     def test_inputwindow_loop_check(self, json):
         for i in json:
