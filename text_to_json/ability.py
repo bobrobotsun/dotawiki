@@ -306,15 +306,15 @@ def input_upgrade(all_json, upgrade_json):
                         temp[upstr][k] = copy.deepcopy(upgrade_json[i][upname][j]["值"][k])
                 else:
                     temp[upstr] = upgrade_json[i][upname][j]["值"]
-                tarname=upgrade_json[i][upname][j]["目标"]["2"]
+                tarname = upgrade_json[i][upname][j]["目标"]["2"]
                 if upname == '神杖':
                     temp[upstr]["升级来源"] = {"1": {"名称": '阿哈利姆神杖', '图片': 'agha.png'}}
                     if i != tarname and i in all_json['技能']:
-                        temp[upstr]["升级来源"]['2']={"名称": i, '图片': all_json['技能'][i]['迷你图片']}
+                        temp[upstr]["升级来源"]['2'] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
                 elif upname == '魔晶':
                     temp[upstr]["升级来源"] = {"1": {"名称": '阿哈利姆魔晶', '图片': 'shard.png'}}
                     if i != tarname and i in all_json['技能']:
-                        temp[upstr]["升级来源"]['2']={"名称": i, '图片': all_json['技能'][i]['迷你图片']}
+                        temp[upstr]["升级来源"]['2'] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
                 elif upname == '技能':
                     temp[upstr]["升级来源"] = {"1": {"名称": i, '图片': all_json['技能'][i]['迷你图片']}}
     for i in all_json["技能"]:
@@ -356,12 +356,12 @@ def input_upgrade(all_json, upgrade_json):
                     break
 
 
-def complete_upgrade(all_json, base_txt):
+def complete_upgrade(all_json,mech, base_txt):
     for i in all_json:
         if all_json[i]['应用'] >= 0:
             for j in all_json[i]["属性"]:
                 if fulfil(all_json[i]["属性"][j], all_json[i]):
-                    one_upgrade(all_json[i]["属性"][j], base_txt, i, '第' + str(j) + '个【属性】')
+                    one_upgrade(all_json[i]["属性"][j],mech, base_txt, i, '第' + str(j) + '个【属性】')
             for j in all_json[i]["冷却时间"]:
                 if '名称' not in all_json[i]["冷却时间"][j]:
                     all_json[i]["冷却时间"][j]['名称'] = ''
@@ -375,7 +375,7 @@ def complete_upgrade(all_json, base_txt):
                     else:
                         break
                 if fulfil(all_json[i]["冷却时间"][j], all_json[i]):
-                    one_upgrade(all_json[i]["冷却时间"][j], base_txt, i, '第' + str(j) + '个【冷却时间】')
+                    one_upgrade(all_json[i]["冷却时间"][j],mech, base_txt, i, '第' + str(j) + '个【冷却时间】')
             for j in all_json[i]["魔法消耗"]:
                 if '名称' not in all_json[i]["魔法消耗"][j]:
                     all_json[i]["魔法消耗"][j]['名称'] = ''
@@ -391,13 +391,13 @@ def complete_upgrade(all_json, base_txt):
                             else:
                                 break
                         if fulfil(all_json[i]["魔法消耗"][j][k], all_json[i]):
-                            one_upgrade(all_json[i]["魔法消耗"][j][k], base_txt, i, '第' + str(j) + '个【魔法消耗】')
+                            one_upgrade(all_json[i]["魔法消耗"][j][k],mech, base_txt, i, '第' + str(j) + '个【魔法消耗】')
             for j in all_json[i]["施法前摇"]:
                 fulfil(all_json[i]["施法前摇"][j], all_json[i])
-                one_upgrade(all_json[i]["施法前摇"][j], base_txt, i, '第' + str(j) + '个【施法前摇】')
+                one_upgrade(all_json[i]["施法前摇"][j],mech, base_txt, i, '第' + str(j) + '个【施法前摇】')
             for j in all_json[i]["施法后摇"]:
                 fulfil(all_json[i]["施法后摇"][j], all_json[i])
-                one_upgrade(all_json[i]["施法后摇"][j], base_txt, i, '第' + str(j) + '个【施法后摇】')
+                one_upgrade(all_json[i]["施法后摇"][j],mech, base_txt, i, '第' + str(j) + '个【施法后摇】')
 
 
 def fulfil(arr, json):
@@ -416,7 +416,7 @@ def fulfil(arr, json):
     return True
 
 
-def one_upgrade(json, base_txt, name, target):
+def one_upgrade(json,mech, base_txt, name, target):
     ii = 1
     while True:
         ii += 1
@@ -458,6 +458,15 @@ def one_upgrade(json, base_txt, name, target):
                             getvalue[0].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["代码"]["3"]][k])
                 else:
                     raise (editerror('技能源', name, target + '没有找到《' + json["1"]["代码"]["1"] + '→' + json["1"]["代码"]["2"] + '》数据库中' + json["1"]["代码"]["3"] + '的内容'))
+            elif json["1"]["代码"]["0"] == "机制":
+                if json["1"]["代码"]["1"] in mech:
+                    if json["1"]["代码"]["2"] in mech[json["1"]["代码"]["1"]]['属性']:
+                        for k in mech[json["1"]["代码"]["1"]]['属性'][json["1"]["代码"]["2"]]:
+                            getvalue[0].append(mech[json["1"]["代码"]["1"]]['属性'][json["1"]["代码"]["2"]][k])
+                    else:
+                        raise (editerror('技能源', name, target + '没有找到《' + json["1"]["代码"]["1"] + '》机制中《' + json["1"]["代码"]["2"] + '》这个属性，请问你是否填写错误？'))
+                else:
+                    raise (editerror('技能源', name, target + '没有找到《' + json["1"]["代码"]["1"] + '》这个机制，请问你是否填写错误？'))
             elif json["1"]["代码"]["0"] == "不存在":
                 return
         else:
@@ -809,26 +818,26 @@ def mech_others(json, mech):
                     json["施法前摇"][i][j]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i][j]["即时生效"]["代码"])]
 
 
-def loop_check(json, data, all_json, name, target,change_all_template_link_to_html):
+def loop_check(json, data, all_json, name, target, change_all_template_link_to_html):
     for i in json:
         ttarget = copy.deepcopy(target)
         ttarget.append(i)
         if isinstance(json[i], dict):
             if "混合文字" in json[i]:
                 ttarget.append("混合文字")
-                change_combine_txt(json, i, data, all_json, name, ttarget,change_all_template_link_to_html)
+                change_combine_txt(json, i, data, all_json, name, ttarget, change_all_template_link_to_html)
             else:
-                loop_check(json[i], data, all_json, name, ttarget,change_all_template_link_to_html)
+                loop_check(json[i], data, all_json, name, ttarget, change_all_template_link_to_html)
 
 
-def change_combine_txt(json, ii, data, all_json, name, target,change_all_template_link_to_html):
+def change_combine_txt(json, ii, data, all_json, name, target, change_all_template_link_to_html):
     returntxt = ""
     i = 0
     while True:
         i += 1
         if str(i) in json[ii]["混合文字"]:
             if isinstance(json[ii]["混合文字"][str(i)], dict):
-                if json[ii]["混合文字"][str(i)]['类型'] == '' or json[ii]["混合文字"][str(i)]['类型'] == '数据' or json[ii]["混合文字"][str(i)]['类型'][:2] == '切换'\
+                if json[ii]["混合文字"][str(i)]['类型'] == '' or json[ii]["混合文字"][str(i)]['类型'] == '数据' or json[ii]["混合文字"][str(i)]['类型'][:2] == '切换' \
                         or json[ii]["混合文字"][str(i)]['类型'][:8] == '缩放点击切换内容':
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
                         if len(json[ii]["混合文字"][str(i)]['类型']) <= 2 or json[ii]["混合文字"][str(i)]['类型'][2] == '0':
@@ -836,10 +845,10 @@ def change_combine_txt(json, ii, data, all_json, name, target,change_all_templat
                         else:
                             returntxt += '<div class="dota_rotatey_transform_switch_content1">'
                     if json[ii]["混合文字"][str(i)]['类型'][:8] == '缩放点击切换内容':
-                        if len(json[ii]["混合文字"][str(i)]['类型'])<=8 or json[ii]["混合文字"][str(i)]['类型'][8]=='0':
-                            returntxt += '<span class="dota_switch_content_by_click_button" data-check-key="'+json[ii]["混合文字"][str(i)]['后缀']+'">'
+                        if len(json[ii]["混合文字"][str(i)]['类型']) <= 8 or json[ii]["混合文字"][str(i)]['类型'][8] == '0':
+                            returntxt += '<span class="dota_switch_content_by_click_button" data-check-key="' + json[ii]["混合文字"][str(i)]['后缀'] + '">'
                         else:
-                            returntxt += '<span class="dota_switch_content_by_click_content" data-check-key="'+json[ii]["混合文字"][str(i)]['后缀']+'">'
+                            returntxt += '<span class="dota_switch_content_by_click_content" data-check-key="' + json[ii]["混合文字"][str(i)]['后缀'] + '">'
                     j = 0
                     while True:
                         j += 1
@@ -924,20 +933,20 @@ def change_combine_txt(json, ii, data, all_json, name, target,change_all_templat
                     ttarget.append(str(i))
                     returntxt += find_the_target_value_jsons_by_conditions_and_show_in_table(json[ii]["混合文字"][str(i)], all_json, ttarget)
                 elif json[ii]["混合文字"][str(i)]['类型'] == '缩放点击切换器':
-                    diplay_number=json[ii]["混合文字"][str(i)]['1']['0']
-                    default_display=json[ii]["混合文字"][str(i)]['1']['1']
-                    returntxt += '<div class="dota_change_attri_by_input">'\
-                                 +'<span class="dota_switch_content_by_click dota_change_attri_by_input_target" data-display-number="'+diplay_number+'"'\
-                                 +' data-default-display="'+default_display+'" >'\
-                                 +'<span class="dota_compound_number_input dota_change_attri_by_input_input" data-number-input-attri-dict="步长=1；当前='+diplay_number+'；"'\
-                                 +'  data-set-value-function="function_dota_change_attri_by_input_change" data-target-attri="data-display-number"'\
-                                 +' data-final-javascript="function_dota_switch_content_by_click_check_display_child"></span>'
-                    k=i
+                    diplay_number = json[ii]["混合文字"][str(i)]['1']['0']
+                    default_display = json[ii]["混合文字"][str(i)]['1']['1']
+                    returntxt += '<div class="dota_change_attri_by_input">' \
+                                 + '<span class="dota_switch_content_by_click dota_change_attri_by_input_target" data-display-number="' + diplay_number + '"' \
+                                 + ' data-default-display="' + default_display + '" >' \
+                                 + '<span class="dota_compound_number_input dota_change_attri_by_input_input" data-number-input-attri-dict="步长=1；当前=' + diplay_number + '；"' \
+                                 + '  data-set-value-function="function_dota_change_attri_by_input_change" data-target-attri="data-display-number"' \
+                                 + ' data-final-javascript="function_dota_switch_content_by_click_check_display_child"></span>'
+                    k = i
                     while True:
-                        k+=1
-                        kk=str(k)
+                        k += 1
+                        kk = str(k)
                         if kk not in json[ii]["混合文字"]:
-                            json[ii]["混合文字"][kk]='</span></div>'
+                            json[ii]["混合文字"][kk] = '</span></div>'
                             break
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
@@ -1355,8 +1364,8 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
                     retxt += seps
                 if len(all_results_with_sort_mark[i][1]) == 1:
                     retxt += '<div class="dota-ability-wrapper">' \
-                             '<div class="dota-ability-title">' + all_results_with_sort_mark[i][1][0] + '</div>'\
-                             +'<div class="dota-ability-content">' + all_results_with_sort_mark[i][2][0] + '</div></div>'
+                             '<div class="dota-ability-title">' + all_results_with_sort_mark[i][1][0] + '</div>' \
+                             + '<div class="dota-ability-content">' + all_results_with_sort_mark[i][2][0] + '</div></div>'
                 elif len(all_results_with_sort_mark[i][1]) > 1:
                     retxt += '<div class="dota-ability-wrapper dota_switch_content_by_click" data-display-number="' + display_num + '">'
                     for j in range(len(all_results_with_sort_mark[i][1])):
@@ -1371,7 +1380,7 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
             for i in range(2, sorttime):
                 reverse = all_results_with_sort_mark[0][i][1] == '-'
                 all_results_with_sort_mark.sort(key=lambda x: x[i][0], reverse=reverse)
-            all_check_key=['默认']
+            all_check_key = ['默认']
             for i in range(len(conditions['点击切换'])):
                 all_check_key.append(conditions['点击切换'][i][-1])
             display_num = len(all_check_key)
@@ -1381,15 +1390,15 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
                 except ValueError:
                     display_num = 1
             display_num = str(display_num)
-            retxt+='<div class="dota_dict_label_switch_content_by_click" data-display-dict="默认=1；"><div>'
+            retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="默认=1；"><div>'
             for i in all_check_key:
-                retxt+='<div class="dota_dict_label_switch_content_by_click_button" data-check-key="'+i+'">'+i+'</div>'
-            retxt+='</div><div>'
+                retxt += '<div class="dota_dict_label_switch_content_by_click_button" data-check-key="' + i + '">' + i + '</div>'
+            retxt += '</div><div>'
             for i in range(len(all_results_with_sort_mark)):
                 if firstseps or i > 0:
                     retxt += seps
                 retxt += all_results_with_sort_mark[i][1]
-            retxt+='</div></div>'
+            retxt += '</div></div>'
     else:
         if len(all_results_with_sort_mark) > 0:
             sorttime = len(all_results_with_sort_mark[0])
@@ -1592,7 +1601,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 try:
                     another_name += '(' + str(tempjson) + ')'
                 except Exception:
-                    raise (editerror(target[0], target[1],'→'.join(target[2:]) + '：\n在调用第' + str(i + 1) + '条【条件名称】时，得到的结果不能转换为文字'))
+                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i + 1) + '条【条件名称】时，得到的结果不能转换为文字'))
         if '属性名' in conditions:
             for i in conditions['属性名'][0]:
                 for j in json['属性']:
@@ -1666,7 +1675,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
 
         if '条件物品属性' in conditions:
             for i in range(len(conditions['条件物品属性'])):
-                tempjson,tempkey = find_json_by_condition_with_result(conditions['条件物品属性'][i], i, json, result, target, '条件物品属性',True)
+                tempjson, tempkey = find_json_by_condition_with_result(conditions['条件物品属性'][i], i, json, result, target, '条件物品属性', True)
                 trait += '<div>' + tempkey[0] + '：' + number_to_string(tempjson['1']) + tempjson['后缀'] + '</div>'
 
         if '条件机制' in conditions:
@@ -1711,25 +1720,25 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 para = json['技能归属']
             else:
                 for i in range(len(conditions['合并'])):
-                    para+=find_json_by_condition_with_result(conditions['合并'][i], i, json, result, target, '合并')
+                    para += find_json_by_condition_with_result(conditions['合并'][i], i, json, result, target, '合并')
             return [para, [title], [content]] + sort_mark
         elif '点击切换' in conditions:
-            check_key=''
-            sortkey=''
-            for i in range(len(sort_mark)-1,-1,-1):
-                sortkey+=str(sort_mark[i][0])
+            check_key = ''
+            sortkey = ''
+            for i in range(len(sort_mark) - 1, -1, -1):
+                sortkey += str(sort_mark[i][0])
             for i in range(len(conditions['点击切换'])):
                 tempjson = find_json_by_condition_with_result(conditions['点击切换'][i][:-1], i, json, result, target, '点击切换')
                 if conditions['点击切换'][i][-1] in tempjson:
-                    check_key+=conditions['点击切换'][i][-1]+'='+sortkey+'；'
-            if check_key=='':
-                check_key='默认'
-            retxt += '<span class="dota_dict_label_switch_content_by_click_content" data-check-key="'+check_key+'"><div class="dota-ability-wrapper">' \
-                     +'<div class="dota-ability-title">' + title + '</div>' + '<div class="dota-ability-content">' + content + '</div></div></span>'
-            return [check_key,retxt]+ sort_mark
+                    check_key += conditions['点击切换'][i][-1] + '=' + sortkey + '；'
+            if check_key == '':
+                check_key = '默认'
+            retxt += '<span class="dota_dict_label_switch_content_by_click_content" data-check-key="' + check_key + '"><div class="dota-ability-wrapper">' \
+                     + '<div class="dota-ability-title">' + title + '</div>' + '<div class="dota-ability-content">' + content + '</div></div></span>'
+            return [check_key, retxt] + sort_mark
         else:
             retxt += '<div class="dota-ability-wrapper">' \
-                     +'<div class="dota-ability-title">' + title + '</div>'+'<div class="dota-ability-content">' + content + '</div></div>'
+                     + '<div class="dota-ability-title">' + title + '</div>' + '<div class="dota-ability-content">' + content + '</div></div>'
     return [retxt] + sort_mark
 
 
@@ -1748,8 +1757,8 @@ def ability_desc_show_one_mech(json, upgrade=False):
     return retxt
 
 
-def find_json_by_condition_with_result(condition, i, tempjson, result, target, condition_name='',bool_rekey=False,hasnot=False):
-    rekey=[]
+def find_json_by_condition_with_result(condition, i, tempjson, result, target, condition_name='', bool_rekey=False, hasnot=False):
+    rekey = []
     for j in range(len(condition)):
         the_key = ''
         if '@' not in condition[j] and '-' in condition[j]:
@@ -1821,7 +1830,7 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
             else:
                 return [[indexkey['英雄技能'], '+']]
         elif condition[j] == '@key':
-            tempjson=rekey[-1]
+            tempjson = rekey[-1]
             break
         else:
             the_key = condition[j]
@@ -1829,12 +1838,11 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
             tempjson = tempjson[the_key]
             rekey.append(the_key)
         elif hasnot:
-            tempjson=''
+            tempjson = ''
         else:
-            raise (editerror(target[0], target[1],
-                             '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项“' + condition[j] + '”时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项“' + condition[j] + '”时，怀疑到您有跳级的嫌疑，请确认输入的顺序正确'))
     if bool_rekey:
-        return tempjson,rekey
+        return tempjson, rekey
     else:
         return tempjson
 
@@ -1920,7 +1928,7 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                 ii = index[0] - 1
                 if one_bool:
                     relist = relist + half_result
-                    ii+=1
+                    ii += 1
                     continue
             elif i == '@either' or i == '@要么':
                 if logic:
@@ -2135,6 +2143,7 @@ def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, 
                     for k in range(1, len(i)):
                         if isinstance(i[k], list):
                             break
+
                         else:
                             equalbool = equalbool and i[k] == combined_result[j][k]
                     if equalbool:
@@ -2195,18 +2204,35 @@ def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, 
 def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions, result, json, all_json, target):
     sort_mark = []
     relist = []
-    search_name='{{H|' + json['页面名'] + '}}'
+    search_name = '{{H|' + json['页面名'] + '}}'
     if '排序' in conditions:
         for i in range(len(conditions['排序'])):
             sort_mark += find_json_by_condition_with_result(conditions['排序'][i], i, json, result, target, '排序')
     if True:
         if '检索名称' in conditions:
             if '技能归属' in conditions['检索名称'][0]:
-                search_name='{{H|' + json['技能归属'] + '}}'+search_name
+                search_name = '{{H|' + json['技能归属'] + '}}' + search_name
         relist.append(search_name)
+        if '条件即时生效' in conditions:
+            for i in range(len(conditions['条件即时生效'])):
+                tempjson = find_json_by_condition_with_result(conditions['条件即时生效'][i], i, json, result, target, '条件即时生效')
+                text = ''
+                jj = 0
+                while True:
+                    jj += 1
+                    j = str(jj)
+                    if j in tempjson:
+                        if int(tempjson[j]['即时生效']['代码']) > 0:
+                            if '升级来源' in tempjson[j]:
+                                for k in tempjson[j]['升级来源']:
+                                    text += '{{图片|' + tempjson[j]['升级来源'][k]['图片'] + '|link=' + tempjson[j]['升级来源'][k]['名称'] + '}}'
+                            text += tempjson[j]['即时生效']['图片']['图片']
+                    else:
+                        break
+                relist.append(text)
         if '条件尝试值' in conditions:
             for i in range(len(conditions['条件尝试值'])):
-                tempjson = find_json_by_condition_with_result(conditions['条件尝试值'][i], i, json, result, target, '条件尝试值',hasnot=True)
+                tempjson = find_json_by_condition_with_result(conditions['条件尝试值'][i], i, json, result, target, '条件尝试值', hasnot=True)
                 if not isinstance(tempjson, dict):
                     relist.append(better_float_to_text(tempjson))
         if '条件值' in conditions:
@@ -2580,7 +2606,7 @@ def create_upgrade_cast_target(db):
                                         else:
                                             retxt += x["值"]
                                         retxt += '</span>'
-                                        retxt +='|(' + w["值"] + ')'
+                                        retxt += '|(' + w["值"] + ')'
                                         ll = 0
                                         while True:
                                             ll += 1
@@ -2645,7 +2671,7 @@ def create_upgrade_manacost(arr, outtip='div'):
                     w = v[j]
                     if jj > 1:
                         retxt += '+'
-                    retxt += '{{额外信息框|'+ common_page.create_upgrade_text(v, j, lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '') \
+                    retxt += '{{额外信息框|' + common_page.create_upgrade_text(v, j, lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '') \
                              + '|' + w['1']['类型']['值'] + '}}'
                 else:
                     break
@@ -2725,27 +2751,27 @@ def create_upgrade_buff(json_dict):
             retxt += '<tr><td>'
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
-                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png',json_dict[str(i)]['升级来源'][j]['图片']) + '|link='+json_dict[str(i)]['升级来源'][j]['名称']+'}} '
+                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[str(i)]['升级来源'][j]['图片']) + '|link=' + json_dict[str(i)]['升级来源'][j]['名称'] + '}} '
             retxt += '</td><td style="padding:0.25em;">'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
                 retxt += '{{额外信息框|{{图片|' + json_dict[str(i)]['图片'] + '}}|' + json_dict[str(i)]['值'] + '}} '
             for j in buff_mech:
                 if json_dict[str(i)][j]['代码'] != 0:
-                    retxt += '{{额外信息框|{{图片|'+ json_dict[str(i)][j]['图片'] +'}}|' + json_dict[str(i)][j]['简述'] + '}} '
+                    retxt += '{{额外信息框|{{图片|' + json_dict[str(i)][j]['图片'] + '}}|' + json_dict[str(i)][j]['简述'] + '}} '
             retxt += json_dict['名称'] + ' '
             if json_dict[str(i)]['驱散']['代码'] != 0:
                 retxt += '{{额外信息框|<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['驱散']['值'] + '</span>|' \
                          + json_dict[str(i)]['驱散']['简述'] + '}}'
             for j in json_dict[str(i)]['叠加']:
                 if json_dict[str(i)]['叠加'][j]['代码1'] != 0:
-                    retxt += '{{额外信息框|<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['叠加'][j]['方式'] + '</span>'\
-                             +'|' + json_dict[str(i)]['叠加'][j]['来源'] + '来源' + json_dict[str(i)]['叠加'][j]['方式'] + '}} '
+                    retxt += '{{额外信息框|<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['叠加'][j]['方式'] + '</span>' \
+                             + '|' + json_dict[str(i)]['叠加'][j]['来源'] + '来源' + json_dict[str(i)]['叠加'][j]['方式'] + '}} '
             for j in json_dict[str(i)]['标记']:
                 if json_dict[str(i)]['标记'][j]['代码'] != 0:
                     retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'
             if json_dict[str(i)]['生效从属']['代码'] > 1:
-                retxt += '{{额外信息框|<span class="ability_indicator" style="background:#009688;color:white;">' + json_dict[str(i)]['生效从属']['值'] + '</span>'\
-                         +'|' + json_dict[str(i)]['生效从属']['简述'] + '}} '
+                retxt += '{{额外信息框|<span class="ability_indicator" style="background:#009688;color:white;">' + json_dict[str(i)]['生效从属']['值'] + '</span>' \
+                         + '|' + json_dict[str(i)]['生效从属']['简述'] + '}} '
             for j in json_dict[str(i)]['生效目标']:
                 if len(json_dict[str(i)]['生效目标'][j]) > 0:
                     target_dict = json_dict[str(i)]['生效目标'][j]
@@ -2831,7 +2857,7 @@ def create_upgrade_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|link='+json_dict[i]['升级来源'][j]["名称"]+'}} '
+                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|link=' + json_dict[i]['升级来源'][j]["名称"] + '}} '
             retxt += '</td><td style="padding:0.25em;"><span style="cursor:help;">{{图片|' + json_dict[i]['图片'] + '}}</span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
             kk = 0
@@ -2861,7 +2887,7 @@ def create_independent_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png',json_dict[i]['升级来源'][j]["图片"]) + '|link='+json_dict[i]['升级来源'][j]["名称"]+'}} '
+                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|link=' + json_dict[i]['升级来源'][j]["名称"] + '}} '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
             if json_dict[i]['机制名'][0] == '#':
                 return ''
@@ -2899,8 +2925,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 bt += "<div style='background:#111;color:#fff;float:left;margin:0 0.1em;padding:0 0.2em;display:inline-block;border-radius:0px;' title='默认按键'><b>" + \
                       db["默认按键"] + "</b></div>"
             bt += '<h4 id="' + db["代码"] + '"  style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db[
-                "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%"><b>{{链接|Data:' + db["数据来源"] + '/源.json|S}}'\
-                  +' {{链接|Data:' + db["页面名"] + '.json|J}}</b></span><br>' \
+                "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%"><b>{{链接|Data:' + db["数据来源"] + '/源.json|S}}' \
+                  + ' {{链接|Data:' + db["页面名"] + '.json|J}}</b></span><br>' \
                   + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db["中文名"] + '</span>' \
                   + '<span style="font-size:12px;color:#ccc;white-space:nowrap;padding:2px;width:75px;overflow:hidden;text-overflow:ellipsis;text-align:center;"> ' \
                   + db["英文名"] + '</span></div>'
@@ -2909,9 +2935,9 @@ def fulfil_complex_and_simple_show(all_json, html_function):
             if db["图片"] != '':
                 bt += '{{图片|' + db["图片"] + '|w160|center}}'
                 st += '<div class="bg-primary" style="float:left;padding:0.5em">{{图片|' + db["图片"] + '|h100|center}}</div>'
-            st += '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">[['+ db["页面名"] + '|'+ db["中文名"] + ']]</div>'\
-                  +'<div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">'+ db["英文名"] + '</div>'\
-                  +'<div class="" style="font-size:100%;padding: 2px;text-align:center;">{{H|' + db['技能归属'] + '}}</div>' \
+            st += '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">[[' + db["页面名"] + '|' + db["中文名"] + ']]</div>' \
+                  + '<div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' + db["英文名"] + '</div>' \
+                  + '<div class="" style="font-size:100%;padding: 2px;text-align:center;">{{H|' + db['技能归属'] + '}}</div>' \
                   + create_upgrade_cast_style(db["施法类型"]) + create_upgrade_cast_target(db["施法目标"]) + '</th></tr>'
             if db['描述'] != '':
                 bt += '<div style="background:#111133;padding:1em;">' + db['描述'] + '</div>'
@@ -2930,7 +2956,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                     i = str(ii)
                     if i in db['技能升级信息']:
                         v = db['技能升级信息'][i]
-                        bt += '<div style="padding:0.25em;">{{图片|' + v['图片'] + '|h18|link='+ v['技能名'] + '}}[[' + v['技能名'] + ']]（' + v['中文名'] + ')</div>'
+                        bt += '<div style="padding:0.25em;">{{图片|' + v['图片'] + '|h18|link=' + v['技能名'] + '}}[[' + v['技能名'] + ']]（' + v['中文名'] + ')</div>'
                     else:
                         break
             bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
@@ -3008,8 +3034,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                         name = v['2']['机制名']
                     else:
                         name = '独立机制' + i
-                    if name[0]!='#':
-                        st += '<span class="dota_switch_content_by_click_button" data-check-key="' + name + '" style="margin:0.25em">' + name + '</span>'\
+                    if name[0] != '#':
+                        st += '<span class="dota_switch_content_by_click_button" data-check-key="' + name + '" style="margin:0.25em">' + name + '</span>' \
                               + '<div class="dota_switch_content_by_click_content" data-check-key="' + name + '" data-display-type="block">' + create_independent_mech(v) + '</div>'
                 else:
                     break

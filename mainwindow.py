@@ -1247,7 +1247,7 @@ class Main(QMainWindow):
             ability.input_upgrade(self.json_base, self.upgrade_base)
 
             unit.complete_upgrade(self.json_base["非英雄单位"], self.text_base)
-            ability.complete_upgrade(self.json_base["技能"], self.text_base)
+            ability.complete_upgrade(self.json_base["技能"], self.json_base["机制"], self.text_base)
 
             ability.complete_mech(self.json_base["技能"], self.mech)
             # 将图片信息规范化

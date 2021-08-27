@@ -607,5 +607,6 @@ unitpro_num = [["远古单位", "IsAncient"]
     , ["模型比例", "ModelScale"]
     , ["英雄攻击伤害", "StatusHealth"]
     , ["非英雄攻击伤害", "StatusHealth"]
+    , ["攻击速度", "BaseAttackSpeed"]
                ]
-unit_default = {"ConsideredHero": {"1": 0}, "IsSummoned": {"1": 0}, "ModelScale": {"1": 1}}
+unit_default = {"ConsideredHero": {"1": 0}, "IsSummoned": {"1": 0}, "ModelScale": {"1": 1}, "BaseAttackSpeed": {"1": 100}}

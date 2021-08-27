@@ -252,6 +252,7 @@ def create_page_logs(title, log_base, log_list):
     junior = False
     bools = False
     index_of_upgrade = -1
+    index_of_index=-1
     for i in range(len(log_list)):
         v = log_list[i]
         for j in range(len(v)):
@@ -262,6 +263,7 @@ def create_page_logs(title, log_base, log_list):
                 break
             if title == v[0] + '/' + w:
                 index_of_upgrade = i
+                index_of_index = j
                 junior = True
                 bools = True
                 break
@@ -270,21 +272,27 @@ def create_page_logs(title, log_base, log_list):
     if index_of_upgrade == -1:
         return '请前往<span class="dota_create_link_to_wiki_page">data:版本更新.json</span>添加当前版本号，以方便确认其前后版本。'
     else:
-        if not junior:
+        if junior:
+            retxt+='\n<tr><td>大版本</td><td>[[' + log_list[index_of_upgrade][0] + ']]</td></tr>'
+            if index_of_index > 1:
+                retxt += '\n<tr><td>上一小版本</td><td>[[' + log_list[index_of_upgrade][0] + '/' + log_list[index_of_upgrade][index_of_index-1] + ']]</td></tr>'
+            if index_of_index < len(log_list[index_of_upgrade]) - 1:
+                retxt += '\n<tr><td>下一小版本</td><td>[[' + log_list[index_of_upgrade][0] + '/' + log_list[index_of_upgrade][index_of_index+1] + ']]</td></tr>'
+        else:
             if index_of_upgrade == 0:
                 retxt += '\n<tr><td colspan=2>当前版本为可考的最古老版本</td></tr>'
             else:
-                retxt += '\n<tr><td>上一版本</td><td><span class="dota_create_link_to_wiki_page">' + log_list[index_of_upgrade - 1][0] + '</span></td></tr>'
+                retxt += '\n<tr><td>上一版本</td><td>[[' + log_list[index_of_upgrade - 1][0] + ']]</td></tr>'
             if index_of_upgrade == len(log_list) - 1:
                 retxt += '\n<tr><td colspan=2>当前版本为最新版本</td></tr>'
             else:
-                retxt += '\n<tr><td>下一版本</td><td><span class="dota_create_link_to_wiki_page">' + log_list[index_of_upgrade + 1][0] + '</span></td></tr>'
+                retxt += '\n<tr><td>下一版本</td><td>[[' + log_list[index_of_upgrade + 1][0] + ']]</td></tr>'
     if '次级版本' in log_base and len(log_base['次级版本']) > 0:
         retxt += '\n<tr><td>小更新</td><td>'
         for i in range(len(log_base['次级版本'])):
             if i > 0:
                 retxt += '<br>'
-            retxt += '<span class="dota_create_link_to_wiki_page">' + log_base['次级版本'][i] + '</span>'
+            retxt += '[[' + log_base['次级版本'][i] + ']]'
     if '官网链接' in log_base and log_base['官网链接'] != '' and log_base['官网链接'] != '-':
         retxt += '\n<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
     retxt += '\n<tr><td colspan=2 style="text-align:right;font-size:85%"><span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + title + '.json"><i class="fa fa-database" aria-hidden="true"></i></span></td></tr></table>'
