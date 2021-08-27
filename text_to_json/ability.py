@@ -1131,6 +1131,17 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《机制→' + json["1"] + '》目录下的《' + json["2"] + '》请检查输入名称是否正确'))
         else:
             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《机制》目录下的《' + json["1"] + '》请检查输入名称是否正确'))
+    elif json["0"] == "机制单内容":
+        if json['1'] in all_json['机制']:
+            if json['2'] in all_json['机制'][json['1']]['内容']:
+                if json['3'] in all_json['机制'][json['1']]['内容'][json['2']]['内容']:
+                    rere[0][0].append(all_json['机制'][json['1']]['内容'][json['2']]['内容'][json['3']]['内容'])
+                else:
+                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《机制→' + json["1"] + '→' + json["2"] + '》目录下的《' + json["3"] + '》请检查输入名称是否正确'))
+            else:
+                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《机制→' + json["1"] + '》目录下的《' + json["2"] + '》请检查输入名称是否正确'))
+        else:
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《机制》目录下的《' + json["1"] + '》请检查输入名称是否正确'))
     else:
         if json["3"] in all_json[json["1"]][json["2"]]:
             temp = all_json[json["1"]][json["2"]][json["3"]]
