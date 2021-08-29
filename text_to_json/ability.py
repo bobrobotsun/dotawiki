@@ -2776,7 +2776,7 @@ def create_upgrade_buff(json_dict):
             for j in json_dict[str(i)]['叠加']:
                 if json_dict[str(i)]['叠加'][j]['代码1'] != 0:
                     retxt += '{{额外信息框|<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['叠加'][j]['方式'] + '</span>' \
-                             + '|' + json_dict[str(i)]['叠加'][j]['来源'] + '来源' + json_dict[str(i)]['叠加'][j]['方式'] + '}} '
+                             + '|' + json_dict[str(i)]['叠加'][j]['来源'] + '来源{{E|' + json_dict[str(i)]['叠加'][j]['方式'] + '}}：{{ET|' + json_dict[str(i)]['叠加'][j]['方式'] + '|注释}}}} '
             for j in json_dict[str(i)]['标记']:
                 if json_dict[str(i)]['标记'][j]['代码'] != 0:
                     retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'

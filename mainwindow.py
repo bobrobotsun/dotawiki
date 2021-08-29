@@ -62,6 +62,7 @@ class Main(QMainWindow):
         self.text_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}}
         self.json_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}, '技能源': {}, '单位组': {}, "机制": {}, '机制源': {}}
         self.json_name = {"英雄": [], "非英雄单位": [], "物品": [], "技能": [], '技能源': [], '单位组': [], "机制": [], '机制源': []}
+        self.entry_base = {}
         self.upgrade_base = {}
         self.mech = {}
         self.red = QBrush(Qt.red)
@@ -466,6 +467,17 @@ class Main(QMainWindow):
             messageBox.exec_()
             if messageBox.clickedButton() == button1:
                 self.download_name_base()
+        try:
+            basefile = open(os.path.join('database', 'entry_base.json'), mode="r", encoding="utf-8")
+            self.entry_base = json.loads(basefile.read())
+            basefile.close()
+        except FileNotFoundError:
+            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载词汇库？", QMessageBox.NoButton, self)
+            button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
+            button2 = messageBox.addButton('没有网络，没法下载', QMessageBox.NoRole)
+            messageBox.exec_()
+            if messageBox.clickedButton() == button1:
+                self.download_entry_base()
 
     def get_data_from_text(self):
         try:
@@ -578,6 +590,13 @@ class Main(QMainWindow):
         self.name_initial_name_base()
         self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
         QMessageBox.information(self, '下载曾用名库完成', '下载曾用名库完成，请继续操作')
+
+    def download_entry_base(self):
+        self.name_base = self.download_json('entry_base.json')
+        self.entry_resort()
+        self.entry_refresh_tree()
+        self.file_save(os.path.join('database', 'entry_base.json'), json.dumps(self.name_base))
+        QMessageBox.information(self, '下载词汇库完成', '下载词汇库完成，请继续操作')
 
     def update_json_name(self, list):
         for i in list:
@@ -1106,6 +1125,7 @@ class Main(QMainWindow):
         """
         记录曾用名和链接，以及对应页面名+图片的内容
         """
+
         self.nameWidget = QWidget(self)
         self.centralWidget().addTab(self.nameWidget, '曾用名')
         self.namelayout = {0: QHBoxLayout()}
@@ -1204,6 +1224,54 @@ class Main(QMainWindow):
         self.namelayout['衍生页面']['布局']['树'][0].setColumnWidth(0, 200)
         """"""
         self.name_initial_name_base()
+        """
+        记录一些便捷词条，包括但不限于生成链接、简易的描述性信息
+        """
+        self.entryWidget = QWidget(self)
+        self.centralWidget().addTab(self.entryWidget, '词汇注释')
+        self.entrylayout = {0: QHBoxLayout()}
+        self.entryWidget.setLayout(self.entrylayout[0])
+
+        self.entrylayout['按钮区域'] = {0: QVBoxLayout(self)}
+        self.entrylayout[0].addLayout(self.entrylayout['按钮区域'][0])
+        self.entrylayout['按钮区域']['下载'] = QPushButton('下载', self)
+        self.entrylayout['按钮区域'][0].addWidget(self.entrylayout['按钮区域']['下载'])
+        self.entrylayout['按钮区域']['下载'].clicked.connect(self.download_entry_base)
+        self.entrylayout['按钮区域']['保存'] = QPushButton('保存', self)
+        self.entrylayout['按钮区域'][0].addWidget(self.entrylayout['按钮区域']['保存'])
+        self.entrylayout['按钮区域']['保存'].clicked.connect(self.entry_save_entry_json)
+        self.entrylayout['按钮区域']['保存并上传'] = QPushButton('保存并上传', self)
+        self.entrylayout['按钮区域'][0].addWidget(self.entrylayout['按钮区域']['保存并上传'])
+        self.entrylayout['按钮区域']['保存并上传'].clicked.connect(self.entry_save_and_upload_entry_json)
+        self.entrylayout['按钮区域'][0].addStretch(1)
+        self.entrylayout['按钮区域']['新增'] = QPushButton('新增', self)
+        self.entrylayout['按钮区域'][0].addWidget(self.entrylayout['按钮区域']['新增'])
+        self.entrylayout['按钮区域']['新增'].clicked.connect(lambda: self.entry_edit_new())
+        self.entrylayout['按钮区域']['删除'] = QPushButton('删除', self)
+        self.entrylayout['按钮区域'][0].addWidget(self.entrylayout['按钮区域']['删除'])
+        self.entrylayout['按钮区域']['删除'].clicked.connect(lambda: self.entry_edit_delete())
+        self.entrylayout['按钮区域'][0].addStretch(1)
+        self.entrylayout['按钮区域']['增加条目'] = QPushButton('增加条目', self)
+        self.entrylayout['按钮区域'][0].addWidget(self.entrylayout['按钮区域']['增加条目'])
+        self.entrylayout['按钮区域']['增加条目'].clicked.connect(lambda: self.entry_edit_change_value())
+        self.entrylayout['按钮区域']['改名'] = QPushButton('改名', self)
+        self.entrylayout['按钮区域'][0].addWidget(self.entrylayout['按钮区域']['改名'])
+        self.entrylayout['按钮区域']['改名'].clicked.connect(lambda: self.entry_edit_change_name())
+        self.entrylayout['按钮区域']['修改值'] = QPushButton('修改值', self)
+        self.entrylayout['按钮区域'][0].addWidget(self.entrylayout['按钮区域']['修改值'])
+        self.entrylayout['按钮区域']['修改值'].clicked.connect(lambda: self.entry_edit_change_value())
+        self.entrylayout['按钮区域'][0].addStretch(1)
+
+        self.entrylayout['编辑区'] = {0: QVBoxLayout()}
+        self.entrylayout[0].addLayout(self.entrylayout['编辑区'][0])
+        self.entrylayout['编辑区']['树'] = {0: QTreeWidget(self)}
+        self.entrylayout['编辑区'][0].addWidget(self.entrylayout['编辑区']['树'][0])
+        self.entrylayout['编辑区']['树'][0].setHeaderLabels(['名称', '值'])
+        self.entrylayout['编辑区']['树'][0].setColumnWidth(0, 300)
+        self.entrylayout['编辑区']['树'][0].doubleClicked.connect(lambda :self.entry_edit_change_value())
+        self.entrylayout['编辑区']['树'][0].keyPressEvent = self.entry_key_function
+
+        self.entry_refresh_tree()
         """
         下面是重新排序的情况
         """
@@ -1884,8 +1952,12 @@ class Main(QMainWindow):
                 pic_style += ' data-image-class="ability_icon"'
             elif template_args[0] in ['I', 'i']:
                 pic_style += ' data-image-class="item_icon"'
-            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" ' \
-                     + ' data-image-link="1" data-text-link="1"' + size + pic_style + '></span>'
+            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="1"' + size + pic_style + '></span>'
+        elif template_args[0] in ['E', 'e']:
+            if template_args[1] in self.entry_base:
+                retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + self.entry_base[template_args[1]]['链接'] + '">' + template_args[1] + '</span>'
+            else:
+                retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
         elif '图片' in template_args[0]:
             size = ''
             center = ''
@@ -1914,6 +1986,14 @@ class Main(QMainWindow):
                 retxt = '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '"' + size + center + link + image_class + '></span>'
             elif template_args[0] == '小图片':
                 retxt = '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '"' + size + center + link + image_class + ' data-image-mini="1"></span>'
+        elif template_args[0] in ['et', 'ET', '词汇']:
+            if template_args[1] in self.entry_base:
+                if len(template_args) > 2 and template_args[2] in self.entry_base[template_args[1]]:
+                    retxt += self.entry_base[template_args[1]][template_args[2]]
+                else:
+                    retxt += self.entry_base[template_args[1]]['文字']
+            else:
+                retxt += '<span class="error_text">错误的词汇名称：' + template_args[1] + '</span>'
         elif template_args[0] == '额外信息框':
             retxt += '<span class="dota_click_absolute_additional_infomation_frame">' \
                      + '<span class="dota_click_absolute_additional_infomation_frame_button">' + template_args[1] + '</span>' \
@@ -2338,7 +2418,7 @@ class Main(QMainWindow):
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         text, ok = MoInputWindow.getText(self, '新增一个' + selected, '请输入你想要的' + selected + '的名称:', default_text)
         if ok:
-            if text in self.json_name[selected]:
+            if text in self.json_base[selected]:
                 QMessageBox.critical(self, '您的输入有问题', '您输入的【' + text + '】已经存在于【' + selected + '】中，请检查是否书写错误。')
                 self.json_edit_new(text)
             else:
@@ -3635,8 +3715,144 @@ class Main(QMainWindow):
         retxt += '};\n</script>'
         return retxt
 
+    def entry_save_entry_json(self):
+        self.entry_save_the_edit()
+        self.file_save(os.path.join('database', 'entry_base.json'), json.dumps(self.entry_base))
+        QMessageBox.information(self, "上传完成", '已经保存entry_base')
+
+    def entry_save_and_upload_entry_json(self):
+        self.entry_save_the_edit()
+        self.entry_resort()
+        self.entry_refresh_tree()
+        self.file_save(os.path.join('database', 'entry_base.json'), json.dumps(self.entry_base))
+        self.upload_json('entry_base.json', self.entry_base)
+        QMessageBox.information(self, "上传完成", '已经整理好，保存并上传entry_base')
+
+    def entry_save_the_edit(self):
+        self.entry_base = {}
+        for i in range(self.entrylayout['编辑区']['树'][0].topLevelItemCount()):
+            item = self.entrylayout['编辑区']['树'][0].topLevelItem(i)
+            name = item.text(0)
+            self.entry_base[name] = {}
+            self.entry_base[name]['链接'] = item.child(0).text(1)
+            self.entry_base[name]['文字'] = item.child(1).text(1)
+            for j in range(2,item.childCount()):
+                child1=item.child(j)
+                self.entry_base[name][item.child(j).text(0)] = item.child(j).text(1)
+
+    def entry_resort(self):
+        temp = []
+        p = Pinyin()
+        for i in self.entry_base:
+            temp.append([p.get_pinyin(i), i])
+        temp = sorted(temp, key=lambda x: x[0])
+        new_base = {}
+        for i in temp:
+            new_base[i[1]] = self.entry_base[i[1]]
+        self.entry_base = new_base
+
+    def entry_refresh_tree(self):
+        self.entrylayout['编辑区']['树'][0].clear()
+        p = Pinyin()
+        for i in self.entry_base:
+            tree1 = TreeItemEdit(self.entrylayout['编辑区']['树'][0], i)
+            tree1.set_type('tree')
+            tree1.setText(1, p.get_pinyin(i))
+            tree2 = TreeItemEdit(tree1, '链接')
+            tree2.set_type('text')
+            tree2.set_value(self.entry_base[i]['链接'])
+            tree3 = TreeItemEdit(tree1, '文字')
+            tree3.set_type('text')
+            tree3.set_value(self.entry_base[i]['文字'])
+            for j in self.entry_base[i]:
+                if j not in ['链接','文字']:
+                    tree4 = TreeItemEdit(tree1, j)
+                    tree4.set_type('text')
+                    tree4.set_value(self.entry_base[i][j])
+
+    def entry_edit_new(self):
+        text, ok = MoInputWindow.getText(self, '新增一个词汇', '请输入你想要的词汇的名称:', '')
+        if ok:
+            if text in self.entry_base:
+                QMessageBox.critical(self, '您的输入有问题', '您输入的【' + text + '】已经存在于【词汇库】中，已为您跳转至改条目。')
+                self.entrylayout['编辑区']['树'][0].setExpanded(False)
+                for i in range(self.entrylayout['编辑区']['树'][0].topLevelItemCount()):
+                    if self.entrylayout['编辑区']['树'][0].topLevelItem(i).text(0) == text:
+                        self.entrylayout['编辑区']['树'][0].setCurrentIndex(i)
+                        self.entrylayout['编辑区']['树'][0].topLevelItem(i).setExpanded(True)
+            else:
+                p = Pinyin()
+                tree1 = TreeItemEdit(self.entrylayout['编辑区']['树'][0], text)
+                tree1.set_type('tree')
+                tree1.setText(1, p.get_pinyin(text))
+                tree2 = TreeItemEdit(tree1, '链接')
+                tree2.set_type('text')
+                tree3 = TreeItemEdit(tree1, '文字')
+                tree3.set_type('text')
+                tree1.setExpanded(True)
+
+    def entry_edit_delete(self):
+        item = self.entrylayout['编辑区']['树'][0].currentItem()
+        if item.itemtype == 'tree':
+            clickb = QMessageBox.critical(self, '删除一组词汇', '您正试图删除【' + item.text(0) + '】这条词汇！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if clickb == QMessageBox.Yes:
+                self.entrylayout['编辑区']['树'][0].takeTopLevelItem(self.entrylayout['编辑区']['树'][0].indexOfTopLevelItem(item))
+        elif item.parent().indexOfChild(item)>1:
+            clickb = QMessageBox.critical(self, '删除一组文字', '您正试图删除【' + item.parent().text(0) + '】这条词汇的【' + item.text(0) + '】！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if clickb == QMessageBox.Yes:
+                item.parent().removeChild(item)
+
+
+
+    def entry_edit_change_name(self):
+        item = self.entrylayout['编辑区']['树'][0].currentItem()
+        if item.itemtype == 'text':
+            index = item.parent().indexOfChild(item)
+            if index>1:
+                text, ok = MoInputWindow.getText(self, '修改值', '您想将【' + item.text(0) + '】其修改为:', item.text(0))
+                if ok:
+                    item.setText(0, text)
+
+    def entry_edit_change_value(self,expand=False):
+        item = self.entrylayout['编辑区']['树'][0].currentItem()
+        if item.itemtype == 'tree':
+            text, ok = MoInputWindow.getText(self, '修改值', '您想增加一个条目:', '文字' + str(item.childCount()))
+            if ok:
+                new = TreeItemEdit(item, text)
+                new.set_type('text')
+                item.setExpanded(expand)
+        elif item.itemtype == 'text':
+            text, ok = MoInputWindow.getText(self, '修改值', '您想将【' + item.text(1) + '】修改为:', item.text(1))
+            if ok:
+                item.set_value(text)
+
+    def entry_key_function(self, event):
+        item = self.entrylayout['编辑区']['树'][0].currentItem()
+        index = 0
+        len = 0
+        if item.itemtype == 'text':
+            parent = item.parent()
+            index = parent.indexOfChild(item)
+            len = parent.childCount()
+        if event.key() in [Qt.Key_S, Qt.Key_Down]:
+            if index > 1 and index < len - 1:
+                parent.removeChild(item)
+                parent.insertChild(index + 1, item)
+                self.entrylayout['编辑区']['树'][0].setCurrentItem(item)
+        elif event.key() in [Qt.Key_W, Qt.Key_Up]:
+            if index > 2:
+                parent.removeChild(item)
+                parent.insertChild(index - 1, item)
+                self.entrylayout['编辑区']['树'][0].setCurrentItem(item)
+        elif event.key() in [Qt.Key_F, Qt.Key_Enter]:
+            self.entry_edit_change_value(True)
+        elif event.key() in [Qt.Key_Escape, Qt.Key_Backspace]:
+            self.entry_edit_delete()
+        elif event.key() in [Qt.Key_A, Qt.Key_N, Qt.Key_Space]:
+            self.entry_edit_change_name()
+
     def test_inputwindow(self):
-        i=1
+        i = 1
 
     def test_inputwindow_loop_check(self, json):
         for i in json:

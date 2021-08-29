@@ -678,13 +678,8 @@ def create_all_chapter_page_mechnism(db):
 
 def create_one_chapter_content_page_mechnism(db):
     retxt = ''
-    anotherbool = False
     for j in db['内容']:
-        if anotherbool:
-            retxt += '\n'
-        else:
-            anotherbool = True
-        retxt += db['内容'][j]['内容'] + '\n'
+        retxt += db['内容'][j]['内容']+'\n'
     return retxt
 
 def create_page_old_ability(json_base, log_base, log_list, ability):
