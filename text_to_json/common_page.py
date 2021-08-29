@@ -422,7 +422,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
                             for k, x in w2.items():
                                 for l in range(2, len(x)):
                                     showit = False
-                                    if x[0] != '' and x[0] in name or j2 in name:
+                                    if x[0] != '' and x[0] in name:
                                         showit = True
                                     else:
                                         for m in range(len(x[l]['目标'])):

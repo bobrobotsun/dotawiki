@@ -573,7 +573,7 @@ def set_version_default(base):
                 v['敏捷英雄'].append(i)
             elif base['英雄'][i]['主属性']['1'] == '智力':
                 v['智力英雄'].append(i)
-            if base['英雄'][i]['近战远程']['1'] == '远程':
+            if base['英雄'][i]['近战远程']['1'] == '近战':
                 v['近战英雄'].append(i)
             elif base['英雄'][i]['近战远程']['1'] == '远程':
                 v['远程英雄'].append(i)

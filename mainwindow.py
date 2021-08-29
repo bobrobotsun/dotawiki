@@ -760,7 +760,7 @@ class Main(QMainWindow):
                 for j in self.json_base[i]:
                     temp = QListWidgetItem()
                     pinyin = p.get_pinyin(j)
-                    temp.setText('【' + pinyin[:2].upper() + '】' + j)
+                    temp.setText('【' + pinyin[:4].lower() + '】' + j)
                     if self.json_base[i][j]['应用'] == 2:
                         temp.setBackground(self.green)
                     elif self.json_base[i][j]['应用'] != 1:
@@ -2241,7 +2241,8 @@ class Main(QMainWindow):
     def choose_mainlayout_change_edit_target(self, target_base=''):
         self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(target_base)
         self.edit_category_selected_changed()
-        target_name = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()[4:]
+        ind=self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text().index('】')
+        target_name = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()[ind+1:]
         self.edit_target_selected_changed(target_name)
 
     def complex_dict_to_tree(self, tdict, edict, sdict):
@@ -3467,8 +3468,13 @@ class Main(QMainWindow):
     def version_button_delete_tree_item(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         parent = item.parent()
+        len=parent.childCount()
+        index = min(parent.indexOfChild(item),len-2)
         parent.removeChild(item)
-        self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(parent)
+        if len==1:
+            self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(parent)
+        else:
+            self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(parent.child(index))
         self.version_edit_all_button_clicked()
 
     def version_button_tree3_add_tree_list(self, level='1'):
