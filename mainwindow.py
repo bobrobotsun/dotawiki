@@ -998,6 +998,7 @@ class Main(QMainWindow):
         self.editlayout['修改核心']['竖布局']['树'][0].clicked.connect(self.tree_item_clicked)
         self.editlayout['修改核心']['竖布局']['树'][0].doubleClicked.connect(self.tree_item_double_clicked)
         self.editlayout['基础数据']['竖布局']['树'][0].doubleClicked.connect(lambda: self.copy_text_from_tree(0))
+        self.editlayout['额外机制']['竖布局']['树'][0].doubleClicked.connect(lambda: self.copy_text_from_tree(1))
         self.mainlayout['列表']['英雄']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('英雄'))
         self.mainlayout['列表']['物品']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('物品'))
         self.mainlayout['列表']['非英雄单位']['布局']['列表'].clicked.connect(lambda: self.choose_mainlayout_change_edit_target('非英雄单位'))
@@ -1736,7 +1737,10 @@ class Main(QMainWindow):
                 for i in self.json_base['技能']:
                     if self.json_base['技能'][i]['技能归属'] == k:
                         all_upload.append([i + '.json', self.json_base['技能'][i]])
-                        all_redirect.append([i, '#重定向[[' + k + '#' + i + ']]'])
+                        if self.json_base['技能'][i]['应用'] == 0:
+                            all_page.append([i, common_page.create_page_old_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
+                        else:
+                            all_redirect.append([i, '#重定向[[' + k + '#' + i + ']]'])
                         j = self.json_base['技能'][i]['数据来源']
                         if j in self.json_base['技能源']:
                             all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
