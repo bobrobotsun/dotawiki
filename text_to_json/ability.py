@@ -1410,6 +1410,14 @@ def find_the_jsons_by_conditions_and_show(json, all_json, target, firstseps=Fals
                     retxt += seps
                 retxt += all_results_with_sort_mark[i][1]
             retxt += '</div></div>'
+    elif '随机显示' in conditions:
+        if len(all_results_with_sort_mark) > 0:
+            retxt+='<span class="dota_random_hide_and_show" data-stretch-attri-dict="当前='+conditions['随机显示'][0][0]+'">'
+            for i in range(len(all_results_with_sort_mark)):
+                if firstseps or i > 0:
+                    retxt += seps
+                retxt += all_results_with_sort_mark[i][0]
+            retxt += '</span>'
     else:
         if len(all_results_with_sort_mark) > 0:
             sorttime = len(all_results_with_sort_mark[0])
@@ -1748,8 +1756,9 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                      + '<div class="dota-ability-title">' + title + '</div>' + '<div class="dota-ability-content">' + content + '</div></div></span>'
             return [check_key, retxt] + sort_mark
         else:
-            retxt += '<div class="dota-ability-wrapper">' \
-                     + '<div class="dota-ability-title">' + title + '</div>' + '<div class="dota-ability-content">' + content + '</div></div>'
+            retxt += '<div class="dota-ability-wrapper">' + '<div class="dota-ability-title">' + title + '</div>' + '<div class="dota-ability-content">' + content + '</div></div>'
+    if '随机显示' in conditions:
+        retxt='<span class="dota_random_hide_and_show_element">'+retxt+'</span>'
     return [retxt] + sort_mark
 
 
