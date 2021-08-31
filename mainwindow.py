@@ -1997,7 +1997,7 @@ class Main(QMainWindow):
                 else:
                     retxt += self.entry_base[template_args[1]]['文字']
             else:
-                retxt += '<span class="error_text">错误的词汇名称：' + template_args[1] + '</span>'
+                retxt += '{{错误文字|错误的词汇名称：' + template_args[1] + '}}'
         elif template_args[0] == '额外信息框':
             retxt += '<span class="dota_click_absolute_additional_infomation_frame">' \
                      + '<span class="dota_click_absolute_additional_infomation_frame_button">' + template_args[1] + '</span>' \
@@ -2007,6 +2007,8 @@ class Main(QMainWindow):
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[2] + '</span>'
             else:
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
+        elif template_args[0] == '错误文字':
+            retxt+='<span class="error_text">'+template_args[1]+'</span>'
         elif template_args[0] == '分类查询':
             post = ''
             dict = ''
@@ -2024,6 +2026,20 @@ class Main(QMainWindow):
                 retxt = common_page.create_hero_choose_element(self.json_base, template_args[2:], dict, post)
             elif template_args[1] == '物品':
                 retxt = common_page.create_item_choose_element(self.json_base, template_args[2:], dict, post)
+        elif template_args[0] == '机制内容':
+            if len(template_args)<4:
+                if template_args[1] in self.json_base['机制']:
+                    if template_args[2] in self.json_base['机制'][template_args[1]]['内容']:
+                        if template_args[3] in self.json_base['机制'][template_args[1]]['内容'][template_args[2]]['内容']:
+                            retxt += self.json_base['机制'][template_args[1]]['内容'][template_args[2]]['内容'][template_args[3]]['内容']
+                        else:
+                            retxt += '{{错误文字|《{{H|' + template_args[1] + '}}》标题下《' + template_args[2] + '》错误标识：' + template_args[3] + '}}'
+                    else:
+                        retxt += '{{错误文字|《{{H|' + template_args[1] + '}}》错误标题：' + template_args[2] + '}}'
+                else:
+                    retxt += '{{错误文字|错误机制名：' + template_args[1] + '}}'
+            else:
+                retxt += '{{错误文字|《机制内容》需要输入3个参数，而您只输入了' + str(len(template_args)-1) + '个参数}}'
         else:
             return x.group(0)
         return retxt
