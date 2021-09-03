@@ -2,7 +2,7 @@ import json, math
 from text_to_json import edit_json
 
 target_url = 'https://dota.huijiwiki.com/w/api.php'
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36 Edg/87.0.664.55'}
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'}
 
 
 def analyse_upload_json(text, upload_info):
@@ -69,26 +69,160 @@ def calculate_physical_damage_change_by_armor_change(pr, pr2):
     else:
         return str(round((pr - pr2) / (100 - pr) * 100, 1)) + '%' if pr < 100 else '重新受伤'
 
-
-def armor_physic_resistance_page148237(seesion, csrf_token):
-    retxt = '<table class="wikitable" style="text-align:center">' \
-            '<tr><th>护甲<br/>物理抗性<br/>物理生命<ref>护甲结算时，因为能抗下更多物理伤害，因此相当于增加了一定百分比的生命值。物理生命为承受物理伤害时，相对于正常血量的百分比</ref>' \
-            '<th>+2护甲<br/>物理抗性<br/>物理生命<br/>伤害减免<ref>之后所有的伤害减免和伤害加深都是指在增加或减少了这个数量的护甲后，相对于初始状态少承受或多承受的伤害百分比</ref></th>' \
-            '<th>-2护甲<br/>物理抗性<br/>物理生命<br/>伤害加深</th><th>+4护甲<br/>物理抗性<br/>物理生命<br/>伤害减免</th><th>-6护甲<br/>物理抗性<br/>物理生命<br/>伤害加深</th>' \
-            '<th>+10护甲<br/>物理抗性<br/>物理生命<br/>伤害减免</th><th>-8护甲<br/>物理抗性<br/>物理生命<br/>伤害加深</th><th>+15护甲<br/>物理抗性<br/>物理生命<br/>伤害减免</th>' \
-            '<th>-20护甲<br/>物理抗性<br/>物理生命<br/>伤害加深</th></tr>'
-    for i in [-20, -10, -5, 0, 2, 5, 10, 15, 20, 30, 50, 80, 150]:
-        pr = calculate_armor_number_to_physical_resistance_percentage(i)
-        ph = calculate_physical_resistance_percentage_to_physical_health_percentage(pr)
-        retxt += '<tr><td>' + str(i) + '(' + str(round(pr, 1)) + '%)<br/>' + ph + '</td>'
-        for j in [2, -2, 4, -6, 10, -8, 15, -20]:
-            arj = i + j
-            prj = calculate_armor_number_to_physical_resistance_percentage(arj)
-            phj = calculate_physical_resistance_percentage_to_physical_health_percentage(prj)
-            dcj = calculate_physical_damage_change_by_armor_change(pr, prj)
-            retxt += '<td>' + str(arj) + '(' + str(round(prj, 1)) + '%)<br/>' + phj + '(' + dcj + ')</td>'
-        retxt += '</tr>'
-    retxt += '</table>{{reflist}}'
-    upload_data = {'action': 'edit', 'title': '护甲/物理抗性表格', 'text': retxt, 'format': 'json', 'token': csrf_token}
+def common_code_chat_page(seesion, csrf_token,html_function):
+    retxt=''
+    retxt+='以下列表中{{点击复制|<code>代码样式文字</code>|代码样式文字|td=0}}均可以通过点击进行复制。\n'\
+           +'<ul>'\
+           +'<li>{{点击复制|<code>-gold</code> XX|-gold|td=0}}：获得金钱。</li>'\
+           +'<ul><li>{{点击复制|<code>-gold 1000</code>|-gold 1000|td=0}}：获得1000金钱。</li>'\
+           +'<li>{{点击复制|<code>-gold 99999</code>|-gold 99999|td=0}}：金钱最大化。</li></ul>'\
+           +'<li>{{点击复制|<code>-lvlup</code> XX|-lvlup|td=0}}：自身等级升级。</li>'\
+           +'<ul><li>{{点击复制|<code>-lvlup 6</code>|-lvlup 6|td=0}}：自身升6级。</li></ul>'\
+           +'<li>{{点击复制|<code>-lvlmax</code>|-lvlmax|td=0}}：自身升到满级，技能自动学满。</li>'\
+           +'<li>{{点击复制|<code>-levelbots</code> XX|-levelbots|td=0}}：所有机器人提升等级。</li>'\
+           +'<ul><li>{{点击复制|<code>-levelbots 30</code>|-levelbots 30|td=0}}：所有机器人提升30级。</li></ul>'\
+           +'<li>{{点击复制|<code>-wtf</code>|-wtf|td=0}}：技能无冷却、无耗蓝。</li>'\
+           +'<li>{{点击复制|<code>-unwtf</code>|-unwtf|td=0}}：关闭wtf模式。</li>'\
+           +'<li>{{点击复制|<code>-refresh</code>|-refresh|td=0}}：刷新状态和所有技能CD。</li>'\
+           +'<li>{{点击复制|<code>-respawn</code>|-respawn|td=0}}：复活。</li>'\
+           +'<li>{{点击复制|<code>-item</code> XX|-item|td=0}}：获得物品。[[#物品代码|点击此处可以跳转至物品代码处]]</li>'\
+           +'<li>{{点击复制|<code>-givebots</code> XX|-givebots|td=0}}：所有机器人获得物品。[[#物品代码|点击此处可以跳转至物品代码处]]</li>'\
+           +'<li>{{点击复制|<code>-createhero</code> XX|-createhero|td=0}}：获得物品。[[#英雄代码|点击此处可以跳转至英雄代码处]]</li>'\
+           +'<li>{{点击复制|<code>-createhero</code> XX enemy|-createhero enemy|td=0}}：所有机器人获得物品。[[#英雄代码|点击此处可以跳转至英雄代码处]]</li>'\
+           +'<li>{{点击复制|<code>-startgame</code>|-startgame|td=0}}：开始游戏，出兵。</li>'\
+           +'<li>{{点击复制|<code>-spawncreeps</code>|-spawncreeps|td=0}}：立刻产生一波小兵。</li>'\
+           +'<li>{{点击复制|<code>-spawnneutrals</code>|-spawnneutrals|td=0}}：立刻产生一波野怪。</li>'\
+           +'<li>{{点击复制|<code>-spawnrune</code>|-spawnrune|td=0}}：立刻刷新一波神符，包括赏金神符和强化神符。</li>'\
+           +'<li>{{点击复制|<code>-disablecreepspawn</code>|-disablecreepspawn|td=0}}：禁止产生小兵。</li>'\
+           +'<li>{{点击复制|<code>-enablecreepspawn</code>|-enablecreepspawn|td=0}}：恢复产生小兵。</li>'\
+           +'<li>{{点击复制|<code>-killwards</code>|-killwards|td=0}}：摧毁所有{{H|侦查守卫}}和{{H|岗哨守卫}}。</li>'\
+           +'<li>{{点击复制|<code>-allvision</code>|-allvision|td=0}}：双方阵营共享视野。</li>'\
+           +'<li>{{点击复制|<code>-normalvision</code>|-normalvision|td=0}}：视野恢复正常。</li>'\
+           +'<li>{{点击复制|<code>-trees</code>|-trees|td=0}}：刷新树木。</li>'\
+           +'</ul>\n'
+    retxt=html_function(retxt)
+    upload_data = {'action': 'edit', 'title': '常用测试指令/聊天框', 'text': retxt, 'format': 'json', 'token': csrf_token}
     upload_info = seesion.post(target_url, headers=headers, data=upload_data)
-    return analyse_upload_json('护甲/物理抗性表格', upload_info)
+    return analyse_upload_json('常用测试指令/聊天框', upload_info)
+
+def common_code_hero_page(json,seesion, csrf_token,html_function):
+    retxt=''
+    retxt+='英雄的所有表格中{{点击复制|<code>代码样式文字</code>|代码样式文字|td=0}}均可以通过点击进行复制。\n'\
+           +'<table class="wikitable mw-collapsible" style="">'\
+           +'<tr><th>英雄</th><th>代码</th><th>完整代码</th><th>创建友方英雄</th><th>创建敌方英雄</th></tr>'
+    for i in json['英雄']:
+        db=json['英雄'][i]
+        if db['应用']==1:
+            retxt+='<tr><td id="'+db['页面名']+'">{{小图片|'+db['主属性']['1']+'}}{{H|'+i+'}}</td>'\
+                   +'<td>{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}</td>'\
+                   +'<td>{{点击复制|<code>npc_dota_hero_'+db['代码名']+'</code>|npc_dota_hero_'+db['代码名']+'|td=0}}</td>'\
+                   +'<td>{{点击复制|<code>-createhero '+db['代码名']+'</code>|-createhero '+db['代码名']+'|td=0}}</td>'\
+                   +'<td>{{点击复制|<code>-createhero '+db['代码名']+' enemy</code>|-createhero '+db['代码名']+' enemy|td=0}}</td></tr>'
+    retxt+='</table>\n'
+    retxt=html_function(retxt)
+    upload_data = {'action': 'edit', 'title': '常用测试指令/英雄', 'text': retxt, 'format': 'json', 'token': csrf_token}
+    upload_info = seesion.post(target_url, headers=headers, data=upload_data)
+    return analyse_upload_json('常用测试指令/英雄', upload_info)
+
+def common_code_item_page(json,seesion, csrf_token,html_function):
+    retxt=''
+    item={'肉山':[],'中立第1级':[],'中立第2级':[],'中立第3级':[],'中立第4级':[],'中立第5级':[],'普通物品':[],'已移除':[]}
+    for i in json['物品']:
+        db=json['物品'][i]
+        if db['应用']==1:
+            getbool=True
+            for j in db['商店']:
+                shop = db['商店'][j]
+                if shop in item:
+                    item[shop].append(i)
+                    getbool = False
+            if getbool:
+                item['普通物品'].append(i)
+        else:
+            item['已移除'].append(i)
+    retxt+='物品的所有表格中{{点击复制|<code>代码样式文字</code>|代码样式文字|td=0}}均可以通过点击进行复制。\n'\
+           +'===肉山物品===\n'\
+           +'<table class="wikitable mw-collapsible">'\
+           +'<tr><th>物品</th><th>代码</th><th>完整代码</th><th>给予自己物品</th><th>给予机器人物品</th></tr>'
+    for i in item['肉山']:
+        db=json['物品'][i]
+        retxt += '<tr><td id="'+db['页面名']+'">{{H|' + i + '}}</td>' \
+                 + '<td>{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>item_' + db['代码名'] + '</code>|item_' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-item ' + db['代码名'] + '</code>|-item ' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-givebots ' + db['代码名'] + '</code>|-givebots ' + db['代码名'] + '|td=0}}</td></tr>'
+    retxt+='</table>\n'\
+           +'===中立物品===\n'\
+           +'<table class="wikitable mw-collapsible">'\
+           +'<tr><th>物品</th><th>代码</th><th>完整代码</th><th>给予自己物品</th><th>给予机器人物品</th></tr>'\
+           +'<tr><th colspan=5>中立第1级</th></tr>'
+    for i in item['中立第1级']:
+        db=json['物品'][i]
+        retxt += '<tr><td id="'+db['页面名']+'">{{H|' + i + '}}</td>' \
+                 + '<td>{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>item_' + db['代码名'] + '</code>|item_' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-item ' + db['代码名'] + '</code>|-item ' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-givebots ' + db['代码名'] + '</code>|-givebots ' + db['代码名'] + '|td=0}}</td></tr>'
+    retxt+='<tr><th colspan=5>中立第2级</th></tr>'
+    for i in item['中立第2级']:
+        db=json['物品'][i]
+        retxt += '<tr><td id="'+db['页面名']+'">{{H|' + i + '}}</td>' \
+                 + '<td>{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>item_' + db['代码名'] + '</code>|item_' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-item ' + db['代码名'] + '</code>|-item ' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-givebots ' + db['代码名'] + '</code>|-givebots ' + db['代码名'] + '|td=0}}</td></tr>'
+    retxt+='<tr><th colspan=5>中立第3级</th></tr>'
+    for i in item['中立第3级']:
+        db=json['物品'][i]
+        retxt += '<tr><td id="'+db['页面名']+'">{{H|' + i + '}}</td>' \
+                 + '<td>{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>item_' + db['代码名'] + '</code>|item_' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-item ' + db['代码名'] + '</code>|-item ' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-givebots ' + db['代码名'] + '</code>|-givebots ' + db['代码名'] + '|td=0}}</td></tr>'
+    retxt+='<tr><th colspan=5>中立第4级</th></tr>'
+    for i in item['中立第4级']:
+        db=json['物品'][i]
+        retxt += '<tr><td id="'+db['页面名']+'">{{H|' + i + '}}</td>' \
+                 + '<td>{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>item_' + db['代码名'] + '</code>|item_' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-item ' + db['代码名'] + '</code>|-item ' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-givebots ' + db['代码名'] + '</code>|-givebots ' + db['代码名'] + '|td=0}}</td></tr>'
+    retxt+='<tr><th colspan=5>中立第5级</th></tr>'
+    for i in item['中立第5级']:
+        db=json['物品'][i]
+        retxt += '<tr><td id="'+db['页面名']+'">{{H|' + i + '}}</td>' \
+                 + '<td>{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>item_' + db['代码名'] + '</code>|item_' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-item ' + db['代码名'] + '</code>|-item ' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-givebots ' + db['代码名'] + '</code>|-givebots ' + db['代码名'] + '|td=0}}</td></tr>'
+    retxt+='</table>\n'\
+           +'===普通物品===\n'\
+           +'<table class="wikitable mw-collapsible">'\
+           +'<tr><th>物品</th><th>代码</th><th>完整代码</th><th>卷轴</th><th>给予自己物品</th><th>给予机器人物品</th></tr>'
+    for i in item['普通物品']:
+        db=json['物品'][i]
+        retxt += '<tr><td id="'+db['页面名']+'">{{H|' + i + '}}</td>' \
+                 + '<td>{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>item_' + db['代码名'] + '</code>|item_' + db['代码名'] + '|td=0}}</td>'
+        if '组件' in db:
+            retxt+='<td>{{点击复制|<code>recipe</code>|item_recipe_' + db['代码名'] + '|td=0}}</td>'
+        else:
+            retxt+='<td></td>'
+        retxt += '<td>{{点击复制|<code>-item ' + db['代码名'] + '</code>|-item ' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-givebots ' + db['代码名'] + '</code>|-givebots ' + db['代码名'] + '|td=0}}</td></tr>'
+    retxt+='</table>\n'\
+           +'===已移除物品===\n'\
+           +'<table class="wikitable mw-collapsible">'\
+           +'<tr><th>物品</th><th>代码</th><th>完整代码</th><th>给予自己物品</th><th>给予机器人物品</th></tr>'
+    for i in item['已移除']:
+        db=json['物品'][i]
+        retxt += '<tr><td id="'+db['页面名']+'">{{H|' + i + '}}</td>' \
+                 + '<td>{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>item_' + db['代码名'] + '</code>|item_' + db['代码名'] + '|td=0}}</td>'\
+                 +'<td>{{点击复制|<code>-item ' + db['代码名'] + '</code>|-item ' + db['代码名'] + '|td=0}}</td>' \
+                 + '<td>{{点击复制|<code>-givebots ' + db['代码名'] + '</code>|-givebots ' + db['代码名'] + '|td=0}}</td></tr>'
+    retxt+='</table>\n'
+    retxt=html_function(retxt)
+    upload_data = {'action': 'edit', 'title': '常用测试指令/物品', 'text': retxt, 'format': 'json', 'token': csrf_token}
+    upload_info = seesion.post(target_url, headers=headers, data=upload_data)
+    return analyse_upload_json('常用测试指令/物品', upload_info)

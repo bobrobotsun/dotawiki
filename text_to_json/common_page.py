@@ -474,14 +474,14 @@ def create_page_hero(json_base, log_base, log_list, hero):
     db = json_base['英雄'][hero]
     retxt = '__NOTOC__<div style="float:left;">' \
             + '<div class="bg-primary" style="margin-left:0px;margin-top:1em;display:block;height:48px;">' \
-            + '<div class="heronavi" style="margin-bottom:0px"><span class="dota_get_image_by_image_name" data-image-name="miniheroes_' + db["代码名"] + '.png" data-image-link="' + \
-            db["中文名"] + '"></span></div>' \
-            + '<div class="heronavi" style="margin-bottom:0px"><span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["中文名"] + '/英雄语音">英雄语音</span></div>' \
-            + '<div class="heronavi" style="margin-bottom:0px"><span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["中文名"] + '#DotA">dota1资料</span></div>' \
-            + '<div class="heronavi" style="margin-bottom:0px"><span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["中文名"] + '/equipment">饰品</span></div>' \
-            + '<div class="heronavi" style="margin-bottom:0px"><span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["中文名"] + '/版本改动">完整改动</span></div>' \
-            + '<div class="heronavi" style="margin-bottom:0px"><span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["中文名"] + '#旧有技能">旧有技能</span></div>' \
-            + '<div class="heronavi" style="margin-bottom:0px"><span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["中文名"] + '/攻略">攻略玩法</span></div>' \
+            + '<div class="heronavi" style="margin-bottom:0px">{{小图片|' + db["页面名"] + '}}</div>' \
+            + '<div class="heronavi" style="margin-bottom:0px">[[' + db["中文名"] + '/英雄语音|英雄语音]]</div>' \
+            + '<div class="heronavi" style="margin-bottom:0px">[[' + db["中文名"] + '#DotA|dota1资料]]</div>' \
+            + '<div class="heronavi" style="margin-bottom:0px">[[' + db["中文名"] + '/equipment|饰品]]</div>' \
+            + '<div class="heronavi" style="margin-bottom:0px">[[' + db["中文名"] + '/版本改动|完整改动]]</div>' \
+            + '<div class="heronavi" style="margin-bottom:0px">[[' + db["中文名"] + '#旧有技能|旧有技能]]</div>' \
+            + '<div class="heronavi" style="margin-bottom:0px">[[' + db["中文名"] + '/攻略|攻略玩法]]</div>' \
+            + '<div class="heronavi" style="margin-bottom:0px">[[' + db["中文名"] + '#代码查询|代码查询]]</div>' \
             + '<div class="heronavi hidden-xs" style="float:right;padding:0px;">'
     ii = 0
     while True:
@@ -520,7 +520,13 @@ def create_page_hero(json_base, log_base, log_list, hero):
              + create_switch_log(log_base, log_list, all_the_names(db, json_base)) \
              + '\n==饰品==\n' \
              + '<span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["中文名"] + '/equipment">点击进入查看饰品信息</span>' \
-             + json_base['机制']['通用']['简单条目']['英雄导航']
+             + '\n==代码查询==\n' \
+             + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>npc_dota_hero_'+db['代码名']+'</code>|npc_dota_hero_'+db['代码名']+'|td=0}}</li>'
+    for i in db['技能']:
+        retxt+='<li>'+i+'（'+json_base['技能'][i]['中文名']+'）：{{点击复制|<code>'+json_base['技能'][i]['代码']+'</code>|'+json_base['技能'][i]['代码']+'|td=0}}</li>'
+    retxt += '<li>[[常用测试指令#'+db['页面名']+'|点击此处可以查看全部测试指令]]</li>'
+    retxt+='</ul>\n'
+    retxt += json_base['机制']['通用']['简单条目']['英雄导航']
     retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
@@ -582,8 +588,16 @@ def create_page_unit(json_base, log_base, log_list, unit):
         retxt += '[[分类:士兵]]'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
-    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base)) \
-             + '<div>' + json_base['机制']['通用']['简单条目']['非英雄单位导航'] + '</div>[[分类:非英雄单位]]'
+    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
+    retxt +='\n==代码查询==\n' \
+            + '<ul><li>'+db['页面名']+'：</li><ul>'
+    for i in db['代码名']:
+        retxt+='<li>'+i+'：{{点击复制|<code>'+db['代码名'][i]+'</code>|'+db['代码名'][i]+'|td=0}}、{{点击复制|<code>npc_dota_'+db['代码名'][i]+'</code>|npc_dota_'+db['代码名'][i]+'|td=0}}</li>'
+    retxt += '</ul>'
+    for i in db['技能']:
+        retxt+='<li>'+i+'（'+json_base['技能'][i]['中文名']+'）：{{点击复制|<code>'+json_base['技能'][i]['代码']+'</code>|'+json_base['技能'][i]['代码']+'|td=0}}</li>'
+    retxt += '</ul>'
+    retxt += '<div>' + json_base['机制']['通用']['简单条目']['非英雄单位导航'] + '</div>[[分类:非英雄单位]]'
     retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
@@ -639,7 +653,13 @@ def create_page_item(json_base, log_base, log_list, item):
             retxt += '。'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
+    retxt += '</ul>'
     retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base)) + '[[分类:物品]]'
+    retxt +='\n==代码查询==\n' \
+            + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>item_'+db['代码名']+'</code>|item_'+db['代码名']+'|td=0}}</li>'
+    for i in db['技能']:
+        retxt+='<li>'+i+'（'+json_base['技能'][i]['中文名']+'）：{{点击复制|<code>'+json_base['技能'][i]['代码']+'</code>|'+json_base['技能'][i]['代码']+'|td=0}}</li>'
+    retxt += '<li>[[常用测试指令#' + db['页面名'] + '|点击此处可以查看全部测试指令]]</li>'
     retxt += thanks_for_the_audience()
     rere = ''
     nums = 0

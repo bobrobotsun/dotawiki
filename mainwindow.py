@@ -648,7 +648,9 @@ class Main(QMainWindow):
 
     def download_and_upload_single_pages(self):
         info_txt = ''
-        info_txt += page.armor_physic_resistance_page148237(self.seesion, self.csrf_token)
+        info_txt += page.common_code_chat_page(self.seesion, self.csrf_token, self.change_all_template_link_to_html)
+        info_txt += page.common_code_hero_page(self.json_base, self.seesion, self.csrf_token, self.change_all_template_link_to_html)
+        info_txt += page.common_code_item_page(self.json_base, self.seesion, self.csrf_token, self.change_all_template_link_to_html)
         QMessageBox.information(self, '更改完毕', info_txt, QMessageBox.Yes, QMessageBox.Yes)
 
     def download_json_base(self):
@@ -1269,7 +1271,7 @@ class Main(QMainWindow):
         self.entrylayout['编辑区'][0].addWidget(self.entrylayout['编辑区']['树'][0])
         self.entrylayout['编辑区']['树'][0].setHeaderLabels(['名称', '值'])
         self.entrylayout['编辑区']['树'][0].setColumnWidth(0, 300)
-        self.entrylayout['编辑区']['树'][0].doubleClicked.connect(lambda :self.entry_edit_change_value())
+        self.entrylayout['编辑区']['树'][0].doubleClicked.connect(lambda: self.entry_edit_change_value())
         self.entrylayout['编辑区']['树'][0].keyPressEvent = self.entry_key_function
 
         self.entry_refresh_tree()
@@ -1933,10 +1935,19 @@ class Main(QMainWindow):
     def upload_text_link(self, x):
         retxt = ''
         link = x.group(1).split('|')
-        if len(link) > 1:
-            retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + link[0] + '">' + link[1] + '</span>'
+        if '#' in link[0]:
+            link_index=link[0].index('#')+1
+            link_hex=link[0][link_index:].encode('utf-8')
+            link_target=''
+            for i in link_hex:
+                link_target+='.'+self.change_256hex_to_str(i)
+            real_link=link[0][:link_index]+link_target
         else:
-            retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + link[0] + '">' + link[0] + '</span>'
+            real_link=link[0]
+        if len(link) > 1:
+            retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + real_link + '">' + link[1] + '</span>'
+        else:
+            retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + real_link + '">' + link[0] + '</span>'
         return retxt
 
     def upload_text_template(self, x):
@@ -2002,13 +2013,22 @@ class Main(QMainWindow):
             retxt += '<span class="dota_click_absolute_additional_infomation_frame">' \
                      + '<span class="dota_click_absolute_additional_infomation_frame_button">' + template_args[1] + '</span>' \
                      + '<span class="dota_click_absolute_additional_infomation_frame_frame">' + template_args[2] + '</span></span> '
+        elif template_args[0] == '点击复制':
+            td = ''
+            if template_args[-1][:3] == 'td=':
+                td = ' data-text-decoration="' + template_args[-1][3:] + '"'
+                template_args.pop()
+            if len(template_args) > 2:
+                retxt = '<span class="dota_click_copy_text_html" data-click-copy-text="' + template_args[2] + '"' + td + '>' + template_args[1] + '</span>'
+            else:
+                retxt = '<span class="dota_click_copy_text_html" data-click-copy-text="' + template_args[1] + '"' + td + '>' + template_args[1] + '</span>'
         elif template_args[0] == '链接':
             if len(template_args) > 2:
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[2] + '</span>'
             else:
                 retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
         elif template_args[0] == '错误文字':
-            retxt+='<span class="error_text">'+template_args[1]+'</span>'
+            retxt += '<span class="error_text">' + template_args[1] + '</span>'
         elif template_args[0] == '分类查询':
             post = ''
             dict = ''
@@ -2027,7 +2047,7 @@ class Main(QMainWindow):
             elif template_args[1] == '物品':
                 retxt = common_page.create_item_choose_element(self.json_base, template_args[2:], dict, post)
         elif template_args[0] == '机制内容':
-            if len(template_args)<4:
+            if len(template_args) < 4:
                 if template_args[1] in self.json_base['机制']:
                     if template_args[2] in self.json_base['机制'][template_args[1]]['内容']:
                         if template_args[3] in self.json_base['机制'][template_args[1]]['内容'][template_args[2]]['内容']:
@@ -2039,9 +2059,23 @@ class Main(QMainWindow):
                 else:
                     retxt += '{{错误文字|错误机制名：' + template_args[1] + '}}'
             else:
-                retxt += '{{错误文字|《机制内容》需要输入3个参数，而您只输入了' + str(len(template_args)-1) + '个参数}}'
+                retxt += '{{错误文字|《机制内容》需要输入3个参数，而您只输入了' + str(len(template_args) - 1) + '个参数}}'
         else:
             return x.group(0)
+        return retxt
+
+    def change_256hex_to_str(self,num):
+        retxt=''
+        temp=num//16
+        num-=temp*16
+        if temp<10:
+            retxt+=chr(48+temp)
+        else:
+            retxt+=chr(55+temp)
+        if num<10:
+            retxt+=chr(48+num)
+        else:
+            retxt+=chr(55+num)
         return retxt
 
     def check_dict_equal(self, d1, d2):
@@ -2257,8 +2291,8 @@ class Main(QMainWindow):
     def choose_mainlayout_change_edit_target(self, target_base=''):
         self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(target_base)
         self.edit_category_selected_changed()
-        ind=self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text().index('】')
-        target_name = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()[ind+1:]
+        ind = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text().index('】')
+        target_name = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()[ind + 1:]
         self.edit_target_selected_changed(target_name)
 
     def complex_dict_to_tree(self, tdict, edict, sdict):
@@ -3484,10 +3518,10 @@ class Main(QMainWindow):
     def version_button_delete_tree_item(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         parent = item.parent()
-        len=parent.childCount()
-        index = min(parent.indexOfChild(item),len-2)
+        len = parent.childCount()
+        index = min(parent.indexOfChild(item), len - 2)
         parent.removeChild(item)
-        if len==1:
+        if len == 1:
             self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(parent)
         else:
             self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(parent.child(index))
@@ -3762,8 +3796,8 @@ class Main(QMainWindow):
             self.entry_base[name] = {}
             self.entry_base[name]['链接'] = item.child(0).text(1)
             self.entry_base[name]['文字'] = item.child(1).text(1)
-            for j in range(2,item.childCount()):
-                child1=item.child(j)
+            for j in range(2, item.childCount()):
+                child1 = item.child(j)
                 self.entry_base[name][item.child(j).text(0)] = item.child(j).text(1)
 
     def entry_resort(self):
@@ -3791,7 +3825,7 @@ class Main(QMainWindow):
             tree3.set_type('text')
             tree3.set_value(self.entry_base[i]['文字'])
             for j in self.entry_base[i]:
-                if j not in ['链接','文字']:
+                if j not in ['链接', '文字']:
                     tree4 = TreeItemEdit(tree1, j)
                     tree4.set_type('text')
                     tree4.set_value(self.entry_base[i][j])
@@ -3823,23 +3857,21 @@ class Main(QMainWindow):
             clickb = QMessageBox.critical(self, '删除一组词汇', '您正试图删除【' + item.text(0) + '】这条词汇！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if clickb == QMessageBox.Yes:
                 self.entrylayout['编辑区']['树'][0].takeTopLevelItem(self.entrylayout['编辑区']['树'][0].indexOfTopLevelItem(item))
-        elif item.parent().indexOfChild(item)>1:
+        elif item.parent().indexOfChild(item) > 1:
             clickb = QMessageBox.critical(self, '删除一组文字', '您正试图删除【' + item.parent().text(0) + '】这条词汇的【' + item.text(0) + '】！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             if clickb == QMessageBox.Yes:
                 item.parent().removeChild(item)
-
-
 
     def entry_edit_change_name(self):
         item = self.entrylayout['编辑区']['树'][0].currentItem()
         if item.itemtype == 'text':
             index = item.parent().indexOfChild(item)
-            if index>1:
+            if index > 1:
                 text, ok = MoInputWindow.getText(self, '修改值', '您想将【' + item.text(0) + '】其修改为:', item.text(0))
                 if ok:
                     item.setText(0, text)
 
-    def entry_edit_change_value(self,expand=False):
+    def entry_edit_change_value(self, expand=False):
         item = self.entrylayout['编辑区']['树'][0].currentItem()
         if item.itemtype == 'tree':
             text, ok = MoInputWindow.getText(self, '修改值', '您想增加一个条目:', '文字' + str(item.childCount()))

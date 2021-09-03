@@ -238,21 +238,17 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         for ii in all_attri:
             if not isinstance(all_attri[ii], str):
                 all_attri[ii] = round(all_attri[ii], 2)
-        st = '<div class="dota_simple_infobox bgc_white dota_hero_comprehensive_attri_dict_hero" data-hero-name="' + i + '">' \
-                                                                                                                         '<div style="text-align:center;"><div class="bg-primary" style="float:left;padding:0.5em">' \
-                                                                                                                         '<span class="dota_get_image_by_json_name" data-json-name="' + i \
-             + '" data-image-height="72" data-image-link="1" data-image-center="1"></span></div>' \
-               '<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">[[' + db["页面名"] + '|' + db["中文名"] + ']]</div>' \
+        st = '<div class="dota_simple_infobox bgc_white dota_hero_comprehensive_attri_dict_hero" data-hero-name="' + i + '">'\
+             +'<div style="text-align:center;"><div class="bg-primary" style="float:left;padding:0.5em">'\
+             +'<span class="dota_get_image_by_json_name" data-json-name="' + i + '" data-image-height="72" data-image-link="1" data-image-center="1"></span></div>' \
+             +'<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:2px;margin:0px;text-align:center;">[[' + db["页面名"] + '|' + db["中文名"] + ']]</div>' \
              + '<div class="bg-primary" style="font-size:100%;padding: 2px;text-align:center;">' + db["英文名"] + '</div>' \
              + '<div style="padding:0.25em;text-align:center;">' \
-             + '<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["阵营"]['1'] \
-             + '" data-text-link="0"></span></span>' \
-               '<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["主属性"]['1'] \
-             + '" data-text-link="0"></span></span>' \
-               '<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["近战远程"]['1'] \
-             + '" data-text-link="0"></span></span></div></div>' \
-               '<div style="display:flex;flex-wrap:wrap;justify-content:space-around;">' \
-               '<div style="padding:0.25em;border:1px #333 solid;' + main_attri['力量'] \
+             + '<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["阵营"]['1'] + '" data-text-link="0"></span></span>' \
+             +'<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["主属性"]['1'] + '" data-text-link="0"></span></span>' \
+             +'<span class="ability_indicator" style="background:#a33;color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["近战远程"]['1'] + '" data-text-link="0"></span></span></div></div>' \
+             +'<div style="display:flex;flex-wrap:wrap;justify-content:space-around;">' \
+             +'<div style="padding:0.25em;border:1px #333 solid;' + main_attri['力量'] \
              + '"><span class="dota_get_image_by_json_name" data-json-name="力量" title="力量"></span>' + str(db['力量']['1']) + '+' + str(db['力量成长']['1']) \
              + fulfil_complex_and_simple_show_attri_2('总力量', '', '=，') + '</div><div style="padding:0.25em;border:1px #333 solid;' + main_attri['敏捷'] \
              + '"><span class="dota_get_image_by_json_name" data-json-name="敏捷" title="敏捷"></span>' + str(db['敏捷']['1']) + '+' + str(db['敏捷成长']['1']) \
