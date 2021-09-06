@@ -2009,6 +2009,8 @@ class Main(QMainWindow):
                     retxt += self.entry_base[template_args[1]]['文字']
             else:
                 retxt += '{{错误文字|错误的词汇名称：' + template_args[1] + '}}'
+        elif template_args[0] == 'symbol':
+            retxt+='{{图片|'+template_args[1]+'.png}}'
         elif template_args[0] == '额外信息框':
             retxt += '<span class="dota_click_absolute_additional_infomation_frame">' \
                      + '<span class="dota_click_absolute_additional_infomation_frame_button">' + template_args[1] + '</span>' \
