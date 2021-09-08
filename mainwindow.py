@@ -592,10 +592,10 @@ class Main(QMainWindow):
         QMessageBox.information(self, '下载曾用名库完成', '下载曾用名库完成，请继续操作')
 
     def download_entry_base(self):
-        self.name_base = self.download_json('entry_base.json')
+        self.entry_base = self.download_json('entry_base.json')
         self.entry_resort()
         self.entry_refresh_tree()
-        self.file_save(os.path.join('database', 'entry_base.json'), json.dumps(self.name_base))
+        self.file_save(os.path.join('database', 'entry_base.json'), json.dumps(self.entry_base))
         QMessageBox.information(self, '下载词汇库完成', '下载词汇库完成，请继续操作')
 
     def update_json_name(self, list):
@@ -1956,6 +1956,8 @@ class Main(QMainWindow):
         if template_args[0] in ['H', 'A', 'I', 'h', 'a', 'i']:
             size = ''
             pic_style = ''
+            if template_args[1]=='魔晶升级':
+                template_args.insert(2,'w24')
             for i in range(2, len(template_args)):
                 if template_args[i][0] == 'w':
                     size = ' data-image-width="' + template_args[i][1:] + '"'
@@ -2010,7 +2012,10 @@ class Main(QMainWindow):
             else:
                 retxt += '{{错误文字|错误的词汇名称：' + template_args[1] + '}}'
         elif template_args[0] == 'symbol':
-            retxt+='{{图片|'+template_args[1]+'.png}}'
+            retxt+='{{图片|'+template_args[1]+'.png'
+            if template_args[1]=='shard':
+                retxt+='|w24'
+            retxt+='}}'
         elif template_args[0] == '额外信息框':
             retxt += '<span class="dota_click_absolute_additional_infomation_frame">' \
                      + '<span class="dota_click_absolute_additional_infomation_frame_button">' + template_args[1] + '</span>' \
