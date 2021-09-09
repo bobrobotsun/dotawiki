@@ -1534,7 +1534,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         if '条件复合属性' in conditions:
             for i in range(len(conditions['条件复合属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i], i, json, result, target, '条件复合属性')
-                another_info += '(' + common_page.create_upgrade_text(tempjson, image_size='18') + ')'
+                another_info += '(' + common_page.create_upgrade_text(tempjson, image_size='|h16') + ')'
         if '条件单一属性' in conditions:
             for i in range(len(conditions['条件单一属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件单一属性'][i], i, json, result, target, '条件单一属性')
@@ -1586,7 +1586,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             for i in range(len(traitlist)):
                 if i > 0:
                     another_info += ';'
-                another_info += common_page.create_upgrade_text(json["属性"], traitlist[i], image_size='18')
+                another_info += common_page.create_upgrade_text(json["属性"], traitlist[i], image_size='|h16')
             another_info += ')'
 
         if '条件物品属性' in conditions:
@@ -1634,7 +1634,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     name = tempjson['名称']
                 else:
                     name = conditions['条件复合属性'][i][-1]
-                trait += '<div>' + name + '：' + common_page.nocheck_create_upgrade_text(tempjson, image_size='18') + '</div>'
+                trait += '<div>' + name + '：' + common_page.nocheck_create_upgrade_text(tempjson, image_size='|h16') + '</div>'
         if '条件单一属性' in conditions:
             for i in range(len(conditions['条件单一属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件单一属性'][i][:-1], i, json, result, target, '条件单一属性')
@@ -1690,7 +1690,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 if '简述' in tempjson and tempjson['简述'] != '':
                     note += '<div>' + tempjson['简述'] + '</div>'
         for i in traitlist:
-            trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i, image_size='18') + '</div>'
+            trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i, image_size='|h16') + '</div>'
 
         if '条件物品属性' in conditions:
             for i in range(len(conditions['条件物品属性'])):

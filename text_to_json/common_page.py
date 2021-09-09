@@ -56,7 +56,9 @@ def number_to_string(number, rr=4):
         return str(i)
 
 
-def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '', image_size='22'):
+def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '', image_size=''):
+    if image_size!='' and '|' not in image_size:
+        print('报错')
     if k in numjsons:
         numjson = numjsons[k]
         retext = ''
@@ -67,7 +69,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
             if i in numjson:
                 if ii > 1:
                     for j in numjson[i]['升级来源']:
-                        retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] + '|h'+image_size+'|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
+                        retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] +image_size+'|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
                 jj = 0
                 while True:
                     jj += 1
@@ -88,7 +90,9 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
         return ''
 
 
-def nocheck_create_upgrade_text(numjson, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '', image_size='22'):
+def nocheck_create_upgrade_text(numjson, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '', image_size=''):
+    if image_size!='' and '|' not in image_size:
+        print('报错')
     retext = ''
     ii = 0
     while True:
@@ -97,7 +101,7 @@ def nocheck_create_upgrade_text(numjson, post_each=lambda x: x['后缀'] if '后
         if i in numjson:
             if ii > 1:
                 for j in numjson[i]['升级来源']:
-                    retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] + '|h'+image_size+'|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
+                    retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] +image_size+'|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
             jj = 0
             while True:
                 jj += 1
@@ -174,7 +178,7 @@ def get_item_value(db):
 
 def create_role_set(role, level):
     retxt = '<div style="margin:auto;display:inline-block" title="' + number_to_string(level) + '级' \
-            + number_to_string(role) + '"><span class="dota_get_image_by_image_name" data-image-name="'
+            + number_to_string(role) + '">{{图片|'
     if role == '核心':
         retxt += 'carry'
     elif role == '爆发':
@@ -193,12 +197,12 @@ def create_role_set(role, level):
         retxt += 'jungler'
     elif role == '推进':
         retxt += 'pusher'
-    retxt += '.png" data-image-height="32"></span></div>'
+    retxt += '.png|h32}}</div>'
     return retxt
 
 
 def create_miniimage_with_link(json_base):
-    return '<span class="dota_get_image_by_json_name" data-json-name="' + json_base['页面名'] + '" data-image-mini="1" data-text-link="1"></span>'
+    return '{{小图片|' + json_base['页面名'] + '|text=1}}'
 
 
 def create_navboxunit(json_base):
@@ -491,8 +495,8 @@ def create_page_hero(json_base, log_base, log_list, hero):
             retxt += create_role_set(db["定位"][i], str(db["定位等级"][i]))
         else:
             break
-    retxt += '&nbsp;<span class="dota_get_image_by_image_name" data-image-name="heroes_' + db["代码名"] + '.png" data-image-height="48"></span>' \
-             + '<span class="dota_get_image_by_image_name" data-image-name="heroes_' + db["代码名"] + '_alt1.png" data-image-height="48"></span></div></div>' \
+    retxt += '&nbsp;{{图片|heroes_' + db["代码名"] + '.png|h48}}' \
+             + '{{图片|heroes_' + db["代码名"] + '_alt1.png|h48}}</div></div>' \
              + "<p><b>" + db["中文名"] + "</b>（" + db["英文名"] + '）是Dota2中的一位' + db["主属性"]['1'] + '<span class="dota_create_link_to_wiki_page">英雄</span>。</p>' \
              + db["具体展示"] + '[[category:' + db["主属性"]['1'] + '英雄]]' \
              + '<div style="line-height: 200%;">' \
@@ -502,8 +506,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
              + '<h3>DotA</h3>'
     if "dota中文名" in db:
         retxt += '<div class="full-width-xs" style="padding:0.5em;display:block;">' \
-                 + '<div style="float:left;margin-right:0.5em;"><span class="dota_get_image_by_image_name" data-image-name="dota_hero_' + db[
-                     "代码名"] + '.png" data-image-width="64"></span></div>' \
+                 + '<div style="float:left;margin-right:0.5em;">{{图片|dota_hero_' + db["代码名"] + '.png|w64}}</div>' \
                  + '<div>' \
                  + '<div style="display:inline-block;">' + db["dota中文别名"] + '&nbsp;' + db["dota英文别名"] + '</div><br>' \
                  + '<div style="display:inline-block;margin-left:1em"><small>' + db["dota中文名"] + '&nbsp;' + db["dota英文名"] + '</small></div>' \
@@ -631,8 +634,7 @@ def create_page_item(json_base, log_base, log_list, item):
         for j, w in db["同商店物品"][i].items():
             if int(j) % 4 == 1:
                 retxt += '\n<tr>'
-            retxt += '<td style="padding:6px;text-align:center;"><span class="dota_get_image_by_json_name" data-json-name="' + w[
-                '物品名'] + '" data-image-width="52" data-image-link="1" data-image-center="1" data-text-link="1"></span></td>'
+            retxt += '<td style="padding:6px;text-align:center;">{{大图片|' + w['物品名'] + '|w52|link=1|center|text=1}}</td>'
             if int(j) % 4 == 0 or int(j) == len(db["同商店物品"][i]):
                 retxt += '</tr>'
         retxt += '</table>'
@@ -648,8 +650,7 @@ def create_page_item(json_base, log_base, log_list, item):
                 for j in range(len(all_the_item_name)):
                     if j > 0:
                         retxt += '、'
-                    retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + all_the_item_name[j][0] + '" data-image-mini="1" data-text-link="1"></span>(' + \
-                             all_the_item_name[j][1] + ')'
+                    retxt += '{{小图片|' + all_the_item_name[j][0] + '|text=1}}(' + all_the_item_name[j][1] + ')'
             retxt += '。'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
@@ -714,7 +715,7 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
     retxt = ''
     if db['次级分类'] != '引用机制':
         if db['图片'] != '':
-            retxt += '<span class="dota_get_image_by_image_name" data-image-name="' + db['图片'] + '" data-image-width="' + db['图片大小'] + '" data-image-center="right"></span>'
+            retxt += '{{图片|' + db['图片'] + '|w' + db['图片大小'] + '|right}}'
     retxt += db['简述'] + create_all_chapter_page_mechnism(db)
     if db['次级分类'] != '引用机制':
         retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
@@ -745,7 +746,7 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     db = json_base['单位组'][unitgroup]
     retxt = ''
     if db['图片'] != '':
-        retxt += '<span class="dota_get_image_by_image_name" data-image-name="file:' + db['图片'] + '" data-image-width="120" data-image-center="right"></span>\n'
+        retxt += '{{图片|' + db['图片'] + '|w120|right}}\n'
     retxt += '==组信息==\n<div class="dota_rotatey_transform_switch_content1">'
     for i in db['成员']:
         retxt += '<div>' + db['成员'][i]['具体展示'] + '</div>'

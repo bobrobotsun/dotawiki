@@ -1980,6 +1980,8 @@ class Main(QMainWindow):
             center = ''
             link = ''
             image_class = ''
+            if template_args[1].lower()=='shard.png':
+                template_args.insert(2, 'w24')
             for i in range(2, len(template_args)):
                 if template_args[i] == 'left':
                     center = ' data-image-center="left"'

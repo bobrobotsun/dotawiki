@@ -41,9 +41,7 @@ def get_source_to_data(all_json, version, text_base,name_base):
                             all_units.append(members[k]['单位名'])
                         one_result = {}
                         one_result['数量'] = ability.one_combine_txt_numbers(members[k]['数量']['代码'], all_json, text_base, ['单位组', i, '成员', '数量'])
-                        bt+='<div style="display:inline-block;padding:0 0.25em;"><div><span class="dota_get_image_by_image_name" data-image-name="'\
-                            +one_member['图片']+'" data-image-height="100" data-image-link="'+one_member['页面名']\
-                            +'" data-image-center="1"></span></div><div><span class="dota_create_link_to_wiki_page">'\
+                        bt+='<div style="display:inline-block;padding:0 0.25em;"><div>{{图片|'+one_member['图片']+'|h100|link='+one_member['页面名']+'|center}}</div><div><span class="dota_create_link_to_wiki_page">'\
                             +one_member['页面名']+'</span>×'+change_combine_numbers_to_str(one_result['数量'])+'</div></div>'
                         st+='<div>{{H|' + one_member['页面名'] + '}}×'+change_combine_numbers_to_str(one_result['数量'])+'</div>'
                         codes = {'0': '升级属性', '1': '非英雄单位', '2': members[k]['单位名']}
@@ -149,7 +147,7 @@ def change_combine_numbers_to_str(slist):
         rere += "("
         for l in range(1, len(slist)):
             for m in slist[l][1]:
-                rere += '<span class="dota_get_image_by_image_name" data-image-name="' + slist[l][1][m] + '" data-image-height="18" data-image-link="'+m+'"></span>'
+                rere += '{{图片|' + slist[l][1][m] + '|h18|link='+m+'}}'
             rere += ability.combine_numbers_post_level(slist[l][0],round=1)
         rere += ")"
     return rere
@@ -161,7 +159,7 @@ def change_double_combine_numbers_to_str(slist1,slist2,linkop='~'):
         rere += "("
         for l in range(1, len(slist1)):
             for m in slist1[l][1]:
-                rere += '<span class="dota_get_image_by_image_name" data-image-name="' + slist1[l][1][m] + '" data-image-height="18" data-image-link="'+m+'"></span>'
+                rere += '{{图片|' + slist1[l][1][m] + '|h18|link='+m+'}}'
             rere += ability.combine_numbers_post_level(slist1[l][0],round=1)+linkop+ability.combine_numbers_post_level(slist2[l][0],round=1)
         rere += ")"
     return rere

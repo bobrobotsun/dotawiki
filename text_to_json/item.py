@@ -290,13 +290,12 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         bt += '<table class="infobox" style="text-align:center;background:#fff;width:300px;color:#fff;"><tr class="infobox-title">' \
               + '<th colspan=2 style="background: #a03030;padding: 0.5em 1em;text-align:center;">' + '<span style="font-size:125%">' + \
               db["中文名"] + '</span><div style="text-align:center;">' + db["英文名"] + '</div></th></tr>' \
-              + '<tr><td colspan=2 style="background:#222"><div class="center"><span class="dota_get_image_by_image_name" data-image-name="' \
-              + db["图片"] + '" data-image-width="100" data-image-link="' + db["页面名"] \
-              + '"></span></div></td></tr><tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] \
+              + '<tr><td colspan=2 style="background:#222">{{图片|' + db["图片"] + '|w100|link=' + db["页面名"] + '|center}}</div></td></tr>'\
+              +'<tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] \
               + '</td></tr>'
         st += '<table class="dota_simple_infobox"><tr><th style="text-align:center;" colspan=2>' \
               '<div class="bg-primary" style="padding:0.5em">'\
-              +'<span class="dota_get_image_by_json_name" data-json-name="'+ db["页面名"] + '" data-image-height="72" data-image-center="left" data-image-link="1"></span>'\
+              +'{{大图片|'+ db["页面名"] + '|h72|left|link=1}}'\
               +'<div class="bg-primary" style="font-size:150%;font-weight:normal;padding:0.25em;text-align:center;">[[' + db["页面名"] + '|' + db["中文名"] + ']]</div>'\
               +'<div class="bg-primary" style="font-size:100%;padding:0.25em;text-align:center;">' + db["英文名"] + '</div></div>'\
               +'<div style="padding:0.25em 0.5em;text-align:center;">'
@@ -318,8 +317,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 st += normal_s_tag[0] + v['展示前缀'] + common_page.number_to_string(v['1']) + v['后缀'] + v['展示后缀'] + normal_s_tag[1]
         for i in db['技能']:
             st += normal_s_tag[0] +'<div class="dota_click_absolute_additional_infomation_frame dota_click_find_text_in_json_and_show">' \
-                  '<div class="dota_get_image_by_json_name dota_click_absolute_additional_infomation_frame_button" data-json-name="' + i \
-                  + '" data-image-mini="1" data-text-link="0"></div>' \
+                  '<div class="dota_click_absolute_additional_infomation_frame_button">{{小图片|'+i+'|text=0}}</div>' \
                     '<div class="dota_click_absolute_additional_infomation_frame_frame dota_click_find_text_in_json_and_show_textarea">' \
                     '<div class="dota_click_find_text_in_json_and_show_button" data-find-text-in-json-address="' + i + '，简易展示">点击显示《' + i + '》详细信息</div></div></div>'\
                   + normal_s_tag[1]

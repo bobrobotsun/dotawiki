@@ -452,7 +452,7 @@ def fulfil_complex_and_simple_show(all_json,html_function):
         st += '</div></div>' \
               '<div style="display:flex;flex-wrap:wrap;justify-content:space-around;">'
         if db['图片'] != '':
-            bt+= '<span class="dota_get_image_by_image_name center" data-image-name="' + db['图片'] + '" data-image-width="200" data-image-link="' + i + '"></span>'
+            bt+= '{{图片|' + db['图片'] + '|w200|link=' + i + '|center}}'
         bt+='</div></td></tr>'
         btlist = [['等级', [['等级']]], ['奖励金钱', [['金钱下限', '金钱上限']]], ['奖励经验', [['经验']]], ['生命值', [['生命值']]]
             , ['魔法值', [['魔法值']]], ['生命恢复', [['生命恢复']]], ['魔法恢复', [['魔法恢复']]], ['攻击力<br>(攻击类型)', [['攻击下限', '攻击上限']], '<br>（', [['攻击类型']], '）']
