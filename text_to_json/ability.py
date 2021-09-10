@@ -892,7 +892,7 @@ def change_combine_txt(json, ii, data, all_json, name, target, change_all_templa
                                     returntxt += temp[j][1][k]
                                 else:
                                     returntxt += temp[j][1][k].replace('Talent.png', 'Talentb.png')
-                                returntxt += '|h18|link=' + k + '}}'
+                                returntxt += '|h16|link=' + k + '}}'
                             returntxt += combine_numbers_post_level(temp[j][0], post, level)
                         returntxt += ")"
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
@@ -1722,9 +1722,9 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
 
         if '次级分类' in json:
             if json['次级分类'] == '神杖技能':
-                note += '<div style="text-align:right;color:#4189d4">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div>'
+                note += '<div style="text-align:right;color:#4189d4">{{图片|Agha.png|h16}}&nbsp;由阿哈利姆神杖获得</div>'
             elif json['次级分类'] == '魔晶技能':
-                note += '<div style="text-align:right;color:#4189d4">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div>'
+                note += '<div style="text-align:right;color:#4189d4">{{图片|Shard.png|h16}}&nbsp;由阿哈利姆魔晶获得</div>'
 
         if '次级分类' in json and json['次级分类'] == '天赋技能':
             title = minisource + '[[' + json['页面名'] + '|' + json['页面名'][len(json['技能归属']):] + ']]' + another_image + another_name
@@ -1766,9 +1766,9 @@ def ability_desc_show_one_mech(json, upgrade=False):
     retxt = '<div>'
     if upgrade and '升级来源' in json:
         for i in json['升级来源']:
-            retxt += '{{图片|' + json['升级来源'][i]['图片'] + '|h18|link=' + json['升级来源'][i]['名称'] + '}}'
+            retxt += '{{图片|' + json['升级来源'][i]['图片'] + '|h16|link=' + json['升级来源'][i]['名称'] + '}}'
     if '图片' in json:
-        retxt += '{{图片|' + json['图片'] + '|h18}}'
+        retxt += '{{图片|' + json['图片'] + '|h16}}'
     if '值' in json:
         retxt += json['值']
     if '简述' in json:
@@ -2736,7 +2736,7 @@ def create_upgrade_cooldown(arr, outtip='div'):
                             k = str(kk)
                             if k in v[j]['升级来源']:
                                 x = v[j]['升级来源'][k]
-                                retxt += '{{图片|' + x['图片'] + '|h18|link=' + x['名称'] + '}}'
+                                retxt += '{{图片|' + x['图片'] + '|h16|link=' + x['名称'] + '}}'
                             else:
                                 break
                         retxt += '{{额外信息框|{{图片|' + v[j]['类型']['图片'] + '|h16}}|' + v[j]['类型']['值'] + '}}'
@@ -2963,11 +2963,11 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 bt += '<div style="background:#111133;padding:1em;">' + db['描述'] + '</div>'
                 st += '<tr><td colspan=2><div style="background:#111133;padding:1em;">' + db['描述'] + '</div></td></tr>'
             if db['神杖信息'] != '':
-                bt += '<div style="background:#222266;padding:0.5em;">{{图片|agha.png|h18}}：' + db['神杖信息'] + '</div>'
-                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">{{图片|agha.png|h18}}：' + db['神杖信息'] + '</div></td></tr>'
+                bt += '<div style="background:#222266;padding:0.5em;">{{图片|agha.png|h16}}：' + db['神杖信息'] + '</div>'
+                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">{{图片|agha.png|h16}}：' + db['神杖信息'] + '</div></td></tr>'
             if db['魔晶信息'] != '':
-                bt += '<div style="background:#222266;padding:0.5em;">{{图片|shard.png|h18}}：' + db['魔晶信息'] + '</div>'
-                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">{{图片|shard.png|h18}}：' + db['魔晶信息'] + '</div></td></tr>'
+                bt += '<div style="background:#222266;padding:0.5em;">{{图片|shard.png|h16}}：' + db['魔晶信息'] + '</div>'
+                st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">{{图片|shard.png|h16}}：' + db['魔晶信息'] + '</div></td></tr>'
             if '技能升级信息' in db and '1' in db['技能升级信息']:
                 bt += '<div style="background:#222266;padding:0.25em;">'
                 ii = 0
@@ -2976,7 +2976,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                     i = str(ii)
                     if i in db['技能升级信息']:
                         v = db['技能升级信息'][i]
-                        bt += '<div style="padding:0.25em;">{{图片|' + v['图片'] + '|h18|link=' + v['技能名'] + '}}[[' + v['技能名'] + ']]（' + v['中文名'] + ')</div>'
+                        bt += '<div style="padding:0.25em;">{{图片|' + v['图片'] + '|h16|link=' + v['技能名'] + '}}[[' + v['技能名'] + ']]（' + v['中文名'] + ')</div>'
                     else:
                         break
             bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
@@ -3001,11 +3001,11 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 bt += '<div style="font-size:75%;padding:1em;border-top:1px solid #777;margin-top:1em;color:#bbb">「 ' + db[
                     "传说"] + ' 」</div>'
             if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
-                bt += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div></div>'
-                st += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Agha.png|h18}}&nbsp;由阿哈利姆神杖获得</div></div>'
+                bt += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Agha.png|h16}}&nbsp;由阿哈利姆神杖获得</div></div>'
+                st += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Agha.png|h16}}&nbsp;由阿哈利姆神杖获得</div></div>'
             if db["次级分类"] == "魔晶技能":
-                bt += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div></div>'
-                st += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Shard.png|h18}}&nbsp;由阿哈利姆魔晶获得</div></div>'
+                bt += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Shard.png|h16}}&nbsp;由阿哈利姆魔晶获得</div></div>'
+                st += '<div style="font-size:14px;color:#4189d4;padding-right:1em;min-height:20px;"><div style="float:right;">{{图片|Shard.png|h16}}&nbsp;由阿哈利姆魔晶获得</div></div>'
             bt += '</div>' \
                   + '<div style="font-size:16px;display:table;padding-left:4px;margin-bottom:24px;padding-right:0em;padding-top:1em;">' \
                   + '<span style="margin-top:0px;padding-top:0px;font-size:120%"><big><b>技能详情</b></big></span><div>'
