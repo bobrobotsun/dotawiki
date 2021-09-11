@@ -1956,7 +1956,7 @@ class Main(QMainWindow):
         if template_args[0] in ['H', 'A', 'I', 'h', 'a', 'i']:
             size = ''
             pic_style = ''
-            if template_args[1]=='魔晶升级':
+            if template_args[1]=='魔晶升级' or template_args[1]=='魔晶技能':
                 template_args.insert(2,'w24')
             for i in range(2, len(template_args)):
                 if template_args[i][0] == 'w':
