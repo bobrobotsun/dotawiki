@@ -290,7 +290,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         bt += '<table class="infobox" style="text-align:center;background:#fff;width:300px;color:#fff;"><tr class="infobox-title">' \
               + '<th colspan=2 style="background: #a03030;padding: 0.5em 1em;text-align:center;">' + '<span style="font-size:125%">' + \
               db["中文名"] + '</span><div style="text-align:center;">' + db["英文名"] + '</div></th></tr>' \
-              + '<tr><td colspan=2 style="background:#222">{{图片|' + db["图片"] + '|w100|link=' + db["页面名"] + '|center}}</div></td></tr>'\
+              + '<tr><td colspan=2 style="background:#222">{{图片|' + db["图片"] + '|w100|link=' + db["页面名"] + '|center}}</td></tr>'\
               +'<tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] \
               + '</td></tr>'
         st += '<table class="dota_simple_infobox"><tr><th style="text-align:center;" colspan=2>' \
