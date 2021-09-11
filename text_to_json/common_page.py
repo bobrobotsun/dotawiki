@@ -654,7 +654,6 @@ def create_page_item(json_base, log_base, log_list, item):
             retxt += '。'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
-    retxt += '</ul>'
     retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base)) + '[[分类:物品]]'
     retxt +='\n==代码查询==\n' \
             + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>item_'+db['代码名']+'</code>|item_'+db['代码名']+'|td=0}}</li>'
