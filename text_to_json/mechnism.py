@@ -4,10 +4,11 @@ import copy
 import math
 import re
 import time
+from PyQt5.QtWidgets import *
 from text_to_json import common_page, ability
 from text_to_json.WikiError import editerror
 
-def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_template_link_to_html,loop_time=1):
+def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_template_link_to_html,loop_time=1,w=''):
     # 一定报错的内容
     for i in tlist:
         if i not in all_json['机制']:
@@ -15,7 +16,8 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
         if i not in all_json['机制源']:
             raise (editerror('机制', i, "在【机制源】中缺少关于【" + i + '】的信息，请及时补充'))
     for loop in range(loop_time):
-        for target in tlist:
+        for targeti in range(len(tlist)):
+            target=tlist[targeti]
             if "图片大小" not in all_json['机制源'][target]:
                 all_json['机制源'][target]["图片大小"]='120'
             fromdict = copy.deepcopy(all_json['机制源'][target])
@@ -102,3 +104,6 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
                     for k in range(uls):
                         comtext += '</ul>'
                     all_json['机制'][target]['内容'][i]['内容'][j]['内容'] = comtext
+            if w!='':
+                w.addtext(['《'+target+'》已经更新了'+str(loop+1)+'次',1], targeti+loop*len(tlist))
+                QApplication.processEvents()

@@ -450,7 +450,10 @@ def create_switch_log(log_base, log_list, name, limit=10):
                                             for m in range(current_ul - x[l]['序列级数']):
                                                 content += '</ul>'
                                             current_ul = x[l]['序列级数']
-                                        content += '<li>' + x[l]['文字'] + '</li>'
+                                        if current_ul>0:
+                                            content += '<li>' + x[l]['文字'] + '</li>'
+                                        else:
+                                            content += '<br>'+x[l]['文字']
                 if current_ul > 0:
                     for m in range(current_ul):
                         content += '</ul>'

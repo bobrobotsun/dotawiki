@@ -315,7 +315,14 @@ def create_html_data_page(all_json):
                 retxt += '"' + all_json['英雄'][i][j[0]]['1'] + '",'
             else:
                 retxt += ability.better_float_to_text(all_json['英雄'][i][j[0]]['1']) + ','
-        retxt = retxt.rstrip(',') + '},'
+        retxt+='"技能":['
+        for j in all_json['英雄'][i]['技能']:
+            retxt+='"'+j+'",'
+        retxt=retxt.rstrip(',') +'],"技能中文名":['
+        for j in all_json['英雄'][i]['技能']:
+            retxt+="'"+all_json['技能'][j]['中文名']+"',"
+        retxt=retxt.rstrip(',') + '],"全属性黄点":'+str(all_json['英雄'][i]['全属性黄点'])+ ','
+        retxt= retxt.rstrip(',') + '},'
     retxt = retxt.rstrip(',') + '};\n</script>'
     return retxt
 

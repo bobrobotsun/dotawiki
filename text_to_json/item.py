@@ -339,6 +339,11 @@ def create_html_data_page(all_json):
         for j in all_json['物品'][i]['商店']:
             retxt += '"' + all_json['物品'][i]['商店'][j] + '",'
         retxt = retxt.rstrip(',') + '],'
+        retxt+='"代码":"'+all_json['物品'][i]['代码名']+'","中文":"'+all_json['物品'][i]['中文名']+'","英文":"'+all_json['物品'][i]['英文名']+'","共享":'+str(all_json['物品'][i]['共享'])+','
+        if '可拆分' in all_json['物品'][i] and all_json['物品'][i]['可拆分']['1']==1:
+            retxt +='"可拆分":1,'
+        else:
+            retxt += '"可拆分":0,'
         for j in ['价格', '卷轴价格']:
             if j in all_json['物品'][i]:
                 retxt += '"' + j + '":'
@@ -359,6 +364,22 @@ def create_html_data_page(all_json):
                 for k in all_json['物品'][i][j]:
                     retxt += '"' + all_json['物品'][i][j][k]['物品名'] + '",'
                 retxt = retxt.rstrip(',') + '],'
+        retxt+='"物品属性":['
+        for j in edit_json.edit_adition['物品属性']:
+            if j in all_json['物品'][i]:
+                v=all_json['物品'][i][j]
+                retxt +=  "'"+v['展示前缀']
+                if isinstance(v['1'], str):
+                    retxt +=  all_json['物品'][i][j]['1']
+                else:
+                    retxt += ability.better_float_to_text(all_json['物品'][i][j]['1'])
+                retxt+=v['后缀'] + v['展示后缀'] +"',"
+        retxt=retxt.rstrip(',') + '],'
+        retxt+='"传说":"'+all_json['物品'][i]['传说']+'",'
+        retxt+='"技能":['
+        for i in all_json['物品'][i]['技能']:
+            retxt+='"'+i+'",'
+        retxt = retxt.rstrip(',') + '],'
         retxt = retxt.rstrip(',') + '},'
     retxt = retxt.rstrip(',') + '};\n</script>'
     return retxt

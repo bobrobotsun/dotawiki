@@ -1404,10 +1404,19 @@ class Main(QMainWindow):
                 for i in self.json_base['机制源']:
                     if i not in allupdate:
                         allupdate.append(i)
+                self.w = upload_text('开始更新机制')
+                self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+                self.w.setWindowIcon(self.icon)
+                QApplication.processEvents()
+                total_num = len(allupdate)*2
+                self.w.confirm_numbers(total_num)
+                self.w.setWindowTitle('机制一共有'+str(total_num)+'个，1~'+str(len(allupdate))+'，'+str(len(allupdate)+1)+'~'+str(total_num)+'。')
+                reversed_name_dict_list = self.reversed_name_create_tree_list_name()
+                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time,self.w)
             else:
                 allupdate.append(target)
-            reversed_name_dict_list = self.reversed_name_create_tree_list_name()
-            mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time)
+                reversed_name_dict_list = self.reversed_name_create_tree_list_name()
+                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time)
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
@@ -1533,15 +1542,32 @@ class Main(QMainWindow):
         QApplication.processEvents()
         all_upload = []
         if chosen == '' or chosen == '英雄':
-            all_upload.append(['英雄数据', hero.create_html_data_page(self.json_base)])
+            all_upload.append(['英雄数据', self.change_all_template_link_to_html(hero.create_html_data_page(self.json_base))])
         if chosen == '' or chosen == '物品':
-            all_upload.append(['物品数据', item.create_html_data_page(self.json_base)])
+            all_upload.append(['物品数据', self.change_all_template_link_to_html(item.create_html_data_page(self.json_base))])
+        # if chosen == '' or chosen == '全数据':
+        #     all_upload.append(['数据库数据', self.create_all_json_data()])
+        #     print(len(all_upload[-1][1]))
         total_num = len(all_upload)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
             self.w.addtext(self.upload_html(all_upload[i][0], all_upload[i][1]), i)
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+
+    def create_all_json_data(self):
+        retxt = '<script>\ndota_json_json_data={'
+        for i in self.json_base['英雄']:
+            retxt += '\n"' + i + '":{"简易展示":"' + self.json_base['英雄'][i]['简易展示'] + '",'
+            retxt = retxt.rstrip(',') + '},'
+        for i in self.json_base['非英雄单位']:
+            retxt += '\n"' + i + '":{"简易展示":"' + self.json_base['非英雄单位'][i]['简易展示'] + '",'
+            retxt = retxt.rstrip(',') + '},'
+        for i in self.json_base['物品']:
+            retxt += '\n"' + i + '":{"简易展示":"' + self.json_base['物品'][i]['简易展示'] + '",'
+            retxt = retxt.rstrip(',') + '},'
+        retxt = retxt.rstrip(',') + '};\n</script>'
+        return retxt
 
     def upload_all_json_and_page(self):
         self.w = upload_text('开始上传数据')
