@@ -1499,7 +1499,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         traitlist = []
         pre_info = ''
         prelist = []
-
+        retxt += '<span style="white-space:nowrap;">'
         if '前置技能归属' in conditions:
             if '技能归属' in json:
                 if json['技能归属'] not in prelist:
@@ -1597,7 +1597,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         retxt += pre_info
         if json['迷你图片'] != '':
             retxt += '{{图片|' + json['迷你图片'] + '}}'
-        retxt += another_image + '[[' + json['页面名'] + ']]' + another_name + another_info
+        retxt += another_image + '[[' + json['页面名'] + ']]' + another_name + another_info+'</span>'
     else:  # 普通的ability_desc
         another_image = ''
         another_name = ''
