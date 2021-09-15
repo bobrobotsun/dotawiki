@@ -1499,7 +1499,6 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         traitlist = []
         pre_info = ''
         prelist = []
-        retxt += '<span style="white-space:nowrap;">'
         if '前置技能归属' in conditions:
             if '技能归属' in json:
                 if json['技能归属'] not in prelist:
@@ -1594,10 +1593,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 if i[0] in json:
                     another_info += '(' + number_to_string(json[i[0]]['1']) + json[i[0]]['后缀'] + ')'
 
-        retxt += pre_info
-        if json['迷你图片'] != '':
-            retxt += '{{图片|' + json['迷你图片'] + '}}'
-        retxt += another_image + '[[' + json['页面名'] + ']]' + another_name + another_info+'</span>'
+        retxt += pre_info+another_image
+        retxt += '{{H|' + json['页面名'] + '}}' + another_name + another_info
     else:  # 普通的ability_desc
         another_image = ''
         another_name = ''
@@ -1719,6 +1716,9 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件注释'][i], i, json, result, target, '条件注释')
                 if isinstance(tempjson, str) and tempjson != '':
                     note += '<div style="color:#229;">' + tempjson + '</div>'
+        if '手填注释' in conditions:
+            for i in range(len(conditions['手填注释'])):
+                note +='<div style="color:#229;">' + conditions['手填注释'][i][0] + '</div>'
 
         if '次级分类' in json:
             if json['次级分类'] == '神杖技能':
@@ -2380,6 +2380,12 @@ def change_json_to_condition_dict(json, target):
                     redict['条件机制'] += [[index + '-0', index + '-1', index + '-2', index + '-' + str(4 + 7 * ii)]]
             else:
                 break
+        redict['满足'].append(manzu)
+    if '页面名' in redict:
+        manzu=['页面名',[]]
+        for i in redict['页面名'][0]:
+            manzu[1].extend(['@=',i,'@either'])
+        manzu[1].pop()
         redict['满足'].append(manzu)
     if '函数' not in redict:
         redict['函数'] = [['']]
