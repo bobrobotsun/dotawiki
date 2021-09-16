@@ -1818,6 +1818,8 @@ class Main(QMainWindow):
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
+    def upload_json_1(self, pagename, content):
+        return ['暂时不予以上传',1]
     # 向wiki网站上传对应的信息
     def upload_json(self, pagename, content):
         download_data = {'action': 'jsondata', 'title': pagename, 'format': 'json'}
