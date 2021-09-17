@@ -246,7 +246,10 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         all_attri['攻击力'] = (all_attri['攻击上限'] + all_attri['攻击下限']) / 2
         all_attri['攻击间隔'] = all_attri['攻击间隔'] / all_attri['攻击速度'] * 100
         all_attri['攻击前摇'] = all_attri['攻击前摇'] / all_attri['攻击速度'] * 100
+        all_attri['攻击后摇'] = db['攻击后摇']/ all_attri['攻击速度'] * 100
         all_attri['物理抗性'] = 6 * all_attri['护甲'] / (1 + abs(0.06 * all_attri['护甲']))
+        all_attri['物理血量'] =all_attri['生命值']/(100-all_attri['物理抗性'])*100
+        all_attri['魔法血量'] =all_attri['生命值']/(100-db['魔法抗性']['1'])*100
         for ii in all_attri:
             if not isinstance(all_attri[ii], str):
                 all_attri[ii] = round(all_attri[ii], 2)
@@ -278,16 +281,22 @@ def fulfil_complex_and_simple_show(all_json, html_function):
              + fulfil_complex_and_simple_show_attri_0('攻击速度', fulfil_complex_and_simple_show_attri_2('总攻击速度', str(all_attri['攻击速度'])) + '(' + str(db['攻击速度']['1']) + ')') \
              + fulfil_complex_and_simple_show_attri_0('攻击间隔', fulfil_complex_and_simple_show_attri_2('总攻击间隔', str(all_attri['攻击间隔'])) + '(' + str(db['攻击间隔']['1']) + ')') \
              + fulfil_complex_and_simple_show_attri_0('攻击前摇', fulfil_complex_and_simple_show_attri_2('总攻击前摇', str(all_attri['攻击前摇'])) + '(' + str(db['攻击前摇']['1']) + ')') \
+             + fulfil_complex_and_simple_show_attri_0('攻击后摇', fulfil_complex_and_simple_show_attri_2('总攻击后摇', str(all_attri['攻击后摇'])) + '(' + str(db['攻击后摇']) + ')') \
              + fulfil_complex_and_simple_show_attri_0('攻击距离', fulfil_complex_and_simple_show_attri_2('总攻击距离', str(db['攻击距离']['1']))) \
+             + fulfil_complex_and_simple_show_attri_0('警戒范围', fulfil_complex_and_simple_show_attri_2('总警戒范围', str(db['警戒范围']['1']))) \
              + fulfil_complex_and_simple_show_attri_0('弹道速度', fulfil_complex_and_simple_show_attri_2('总弹道速度', str(db['弹道速度']['1']))) \
              + fulfil_complex_and_simple_show_attri_0('护甲(物理抗性)', fulfil_complex_and_simple_show_attri_2('总护甲', str(all_attri['护甲'])) \
                                                       + '(' + fulfil_complex_and_simple_show_attri_2('总物理抗性', str(all_attri['物理抗性']) + '%', '，%') + ')') \
+             + fulfil_complex_and_simple_show_attri_0('物理血量', fulfil_complex_and_simple_show_attri_2('总物理血量',str(all_attri['物理血量']))) \
              + fulfil_complex_and_simple_show_attri_0('魔法抗性', fulfil_complex_and_simple_show_attri_2('总魔法抗性', str(db['魔法抗性']['1']) + '%', '，%')) \
+             + fulfil_complex_and_simple_show_attri_0('魔法血量', fulfil_complex_and_simple_show_attri_2('总魔法血量',str(all_attri['魔法血量']))) \
              + fulfil_complex_and_simple_show_attri_0('移动速度', fulfil_complex_and_simple_show_attri_2('总移动速度', str(db['移动速度']['1']))) \
              + fulfil_complex_and_simple_show_attri_0('转身速率', fulfil_complex_and_simple_show_attri_2('总转身速率', str(db['转身速率']['1']))) \
              + fulfil_complex_and_simple_show_attri_0('白天视野', fulfil_complex_and_simple_show_attri_2('总白天视野', str(db['白天视野']['1']))) \
              + fulfil_complex_and_simple_show_attri_0('夜晚视野', fulfil_complex_and_simple_show_attri_2('总夜晚视野', str(db['夜晚视野']['1']))) \
-             + fulfil_complex_and_simple_show_attri_0('腿数量', str(db['腿数量']['1'])) \
+             + fulfil_complex_and_simple_show_attri_0('碰撞体积', fulfil_complex_and_simple_show_attri_2('总碰撞体积',str(db['碰撞体积']['1']))) \
+             + fulfil_complex_and_simple_show_attri_0('边界体积', fulfil_complex_and_simple_show_attri_2('总边界体积',str(db['边界体积']['1']))) \
+             + fulfil_complex_and_simple_show_attri_0('腿数量', fulfil_complex_and_simple_show_attri_2('总腿数量',str(db['腿数量']['1']))) \
              + '</div>'  # 完整显示
         st = '<div class="dota_simple_infobox bgc_white dota_hero_comprehensive_attri_dict_hero" data-hero-name="' + i + '">' \
              + '<div style="text-align:center;"><div class="bg-primary" style="float:left;padding:0.5em">' \
@@ -372,7 +381,7 @@ def create_html_data_page(all_json):
     retxt = '<script>\ndota_json_hero_data={'
     p = Pinyin()
     for i in all_json['英雄']:
-        retxt += '\n"' + i + '":{"拼音":"' + p.get_pinyin(i).replace('-', '') + '","英文":"' + all_json['英雄'][i]['英文名'] + '","代码":"' + all_json['英雄'][i]['代码名'] + '",'
+        retxt += '\n"' + i + '":{"拼音":"' + p.get_pinyin(i).replace('-', '') + '","英文":"' + all_json['英雄'][i]['英文名'] + '","代码":"' + all_json['英雄'][i]['代码名'] + '","攻击后摇":"' + str(all_json['英雄'][i]['攻击后摇']) + '",'
         for j in [['主属性'], ['近战远程'], ['阵营'], ['碰撞体积'], ['边界体积'], ['体质类型']] + heropro_num:
             retxt += '"' + j[0] + '":'
             if isinstance(all_json['英雄'][i][j[0]]['1'], str):
@@ -380,11 +389,18 @@ def create_html_data_page(all_json):
             else:
                 retxt += ability.better_float_to_text(all_json['英雄'][i][j[0]]['1']) + ','
         retxt += '"技能":['
-        for j in all_json['英雄'][i]['技能']:
-            retxt += '"' + j + '",'
+        for j in range(len(all_json['英雄'][i]['技能'])-8):
+            retxt += '"' + all_json['英雄'][i]['技能'][j] + '",'
+        talent=['10级左','10级右','15级左','15级右','20级左','20级右','25级左','25级右']
+        for j in talent:
+            retxt+='"' +i+ j + '天赋",'
         retxt = retxt.rstrip(',') + '],"技能中文名":['
-        for j in all_json['英雄'][i]['技能']:
-            retxt += "'" + all_json['技能'][j]['中文名'] + "',"
+        for j in range(len(all_json['英雄'][i]['技能'])-8):
+            w=all_json['英雄'][i]['技能'][j]
+            retxt += "'" + all_json['技能'][w]['中文名'] + "',"
+        for j in talent:
+            w=i+ j + '天赋'
+            retxt+= "'" + all_json['技能'][w]['中文名'] + "',"
         retxt = retxt.rstrip(',') + '],"全属性黄点":' + str(all_json['英雄'][i]['全属性黄点']) + ','
         retxt = retxt.rstrip(',') + '},'
     retxt = retxt.rstrip(',') + '};\n</script>'
