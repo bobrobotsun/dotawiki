@@ -22,7 +22,7 @@ import hashlib
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from text_to_json import hero, ability, item, unit, mechnism, unitgroup, edit_json, dota_menus, page, common_page
+from text_to_json import hero, ability, item, unit, mechnism, unitgroup, edit_json, dota_menus, page, common_page, translate
 from text_to_json.WikiError import editerror
 import win32con
 import win32clipboard as wincld
@@ -59,7 +59,7 @@ class Main(QMainWindow):
         # 图标
         self.icon = QIcon(os.path.join('material_lib', 'DOTA2.jpg'))
         # 数据库信息
-        self.text_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}}
+        self.text_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}, "翻译": {}}
         self.json_base = {"英雄": {}, "非英雄单位": {}, "物品": {}, "技能": {}, '技能源': {}, '单位组': {}, "机制": {}, '机制源': {}}
         self.json_name = {"英雄": [], "非英雄单位": [], "物品": [], "技能": [], '技能源': [], '单位组': [], "机制": [], '机制源': []}
         self.entry_base = {}
@@ -510,7 +510,7 @@ class Main(QMainWindow):
         self.catch_file_from_dota2(nowaddress)
 
     def catch_file_from_dota2(self, address, bools=True):
-        has_text = [['英雄', '技能', '非英雄单位', '物品'],
+        has_text = [['英雄', '技能', '非英雄单位', '物品', '翻译'],
                     ['npc_heroes.txt', 'npc_abilities.txt', 'npc_units.txt', 'items.txt'],
                     [False, False, False]]
         ttt = ''
@@ -523,7 +523,7 @@ class Main(QMainWindow):
                 has_text[2][i] = True
             else:
                 ttt += has_text[1][i] + '文件不存在，读取失败'
-        ttt += '\n已经从vpk处提取物品文件'
+        ttt += '\n已经从vpk处提取物品、翻译文件'
         if has_text[2][0] or has_text[2][1] or has_text[2][2]:
             if has_text[2][0]:
                 hero.get_hero_data_from_txt(self.text_base['英雄'], os.path.join(address, has_text[1][0]))
@@ -537,6 +537,7 @@ class Main(QMainWindow):
             ability.get_dota_data_from_vpk(self.text_base['技能'], pak1.get_file("resource/localization/abilities_schinese.txt"))
             item.get_hero_data_from_txt(self.text_base['物品'], pak1.get_file("scripts/npc/items.txt"))
             item.get_dota_data_from_vpk(self.text_base['物品'], pak1.get_file("resource/localization/abilities_schinese.txt"))
+            translate.get_dota_data_from_vpk(self.text_base['翻译'], pak1.get_file("resource/localization/dota_schinese.txt"), pak1.get_file("resource/localization/dota_english.txt"))
             self.file_save(os.path.join('database', 'dota2_address.json'), address)
             self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
             messagebox = QMessageBox(QMessageBox.Information, '文件抓取', ttt, QMessageBox.NoButton, self)
@@ -651,6 +652,7 @@ class Main(QMainWindow):
         info_txt += page.common_code_chat_page(self.seesion, self.csrf_token, self.change_all_template_link_to_html)
         info_txt += page.common_code_hero_page(self.json_base, self.seesion, self.csrf_token, self.change_all_template_link_to_html)
         info_txt += page.common_code_item_page(self.json_base, self.seesion, self.csrf_token, self.change_all_template_link_to_html)
+        info_txt += page.translate_page_dota_hud_error(self.text_base['翻译'], self.seesion, self.csrf_token, self.change_all_template_link_to_html)
         QMessageBox.information(self, '更改完毕', info_txt, QMessageBox.Yes, QMessageBox.Yes)
 
     def download_json_base(self):
@@ -2097,6 +2099,35 @@ class Main(QMainWindow):
                     retxt += '{{错误文字|错误机制名：' + template_args[1] + '}}'
             else:
                 retxt += '{{错误文字|《机制内容》需要输入3个参数，而您只输入了' + str(len(template_args) - 1) + '个参数}}'
+        elif template_args[0]=='翻译':
+            lang=''
+            aclass=''
+            for i in range(2, len(template_args)):
+                if template_args[i][:5] == 'lang=':
+                    lang = template_args[i][5:]
+                if template_args[i][:5] == 'style=':
+                    if template_args[i][5:]=='warning':
+                        aclass+=' bgc_warning'
+            if template_args[1] in self.text_base:
+                if lang=='':
+                    retxt+='<span class="dota_self_switch_content_by_click">'
+                    for i in self.text_base[template_args[1]]:
+                        v=self.text_base[template_args[1]][i]
+                        retxt+='<span class="dota_self_switch_content_by_click_content'+aclass+'">'+v+'</span>'
+                    retxt+='</span>'
+                else:
+                    if lang in self.text_base[template_args[1]]:
+                        v=self.text_base[template_args[1]][lang]
+                        retxt += '<span class="' + aclass + '">' + v + '</span>'
+                    else:
+                        retxt = '{{错误文字|您输入的代码“' + template_args[1] + '”没有“'+lang+'”语言信息，请检查后重新输入}}'
+            else:
+                retxt='{{错误文字|您输入的代码“'+template_args[1]+'”有误，请检查后重新输入}}'
+        elif template_args[0]=='游戏报错':
+            retxt='{{翻译'
+            for i in range(1,len(template_args)):
+                retxt+='|'+template_args[i]
+            retxt+='|style=warning}}'
         else:
             return x.group(0)
         return retxt

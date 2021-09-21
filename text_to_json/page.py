@@ -12,8 +12,7 @@ def analyse_upload_json(text, upload_info):
         if 'nochange' in upload_info.json()['edit']:
             retxt = '《' + text + '》没有修改'
         elif 'oldrevid' in upload_info.json()['edit']:
-            retxt = '《' + text + '》修改' + str(upload_info.json()['edit']['oldrevid']) + '为' + str(upload_info.json()['edit'][
-                                                                                                     'newrevid'])
+            retxt = '《' + text + '》修改' + str(upload_info.json()['edit']['oldrevid']) + '为' + str(upload_info.json()['edit']['newrevid'])
         else:
             retxt = '《' + text + '》修改成功'
     else:
@@ -226,3 +225,22 @@ def common_code_item_page(json,seesion, csrf_token,html_function):
     upload_data = {'action': 'edit', 'title': '常用测试指令/物品', 'text': retxt, 'format': 'json', 'token': csrf_token}
     upload_info = seesion.post(target_url, headers=headers, data=upload_data)
     return analyse_upload_json('常用测试指令/物品', upload_info)
+
+def translate_page_dota_hud_error(json,seesion, csrf_token,html_function):
+    retxt=''
+    retxt+='<table class="wikitable"><tr><th>代码</th><th>中文</th><th>英文</th></tr>'
+    for i in json:
+        if i[:15]=='dota_hud_error_':
+            v=json[i]
+            v1=''
+            v2=''
+            if '中文' in v:
+                v1=v['中文']
+            if '英文' in v:
+                v2=v['英文']
+            retxt+='<tr><td>{{点击复制|<code>' + i + '</code>|' + i + '|td=0}}</td><td>' + v1 + '</td><td>' + v2 + '</td></tr>'
+    retxt+='</table>\n{{全部格式}}'
+    retxt=html_function(retxt)
+    upload_data = {'action': 'edit', 'title': '翻译对照/游戏报错', 'text': retxt, 'format': 'json', 'token': csrf_token}
+    upload_info = seesion.post(target_url, headers=headers, data=upload_data)
+    return analyse_upload_json('翻译对照/游戏报错', upload_info)
