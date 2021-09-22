@@ -2105,19 +2105,19 @@ class Main(QMainWindow):
             for i in range(2, len(template_args)):
                 if template_args[i][:5] == 'lang=':
                     lang = template_args[i][5:]
-                if template_args[i][:5] == 'style=':
-                    if template_args[i][5:]=='warning':
+                if template_args[i][:6] == 'style=':
+                    if template_args[i][6:]=='warning':
                         aclass+=' bgc_warning'
-            if template_args[1] in self.text_base:
+            if template_args[1] in self.text_base['翻译']:
                 if lang=='':
                     retxt+='<span class="dota_self_switch_content_by_click">'
-                    for i in self.text_base[template_args[1]]:
-                        v=self.text_base[template_args[1]][i]
+                    for i in self.text_base['翻译'][template_args[1]]:
+                        v=self.text_base['翻译'][template_args[1]][i]
                         retxt+='<span class="dota_self_switch_content_by_click_content'+aclass+'">'+v+'</span>'
                     retxt+='</span>'
                 else:
-                    if lang in self.text_base[template_args[1]]:
-                        v=self.text_base[template_args[1]][lang]
+                    if lang in self.text_base['翻译'][template_args[1]]:
+                        v=self.text_base['翻译'][template_args[1]][lang]
                         retxt += '<span class="' + aclass + '">' + v + '</span>'
                     else:
                         retxt = '{{错误文字|您输入的代码“' + template_args[1] + '”没有“'+lang+'”语言信息，请检查后重新输入}}'
