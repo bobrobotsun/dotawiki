@@ -155,6 +155,7 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
     for ii in all_json:
         all_json[ii]["分类"] = "物品"
         all_json[ii]["版本"] = version
+        all_json[ii]["页面名"] = ii
         all_json[ii]["传说"] = base_txt["物品"][all_json[ii]['代码名']]['lore']['1'] if 'lore' in base_txt["物品"][all_json[ii]['代码名']] else all_json[ii]["传说"]
         if all_json[ii]['图片'] == '':
             all_json[ii]['图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'

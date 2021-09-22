@@ -575,9 +575,8 @@ def create_page_unit(json_base, log_base, log_list, unit):
     if '1' in db['源技能']:
         retxt += '\n==召唤源技能==\n'
         for i, v in db['源技能'].items():
-            if v in json_base['技能']:
-                sdb = json_base['技能'][v]
-                retxt += '<br>' + sdb['简易展示']
+            if v in json_base['技能'] and json_base['技能'][v]['应用']==db['应用']:
+                retxt +='<span style="padding:0.5em;">' + json_base['技能'][v]['简易展示'] + '</span>'
     unitgroup = []
     for i, v in json_base['单位组'].items():
         if unit in v['全部单位']:

@@ -502,7 +502,8 @@ def fulfil_complex_and_simple_show(all_json,html_function):
         if '1' in db['源技能']:
             st+='<div class="border_white" style="padding:0.25em;flex-grow:1;"><div>源技能：</div>'
             for j in db['源技能']:
-                st += unit_ability_image_with_click_infomation(db['源技能'][j],'简易展示')
+                if db['源技能'][j] in all_json['技能'] and all_json['技能'][db['源技能'][j]]['应用']==db['应用']:
+                    st += unit_ability_image_with_click_infomation(db['源技能'][j],'简易展示')
             st+='</div>'
         unitgroup = []
         for j,w in all_json['单位组'].items():
