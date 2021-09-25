@@ -140,18 +140,20 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
     for i in all_json['技能源']:
         all_json['技能源'][i]['页面名'] = i
         all_json['技能源'][i]['分类'] = '技能源'
-        if 'A杖信息' in all_json['技能源'][i]:
-            all_json['技能源'][i].pop('A杖信息')
-        if '升级' in all_json['技能源'][i]:
-            if 'A杖' in all_json['技能源'][i]['升级']:
-                all_json['技能源'][i]['升级']['神杖'] = copy.deepcopy(all_json['技能源'][i]['升级']['A杖'])
-                all_json['技能源'][i]['升级'].pop('A杖')
-            if '混合' in all_json['技能源'][i]['升级']:
-                all_json['技能源'][i]['升级'].pop('混合')
-            if '魔晶' not in all_json['技能源'][i]['升级']:
-                all_json['技能源'][i]['升级']['魔晶'] = ''
-            if '神杖' not in all_json['技能源'][i]['升级']:
-                all_json['技能源'][i]['升级']['神杖'] = ''
+        if '链接指向' not in all_json['技能源'][i]:
+            all_json['技能源'][i]['链接指向']={}
+        # if 'A杖信息' in all_json['技能源'][i]:
+        #     all_json['技能源'][i].pop('A杖信息')
+        # if '升级' in all_json['技能源'][i]:
+        #     if 'A杖' in all_json['技能源'][i]['升级']:
+        #         all_json['技能源'][i]['升级']['神杖'] = copy.deepcopy(all_json['技能源'][i]['升级']['A杖'])
+        #         all_json['技能源'][i]['升级'].pop('A杖')
+        #     if '混合' in all_json['技能源'][i]['升级']:
+        #         all_json['技能源'][i]['升级'].pop('混合')
+        #     if '魔晶' not in all_json['技能源'][i]['升级']:
+        #         all_json['技能源'][i]['升级']['魔晶'] = ''
+        #     if '神杖' not in all_json['技能源'][i]['升级']:
+        #         all_json['技能源'][i]['升级']['神杖'] = ''
         # loop_check_source_to_change_content(all_json['技能源'][i])
     # alllogs=[]
     for ijk in all_json['技能']:
@@ -164,6 +166,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
         unit_dic["分类"] = "技能"
         unit_dic["版本"] = version
         unit_dic['曾用名'] = []
+        unit_dic['链接指向'] = []
         if unit_dic["次级分类"] == 'a杖技能' or unit_dic["次级分类"] == 'A杖技能':
             unit_dic["次级分类"] = '神杖技能'
         elif unit_dic["次级分类"] == '非英雄单位' or unit_dic["次级分类"] == '非英雄技能':
@@ -209,6 +212,8 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                 else:
                     unit_dic["图片"] = "Spellicons_" + temp1["代码"] + ".png"
                     unit_dic["迷你图片"] = "Spellicons_" + temp1["代码"] + ".png"
+            for i in temp1['链接指向']:
+                unit_dic['链接指向'].append(temp1['链接指向'][i])
             for i in temp1:
                 if i in ability_trait_level[0]:
                     unit_dic[i] = temp1[i]
@@ -249,7 +254,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                     if ("神杖" in temp1[i] and len(temp1[i]["神杖"]) > 0 or "技能" in temp1[i] and len(
                             temp1[i]["技能"]) > 0 or "魔晶" in temp1[i] and len(temp1[i]["魔晶"]) > 0) and unit_dic['应用'] == 1:
                         upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
-                elif i == "页面名" or i == '应用' or i == '分类':
+                elif i == "页面名" or i == '应用' or i == '分类' or i=='链接指向':
                     continue
                 else:
                     unit_dic[i] = group_source(temp1[i])

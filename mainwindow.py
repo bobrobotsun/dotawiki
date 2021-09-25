@@ -3404,6 +3404,8 @@ class Main(QMainWindow):
             text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{H|' + x.group(1) + '}}', text)
             text = re.sub(r'(?<!\|)shard(?<!\})', lambda x: '{{H|魔晶升级}}', text)
             text = re.sub(r'(?<!\|)agha(?<!\})', lambda x: '{{H|神杖升级}}', text)
+            text = re.sub(r'(?<!\|)SHARD(?<!\})', lambda x: '{{H|魔晶技能}}', text)
+            text = re.sub(r'(?<!\|)AGHA(?<!\})', lambda x: '{{H|神杖技能}}', text)
             text = re.sub(r'(?<!\|)talent(?<!\})', lambda x: '{{H|天赋升级}}', text)
             text = re.sub(r'^(.+?)：：', lambda x: '{{H|' + x.group(1) + '}}：', text)
             text = re.sub(r'\{\{([AHI])\|([0-9]+?)\}\}', lambda x: '{{' + x.group(1) + '|' + hero_text + x.group(2) + '级天赋}}', text)
@@ -3680,13 +3682,26 @@ class Main(QMainWindow):
                             tname = j + l + '级左天赋'
                             if tname in self.json_base['技能'] and '图片' in self.json_base['技能'][tname] and '迷你图片' in self.json_base['技能'][tname]:
                                 self.name_base['衍生'].append({'名称': oname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']})
-        for i in ['物品', '非英雄单位', '技能', '机制', '单位组']:
+        for i in ['物品', '非英雄单位', '机制', '单位组']:
             for j in self.json_base[i]:
                 if '图片' in self.json_base[i][j] and '迷你图片' in self.json_base[i][j]:
                     self.name_base['原生'].append({'名称': j, '页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
                     for k in range(len(self.name_base['历史'])):
                         if j == self.name_base['历史'][k]['页面名']:
                             self.name_base['历史'][k].update({'图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
+        i='技能'
+        for j in self.json_base[i]:
+            if '图片' in self.json_base[i][j] and '迷你图片' in self.json_base[i][j]:
+                self.name_base['原生'].append({'名称': j, '页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
+                for k in range(len(self.name_base['历史'])):
+                    if j == self.name_base['历史'][k]['页面名']:
+                        self.name_base['历史'][k].update({'图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
+            if '链接指向' in self.json_base[i][j]:
+                for k in self.json_base[i][j]['链接指向']:
+                    if k !='':
+                        self.name_base['原生'].append({'名称': k, '页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
+                    else:
+                        print('搞错了？')
         i = '英雄'
         for j in self.json_base[i]:
             for k in ['10', '15', '20', '25']:
@@ -3707,7 +3722,7 @@ class Main(QMainWindow):
                 child.setIcon(1, self.create_icon_by_local_image(i['迷你图片']))
         for i in self.name_base['原生']:
             child = QTreeWidgetItem(self.namelayout['原生页面']['布局']['树'][0])
-            child.setText(0, i['页面名'])
+            child.setText(0, i['名称'])
             if i['迷你图片'] != '':
                 child.setIcon(0, self.create_icon_by_local_image(i['迷你图片'] if i['迷你图片'] != 'Talent.png' else i['图片']))
         for i in self.name_base['衍生']:
@@ -3780,6 +3795,7 @@ class Main(QMainWindow):
         QMessageBox.information(self, "上传完成", '已经保存name_base')
 
     def name_save_and_upload_name_json(self):
+        self.name_initial_name_base()
         self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
         name_base_up = {'历史': self.name_base['历史']}
         self.upload_json('name_base.json', name_base_up)

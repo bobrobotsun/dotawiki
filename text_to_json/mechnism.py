@@ -24,6 +24,8 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
             all_json['机制源'][target]['分类'] = '机制源'
             all_json['机制源'][target]['页面名'] = target
             all_json['机制源'][target]["版本"] = version
+            if '日志标识' not in all_json['机制源'][target]:
+                all_json['机制源'][target]['日志标识']={}
             todict = all_json['机制'][target]
             todict['分类'] = '机制'
             todict['页面名'] = target
@@ -84,6 +86,8 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
                 for namej in name_base[target]:
                     if namej != target:
                         all_json['机制'][target]['曾用名'].append(namej)
+            for i in all_json['机制源'][target]['日志标识']:
+                all_json['机制'][target]['曾用名'].append(all_json['机制源'][target]['日志标识'][i])
             # 下面把序列级数合并成为一串文字，以方便调用
             for i in all_json['机制'][target]['内容']:
                 for j in all_json['机制'][target]['内容'][i]['内容']:
