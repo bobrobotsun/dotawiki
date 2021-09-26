@@ -253,7 +253,7 @@ edit = {
         "魔晶信息": ['text', ''],
         "传说": ['text', ''],
         "描述": ['text', ''],
-        "链接指向": ['tree', {"list": ['text', '', 1, 1, False]}],
+        "链接指向": ['tree', {"list": ['text', '', 1, 0, True]}],
         "注释": ['tree', {'list': ['tree', {'序列级数': ['int', 1], '文字': ['text', '']}, 1, 0, True]}],
         "施法目标": ['tree', {'不分类': ['tree', {"list":
                                                ['tree', {'代码': ['int', 1], 'list':
@@ -386,7 +386,7 @@ edit = {
         "迷你图片": ['text', ''],
         "图片大小": ['text', '120'],
         "简述": ['text', ''],
-        "日志标识": ['tree', {"list": ['text', '', 1, 1, False]}],
+        "日志标识": ['tree', {"list": ['text', '', 1, 0, True]}],
         "属性": ['tree', {"list": ['tree', {'标识': ['text', ''], 'list': ['text', '', 1, 1, False]}, 1, 0, True]}],
         "简单条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],
         "具体条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],
