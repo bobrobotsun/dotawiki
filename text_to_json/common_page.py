@@ -799,7 +799,7 @@ def create_hero_choose_element(json_base, args, dict, post):
     return retxt
 
 
-def create_item_choose_element(json_base, args, dict, post):
+def create_item_choose_element(json_base, args, dict, post,yingyong=1):
     args.insert(1, '')
     retxt = ''
     retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；'
@@ -815,7 +815,36 @@ def create_item_choose_element(json_base, args, dict, post):
                  + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
     retxt += '</span><div>'
     for i in json_base['物品']:
-        if json_base['物品'][i]['应用'] == 1:
+        if json_base['物品'][i]['应用'] == yingyong:
+            retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
+                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；'
+            for j in json_base['物品'][i]['商店']:
+                retxt += json_base['物品'][i]['商店'][j] + '=1；'
+            for j in edit_json.edit_adition['物品属性']:
+                if j in json_base['物品'][i]:
+                    retxt += j + '=' + ability.better_float_to_text(json_base['物品'][i][j]['1']) + '；'
+            args[1] = i
+            retxt += '" style="border:1px black solid;margin:2px;text-align:center;">{{' + '|'.join(args) + '}}' + post + '</span>'
+    retxt += '</div></div>'
+    return retxt
+
+def create_neutral_item_choose_element(json_base, args, dict, post,yingyong=1):
+    args.insert(1, '')
+    retxt = ''
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；'
+    retxt += '"><div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
+             + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
+             + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">中立等级</span>'
+    for i in edit_json.item_shop:
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
+                 + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
+    for i in edit_json.edit_adition['物品属性']:
+        retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
+                 + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
+    retxt += '</span><div>'
+    for i in json_base['物品']:
+        if json_base['物品'][i]['应用'] == yingyong and json_base['物品'][i]['商店']['1'][:3]=='中立第':
             retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
                      + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；'
             for j in json_base['物品'][i]['商店']:

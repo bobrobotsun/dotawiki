@@ -193,7 +193,7 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
                     ttime = int(all_json[ii][i]['1'])
                     all_json[ii][i]['1'] = str(math.floor(ttime / 60)) + '：' + str(math.floor(ttime % 60)).zfill(2)
         if all_json[ii]["商店"]["1"][:2] == '中立':
-            all_json[ii]["价格"]["1"] = '中立生物掉落'
+            all_json[ii]["价格"]["1"] = all_json[ii]["商店"]["1"]
         # 以下是确认物品的组件、卷轴情况
         if all_json[ii]["合成"] >= 0:
             if all_json[ii]["合成"] == 0:
