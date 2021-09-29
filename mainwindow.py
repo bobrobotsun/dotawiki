@@ -2071,7 +2071,7 @@ class Main(QMainWindow):
         elif template_args[0] == '分类查询':
             post = ''
             dict = ''
-            yingyong=1
+            delete = True
             should_be_delete = []
             for i in range(2, len(template_args)):
                 if template_args[i][:5] == 'post=':
@@ -2080,17 +2080,23 @@ class Main(QMainWindow):
                 if template_args[i][:5] == 'dict=':
                     dict = template_args[i][5:]
                     should_be_delete.insert(0, i)
-                if template_args[i][:9] == 'yingyong=':
-                    yingyong = int(template_args[i][9:])
+                if template_args[i] == 'delete':
+                    delete = False
                     should_be_delete.insert(0, i)
             for i in should_be_delete:
                 template_args.pop(i)
             if template_args[1] == '英雄':
-                retxt = common_page.create_hero_choose_element(self.json_base, template_args[2:], dict, post,yingyong)
+                retxt = common_page.create_hero_choose_element(self.json_base, template_args[2:], dict, post)
             elif template_args[1] == '物品':
-                retxt = common_page.create_item_choose_element(self.json_base, template_args[2:], dict, post,yingyong)
+                if delete:
+                    retxt = common_page.create_item_choose_element(self.json_base, template_args[2:], dict, post)
+                else:
+                    retxt = common_page.create_delete_item_choose_element(self.json_base, template_args[2:], post)
             elif template_args[1] == '中立物品':
-                retxt = common_page.create_neutral_item_choose_element(self.json_base, template_args[2:], dict, post,yingyong)
+                if delete:
+                    retxt = common_page.create_neutral_item_choose_element(self.json_base, template_args[2:], dict, post)
+                else:
+                    retxt = common_page.create_delete_neutral_item_choose_element(self.json_base, template_args[2:], post)
         elif template_args[0] == '机制内容':
             if len(template_args) < 4:
                 if template_args[1] in self.json_base['机制']:

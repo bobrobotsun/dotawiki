@@ -204,9 +204,8 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
                 all_json[ii]["组件"] = {}
                 if "ItemCost" in base_txt["物品"]['recipe_' + all_json[ii]["代码名"]] and base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"] != 0:
                     if all_json[ii]["商店"]["1"][:2] == '中立':
-                        all_json[ii]["价格"] = {'代码': 'ItemCost',
-                                              '1': base_txt["物品"][all_json[ii]["代码名"]]['ItemCost']["1"] - base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]['ItemCost']["1"]}
-                        all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': '中立生物掉落'}
+                        all_json[ii]["价格"] = {'代码': 'ItemCost','1': all_json[ii]["商店"]["1"]+'合成'}
+                        all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': all_json[ii]["商店"]["1"]}
                     else:
                         all_json[ii]["卷轴价格"] = {'代码': 'ItemCost', '1': base_txt["物品"]['recipe_' + all_json[ii]["代码名"]]["ItemCost"]["1"]}
                     all_json[ii]["组件"] = {}
