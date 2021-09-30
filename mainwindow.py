@@ -3754,6 +3754,10 @@ class Main(QMainWindow):
         else:
             self.name_base['历史'].append({'名称': name, '页面名': page_name})
             self.name_initial_name_base()
+            for i in range(self.namelayout['历史曾用名']['布局']['树'][0].topLevelItemCount()):
+                child = self.namelayout['历史曾用名']['布局']['树'][0].topLevelItem(i)
+                if child.text(0) == name and child.text(1) == page_name:
+                    self.namelayout['历史曾用名']['布局']['树'][0].setCurrentItem(child)
             for i in range(self.namelayout['原生页面']['布局']['树'][0].topLevelItemCount()):
                 child = self.namelayout['原生页面']['布局']['树'][0].topLevelItem(i)
                 if child.text(0) == page_name:
