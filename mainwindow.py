@@ -4010,15 +4010,20 @@ class Main(QMainWindow):
             self.entry_edit_change_name()
 
     def test_inputwindow(self):
-        i = 1
+        for i in self.json_base['非英雄单位']:
+            v=self.json_base['非英雄单位'][i]
+            for j in ['英雄攻击伤害','非英雄攻击伤害']:
+                w=v[j]
+                if '1' in w and str(w['1']['1'])=='0' and '2' not in w and '2' not in w['1']:
+                    w.pop('1')
 
     def test_inputwindow_loop_check(self, json):
-        for i in json:
-            if isinstance(json[i], dict):
-                if "混合文字" in json[i]:
-                    self.test_inputwindow_change_it(json[i]['混合文字'])
-                else:
-                    self.test_inputwindow_loop_check(json[i])
+        for i in self.json_base['非英雄单位']:
+            v=self.json_base['非英雄单位'][i]
+            for j in ['英雄攻击伤害','非英雄攻击伤害']:
+                w=v[j]
+                if '1' in w and w['1']['1']=='0':
+                    v.pop('1')
 
     def test_inputwindow_change_it(self, json):
         ii = 0

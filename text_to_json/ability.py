@@ -2094,19 +2094,19 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                         skip_cal = False
                     else:
                         if i == '@=' or i == '@==':
-                            all_bools = operation_number_str_equal(tempjson, condition[ii + 1])
+                            all_bools = all_bools and operation_number_str_equal(tempjson, condition[ii + 1])
                         elif i == '@!=' or i == '@<>' or i == '@><':
-                            all_bools = not operation_number_str_equal(tempjson, condition[ii + 1])
+                            all_bools = all_bools and operation_number_str_not_equal(tempjson, condition[ii + 1])
                         elif i == '@<' or i == '@<=' or i == '@>' or i == '@>=':
-                            all_bools = operation_number_check(tempjson, condition[ii + 1], i[1:])
+                            all_bools = all_bools and operation_number_check(tempjson, condition[ii + 1], i[1:])
                         elif i == '@in':
-                            all_bools = isinstance(tempjson, dict) and condition[ii + 1] in tempjson
+                            all_bools = all_bools and isinstance(tempjson, dict) and condition[ii + 1] in tempjson
                         elif i == '@notin':
-                            all_bools = isinstance(tempjson, dict) and condition[ii + 1] not in tempjson
+                            all_bools = all_bools and isinstance(tempjson, dict) and condition[ii + 1] not in tempjson
                         elif i == '@strin':
-                            all_bools = isinstance(tempjson, str) and condition[ii + 1] in tempjson
+                            all_bools = all_bools and isinstance(tempjson, str) and condition[ii + 1] in tempjson
                         elif i == '@notstrin':
-                            all_bools = isinstance(tempjson, str) and condition[ii + 1] not in tempjson
+                            all_bools = all_bools and isinstance(tempjson, str) and condition[ii + 1] not in tempjson
                         else:
                             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在【检索】' + '→'.join(json) + '时，没有找到您输入的符号”' + i + '“请重新检查输入'))
                         half_result.append([i, condition[ii + 1]])
@@ -2436,6 +2436,18 @@ def operation_number_str_equal(str1, str2):
         i1 = str(str1)
         i2 = str(str2)
         return i1 == i2
+
+def operation_number_str_not_equal(str1, str2):
+    if isinstance(str1, dict) or isinstance(str2, dict):
+        return False
+    try:
+        i1 = float(str1)
+        i2 = float(str2)
+        return i1 != i2
+    except ValueError:
+        i1 = str(str1)
+        i2 = str(str2)
+        return i1 != i2
 
 
 # 通过符号检查两边的信息是否满足条件（必须是两个数字，否则返回false)
