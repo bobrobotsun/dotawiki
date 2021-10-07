@@ -13,6 +13,10 @@ def get_source_to_data(all_json, version, text_base,name_base):
         all_json['单位组'][i]['页面名'] = i
         all_json['单位组'][i]['分类'] = '单位组'
         all_units=[]
+        if '手填标签' not in all_json['单位组'][i]:
+            all_json['单位组'][i]['手填标签'] = {}
+        if '标签' not in all_json['单位组'][i]:
+            all_json['单位组'][i]['标签'] = []
         for j in all_json['单位组'][i]['成员']:
             members = all_json['单位组'][i]['成员'][j]
             if '额外属性' not in members:

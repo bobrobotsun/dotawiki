@@ -26,6 +26,10 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
             all_json['机制源'][target]["版本"] = version
             if '日志标识' not in all_json['机制源'][target]:
                 all_json['机制源'][target]['日志标识']={}
+            if '手填标签' not in all_json['机制源'][target]:
+                all_json['机制源'][target]['手填标签']={}
+            if '标签' not in all_json['机制'][target]:
+                all_json['机制'][target]['标签']=[]
             todict = all_json['机制'][target]
             todict['分类'] = '机制'
             todict['页面名'] = target

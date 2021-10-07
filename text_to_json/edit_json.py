@@ -119,7 +119,8 @@ edit = {
         "全属性黄点": ['number', 7],
         "模型技能": ['text', ''],
         "dota背景": ['text', ''],
-        "曾用名": ['tree', {"list": ['text', '', 1, 0, False]}]
+        "曾用名": ['tree', {"list": ['text', '', 1, 0, False]}],
+        "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}]
     },
     '非英雄单位': {
         "页面名": ['text', ''],
@@ -135,6 +136,7 @@ edit = {
         "英文名": ['tree', {"list": ['text', '', 1, 1, False]}],
         "攻击后摇": ['tree', {"list": ['number', 0, 1, 1, False]}],
         "源技能": ['tree', {"list": ['text', '', 1, 0, True]}],
+        "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}],
         "英雄级单位": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                              '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "远古单位": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
@@ -227,7 +229,8 @@ edit = {
         "共享": ['int', 0],
         "合成": ['int', 0],
         "传说": ['text', ''],
-        '价格': ['tree', {'代码': ['text', 'ItemCost']}]
+        '价格': ['tree', {'代码': ['text', 'ItemCost']}],
+        "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}]
     },
     '技能': {
         "页面名": ['text', ''],
@@ -254,6 +257,7 @@ edit = {
         "传说": ['text', ''],
         "描述": ['text', ''],
         "链接指向": ['tree', {"list": ['text', '', 1, 0, True]}],
+        "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}],
         "注释": ['tree', {'list': ['tree', {'序列级数': ['int', 1], '文字': ['text', '']}, 1, 0, True]}],
         "施法目标": ['tree', {'不分类': ['tree', {"list":
                                                ['tree', {'代码': ['int', 1], 'list':
@@ -366,6 +370,7 @@ edit = {
         "图片": ['text', ''],
         "迷你图片": ['text', ''],
         "次级分类": ['text', ''],
+        "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}],
         "成员": ['tree', {"list": ["tree", {'名称': ['text', ''],
             '额外属性': ['tree', {'list': ['tree', {
                                             '属性':['text',''],
@@ -387,6 +392,7 @@ edit = {
         "图片大小": ['text', '120'],
         "简述": ['text', ''],
         "日志标识": ['tree', {"list": ['text', '', 1, 0, True]}],
+        "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}],
         "属性": ['tree', {"list": ['tree', {'标识': ['text', ''], 'list': ['text', '', 1, 1, False]}, 1, 0, True]}],
         "简单条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],
         "具体条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],

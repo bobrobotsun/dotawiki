@@ -145,10 +145,10 @@ def fulfill_hero_json(base_txt, all_json, version, name_base):
             all_json[i]['攻击后摇'] = float(all_json[i]['攻击后摇'])
             all_json[i]['背景'] = base_txt["英雄"][all_json[i]["代码名"]]['lore']['1']
             all_json[i]['简介'] = base_txt["英雄"][all_json[i]["代码名"]]['hype']['1']
-            if '图片地址' in all_json[i]:
-                all_json[i].pop('图片地址')
-            if '迷你图片地址' in all_json[i]:
-                all_json[i].pop('迷你图片地址')
+            if '手填标签' not in all_json[i]:
+                all_json[i]['手填标签']={}
+            if '标签' not in all_json[i]:
+                all_json[i]['标签']=[]
             for j in heropro_txt:
                 if len(j) == 4 and j[3] in base_txt["英雄"][all_json[i]["代码名"]]:
                     proname = j[3]
@@ -375,6 +375,15 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         # 缩略显示
         db['简易展示'] = html_function(st)
         db['具体展示'] = html_function(bt)
+        #下面是生成标签功能
+        db['标签']=[]
+        for i in db['手填标签']:
+            if db['手填标签'][i]!='':
+                db['标签'].append(db['手填标签'][i])
+        db['标签'].append('英雄')
+        db['标签'].append(db['主属性']['1']+'英雄')
+        db['标签'].append(db['近战远程']['1'])
+        db['标签'].append(db['阵营']['1'])
 
 
 def create_html_data_page(all_json):

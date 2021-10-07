@@ -161,6 +161,10 @@ def fulfill_item_json(base_txt, all_json, version, name_base):
             all_json[ii]['图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
         if all_json[ii]['迷你图片'] == '':
             all_json[ii]['迷你图片'] = 'Items_' + all_json[ii]["代码名"] + '.png'
+        if '手填标签' not in all_json[ii]:
+            all_json[ii]['手填标签'] = {}
+        if '标签' not in all_json[ii]:
+            all_json[ii]['标签'] = []
         all_json[ii]['曾用名'] = []
         if ii in name_base:
             for namej in name_base[ii]:

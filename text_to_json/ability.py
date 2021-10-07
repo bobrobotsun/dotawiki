@@ -142,6 +142,9 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
         all_json['技能源'][i]['分类'] = '技能源'
         if '链接指向' not in all_json['技能源'][i]:
             all_json['技能源'][i]['链接指向']={}
+
+        if '手填标签' not in all_json['技能源'][i]:
+            all_json['技能源'][i]['手填标签'] = {}
         # if 'A杖信息' in all_json['技能源'][i]:
         #     all_json['技能源'][i].pop('A杖信息')
         # if '升级' in all_json['技能源'][i]:
@@ -167,6 +170,8 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
         unit_dic["版本"] = version
         unit_dic['曾用名'] = []
         unit_dic['链接指向'] = []
+        if '标签' not in unit_dic:
+            unit_dic['标签'] = []
         if unit_dic["次级分类"] == 'a杖技能' or unit_dic["次级分类"] == 'A杖技能':
             unit_dic["次级分类"] = '神杖技能'
         elif unit_dic["次级分类"] == '非英雄单位' or unit_dic["次级分类"] == '非英雄技能':
@@ -2103,6 +2108,10 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                             all_bools = all_bools and isinstance(tempjson, dict) and condition[ii + 1] in tempjson
                         elif i == '@notin':
                             all_bools = all_bools and isinstance(tempjson, dict) and condition[ii + 1] not in tempjson
+                        elif i == '@listin':
+                            all_bools = all_bools and isinstance(tempjson, list) and condition[ii + 1] in tempjson
+                        elif i == '@notlistin':
+                            all_bools = all_bools and isinstance(tempjson, list) and condition[ii + 1] not in tempjson
                         elif i == '@strin':
                             all_bools = all_bools and isinstance(tempjson, str) and condition[ii + 1] in tempjson
                         elif i == '@notstrin':

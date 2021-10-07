@@ -112,6 +112,10 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
         if len(all_json[i]['迷你图片']) > 1:
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'][0].upper() + all_json[i]['迷你图片'][1:]
             all_json[i]['迷你图片'] = all_json[i]['迷你图片'].replace(' ', '_')
+        if '手填标签' not in all_json[i]:
+            all_json[i]['手填标签'] = {}
+        if '标签' not in all_json[i]:
+            all_json[i]['标签'] = []
         for j in unitpro_txt + unitpro_num:
             popit = []
             if j[0] not in all_json[i]:
