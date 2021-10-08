@@ -559,17 +559,17 @@ def create_page_unit(json_base, log_base, log_list, unit):
     db = json_base['非英雄单位'][unit]
     retxt = '__NOTOC__<div>' + db['具体展示'] + db["页面名"] + '是DOTA2中的一种'
     if db["远古单位"]["1"]["1"] == 1:
-        retxt += '远古[[分类:远古单位]]'
+        retxt += '远古'
     if db["英雄级单位"]["1"]["1"] == 1:
-        retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="英雄级单位">英雄级</span>单位[[分类:英雄级单位]][[分类:召唤物]]'
+        retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="英雄级单位">英雄级</span>单位'
     if db["召唤物"]["1"]["1"] == 1:
-        retxt += '召唤物[[分类:召唤物]]'
+        retxt += '召唤物'
     if db["中立生物"]["1"]["1"] == 1:
-        retxt += '<span class="dota_create_link_to_wiki_page">中立生物</span>[[分类:中立生物]]'
+        retxt += '<span class="dota_create_link_to_wiki_page">中立生物</span>'
     if db["类型"] == '建筑物':
-        retxt += '<span class="dota_create_link_to_wiki_page">建筑物</span>[[分类:建筑物]]'
+        retxt += '<span class="dota_create_link_to_wiki_page">建筑物</span>'
     if db["单位关系类型"]["1"]["1"] == '守卫':
-        retxt += '<span class="dota_create_link_to_wiki_page">守卫</span>[[分类:守卫]][[分类:召唤物]]'
+        retxt += '<span class="dota_create_link_to_wiki_page">守卫</span>'
     elif db["单位关系类型"]["1"]["1"] != '默认':
         retxt += '<span class="dota_create_link_to_wiki_page">' + db["单位关系类型"]["1"]["1"] + '</span>'
     if "简介" in db and db["简介"] != '':
@@ -591,8 +591,6 @@ def create_page_unit(json_base, log_base, log_list, unit):
         for i in unitgroup:
             retxt += '<div>' + json_base['单位组'][i]['成员']['1']['简易展示'] + '</div>'
     retxt += '</div>'
-    if db["类型"] == '士兵':
-        retxt += '[[分类:士兵]]'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
     retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
@@ -604,7 +602,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
     for i in db['技能']:
         retxt+='<li>'+i+'（'+json_base['技能'][i]['中文名']+'）：{{点击复制|<code>'+json_base['技能'][i]['代码']+'</code>|'+json_base['技能'][i]['代码']+'|td=0}}</li>'
     retxt += '</ul>'
-    retxt += '<div>' + json_base['机制']['通用']['简单条目']['非英雄单位导航'] + '</div>[[分类:非英雄单位]]'
+    retxt += '<div>' + json_base['机制']['通用']['简单条目']['非英雄单位导航'] + '</div>'
     retxt += thanks_for_the_audience()
     rere = ''
     nums = 0
@@ -622,6 +620,8 @@ def create_page_unit(json_base, log_base, log_list, unit):
                 nums += 1
         rere += retxt[i]
     rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + unit + '.json">' + unit + '</span></div>'
+    for i in db['标签']:
+        rere+='[[分类:'+i+']]'
     return rere
 
 
@@ -631,7 +631,7 @@ def create_page_item(json_base, log_base, log_list, item):
     for i, v in db['商店'].items():
         if i != '1':
             retxt += '、'
-        retxt += db['商店'][i] + '[[分类:' + db['商店'][i] + '物品]]'
+        retxt += db['商店'][i]
     retxt += '"</b>商店获得。<br>'
     for i, v in db['商店'].items():
         retxt += '<br><b>' + v + '商店</b>出售以下商品：<br><br>' + '<table style="font-size:16px;">'
@@ -658,7 +658,7 @@ def create_page_item(json_base, log_base, log_list, item):
             retxt += '。'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
-    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base)) + '[[分类:物品]]'
+    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
     retxt +='\n==代码查询==\n' \
             + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>item_'+db['代码名']+'</code>|item_'+db['代码名']+'|td=0}}</li>'
     for i in db['技能']:
@@ -681,6 +681,8 @@ def create_page_item(json_base, log_base, log_list, item):
                 nums += 1
         rere += retxt[i]
     rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + item + '.json">' + item + '</span></div>'
+    for i in db['标签']:
+        rere+='[[分类:'+i+']]'
     return rere
 
 
@@ -711,6 +713,8 @@ def create_page_old_ability(json_base, log_base, log_list, ability):
     retxt=''
     retxt+='您当前进入的页面是一个陈旧的、被删除的技能。考虑到它可能无法呈现在{{H|'+db['技能归属']+'}}的页面上，因此我们将其所有的信息保存在它们自己的页面上。您将在此看到这个技能在删除前的最后一个版本的数据，和它的更新日志。\n\n'+db['具体展示']\
            +'\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base),0)+thanks_for_the_audience()
+    for i in db['标签']:
+        retxt+='[[分类:'+i+']]'
     return retxt
 
 def create_page_mechnism(json_base, log_base, log_list, mech):
@@ -723,8 +727,6 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
     if db['次级分类'] != '引用机制':
         retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
         retxt += thanks_for_the_audience()
-        if db['次级分类'] != '':
-            retxt += '[[分类:' + db['次级分类'] + ']]'
         retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + mech + '/源.json">' \
                  + mech + '/源</span><br><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + mech + '.json">' + mech + '</span></div>'
     rere = ''
@@ -742,6 +744,8 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
                         rere += '\t'
                 nums += 1
         rere += retxt[i]
+    for i in db['标签']:
+        rere+='[[分类:'+i+']]'
     return rere
 
 
@@ -763,13 +767,14 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
             retxt += json_base['非英雄单位'][i]['简易展示']
     retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
     retxt += thanks_for_the_audience()
-    retxt += '[[分类:单位组]]'
     if db['次级分类'] != '':
-        retxt += '[[分类:' + db['次级分类'] + ']]\n'
+        retxt += '\n'
         if len(db['次级分类']) >= 4 and db['次级分类'][-4:] == '中立营地':
             retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']
     retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' \
              + unitgroup + '.json">' + unitgroup + '</span></div>'
+    for i in db['标签']:
+        retxt+='[[分类:'+i+']]'
     return retxt
 
 

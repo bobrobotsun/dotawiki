@@ -142,7 +142,6 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
         all_json['技能源'][i]['分类'] = '技能源'
         if '链接指向' not in all_json['技能源'][i]:
             all_json['技能源'][i]['链接指向']={}
-
         if '手填标签' not in all_json['技能源'][i]:
             all_json['技能源'][i]['手填标签'] = {}
         # if 'A杖信息' in all_json['技能源'][i]:
@@ -261,6 +260,8 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
                         upgrade_json[unit_dic["页面名"]] = copy.deepcopy(temp1[i])
                 elif i == "页面名" or i == '应用' or i == '分类' or i=='链接指向':
                     continue
+                elif i == '手填标签':
+                    unit_dic[i] = temp1[i]
                 else:
                     unit_dic[i] = group_source(temp1[i])
             unit_dic["技能升级信息"] = {}
@@ -2955,6 +2956,11 @@ def create_independent_mech(json_dict):
 def fulfil_complex_and_simple_show(all_json, html_function):
     for i in all_json['技能']:
         db = all_json['技能'][i]
+        db['标签'] = []
+        for k in db['手填标签']:
+            if db['手填标签'][k] != '':
+                db['标签'].append(db['手填标签'][k])
+        db['标签'].append('技能')
         if db['应用'] >= 0:
             bt = ''  # 完整显示
             st = ''  # 缩略显示
@@ -2965,8 +2971,13 @@ def fulfil_complex_and_simple_show(all_json, html_function):
             st += '<table class="dota_simple_infobox"><tr><th style="text-align:center;" colspan=2>'
             if db["次级分类"] == "终极技能":
                 bt += '#6c3d83'
+                db['标签'].append('终极技能')
             elif db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能" or db["次级分类"] == "魔晶技能":
                 bt += '#105aa7'
+                if db["次级分类"] == "A杖技能" or db["次级分类"] == "神杖技能":
+                    db['标签'].append('神杖技能')
+                else:
+                    db['标签'].append('魔晶技能')
             else:
                 bt += '#803024'
             bt += ';padding:0.5em;">'
@@ -2997,9 +3008,11 @@ def fulfil_complex_and_simple_show(all_json, html_function):
             if db['神杖信息'] != '':
                 bt += '<div style="background:#222266;padding:0.5em;">{{图片|agha.png|h16}}：' + db['神杖信息'] + '</div>'
                 st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">{{图片|agha.png|h16}}：' + db['神杖信息'] + '</div></td></tr>'
+                db['标签'].append('神杖升级')
             if db['魔晶信息'] != '':
                 bt += '<div style="background:#222266;padding:0.5em;">{{图片|shard.png|h16}}：' + db['魔晶信息'] + '</div>'
                 st += '<tr><td colspan=2><div style="background:#222266;padding:0.5em;">{{图片|shard.png|h16}}：' + db['魔晶信息'] + '</div></td></tr>'
+                db['标签'].append('神杖升级')
             if '技能升级信息' in db and '1' in db['技能升级信息']:
                 bt += '<div style="background:#222266;padding:0.25em;">'
                 ii = 0
@@ -3112,12 +3125,12 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                         bt += '<li>' + v['文字'] + '</li>'
                     else:
                         break
-            for i in range(1, uls + 1):
+            for k in range(1, uls + 1):
                 bt += '</ul>'
             bt += '</div></div></div></div>'
-            for i in db['技能召唤物']:
-                if i in all_json['非英雄单位']:
-                    bt += all_json['非英雄单位'][i]['简易展示']
+            for k in db['技能召唤物']:
+                if k in all_json['非英雄单位']:
+                    bt += all_json['非英雄单位'][k]['简易展示']
             bt += '</div>'
             bt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">' \
                   '{{链接|Data:' + db['数据来源'] + '/源.json|' + db['数据来源'] + '/源}}<br>{{链接|Data:' + db['数据来源'] + '.json|' + db['数据来源'] + '}}</div>'

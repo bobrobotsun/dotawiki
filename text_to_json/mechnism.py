@@ -115,3 +115,15 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
             if w!='':
                 w.addtext(['《'+target+'》已经更新了'+str(loop+1)+'次',1], targeti+loop*len(tlist))
                 QApplication.processEvents()
+
+def fulfil_labels(all_json):
+    for i in all_json['机制']:
+        v1=all_json['机制'][i]
+        v2=all_json['机制源'][i]
+        v1['标签'] = []
+        if v1['次级分类'] != '' and v1['次级分类'] not in v2['手填标签'].values():
+            v2['手填标签'][str(len(v2['手填标签'])+1)]=v1['次级分类']
+        for i in v2['手填标签']:
+            if v2['手填标签'][i] != '':
+                v1['标签'].append(v2['手填标签'][i])
+        v1['标签'].append('机制')

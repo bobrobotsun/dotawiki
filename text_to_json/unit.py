@@ -415,6 +415,17 @@ def create_file(all_json):
 def fulfil_complex_and_simple_show(all_json,html_function):
     for i in all_json['非英雄单位']:
         db = all_json['非英雄单位'][i]
+        db['标签'] = []
+        if db["召唤物"]["1"]["1"] == 1 and '召唤物' not in db['手填标签'].values():
+            db['手填标签'][str(len(db['手填标签'])+1)]='召唤物'
+        if db["类型"] != '' and db["类型"] not in db['手填标签'].values():
+            db['手填标签'][str(len(db['手填标签'])+1)]=db["类型"]
+        if db["单位关系类型"]["1"]["1"] != '默认' and db["单位关系类型"]["1"]["1"] != '' and db["单位关系类型"]["1"]["1"] not in db['手填标签'].values():
+            db['手填标签'][str(len(db['手填标签'])+1)]=db["单位关系类型"]["1"]["1"]
+        for k in db['手填标签']:
+            if db['手填标签'][k] != '':
+                db['标签'].append(db['手填标签'][k])
+        db['标签'].append('非英雄单位')
         bt = ''  # 完整显示
         st = ''  # 缩略显示
         bt='<table class="infobox" style="text-align:center;background:#222;width:300px;color:#fff;margin-top:12px;margin-right:12px;">' \
@@ -430,27 +441,33 @@ def fulfil_complex_and_simple_show(all_json,html_function):
         if db["英雄级单位"]['1']['1'] == 1:
             bt += '<span class="label bg-primary">英雄级</span>'
             st += '<span class="ability_indicator bg-primary">英雄级</span>'
+            db['标签'].append('英雄级单位')
         else:
             bt += '<span class="label bg-default">非英雄级</span>'
             st += '<span class="ability_indicator bg-default">非英雄级</span>'
         if db["单位关系类型"]['1']['1'] == '守卫':
             bt += ' <span class="label bg-warning">守卫</span>'
             st += ' <span class="ability_indicator bg-warning">守卫</span>'
+            db['标签'].append('守卫')
         else:
             bt += ' <span class="label bg-default">非守卫</span>'
             st += ' <span class="ability_indicator bg-default">非守卫</span>'
         if db["远古单位"]['1']['1'] == 1:
             bt += ' <span class="label bg-warning">远古</span>'
             st += ' <span class="ability_indicator bg-warning">远古</span>'
+            db['标签'].append('远古单位')
         else:
             bt += ' <span class="label bg-default">非远古</span>'
             st += ' <span class="ability_indicator bg-default">非远古</span>'
         if db["生命类型"] == '攻击次数':
             bt += ' <span class="label bg-warning">攻击次数型</span>'
             st += ' <span class="ability_indicator bg-warning">攻击次数型</span>'
+            db['标签'].append('攻击次数型生命值')
         else:
             bt += ' <span class="label bg-default">生命值型</span>'
             st += ' <span class="ability_indicator bg-default">生命值型</span>'
+        if db["中立生物"]["1"]["1"] == 1:
+            db['标签'].append('中立生物')
         bt += '</td></tr>' \
               '<tr><td colspan=2 style="background:#fff"><div class="center">'
         st += '</div></div>' \

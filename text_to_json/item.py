@@ -280,6 +280,13 @@ def create_file(all_json):
 def fulfil_complex_and_simple_show(all_json, html_function):
     for i in all_json['物品']:
         db = all_json['物品'][i]
+        db['标签'] = []
+        for k in db['手填标签']:
+            if db['手填标签'][k] != '':
+                db['标签'].append(db['手填标签'][k])
+        for k, v in db['商店'].items():
+            db['标签'].append(v + '物品')
+        db['标签'].append('物品')
         bt = ''  # 完整显示
         st = ''  # 缩略显示
         common_tag = ['<tr><td colspan=2 style="background:#ccc;', '</td></tr>']
