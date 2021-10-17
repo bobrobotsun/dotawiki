@@ -43,7 +43,7 @@ class Main(QMainWindow):
         self.target_url = 'http://dota.huijiwiki.com/w/api.php'
         self.image_url = 'http://huiji-public.huijistatic.com/dota/uploads'
         self.seesion = requests.session()
-        self.header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.47'}
+        self.header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36'}
         self.get_login_token_data = {'action': 'query', 'meta': 'tokens', 'type': 'login', 'format': 'json'}
         self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'http://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
         self.get_csrf_token_data = {'action': 'query', 'meta': 'tokens', 'format': 'json'}
