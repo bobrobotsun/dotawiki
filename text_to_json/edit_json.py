@@ -408,8 +408,8 @@ edit_adition = {
     '混合文字': ['tree', {"类型": ['text', ''], "后缀": ['text', ''], "list": ['tree', {"符号": ['text', ''], "list": ['text', '', 0, 4, False]}, 1, 1, False]}, 1, 0, False],
     '物品属性': {
         '全属性': {'代码': 'bonus_all_stats', '后缀': '', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page" data-link-page-name="属性">全属性</span>'},
-        '主属性': {'代码': 'bonus_primary_stat', '后缀': '', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page" data-link-page-name="属性">全属性</span>'},
-        '百分比主属性': {'代码': 'primary_stat_percent', '后缀': '%', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page" data-link-page-name="属性">全属性</span>'},
+        '主属性': {'代码': 'bonus_primary_stat', '后缀': '', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page" data-link-page-name="属性">主属性</span>'},
+        '百分比主属性': {'代码': 'primary_stat_percent', '后缀': '%', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page" data-link-page-name="属性">主属性</span>'},
         '次级属性': {'代码': 'secondary_stats', '后缀': '', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page" data-link-page-name="属性">次级属性</span>'},
         '力量': {'代码': 'bonus_strength', '后缀': '', '展示前缀': '+', '展示后缀': '<span class="dota_get_image_by_json_name" data-json-name="力量" data-text-link="1"></span>'},
         '百分比力量': {'代码': 'strength_pct', '后缀': '%', '展示前缀': '+', '展示后缀': '<span class="dota_get_image_by_json_name" data-json-name="敏捷" data-text-link="1"></span>'},
