@@ -37,7 +37,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.30d'
+        self.version = '7.30e'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'http://dota.huijiwiki.com/w/api.php'
