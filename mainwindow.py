@@ -1412,11 +1412,11 @@ class Main(QMainWindow):
                 self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
                 self.w.setWindowIcon(self.icon)
                 QApplication.processEvents()
-                total_num = len(allupdate)*2
+                total_num = len(allupdate) * 2
                 self.w.confirm_numbers(total_num)
-                self.w.setWindowTitle('机制一共有'+str(total_num)+'个，1~'+str(len(allupdate))+'，'+str(len(allupdate)+1)+'~'+str(total_num)+'。')
+                self.w.setWindowTitle('机制一共有' + str(total_num) + '个，1~' + str(len(allupdate)) + '，' + str(len(allupdate) + 1) + '~' + str(total_num) + '。')
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
-                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time,self.w)
+                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time, self.w)
             else:
                 allupdate.append(target)
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
@@ -1823,7 +1823,8 @@ class Main(QMainWindow):
         QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
     def upload_json_1(self, pagename, content):
-        return ['暂时不予以上传',1]
+        return ['暂时不予以上传', 1]
+
     # 向wiki网站上传对应的信息
     def upload_json(self, pagename, content):
         download_data = {'action': 'jsondata', 'title': pagename, 'format': 'json'}
@@ -1968,14 +1969,14 @@ class Main(QMainWindow):
         retxt = ''
         link = x.group(1).split('|')
         if '#' in link[0]:
-            link_index=link[0].index('#')+1
-            link_hex=link[0][link_index:].encode('utf-8')
-            link_target=''
+            link_index = link[0].index('#') + 1
+            link_hex = link[0][link_index:].encode('utf-8')
+            link_target = ''
             for i in link_hex:
-                link_target+='.'+self.change_256hex_to_str(i)
-            real_link=link[0][:link_index]+link_target
+                link_target += '.' + self.change_256hex_to_str(i)
+            real_link = link[0][:link_index] + link_target
         else:
-            real_link=link[0]
+            real_link = link[0]
         if len(link) > 1:
             retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + real_link + '">' + link[1] + '</span>'
         else:
@@ -1988,8 +1989,8 @@ class Main(QMainWindow):
         if template_args[0] in ['H', 'A', 'I', 'h', 'a', 'i']:
             size = ''
             pic_style = ''
-            if template_args[1]=='魔晶升级' or template_args[1]=='魔晶技能':
-                template_args.insert(2,'w24')
+            if template_args[1] == '魔晶升级' or template_args[1] == '魔晶技能':
+                template_args.insert(2, 'w24')
             for i in range(2, len(template_args)):
                 if template_args[i][0] == 'w':
                     size = ' data-image-width="' + template_args[i][1:] + '"'
@@ -2007,12 +2008,36 @@ class Main(QMainWindow):
                 retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + self.entry_base[template_args[1]]['链接'] + '">' + template_args[1] + '</span>'
             else:
                 retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
+        elif template_args[0].lower() in ['b', 'buff']:
+            if len(template_args) < 3:
+                retxt = '{{错误文字|调用buff应使用2个参数，而您只输入了' + str(len(template_args) - 1) + '个参数}}'
+            else:
+                if template_args[1] in self.json_base['技能']:
+                    v = self.json_base['技能'][template_args[1]]['效果']
+                    w = ''
+                    tip=False
+                    for i in range(3, len(template_args)):
+                        if template_args[i] == 'tip':
+                            tip=True
+                    if template_args[2] in v:
+                        w = v[template_args[2]]
+                    else:
+                        for j in v:
+                            if template_args[2]==v[template_args[2]]['名称']:
+                                w = v[template_args[2]]
+                    if w != '':
+                        if tip:
+                            retxt += '{{额外信息框|<span class="border_3d_out" style="padding:0.25em;background-color:#fff">' + w['名称'] + '</span>|'+ability.create_upgrade_buff(w)+'}}'
+                        else:
+                            retxt+='<span class="" style="border-style:outset;padding:0.25em;background-color:#fff">' + w['名称'] + '</span>'
+                    else:
+                        retxt = '{{错误文字|未在《'+template_args[1]+'》中找到对应“'+template_args[2]+'”的buff}}'
         elif '图片' in template_args[0]:
             size = ''
             center = ''
             link = ''
             image_class = ''
-            if template_args[1].lower()=='shard.png':
+            if template_args[1].lower() == 'shard.png':
                 template_args.insert(2, 'w24')
             for i in range(2, len(template_args)):
                 if template_args[i] == 'left':
@@ -2046,10 +2071,10 @@ class Main(QMainWindow):
             else:
                 retxt += '{{错误文字|错误的词汇名称：' + template_args[1] + '}}'
         elif template_args[0] == 'symbol':
-            retxt+='{{图片|'+template_args[1]+'.png'
-            if template_args[1]=='shard':
-                retxt+='|w24'
-            retxt+='}}'
+            retxt += '{{图片|' + template_args[1] + '.png'
+            if template_args[1] == 'shard':
+                retxt += '|w24'
+            retxt += '}}'
         elif template_args[0] == '额外信息框':
             retxt += '<span class="dota_click_absolute_additional_infomation_frame">' \
                      + '<span class="dota_click_absolute_additional_infomation_frame_button">' + template_args[1] + '</span>' \
@@ -2113,51 +2138,51 @@ class Main(QMainWindow):
                     retxt += '{{错误文字|错误机制名：' + template_args[1] + '}}'
             else:
                 retxt += '{{错误文字|《机制内容》需要输入3个参数，而您只输入了' + str(len(template_args) - 1) + '个参数}}'
-        elif template_args[0]=='翻译':
-            lang=''
-            aclass=''
+        elif template_args[0] == '翻译':
+            lang = ''
+            aclass = ''
             for i in range(2, len(template_args)):
                 if template_args[i][:5] == 'lang=':
                     lang = template_args[i][5:]
                 if template_args[i][:6] == 'style=':
-                    if template_args[i][6:]=='warning':
-                        aclass+=' bgc_warning'
+                    if template_args[i][6:] == 'warning':
+                        aclass += ' bgc_warning'
             if template_args[1] in self.text_base['翻译']:
-                if lang=='':
-                    retxt+='<span class="dota_self_switch_content_by_click">'
+                if lang == '':
+                    retxt += '<span class="dota_self_switch_content_by_click">'
                     for i in self.text_base['翻译'][template_args[1]]:
-                        v=self.text_base['翻译'][template_args[1]][i]
-                        retxt+='<span class="dota_self_switch_content_by_click_content'+aclass+'">'+v+'</span>'
-                    retxt+='</span>'
+                        v = self.text_base['翻译'][template_args[1]][i]
+                        retxt += '<span class="dota_self_switch_content_by_click_content' + aclass + '">' + v + '</span>'
+                    retxt += '</span>'
                 else:
                     if lang in self.text_base['翻译'][template_args[1]]:
-                        v=self.text_base['翻译'][template_args[1]][lang]
+                        v = self.text_base['翻译'][template_args[1]][lang]
                         retxt += '<span class="' + aclass + '">' + v + '</span>'
                     else:
-                        retxt = '{{错误文字|您输入的代码“' + template_args[1] + '”没有“'+lang+'”语言信息，请检查后重新输入}}'
+                        retxt = '{{错误文字|您输入的代码“' + template_args[1] + '”没有“' + lang + '”语言信息，请检查后重新输入}}'
             else:
-                retxt='{{错误文字|您输入的代码“'+template_args[1]+'”有误，请检查后重新输入}}'
-        elif template_args[0]=='游戏报错':
-            retxt='{{翻译'
-            for i in range(1,len(template_args)):
-                retxt+='|'+template_args[i]
-            retxt+='|style=warning}}'
+                retxt = '{{错误文字|您输入的代码“' + template_args[1] + '”有误，请检查后重新输入}}'
+        elif template_args[0] == '游戏报错':
+            retxt = '{{翻译'
+            for i in range(1, len(template_args)):
+                retxt += '|' + template_args[i]
+            retxt += '|style=warning}}'
         else:
             return x.group(0)
         return retxt
 
-    def change_256hex_to_str(self,num):
-        retxt=''
-        temp=num//16
-        num-=temp*16
-        if temp<10:
-            retxt+=chr(48+temp)
+    def change_256hex_to_str(self, num):
+        retxt = ''
+        temp = num // 16
+        num -= temp * 16
+        if temp < 10:
+            retxt += chr(48 + temp)
         else:
-            retxt+=chr(55+temp)
-        if num<10:
-            retxt+=chr(48+num)
+            retxt += chr(55 + temp)
+        if num < 10:
+            retxt += chr(48 + num)
         else:
-            retxt+=chr(55+num)
+            retxt += chr(55 + num)
         return retxt
 
     def check_dict_equal(self, d1, d2):
@@ -3703,7 +3728,7 @@ class Main(QMainWindow):
                     for k in range(len(self.name_base['历史'])):
                         if j == self.name_base['历史'][k]['页面名']:
                             self.name_base['历史'][k].update({'图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
-        i='技能'
+        i = '技能'
         for j in self.json_base[i]:
             if '图片' in self.json_base[i][j] and '迷你图片' in self.json_base[i][j]:
                 self.name_base['原生'].append({'名称': j, '页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
@@ -3712,7 +3737,7 @@ class Main(QMainWindow):
                         self.name_base['历史'][k].update({'图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
             if '链接指向' in self.json_base[i][j]:
                 for k in self.json_base[i][j]['链接指向']:
-                    if k !='':
+                    if k != '':
                         self.name_base['原生'].append({'名称': k, '页面名': j, '图片': self.json_base[i][j]['图片'], '迷你图片': self.json_base[i][j]['迷你图片']})
                     else:
                         print('搞错了？')
@@ -4013,18 +4038,18 @@ class Main(QMainWindow):
 
     def test_inputwindow(self):
         for i in self.json_base['非英雄单位']:
-            v=self.json_base['非英雄单位'][i]
-            for j in ['英雄攻击伤害','非英雄攻击伤害']:
-                w=v[j]
-                if '1' in w and str(w['1']['1'])=='0' and '2' not in w and '2' not in w['1']:
+            v = self.json_base['非英雄单位'][i]
+            for j in ['英雄攻击伤害', '非英雄攻击伤害']:
+                w = v[j]
+                if '1' in w and str(w['1']['1']) == '0' and '2' not in w and '2' not in w['1']:
                     w.pop('1')
 
     def test_inputwindow_loop_check(self, json):
         for i in self.json_base['非英雄单位']:
-            v=self.json_base['非英雄单位'][i]
-            for j in ['英雄攻击伤害','非英雄攻击伤害']:
-                w=v[j]
-                if '1' in w and w['1']['1']=='0':
+            v = self.json_base['非英雄单位'][i]
+            for j in ['英雄攻击伤害', '非英雄攻击伤害']:
+                w = v[j]
+                if '1' in w and w['1']['1'] == '0':
                     v.pop('1')
 
     def test_inputwindow_change_it(self, json):
