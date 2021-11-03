@@ -963,7 +963,7 @@ def change_combine_txt(json, ii, data, all_json, name, target, change_all_templa
                 returntxt += json[ii]["混合文字"][str(i)]
         else:
             break
-    json[ii] = change_all_template_link_to_html(returntxt)
+    json[ii] = returntxt
 
 
 def combine_txt_numbers(json, index, all_json, base_txt, target):

@@ -1342,6 +1342,9 @@ class Main(QMainWindow):
                     ability.loop_check(self.json_base["技能"][i], self.text_base, self.json_base, i, target, self.change_all_template_link_to_html)  # 花费时间过久9s+
 
             ability.confirm_upgrade_info(self.json_base['技能'])
+
+            for i in ['物品','技能','非英雄单位','单位组']:
+                self.loop_check_to_html(self.json_base[i],self.change_all_template_link_to_html)
             # 增加拥有技能
 
             ability_own = {}
@@ -1395,6 +1398,13 @@ class Main(QMainWindow):
             QMessageBox.information(self, "已完成", info + '\n总耗时：' + str(round(time.time() - time_show, 2)) + '秒')
             return False
 
+    def loop_check_to_html(self,json,function):
+        for i in json:
+            if isinstance(json[i],dict):
+                self.loop_check_to_html(json[i],function)
+            elif isinstance(json[i],str):
+                json[i]=function(json[i])
+
     def update_json_base_mechanism(self, target=''):
         try:
             time_show = time.time()
@@ -1417,10 +1427,12 @@ class Main(QMainWindow):
                 self.w.setWindowTitle('机制一共有' + str(total_num) + '个，1~' + str(len(allupdate)) + '，' + str(len(allupdate) + 1) + '~' + str(total_num) + '。')
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
                 mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time, self.w)
+                self.loop_check_to_html(self.json_base['机制'], self.change_all_template_link_to_html)
             else:
                 allupdate.append(target)
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
                 mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time)
+                self.loop_check_to_html(self.json_base['机制'][target], self.change_all_template_link_to_html)
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
@@ -2015,10 +2027,10 @@ class Main(QMainWindow):
                 if template_args[1] in self.json_base['技能']:
                     v = self.json_base['技能'][template_args[1]]['效果']
                     w = ''
-                    tip=False
+                    tip=True
                     for i in range(3, len(template_args)):
                         if template_args[i] == 'tip':
-                            tip=True
+                            tip=False
                     if template_args[2] in v:
                         w = v[template_args[2]]
                     else:
@@ -2027,9 +2039,9 @@ class Main(QMainWindow):
                                 w = v[template_args[2]]
                     if w != '':
                         if tip:
-                            retxt += '{{额外信息框|<span class="border_3d_out" style="padding:0.25em;background-color:#fff">' + w['名称'] + '</span>|'+ability.create_upgrade_buff(w)+'}}'
+                            retxt += '{{额外信息框|<span class="border_3d_out" style="background-color:#fff">' + w['名称'] + '</span>|'+ability.create_upgrade_buff(w)+'}}'
                         else:
-                            retxt+='<span class="" style="border-style:outset;padding:0.25em;background-color:#fff">' + w['名称'] + '</span>'
+                            retxt+='<span class="" style="border-style:outset;background-color:#fff">' + w['名称'] + '</span>'
                     else:
                         retxt = '{{错误文字|未在《'+template_args[1]+'》中找到对应“'+template_args[2]+'”的buff}}'
         elif '图片' in template_args[0]:
