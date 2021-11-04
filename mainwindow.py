@@ -1494,6 +1494,11 @@ class Main(QMainWindow):
             for i in self.json_base['英雄']:
                 all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
                 all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base), 0)])
+                talent_name=[]
+                for j in ['10','15','20','25']:
+                    talent_name.append(common_page.all_the_names(self.json_base['技能'][i+j+'级左天赋'], self.json_base)+common_page.all_the_names(self.json_base['技能'][i+j+'级右天赋'], self.json_base))
+                    all_upload.append([i+j+'级天赋/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], talent_name[-1], 0)])
+                all_upload.append([i +'/天赋/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], talent_name[0]+talent_name[1]+talent_name[2]+talent_name[3], 0)])
             self.w.add_info_text('【英雄】页面已经分析完毕！')
             QApplication.processEvents()
         if chosen == '' or chosen == '非英雄单位':
@@ -1521,6 +1526,8 @@ class Main(QMainWindow):
                 else:
                     page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                     all_redirect.append([i, page_link_content])
+                    if self.json_base['技能'][i]['次级分类']!='天赋技能':
+                        all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['技能'][i], self.json_base), 0)])
             self.w.add_info_text('【技能】页面已经分析完毕！')
             QApplication.processEvents()
         if chosen == '' or chosen == '机制':
@@ -1608,6 +1615,11 @@ class Main(QMainWindow):
         for i in self.json_base['英雄']:
             all_page_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
             all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base), 0)])
+            talent_name = []
+            for j in ['10', '15', '20', '25']:
+                talent_name.append(common_page.all_the_names(self.json_base['技能'][i + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][i + j + '级右天赋'], self.json_base))
+                all_page_upload.append([i + j + '级天赋/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], talent_name[-1], 0)])
+            all_page_upload.append([i + '/天赋/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3], 0)])
         self.w.add_info_text('【英雄】页面已经分析完毕！')
         QApplication.processEvents()
         for i in self.json_base['非英雄单位']:
@@ -1631,6 +1643,8 @@ class Main(QMainWindow):
             else:
                 page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                 all_redirect.append([i, page_link_content])
+                if self.json_base['技能'][i]['次级分类'] != '天赋技能':
+                    all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['技能'][i], self.json_base), 0)])
         self.w.add_info_text('【技能】页面已经分析完毕！')
         QApplication.processEvents()
         for i in self.json_base['机制']:
@@ -2001,6 +2015,7 @@ class Main(QMainWindow):
         if template_args[0] in ['H', 'A', 'I', 'h', 'a', 'i']:
             size = ''
             pic_style = ''
+            text_link='1'
             if template_args[1] == '魔晶升级' or template_args[1] == '魔晶技能':
                 template_args.insert(2, 'w24')
             for i in range(2, len(template_args)):
@@ -2008,13 +2023,15 @@ class Main(QMainWindow):
                     size = ' data-image-width="' + template_args[i][1:] + '"'
                 elif template_args[i][0] == 'h':
                     size = ' data-image-height="' + template_args[i][1:] + '"'
+                elif template_args[i][:5] == 'link=':
+                    text_link = template_args[i][5:]
             if len(template_args[1]) > 2 and template_args[1][-2:] == '天赋':
                 pic_style = ''
             elif template_args[0] in ['A', 'a']:
                 pic_style += ' data-image-class="ability_icon"'
             elif template_args[0] in ['I', 'i']:
                 pic_style += ' data-image-class="item_icon"'
-            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="1"' + size + pic_style + '></span>'
+            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="'+text_link+'"' + size + pic_style + '></span>'
         elif template_args[0] in ['E', 'e']:
             if template_args[1] in self.entry_base:
                 retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + self.entry_base[template_args[1]]['链接'] + '">' + template_args[1] + '</span>'

@@ -467,13 +467,12 @@ def create_switch_log(log_base, log_list, name, limit=10):
         if limit == 0:
             retxt += '您可以点击上面的版本号按钮来快速查看对应的更新日志。'
         else:
-            retxt += '您可以点击上面的版本号按钮来快速查看对应的更新日志，或者您可以' \
-                     + '<b><span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">点此处查看完整的日志页面……</span></b>'
+            retxt += '您可以点击上面的版本号按钮来快速查看对应的更新日志，或者您可以<b>[[' + name[0] + '/版本改动|点此处查看完整的日志页面……]]</b>'
     elif limit == 0:
-        retxt += '你看，我说<span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '">《' + name[0] + '》</span>没有更新日志，您还不信。<br>' \
-                 + '实在不行，要不您先看看<span class="dota_create_link_to_wiki_page" data-link-page-name="' + log_list[-1][0] + '">最新的更新日志：' + log_list[-1][0] + '</span>'
+        retxt += '你看，我说[[' + name[0] + '|《' + name[0] + '》]]没有更新日志，您还不信。<br>' \
+                 + '实在不行，要不您先看看[[' + log_list[-1][0] + '|最新的更新日志：' + log_list[-1][0] + ']]'
     else:
-        retxt += '没有查询到<span class="dota_create_link_to_wiki_page" data-link-page-name="' + name[0] + '/版本改动">《' + name[0] + '》的更新日志</span>'
+        retxt += '没有查询到[[' + name[0] + '/版本改动|《' + name[0] + '》的更新日志]]'
     return retxt
 
 
@@ -523,8 +522,14 @@ def create_page_hero(json_base, log_base, log_list, hero):
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
     retxt += '\n==历史更新==\n' \
-             + create_switch_log(log_base, log_list, all_the_names(db, json_base)) \
-             + '\n==饰品==\n' \
+             + create_switch_log(log_base, log_list, all_the_names(db, json_base))\
+             +'<br>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
+    for i in range(len(db['技能'])-8):
+        retxt+='{{H|'+db['技能'][i]+'|link='+db['技能'][i]+'/版本改动}}'
+    for i in ['10','15','20','25']:
+        retxt+='{{H|'+hero+i+'级天赋|link='+hero+i+'级天赋/版本改动}}'
+    retxt+='{{图片|talent.png}}[['+hero+'/天赋/版本改动|'+hero+'全部天赋]]'
+    retxt += '\n==饰品==\n' \
              + '<span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["中文名"] + '/equipment">点击进入查看饰品信息</span>' \
              + '\n==代码查询==\n' \
              + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>npc_dota_hero_'+db['代码名']+'</code>|npc_dota_hero_'+db['代码名']+'|td=0}}</li>'
@@ -594,6 +599,10 @@ def create_page_unit(json_base, log_base, log_list, unit):
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
     retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
+    if len(db['技能'])>0:
+        retxt +='<br>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
+        for i in range(len(db['技能'])):
+            retxt+='{{H|'+db['技能'][i]+'|link='+db['技能'][i]+'/版本改动}}'
     retxt +='\n==代码查询==\n' \
             + '<ul><li>'+db['页面名']+'：</li><ul>'
     for i in db['代码名']:
@@ -659,6 +668,10 @@ def create_page_item(json_base, log_base, log_list, item):
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
     retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
+    if len(db['技能'])>0:
+        retxt +='<br>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
+        for i in range(len(db['技能'])):
+            retxt+='{{H|'+db['技能'][i]+'|link='+db['技能'][i]+'/版本改动}}'
     retxt +='\n==代码查询==\n' \
             + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>item_'+db['代码名']+'</code>|item_'+db['代码名']+'|td=0}}</li>'
     for i in db['技能']:
