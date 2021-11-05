@@ -852,12 +852,14 @@ class Main(QMainWindow):
         self.ml['高级功能']['上传《非英雄单位》页面'].triggered.connect(lambda: self.upload_common_page('非英雄单位'))
         self.ml['高级功能']['上传《物品》页面'] = self.ml['高级功能'][0].addAction('上传《物品》页面')
         self.ml['高级功能']['上传《物品》页面'].triggered.connect(lambda: self.upload_common_page('物品'))
-        self.ml['高级功能']['上传《技能链接》页面'] = self.ml['高级功能'][0].addAction('上传《技能链接》页面')
-        self.ml['高级功能']['上传《技能链接》页面'].triggered.connect(lambda: self.upload_common_page('技能'))
+        self.ml['高级功能']['上传《技能日志》页面'] = self.ml['高级功能'][0].addAction('上传《技能日志》页面')
+        self.ml['高级功能']['上传《技能日志》页面'].triggered.connect(lambda: self.upload_common_page('技能日志'))
         self.ml['高级功能']['上传《单位组》页面'] = self.ml['高级功能'][0].addAction('上传《单位组》页面')
         self.ml['高级功能']['上传《单位组》页面'].triggered.connect(lambda: self.upload_common_page('单位组'))
         self.ml['高级功能']['上传《机制》页面'] = self.ml['高级功能'][0].addAction('上传《机制》页面')
         self.ml['高级功能']['上传《机制》页面'].triggered.connect(lambda: self.upload_common_page('机制'))
+        self.ml['高级功能']['上传《技能链接》页面'] = self.ml['高级功能'][0].addAction('上传《技能链接》页面')
+        self.ml['高级功能']['上传《技能链接》页面'].triggered.connect(lambda: self.upload_common_page('技能'))
         self.ml['高级功能'][0].addSeparator()
         self.ml['高级功能']['上传HTML数据页面'] = self.ml['高级功能'][0].addAction('上传HTML数据页面')
         self.ml['高级功能']['上传HTML数据页面'].triggered.connect(lambda: self.upload_html_data_page())
@@ -1526,9 +1528,14 @@ class Main(QMainWindow):
                 else:
                     page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                     all_redirect.append([i, page_link_content])
+            self.w.add_info_text('【技能】页面已经分析完毕！')
+            QApplication.processEvents()
+        if chosen == '' or chosen == '技能日志':
+            for i in self.json_base['技能']:
+                if self.json_base['技能'][i]['应用'] != 0:
                     if self.json_base['技能'][i]['次级分类']!='天赋技能':
                         all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['技能'][i], self.json_base), 0)])
-            self.w.add_info_text('【技能】页面已经分析完毕！')
+            self.w.add_info_text('【技能日志】页面已经分析完毕！')
             QApplication.processEvents()
         if chosen == '' or chosen == '机制':
             for i in self.json_base['机制']:
@@ -2052,8 +2059,8 @@ class Main(QMainWindow):
                         w = v[template_args[2]]
                     else:
                         for j in v:
-                            if template_args[2]==v[template_args[2]]['名称']:
-                                w = v[template_args[2]]
+                            if template_args[2]==v[j]['名称']:
+                                w = v[j]
                     if w != '':
                         if tip:
                             retxt += '{{额外信息框|<span class="border_3d_out" style="background-color:#fff">' + w['名称'] + '</span>|'+ability.create_upgrade_buff(w)+'}}'
