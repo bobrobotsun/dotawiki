@@ -2987,9 +2987,12 @@ def fulfil_complex_and_simple_show(all_json, html_function):
             if db["默认按键"] != "":
                 bt += "<div style='background:#111;color:#fff;float:left;margin:0 0.1em;padding:0 0.2em;display:inline-block;border-radius:0px;' title='默认按键'><b>" + \
                       db["默认按键"] + "</b></div>"
-            bt += '<h4 id="' + db["代码"] + '"  style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db[
-                "页面名"] + '</h4>' + '<span class="" style="float:right;font-size:125%"><b>{{链接|Data:' + db["数据来源"] + '/源.json|S}}' \
-                  + ' {{链接|Data:' + db["页面名"] + '.json|J}}</b></span><br>' \
+            logname=db['页面名']
+            if db['次级分类']=='天赋技能':
+                logname=db['页面名'][:-3]+'天赋'
+            bt += '<h4 id="' + db["代码"] + '"  style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db["页面名"] \
+                  + '</h4>' + '<span class="adminpanel" style="float:right;font-size:125%">{{链接|Data:' + db["数据来源"] + '/源.json|源}}' \
+                  + ' {{链接|Data:' + db["页面名"] + '.json|json}} {{链接|' + logname + '/版本更新|日志}}</span><br>' \
                   + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db["中文名"] + '</span>' \
                   + '<span style="font-size:12px;color:#ccc;white-space:nowrap;padding:2px;width:75px;overflow:hidden;text-overflow:ellipsis;text-align:center;"> ' \
                   + db["英文名"] + '</span></div>'
@@ -3132,8 +3135,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 if k in all_json['非英雄单位']:
                     bt += all_json['非英雄单位'][k]['简易展示']
             bt += '</div>'
-            bt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">' \
-                  '{{链接|Data:' + db['数据来源'] + '/源.json|' + db['数据来源'] + '/源}}<br>{{链接|Data:' + db['数据来源'] + '.json|' + db['数据来源'] + '}}</div>'
+            bt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + db['页面名'] + '|' + db['页面名'] + ']]</div>'
             db['简易展示'] = html_function(st)
             db['具体展示'] = html_function(bt)
 

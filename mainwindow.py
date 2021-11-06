@@ -1995,7 +1995,7 @@ class Main(QMainWindow):
             else:
                 findlen = findnow
             retxt = re.sub(r'\{\{([^\{\}]*?)\}\}', lambda x: self.upload_text_template(x), retxt)
-        retxt = re.sub(r'\[\[((?!#)[^:]*?)\]\]', lambda x: self.upload_text_link(x), retxt)
+        retxt = re.sub(r'\[\[([^:]*?)\]\]', lambda x: self.upload_text_link(x), retxt)
         return retxt
 
     def upload_text_link(self, x):
@@ -2003,10 +2003,14 @@ class Main(QMainWindow):
         link = x.group(1).split('|')
         if '#' in link[0]:
             link_index = link[0].index('#') + 1
-            link_hex = link[0][link_index:].encode('utf-8')
             link_target = ''
-            for i in link_hex:
-                link_target += '.' + self.change_256hex_to_str(i)
+            for i in range(link_index,len(link[0])):
+                link_hex=link[0][i].encode('utf-8')
+                if len(link_hex)>1:
+                    for j in link_hex:
+                        link_target += '.' + self.change_256hex_to_str(j)
+                else:
+                    link_target +=link[0][i]
             real_link = link[0][:link_index] + link_target
         else:
             real_link = link[0]

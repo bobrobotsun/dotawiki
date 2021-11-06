@@ -264,7 +264,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 all_attri[ii] = round(all_attri[ii], 2)
         bt = '<span class="dota_compound_list_select_input dota_hero_comprehensive_attri_dict">' \
              +'<div class="dota_hero_comprehensive_attri_dict_hero bgc_black" style="width:360px;float:right;color:white;text-align:center;" data-hero-name="' + i + '">' \
-             + '<div style="text-align:center;"><div style="font-size:200%;font-weight:normal;padding:2px;margin:0px;text-align:center;' + main_color + '">' + db['中文名'] + '</div>' \
+             + '<div style="text-align:center;"><div id="'+db['页面名']+'" style="font-size:200%;font-weight:normal;padding:2px;margin:0px;text-align:center;' + main_color + '">' + db['中文名'] + '</div>' \
              + '<div style="font-size:100%;padding: 2px;text-align:center;' + main_color + '">' + db['英文名'] + '</div>[[file:npc_dota_hero_' + db['代码名'] + '.webm|center|360px|link=]]' \
              + '<div style="padding:0.25em;text-align:center;">' \
              + '<span class="ability_indicator" style="' + main_color + 'color:white;"><span class="dota_get_image_by_json_name" data-json-name="' + db["阵营"]['1'] + '" data-text-link="0"></span></span>' \
@@ -379,7 +379,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                   + ' data-ability-level-point-level-now=' + str(db['全属性黄点']) + ' style="padding:0.25em;">+ 2 全 属 性</div>'
             st += '<div class="dota_ability_level_point_change_show" data-ability-level-point-level-max=' + str(db['全属性黄点']) \
                   + ' data-ability-level-point-level-now=' + str(db['全属性黄点']) + '>+ 2 全 属 性</div>'
-        bt += '<div class="adminpanel" style="text-align:left;"><b>[[data:' + db["页面名"] + '.json|J]]</b></div></div></span>'
+        bt += '<div class="adminpanel" style="text-align:left;"><b>[[data:' + db["页面名"] + '.json|J]]</b></div></div></span>'\
+              +'<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + db["页面名"] + '|' + db["页面名"] + ']]</div>'
         st += '</div>'
         # 缩略显示
         db['简易展示'] = html_function(st)

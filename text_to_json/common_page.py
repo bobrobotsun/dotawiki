@@ -554,7 +554,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
                         rere += '\t'
                 nums += 1
         rere += retxt[i]
-    rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + hero + '.json">' + hero + '</span></div>'
+    rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#历史更新|更新日志]]<br>[[#代码查询|代码查询]]</div>'
     for i in db['标签']:
         rere+='[[分类:'+i+']]'
     return rere
