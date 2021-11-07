@@ -562,7 +562,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
 
 def create_page_unit(json_base, log_base, log_list, unit):
     db = json_base['非英雄单位'][unit]
-    retxt = '__NOTOC__<div>' + db['具体展示'] + db["页面名"] + '是DOTA2中的一种'
+    retxt = '__NOTOC__<div>' + db['具体展示']+ db["页面名"] + '是DOTA2中的一种'
     if db["远古单位"]["1"]["1"] == 1:
         retxt += '远古'
     if db["英雄级单位"]["1"]["1"] == 1:

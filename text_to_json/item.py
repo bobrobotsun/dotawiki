@@ -299,7 +299,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         normal_tag = ['<tr><td colspan=2 style="background:#ddd;color:#000;margin:6px;font-size:1em;">', '</td></tr>']
         normal_s_tag = ['<div style="padding:0.5em 0.5em 0em 1em">', '</div>']
         bt += '<table class="infobox" style="text-align:center;background:#fff;width:300px;color:#fff;"><tr class="infobox-title">' \
-              + '<th colspan=2 style="background: #a03030;padding: 0.5em 1em;text-align:center;">' + '<span style="font-size:125%">' + \
+              + '<th colspan=2 style="background: #a03030;padding: 0.5em 1em;text-align:center;">' + '<span id="'+db['页面名']+'" style="font-size:125%">' + \
               db["中文名"] + '</span><div style="text-align:center;">' + db["英文名"] + '</div></th></tr>' \
               + '<tr><td colspan=2 style="background:#222">{{图片|' + db["图片"] + '|w100|link=' + db["页面名"] + '|center}}</td></tr>'\
               +'<tr><td style="background:#a03030;font-size:12px;color:#eee;padding:12px;>' + db['传说'] \
@@ -338,7 +338,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel" style="padding-left:0.25em"><b> ' \
               '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] \
               + '">P</span>  <span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["页面名"] \
-              + '.json">J</span></b></div><div style="float:right;color:#000;padding-right:0.25em">' + db['代码名'] + '</div></td></tr></table>'
+              + '.json">J</span></b></div><div style="float:right;color:#000;padding-right:0.25em">' + db['代码名'] + '</div></td></tr></table>'\
+              +'<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + db["页面名"] + '|' + db["页面名"] + ']]</div>'
         db['简易展示'] = html_function(st)
         db['具体展示'] = html_function(bt)
 

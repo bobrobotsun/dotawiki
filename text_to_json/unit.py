@@ -430,7 +430,7 @@ def fulfil_complex_and_simple_show(all_json,html_function):
         st = ''  # 缩略显示
         bt='<table class="infobox" style="text-align:center;background:#222;width:300px;color:#fff;margin-top:12px;margin-right:12px;">' \
            '<tr class="infobox-title"><th colspan=2 style="background:#000;padding:8px 16px 0 16px;text-align:center;">' \
-           '<span style="font-size:36px;"> ' \
+           '<span id="'+db['页面名']+'" style="font-size:36px;"> ' \
            + common_page.get_unit_value(db["中文名"]) + ' </span><br><span style="font-size:24px;text-align:center;"> '\
            +common_page.get_unit_value(db["英文名"])+' </span></th></tr><tr><td class="dota_unit_simple_infobox_label" colspan=2>'
         st += '<div class="dota_simple_infobox"><div style="text-align:center;min-height:100px">' \
@@ -504,7 +504,8 @@ def fulfil_complex_and_simple_show(all_json,html_function):
                 bt += '</td></tr>'
         bt += '<tr><td colspan=2 style="background:#000;text-align:left;"><div class="adminpanel">\'\'\'' \
               '<span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["页面名"] \
-              + '.json">J</span> <span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] + '">P</span>\'\'\'</div></td></tr></table>'
+              + '.json">J</span> <span class="dota_create_link_to_wiki_page" data-link-page-name="' + db["页面名"] + '">P</span>\'\'\'</div></td></tr></table>'\
+              +'<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + db["页面名"] + '|' + db["页面名"] + ']]</div>'
         st_flex_list=[['等级','',['等级'],''],['生命值','',['生命值'],''],['生命恢复','',['生命恢复'],''],['魔法值','',['魔法值'],''],['魔法恢复','',['魔法恢复'],'']
                 ,['攻击力','攻击类型',['攻击下限','攻击上限'],''],['攻击间隔','',['攻击间隔'],''],['攻击距离','近战远程',['攻击距离'],'']]
         if db['生命类型']=='生命值':
