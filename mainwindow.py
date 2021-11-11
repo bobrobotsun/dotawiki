@@ -1806,14 +1806,20 @@ class Main(QMainWindow):
                             all_page.append([i, common_page.create_page_old_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
                         else:
                             all_redirect.append([i, '#重定向[[' + k + '#' + i + ']]'])
+                            if self.json_base['技能'][i]['次级分类'] != '天赋技能':
+                                all_page.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['技能'][i], self.json_base), 0)])
                         j = self.json_base['技能'][i]['数据来源']
                         if j in self.json_base['技能源']:
                             all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
                 if k in self.json_base['英雄']:
                     all_upload.append([k + '.json', self.json_base['英雄'][k]])
                     all_page.append([k, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],
-                                                                                common_page.all_the_names(self.json_base['英雄'][k], self.json_base), 0)])
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],common_page.all_the_names(self.json_base['英雄'][k], self.json_base), 0)])
+                    talent_name = []
+                    for j in ['10', '15', '20', '25']:
+                        talent_name.append(common_page.all_the_names(self.json_base['技能'][k + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][k + j + '级右天赋'], self.json_base))
+                        all_page.append([k + j + '级天赋/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], talent_name[-1], 0)])
+                    all_page.append([k + '/天赋/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3], 0)])
                 elif k in self.json_base['物品']:
                     all_upload.append([k + '.json', self.json_base['物品'][k]])
                     all_page.append([k, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], k)])
