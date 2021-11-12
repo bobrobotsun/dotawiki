@@ -467,7 +467,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
         if limit == 0:
             retxt += '您可以点击上面的版本号按钮来快速查看对应的更新日志。'
         else:
-            retxt += '您可以点击上面的版本号按钮来快速查看对应的更新日志，或者您可以<b>[[' + name[0] + '/版本改动|点此处查看完整的日志页面……]]</b>'
+            retxt += '<br><ul><li>您可以点击上面的版本号按钮来快速查看对应的更新日志，或者您可以<b>[[' + name[0] + '/版本改动|点此处查看完整的日志页面……]]</b></li></ul>'
     elif limit == 0:
         retxt += '你看，我说[[' + name[0] + '|《' + name[0] + '》]]没有更新日志，您还不信。<br>' \
                  + '实在不行，要不您先看看[[' + log_list[-1][0] + '|最新的更新日志：' + log_list[-1][0] + ']]'
@@ -523,13 +523,18 @@ def create_page_hero(json_base, log_base, log_list, hero):
         retxt += json_base['技能'][i]['具体展示']
     retxt += '\n==历史更新==\n' \
              + create_switch_log(log_base, log_list, all_the_names(db, json_base))\
-             +'<br>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
+             +'<ul><li>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
     for i in range(len(db['技能'])-8):
         retxt+='{{H|'+db['技能'][i]+'|link='+db['技能'][i]+'/版本改动}}'
     for i in ['10','15','20','25']:
         retxt+='{{H|'+hero+i+'级天赋|link='+hero+i+'级天赋/版本改动}}'
-    retxt+='{{图片|talent.png}}[['+hero+'/天赋/版本改动|'+hero+'全部天赋]]'
-    retxt += '\n==饰品==\n' \
+    retxt+='{{图片|talent.png}}[['+hero+'/天赋/版本改动|'+hero+'全部天赋]]</li>'
+    if len(db['删除技能'])>0:
+        retxt+='<li>或者您可以在此查询一些已经被删除的技能：'
+        for i in db['删除技能']:
+            retxt += '{{H|' + i + '}}'
+        retxt+='</li>'
+    retxt += '</ul>\n==饰品==\n' \
              + '<span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["中文名"] + '/equipment">点击进入查看饰品信息</span>' \
              + '\n==代码查询==\n' \
              + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>npc_dota_hero_'+db['代码名']+'</code>|npc_dota_hero_'+db['代码名']+'|td=0}}</li>'
@@ -598,12 +603,18 @@ def create_page_unit(json_base, log_base, log_list, unit):
     retxt += '</div>'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
-    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
+    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))+'<ul>'
     if len(db['技能'])>0:
-        retxt +='<br>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
+        retxt +='<li>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
         for i in range(len(db['技能'])):
             retxt+='{{H|'+db['技能'][i]+'|link='+db['技能'][i]+'/版本改动}}'
-    retxt +='\n==代码查询==\n' \
+        retxt+='</li>'
+    if len(db['删除技能'])>0:
+        retxt+='<li>或者您可以在此查询一些已经被删除的技能：'
+        for i in db['删除技能']:
+            retxt += '{{H|' + i + '}}'
+        retxt+='</li>'
+    retxt +='</ul>\n==代码查询==\n' \
             + '<ul><li>'+db['页面名']+'：</li><ul>'
     for i in db['代码名']:
         retxt+='<li>'+i+'：{{点击复制|<code>'+db['代码名'][i]+'</code>|'+db['代码名'][i]+'|td=0}}、{{点击复制|<code>npc_dota_'+db['代码名'][i]+'</code>|npc_dota_'+db['代码名'][i]+'|td=0}}</li>'
@@ -667,12 +678,18 @@ def create_page_item(json_base, log_base, log_list, item):
             retxt += '。'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
-    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
+    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))+'<ul>'
     if len(db['技能'])>0:
-        retxt +='<br>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
+        retxt +='<li>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
         for i in range(len(db['技能'])):
             retxt+='{{H|'+db['技能'][i]+'|link='+db['技能'][i]+'/版本改动}}'
-    retxt +='\n==代码查询==\n' \
+        retxt+='</li>'
+    if len(db['删除技能'])>0:
+        retxt+='<li>或者您可以在此查询一些已经被删除的技能：'
+        for i in db['删除技能']:
+            retxt += '{{H|' + i + '}}'
+        retxt+='</li>'
+    retxt +='</ul>\n==代码查询==\n' \
             + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>item_'+db['代码名']+'</code>|item_'+db['代码名']+'|td=0}}</li>'
     for i in db['技能']:
         retxt+='<li>'+i+'（'+json_base['技能'][i]['中文名']+'）：{{点击复制|<code>'+json_base['技能'][i]['代码']+'</code>|'+json_base['技能'][i]['代码']+'|td=0}}</li>'
@@ -721,11 +738,30 @@ def create_one_chapter_content_page_mechnism(db):
         retxt += db['内容'][j]['内容']+'\n'
     return retxt
 
+def create_page_normal_ability(json_base, log_base, log_list, ability):
+    db = json_base['技能'][ability]
+    retxt=''
+    retxt+='您当前进入的页面是{{H|'+db['技能归属']+'}}的技能{{H|'+ability+'}}的更新日志页面。<br>\n'\
+           + create_switch_log(log_base, log_list, all_the_names(db, json_base,False),0)+thanks_for_the_audience()
+    retxt+='[[分类:更新日志]]'
+    return retxt
+
+def create_page_talent_ability(log_base, log_list,hero,talent_type, talent_names):
+    retxt='您当前进入的页面是{{H|'+hero+'}}的'
+    if talent_type=='':
+        retxt+='全部{{图片|talent.png}}天赋'
+    else:
+        retxt+='{{H|'+hero+talent_type+'级左天赋}}{{H|'+hero+talent_type+'级右天赋}}'
+    retxt+='的更新日志页面。<br>\n'\
+           + create_switch_log(log_base, log_list, talent_names,0)+thanks_for_the_audience()
+    retxt+='[[分类:更新日志]]'
+    return retxt
+
 def create_page_old_ability(json_base, log_base, log_list, ability):
     db = json_base['技能'][ability]
     retxt=''
     retxt+='您当前进入的页面是一个陈旧的、被删除的技能。考虑到它可能无法呈现在{{H|'+db['技能归属']+'}}的页面上，因此我们将其所有的信息保存在它们自己的页面上。您将在此看到这个技能在删除前的最后一个版本的数据，和它的更新日志。\n\n'+db['具体展示']\
-           +'\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base),0)+thanks_for_the_audience()
+           +'\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base,False),0)+thanks_for_the_audience()
     for i in db['标签']:
         retxt+='[[分类:'+i+']]'
     return retxt
