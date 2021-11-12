@@ -2992,7 +2992,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 logname=db['页面名'][:-3]+'天赋'
             bt += '<h4 id="' + db["代码"] + '"  style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db["页面名"] \
                   + '</h4>' + '<span class="adminpanel" style="float:right;font-size:125%">{{链接|Data:' + db["数据来源"] + '/源.json|源}}' \
-                  + ' {{链接|Data:' + db["页面名"] + '.json|json}} {{链接|' + logname + '/版本更新|日志}}</span><br>' \
+                  + ' {{链接|Data:' + db["页面名"] + '.json|json}} {{链接|' + logname + '/版本改动|日志}}</span><br>' \
                   + '<span style="font-weight:normal;padding:0px;margin:0px;display:inline-block;">' + db["中文名"] + '</span>' \
                   + '<span style="font-size:12px;color:#ccc;white-space:nowrap;padding:2px;width:75px;overflow:hidden;text-overflow:ellipsis;text-align:center;"> ' \
                   + db["英文名"] + '</span></div>'
