@@ -2062,6 +2062,7 @@ class Main(QMainWindow):
                 retxt = '{{错误文字|调用buff应使用2个参数，而您只输入了' + str(len(template_args) - 1) + '个参数}}'
             else:
                 if template_args[1] in self.json_base['技能']:
+                    db=self.json_base['技能'][template_args[1]]
                     v = self.json_base['技能'][template_args[1]]['效果']
                     w = ''
                     tip=True
@@ -2076,7 +2077,7 @@ class Main(QMainWindow):
                                 w = v[j]
                     if w != '':
                         if tip:
-                            retxt += '{{额外信息框|<span class="border_3d_out" style="background-color:#fff">' + w['名称'] + '</span>|'+ability.create_upgrade_buff(w)+'}}'
+                            retxt += '{{额外信息框|<span class="border_3d_out" style="background-color:#fff">' + w['名称'] + '</span>|{{H|'+db['技能归属']+'}}{{H|'+db['页面名']+'}}'+ability.create_upgrade_buff(w)+'}}'
                         else:
                             retxt+='<span class="" style="border-style:outset;background-color:#fff">' + w['名称'] + '</span>'
                     else:
