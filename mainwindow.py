@@ -102,7 +102,7 @@ class Main(QMainWindow):
         self.move(qr.topLeft())
 
     # 这是用来控制间隔时间的函数
-    def time_point_for_iterable_sleep_by_time(self, staytime=0.06, pasttime=0.0):
+    def time_point_for_iterable_sleep_by_time(self, staytime=0.08, pasttime=0.0):
         if pasttime == 0:
             pasttime = self.time_point_for_iterable_sleep
         temptime = time.time()
@@ -726,7 +726,7 @@ class Main(QMainWindow):
                         self.lock.release()
                 else:
                     self.local.k += 1
-                    self.time_point_for_iterable_sleep_by_time(1)
+                    self.time_point_for_iterable_sleep_by_time(0.5)
                     self.progress.addtext(
                         ['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：' + str(self.local.download_info.status_code) + '，尝试次数：' + str(self.local.k), 2],
                         self.current_num[0], threading.current_thread().name)
@@ -3619,6 +3619,7 @@ class Main(QMainWindow):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         text, ok = MoInputWindow.getText(self, '新增一个中标题', '请输入你想要增加的标题名称:')
         if ok:
+            text=text.lstrip(' ').rstrip('\n')
             new = VersionItemEdit(item)
             new.setText(0, text)
             new.itemtype = 'tree2'
@@ -3637,6 +3638,7 @@ class Main(QMainWindow):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         text, ok = MoInputWindow.getText(self, '新增一个小分类', '请输入你想要增加的分类名称:')
         if ok:
+            text=text.lstrip(' ').rstrip('\n')
             new = VersionItemEdit(item)
             new.setText(0, text)
             new.itemtype = 'tree3'
