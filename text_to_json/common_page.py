@@ -336,13 +336,20 @@ def create_page_logs(title, log_base, log_list):
                                         for tnumber in range(current_ul):
                                             retxt += '\t'
                                         retxt += '</ul>'
+                                show_text=''
+                                for y in x['标签']:
+                                    if y in edit_json.version_label:
+                                        show_text+=edit_json.version_label[y]
+                                    if y in edit_json.version_label2:
+                                        show_text += edit_json.version_label2[y]
+                                show_text+=x['文字']
                                 if current_ul == 0:
-                                    retxt += '\n' + x['文字'] + '\n'
+                                    retxt += '\n' + show_text + '\n'
                                 else:
                                     retxt += '\n'
                                     for tnumber in range(current_ul):
                                         retxt += '\t'
-                                    retxt += '<li>' + x['文字'] + '</li>'
+                                    retxt += '<li>' + show_text + '</li>'
                         allul = current_ul
                         for l in range(allul):
                             current_ul -= 1
@@ -396,7 +403,14 @@ def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
                                             for m in range(current_ul - x[l]['序列级数']):
                                                 retxt += '</ul>'
                                             current_ul = x[l]['序列级数']
-                                        retxt += '<li>' + x[l]['文字'] + '</li>'
+                                        show_text = ''
+                                        for y in x[l]['标签']:
+                                            if y in edit_json.version_label:
+                                                show_text += edit_json.version_label[y]
+                                            if y in edit_json.version_label2:
+                                                show_text += edit_json.version_label2[y]
+                                        show_text += x[l]['文字']
+                                        retxt += '<li>' + show_text + '</li>'
                 for m in range(current_ul):
                     retxt += '</ul>'
     if limit > 0:
@@ -450,10 +464,17 @@ def create_switch_log(log_base, log_list, name, limit=10):
                                             for m in range(current_ul - x[l]['序列级数']):
                                                 content += '</ul>'
                                             current_ul = x[l]['序列级数']
+                                        show_text = ''
+                                        for y in x[l]['标签']:
+                                            if y in edit_json.version_label:
+                                                show_text += edit_json.version_label[y]
+                                            if y in edit_json.version_label2:
+                                                show_text += edit_json.version_label2[y]
+                                        show_text += x[l]['文字']
                                         if current_ul>0:
-                                            content += '<li>' + x[l]['文字'] + '</li>'
+                                            content += '<li>' + show_text + '</li>'
                                         else:
-                                            content += '<br>'+x[l]['文字']
+                                            content += '<br>'+show_text
                 if current_ul > 0:
                     for m in range(current_ul):
                         content += '</ul>'
@@ -858,11 +879,14 @@ def create_hero_choose_element(json_base, args, dict, post):
 def create_item_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
-    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；">'\
+    p = Pinyin()
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="简易拼音=1；">'\
              +'<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>'\
              +'<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
              + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
-             +'<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">价格</span>'
+             +'<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">价格</span>'\
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>' \
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
     for i in edit_json.item_shop:
         retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
                  + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
@@ -873,7 +897,7 @@ def create_item_choose_element(json_base, args, dict, post):
     for i in json_base['物品']:
         if json_base['物品'][i]['应用'] == 1:
             retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
-                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；'
+                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音='+p.get_pinyin(i).replace('-', '')[:3]+'；完整代码='+json_base['物品'][i]['代码名']+'；'
             for j in json_base['物品'][i]['商店']:
                 retxt += json_base['物品'][i]['商店'][j] + '=1；'
             for j in edit_json.edit_adition['物品属性']:
@@ -897,11 +921,14 @@ def create_delete_item_choose_element(json_base, args, post):
 def create_neutral_item_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
-    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；'
+    p = Pinyin()
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="简易拼音=1；'
     retxt += '"><div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
              + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
              + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
-             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">中立等级</span>'
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">中立等级</span>'\
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>' \
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
     for i in edit_json.item_shop:
         retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
                  + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
@@ -912,7 +939,7 @@ def create_neutral_item_choose_element(json_base, args, dict, post):
     for i in json_base['物品']:
         if json_base['物品'][i]['应用'] == 1 and json_base['物品'][i]['商店']['1'][:3]=='中立第':
             retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
-                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；'
+                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音='+p.get_pinyin(i).replace('-', '')[:3]+'；完整代码='+json_base['物品'][i]['代码名']+'；'
             for j in json_base['物品'][i]['商店']:
                 retxt += json_base['物品'][i]['商店'][j] + '=1；'
             for j in edit_json.edit_adition['物品属性']:
@@ -931,6 +958,29 @@ def create_delete_neutral_item_choose_element(json_base, args, post):
             args[1] = i
             retxt += '<span style="border:1px black solid;margin:2px;text-align:center;display: inline-block;">{{' + '|'.join(args) + '}}' + post + '</span>'
     retxt += ''
+    return retxt
+
+def create_version_choose_element(list,base,dict):
+    retxt = ''
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="版本号=2；">' \
+             + '<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
+             + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
+             + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="版本号" data-display-len="3">版本号</span>'\
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="时间" data-display-len="3">时间</span>'
+    retxt += '</span><div>'
+    for i in list:
+        for j in range(len(i)):
+            version_name=i[0]
+            if j>0:
+                version_name+='/'+i[j]
+            if version_name in base:
+                db=base[version_name]
+                retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content"' \
+                         + ' data-select-input-text="' + version_name + '" data-check-key="版本号=' +version_name+'.；时间=' +db['更新日期']+'；"' \
+                         + ' style="border:1px black solid;margin:2px;text-align:center;">' \
+                         + version_name + '</span>'
+    retxt += '</div></div>'
     return retxt
 
 

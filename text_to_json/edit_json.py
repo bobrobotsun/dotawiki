@@ -559,6 +559,21 @@ version = {
 }
 version_default = {
 }
+version_label = {
+    '重要':'',
+    '加强':'<i class="fa fa-arrow-up" style="color:#33aa33"></i>',
+    '削弱':'<i class="fa fa-arrow-down" style="color:#aa3333"></i>',
+    '平衡':'<i class="fa fa-exchange" style="color:#3333aa"></i>',
+    '英雄重做':'',
+    '技能重做':'',
+    '神杖重做':'',
+    '魔晶重做':'',
+    '物品重做':''
+}
+version_label2={
+    '补偿性加强':'<i class="fa fa-arrow-circle-up" style="color:#33aa33"></i>',
+    '补偿性削弱':'<i class="fa fa-arrow-circle-down" style="color:#aa3333"></i>'
+}
 item_shop=['消耗品','属性','装备','其他','配件','辅助','法器','防具','兵刃','宝物','神秘商店','肉山','共享','中立第1级','中立第2级','中立第3级','中立第4级','中立第5级']
 
 def set_version_default(base):

@@ -1106,7 +1106,7 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['删除小分类'].clicked.connect(self.version_button_delete_tree_item)
         self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'] = QPushButton('加一条新条目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].clicked.connect(self.version_button_tree3_add_tree_list)
+        self.versionlayout['版本内容']['横排版']['竖排版']['加一条新条目'].clicked.connect(lambda: self.version_button_tree3_add_tree_list())
         self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'] = QPushButton('向上移动题目', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'])
         self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].clicked.connect(lambda: self.version_button_move_list_item(-1))
@@ -1122,6 +1122,9 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'] = QPushButton('删除该目标', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'])
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].clicked.connect(self.version_button_delete_tree_item)
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'] = QPushButton('增加新标签', self)
+        self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'])
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'].clicked.connect(self.version_button_list_add_list_label)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(5)
 
         self.check_version()
@@ -1345,8 +1348,8 @@ class Main(QMainWindow):
 
             ability.confirm_upgrade_info(self.json_base['技能'])
 
-            for i in ['物品','技能','非英雄单位','单位组']:
-                self.loop_check_to_html(self.json_base[i],self.change_all_template_link_to_html)
+            for i in ['物品', '技能', '非英雄单位', '单位组']:
+                self.loop_check_to_html(self.json_base[i], self.change_all_template_link_to_html)
             # 增加拥有技能
 
             ability_own = {}
@@ -1403,12 +1406,12 @@ class Main(QMainWindow):
             QMessageBox.information(self, "已完成", info + '\n总耗时：' + str(round(time.time() - time_show, 2)) + '秒')
             return False
 
-    def loop_check_to_html(self,json,function):
+    def loop_check_to_html(self, json, function):
         for i in json:
-            if isinstance(json[i],dict):
-                self.loop_check_to_html(json[i],function)
-            elif isinstance(json[i],str):
-                json[i]=function(json[i])
+            if isinstance(json[i], dict):
+                self.loop_check_to_html(json[i], function)
+            elif isinstance(json[i], str):
+                json[i] = function(json[i])
 
     def update_json_base_mechanism(self, target=''):
         try:
@@ -1499,11 +1502,11 @@ class Main(QMainWindow):
             for i in self.json_base['英雄']:
                 all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
                 all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base), 0)])
-                talent_name=[]
-                for j in ['10','15','20','25']:
-                    talent_name.append(common_page.all_the_names(self.json_base['技能'][i+j+'级左天赋'], self.json_base)+common_page.all_the_names(self.json_base['技能'][i+j+'级右天赋'], self.json_base))
-                    all_upload.append([i+j+'级天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'],i,j, talent_name[-1])])
-                all_upload.append([i +'/天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'],i,'', talent_name[0]+talent_name[1]+talent_name[2]+talent_name[3])])
+                talent_name = []
+                for j in ['10', '15', '20', '25']:
+                    talent_name.append(common_page.all_the_names(self.json_base['技能'][i + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][i + j + '级右天赋'], self.json_base))
+                    all_upload.append([i + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'], i, j, talent_name[-1])])
+                all_upload.append([i + '/天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'], i, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
             self.w.add_info_text('【英雄】页面已经分析完毕！')
             QApplication.processEvents()
         if chosen == '' or chosen == '非英雄单位':
@@ -1536,7 +1539,7 @@ class Main(QMainWindow):
         if chosen == '' or chosen == '技能日志':
             for i in self.json_base['技能']:
                 if self.json_base['技能'][i]['应用'] != 0:
-                    if self.json_base['技能'][i]['次级分类']!='天赋技能':
+                    if self.json_base['技能'][i]['次级分类'] != '天赋技能':
                         all_upload.append([i + '/版本改动', common_page.create_page_normal_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
             self.w.add_info_text('【技能日志】页面已经分析完毕！')
             QApplication.processEvents()
@@ -1628,8 +1631,8 @@ class Main(QMainWindow):
             talent_name = []
             for j in ['10', '15', '20', '25']:
                 talent_name.append(common_page.all_the_names(self.json_base['技能'][i + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][i + j + '级右天赋'], self.json_base))
-                all_page_upload.append([i + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'],i,j, talent_name[-1])])
-            all_page_upload.append([i + '/天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'],i,'', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
+                all_page_upload.append([i + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'], i, j, talent_name[-1])])
+            all_page_upload.append([i + '/天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'], i, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
         self.w.add_info_text('【英雄】页面已经分析完毕！')
         QApplication.processEvents()
         for i in self.json_base['非英雄单位']:
@@ -1817,12 +1820,12 @@ class Main(QMainWindow):
                 if k in self.json_base['英雄']:
                     all_upload.append([k + '.json', self.json_base['英雄'][k]])
                     all_page.append([k, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],common_page.all_the_names(self.json_base['英雄'][k], self.json_base), 0)])
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][k], self.json_base), 0)])
                     talent_name = []
                     for j in ['10', '15', '20', '25']:
                         talent_name.append(common_page.all_the_names(self.json_base['技能'][k + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][k + j + '级右天赋'], self.json_base))
-                        all_page.append([k + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'],k,j, talent_name[-1])])
-                    all_page.append([k + '/天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'],k,'', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
+                        all_page.append([k + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'], k, j, talent_name[-1])])
+                    all_page.append([k + '/天赋/版本改动', common_page.create_page_talent_ability(self.version_base, self.version_list['版本'], k, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
                 elif k in self.json_base['物品']:
                     all_upload.append([k + '.json', self.json_base['物品'][k]])
                     all_page.append([k, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], k)])
@@ -2010,23 +2013,29 @@ class Main(QMainWindow):
     def upload_text_link(self, x):
         retxt = ''
         link = x.group(1).split('|')
-        if '#' in link[0]:
-            link_index = link[0].index('#') + 1
+        if len(link)>1:
+            retxt=self.uploat_text_link_by_args(link[0],link[1])
+        else:
+            retxt = self.uploat_text_link_by_args(link[0])
+        return retxt
+
+    def uploat_text_link_by_args(self,link,text=''):
+        if '#' in link:
+            link_index = link.index('#') + 1
             link_target = ''
-            for i in range(link_index,len(link[0])):
-                link_hex=link[0][i].encode('utf-8')
-                if len(link_hex)>1:
+            for i in range(link_index, len(link)):
+                link_hex = link[i].encode('utf-8')
+                if len(link_hex) > 1:
                     for j in link_hex:
                         link_target += '.' + self.change_256hex_to_str(j)
                 else:
-                    link_target +=link[0][i]
-            real_link = link[0][:link_index] + link_target
+                    link_target += link[i]
+            real_link = link[:link_index] + link_target
         else:
-            real_link = link[0]
-        if len(link) > 1:
-            retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + real_link + '">' + link[1] + '</span>'
-        else:
-            retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + real_link + '">' + link[0] + '</span>'
+            real_link = link
+        if text=='':
+            text=link
+        retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + real_link + '">' + text + '</span>'
         return retxt
 
     def upload_text_template(self, x):
@@ -2035,7 +2044,7 @@ class Main(QMainWindow):
         if template_args[0] in ['H', 'A', 'I', 'h', 'a', 'i']:
             size = ''
             pic_style = ''
-            text_link='1'
+            text_link = '1'
             if template_args[1] == '魔晶升级' or template_args[1] == '魔晶技能':
                 template_args.insert(2, 'w24')
             for i in range(2, len(template_args)):
@@ -2051,7 +2060,7 @@ class Main(QMainWindow):
                 pic_style += ' data-image-class="ability_icon"'
             elif template_args[0] in ['I', 'i']:
                 pic_style += ' data-image-class="item_icon"'
-            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="'+text_link+'"' + size + pic_style + '></span>'
+            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="' + text_link + '"' + size + pic_style + '></span>'
         elif template_args[0] in ['E', 'e']:
             if template_args[1] in self.entry_base:
                 retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + self.entry_base[template_args[1]]['链接'] + '">' + template_args[1] + '</span>'
@@ -2062,26 +2071,26 @@ class Main(QMainWindow):
                 retxt = '{{错误文字|调用buff应使用2个参数，而您只输入了' + str(len(template_args) - 1) + '个参数}}'
             else:
                 if template_args[1] in self.json_base['技能']:
-                    db=self.json_base['技能'][template_args[1]]
+                    db = self.json_base['技能'][template_args[1]]
                     v = self.json_base['技能'][template_args[1]]['效果']
                     w = ''
-                    tip=True
+                    tip = True
                     for i in range(3, len(template_args)):
                         if template_args[i] == 'tip':
-                            tip=False
+                            tip = False
                     if template_args[2] in v:
                         w = v[template_args[2]]
                     else:
                         for j in v:
-                            if template_args[2]==v[j]['名称']:
+                            if template_args[2] == v[j]['名称']:
                                 w = v[j]
                     if w != '':
                         if tip:
-                            retxt += '{{额外信息框|<span class="border_3d_out" style="background-color:#fff">' + w['名称'] + '</span>|{{H|'+db['技能归属']+'}}{{H|'+db['页面名']+'}}'+ability.create_upgrade_buff(w)+'}}'
+                            retxt += '{{额外信息框|<span class="border_3d_out" style="background-color:#fff">' + w['名称'] + '</span>|{{H|' + db['技能归属'] + '}}{{H|' + db['页面名'] + '}}' + ability.create_upgrade_buff(w) + '}}'
                         else:
-                            retxt+='<span class="" style="border-style:outset;background-color:#fff">' + w['名称'] + '</span>'
+                            retxt += '<span class="" style="border-style:outset;background-color:#fff">' + w['名称'] + '</span>'
                     else:
-                        retxt = '{{错误文字|未在《'+template_args[1]+'》中找到对应“'+template_args[2]+'”的buff}}'
+                        retxt = '{{错误文字|未在《' + template_args[1] + '》中找到对应“' + template_args[2] + '”的buff}}'
         elif '图片' in template_args[0]:
             size = ''
             center = ''
@@ -2139,10 +2148,10 @@ class Main(QMainWindow):
             else:
                 retxt = '<span class="dota_click_copy_text_html" data-click-copy-text="' + template_args[1] + '"' + td + '>' + template_args[1] + '</span>'
         elif template_args[0] == '链接':
-            if len(template_args) > 2:
-                retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[2] + '</span>'
+            if len(template_args)>2:
+                retxt=self.uploat_text_link_by_args(template_args[1],template_args[2])
             else:
-                retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
+                retxt = self.uploat_text_link_by_args(template_args[1])
         elif template_args[0] == '错误文字':
             retxt += '<span class="error_text">' + template_args[1] + '</span>'
         elif template_args[0] == '分类查询':
@@ -2174,6 +2183,8 @@ class Main(QMainWindow):
                     retxt = common_page.create_neutral_item_choose_element(self.json_base, template_args[2:], dict, post)
                 else:
                     retxt = common_page.create_delete_neutral_item_choose_element(self.json_base, template_args[2:], post)
+            elif template_args[1] == '更新日志':
+                retxt = common_page.create_version_choose_element(self.version_list['版本'], self.version_base, dict)
         elif template_args[0] == '机制内容':
             if len(template_args) < 4:
                 if template_args[1] in self.json_base['机制']:
@@ -3111,8 +3122,7 @@ class Main(QMainWindow):
             self.version_tree_expand_toplevelitem()
             self.version_edit_all_button_default()
         else:
-            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "您没有这个版本更新的库，请问您准备从哪里获取？", QMessageBox.NoButton,
-                                     self)
+            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "您没有这个版本更新的库，请问您准备从哪里获取？", QMessageBox.NoButton, self)
             button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
             button2 = messageBox.addButton('造个新的', QMessageBox.AcceptRole)
             button3 = messageBox.addButton('不创建', QMessageBox.NoRole)
@@ -3208,6 +3218,67 @@ class Main(QMainWindow):
                         self.time_point_for_iterable_sleep_by_time()
                         QApplication.processEvents()
 
+    def version_create_simple_show(self, version):
+        retxt = '<div class="dota_simple_infobox bgc_white" style="text-align:left;"><span style="font-size:36px">[[' + version['版本'] + ']]</span> ' + version['更新日期'] + ' <br>'
+        label = {}
+        titles = {'英雄': ['英雄'], '物品': ['物品'], '其他': []}
+        for i in edit_json.version:
+            if edit_json.version[i][0] == 'tree' and i not in titles:
+                titles['其他'].append(i)
+        for i in titles:
+            title_num = []
+            for j in edit_json.version_label:
+                label[j] = []
+            for ii in titles[i]:
+                if ii in version:
+                    v = version[ii]
+                    for j in v:
+                        for k in v[j]:
+                            bool = {'加强': False, '削弱': False, '平衡': False}
+                            for l in range(2, len(v[j][k])):
+                                for m in v[j][k][l]['标签']:
+                                    if m in label:
+                                        if m == '重要':
+                                            label[m].append(v[j][k][l]['文字'])
+                                        elif m in bool:
+                                            bool[m] = True
+                                        else:
+                                            label[m].append(k)
+                            target_name = v[j][k][0]
+                            if v[j][k][0] == '':
+                                if j == '无标题':
+                                    target_name = i
+                                else:
+                                    target_name = j
+                            else:
+                                title_num.append(v[j][k][0])
+                            if bool['加强'] and not bool['削弱'] and not bool['平衡']:
+                                label['加强'].append(target_name)
+                            elif not bool['加强'] and bool['削弱'] and not bool['平衡']:
+                                label['削弱'].append(target_name)
+                            elif bool['加强'] or bool['削弱'] or bool['平衡']:
+                                label['平衡'].append(target_name)
+            if len(title_num) > 0:
+                retxt += '<ul><li>{{额外信息框|本版本中一共有' + str(len(title_num)) + '个' + i + '更新|'
+                for j in range(len(title_num)):
+                    if j > 0:
+                        retxt += '、'
+                    retxt += '{{H|' + title_num[j] + '}}'
+                retxt += '}}</li><ul>'
+                for j in label['重要']:
+                    retxt += '<li>' + j + '</li>'
+                for j in label:
+                    if j != '重要' and len(label[j]) > 0:
+                        retxt += '<li>{{额外信息框|本版本对' + str(len(label[j])) + '个' + i + '内容进行了【' +edit_json.version_label[j]+ j + '】|'
+                        for k in range(len(label[j])):
+                            if k > 0:
+                                retxt += '、'
+                            retxt += '{{H|' + label[j][k] + '}}'
+                        retxt += '}}</li>'
+                retxt += '</ul></ul>'
+        retxt += '</div>'
+        return retxt
+
     def version_save_the_version(self):
         item = self.versionlayout['版本列表']['横排版']['列表'].currentItem()
         if item.parent() == None:
@@ -3231,7 +3302,7 @@ class Main(QMainWindow):
                         self.version_base[title][items.text(0)][items2.text(0)] = edit_json.one_version_name_sort(self.version_tree_to_json(items2))
                 temp1 = copy.deepcopy(self.version_base[title][items.text(0)])
                 if '无标题' not in self.version_base[title][items.text(0)]:
-                    temp1['无标题'] = {'0': ['', '', {'序列级数': 1, '文字': '', '目标': []}]}
+                    temp1['无标题'] = {'0': ['', '', {'序列级数': 1, '文字': '', '目标': [], '标签': []}]}
                 else:
                     temp1['无标题'] = self.version_base[title][items.text(0)]['无标题']
                     self.version_base[title][items.text(0)].pop('无标题')
@@ -3241,6 +3312,7 @@ class Main(QMainWindow):
             self.version_base[title]['次级版本'] = []
             for i in range(item.childCount()):
                 self.version_base[title]['次级版本'].append(item.text(0) + '/' + item.child(i).text(0))
+        self.version_base[title]['简易展示'] = self.change_all_template_link_to_html(self.version_create_simple_show(self.version_base[title]))
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
         return title
 
@@ -3266,25 +3338,10 @@ class Main(QMainWindow):
         QApplication.processEvents()
         all_upload = []
         all_upload_page = []
-        name_upload_base = self.name_create_tree_list_name()
         for i in self.version_base:
-            for j in self.version_base[i]:
-                if isinstance(self.version_base[i][j], dict):
-                    temp1 = {}
-                    if '无标题' not in self.version_base[i][j]:
-                        temp1['无标题'] = {'0': ['', '', {'序列级数': 1, '文字': '', '目标': []}]}
-                    else:
-                        temp1['无标题'] = self.version_base[i][j]['无标题']
-                        self.version_base[i][j].pop('无标题')
-                    for k in self.version_base[i][j]:
-                        if j == '开头' or j == '结尾':
-                            temp1[k] = self.version_base[i][j][k]
-                        else:
-                            temp1[k] = edit_json.one_version_name_sort(self.version_base[i][j][k])
-                    self.version_base[i][j] = copy.deepcopy(temp1)
+            self.version_base[i]['简易展示'] = self.change_all_template_link_to_html(self.version_create_simple_show(self.version_base[i]))
             all_upload.append([i + '.json', self.version_base[i]])
-            all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'])])
-        name_list_tree = self.name_create_tree_list_name()
+            # all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'])])
         num1 = len(all_upload)
         num2 = len(all_upload_page)
         self.w.confirm_numbers(num1 + num2)
@@ -3316,6 +3373,7 @@ class Main(QMainWindow):
             for j in range(item1.childCount()):
                 item2 = item1.child(j).child(1)
                 item3 = item1.child(j).child(2)
+                item4 = item1.child(j).child(3)
                 index = len(re[ii])
                 while True:
                     if index > 2 and re[ii][index - 1]['文字'] == '':
@@ -3323,7 +3381,7 @@ class Main(QMainWindow):
                         re[ii].pop(index)
                     else:
                         break
-                re[ii].append({'序列级数': 1, '文字': '', '目标': []})
+                re[ii].append({'序列级数': 1, '文字': '', '目标': [], '标签': []})
                 item0 = item1.child(j).child(0)
                 try:
                     re[ii][index]['序列级数'] = int(item0.itemvalue)
@@ -3336,10 +3394,15 @@ class Main(QMainWindow):
                             break
                 re[ii][index]['文字'] = '{{upgrade|agha}}' + item2.text(1)[4:] if item2.text(1)[:4] == '神杖升级' or item2.text(1)[:4] == 'agha' else item2.text(1)
                 for k in range(item3.childCount()):
-                    item4 = item3.child(k)
-                    re[ii][index]['目标'].append(item4.text(1))
+                    item00 = item3.child(k)
+                    if item00.text(1) not in re[ii][index]['目标']:
+                        re[ii][index]['目标'].append(item00.text(1))
+                for k in range(item4.childCount()):
+                    item00 = item4.child(k)
+                    if item00.text(1) not in re[ii][index]['标签']:
+                        re[ii][index]['标签'].append(item00.text(1))
             if len(re[ii]) == 2 or re[ii][-1]['文字'] != '':
-                re[ii].append({'序列级数': 1, '文字': '', '目标': []})
+                re[ii].append({'序列级数': 1, '文字': '', '目标': [], '标签': []})
         return re
 
     def create_one_version(self):
@@ -3417,6 +3480,13 @@ class Main(QMainWindow):
                                     new8 = VersionItemEdit(new7)
                                     new8.itemtype = 'list_text'
                                     new8.set_value(m)
+                                new9 = VersionItemEdit(new4)
+                                new9.itemtype = 'list'
+                                new9.setText(0, '标签')
+                                for m in self.version_base[title][i][j][k][l]['标签']:
+                                    new10 = VersionItemEdit(new9)
+                                    new10.itemtype = 'list_text'
+                                    new10.set_value(m)
                 else:
                     new1 = VersionItemEdit(self.versionlayout['版本内容']['横排版']['树'][0])
                     new1.itemtype = 'tree1'
@@ -3447,8 +3517,9 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['向上移动题目'].setEnabled(item.itemtype == 'tree2' or item.itemtype == 'tree3' or item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['向下移动题目'].setEnabled(item.itemtype == 'tree2' or item.itemtype == 'tree3' or item.itemtype == 'tree_list')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(item.itemtype == 'tree_list')
-        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(item.itemtype == 'list')
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(item.itemtype == 'list' and item.text(0) == '目标')
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].setEnabled(item.itemtype == 'list_text')
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'].setEnabled(item.itemtype == 'list' and item.text(0) == '标签')
 
     def version_edit_all_button_default(self):
         self.versionlayout['版本内容']['横排版']['竖排版']['修改内容'].setEnabled(False)
@@ -3465,6 +3536,7 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].setEnabled(False)
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].setEnabled(False)
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'].setEnabled(False)
 
     def version_item_double_clicked(self):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
@@ -3488,6 +3560,7 @@ class Main(QMainWindow):
         ori_text = re.sub(r'[\[\]【】]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
+            text = re.sub(r'(?<!\\)([+-]{2,})', lambda x: self.version_edit_change_value_create_lablel1(item, x.group(1)), text)
             text = re.sub(r'(?<!\\)([\[【]{2})', lambda x: '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)([\]】]{2})', lambda x: '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{H|' + x.group(1) + '}}', text)
@@ -3516,16 +3589,16 @@ class Main(QMainWindow):
                     nowparent = igrandpa.child(h)
                     icount = nowparent.childCount()
                     if int(nowparent.child(0).text(1)) > ilevel or nowindex == h:
-                        if nowparent.child(icount - 1).text(0) == '目标':
+                        if icount > 2 and nowparent.child(2).text(0) == '目标':
                             for i in iresult:
                                 ibool = True
-                                itarget = nowparent.child(icount - 1)
+                                itarget = nowparent.child(2)
                                 for j in range(itarget.childCount()):
                                     if itarget.child(j).text(1) == i[4:-2]:
                                         ibool = False
                                         break
                                 if ibool:
-                                    new = VersionItemEdit(nowparent.child(icount - 1))
+                                    new = VersionItemEdit(itarget)
                                     new.itemtype = 'list_text'
                                     new.set_value(i[4:-2])
                     else:
@@ -3534,6 +3607,34 @@ class Main(QMainWindow):
                     self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(igrandpa)
                     self.version_button_tree3_add_tree_list(str(ilevel))
                     self.versionlayout['版本内容']['横排版']['树'][0].setCurrentItem(item)
+
+    def version_edit_change_value_create_lablel1(self, item, type):
+        parent = item.parent()
+        retxt = type
+        if parent.childCount() > 3 and parent.child(3).text(0) == '标签':
+            label = parent.child(3)
+            count = label.childCount()
+            bool = True
+            if type == '++' or type == '+++':
+                add = '加强'
+            elif type == '--' or type == '---':
+                add = '削弱'
+            elif type == '++-':
+                add = '补偿性加强'
+            elif type == '--+':
+                add = '补偿性削弱'
+            elif type == '+-' or type == '-+':
+                add = '平衡'
+            for i in range(count):
+                if label.child(i).text(1) == add:
+                    bool = False
+                    break
+            if bool:
+                new = VersionItemEdit(label)
+                new.itemtype = 'list_text'
+                new.set_value(add)
+            retxt = ''
+        return retxt
 
     def version_input_text_template_simple_txt(self, trait, name):
         for i in [['英雄', 'H'], ['非英雄单位', 'H'], ['物品', 'I'], ['技能', 'A']]:
@@ -3590,8 +3691,7 @@ class Main(QMainWindow):
             rere += '{{H|' + name + '}}：' + self.json_base['技能'][name]['描述']
             for i in self.json_base['技能'][name]['属性']:
                 rere += self.json_base['技能'][name]['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(self.json_base['技能'][name]['属性'], i) + '，'
-            rere += common_page.create_upgrade_manacost(self.json_base['技能'][name]['魔法消耗'], 'span') + common_page.create_upgrade_cooldown(self.json_base['技能'][name]['冷却时间'],
-                                                                                                                                          'span')
+            rere += common_page.create_upgrade_manacost(self.json_base['技能'][name]['魔法消耗'], 'span') + common_page.create_upgrade_cooldown(self.json_base['技能'][name]['冷却时间'], 'span')
         return rere
 
     def version_button_tree1(self):
@@ -3619,7 +3719,7 @@ class Main(QMainWindow):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         text, ok = MoInputWindow.getText(self, '新增一个中标题', '请输入你想要增加的标题名称:')
         if ok:
-            text=text.lstrip(' ').rstrip('\n')
+            text = text.lstrip(' ').rstrip('\n')
             new = VersionItemEdit(item)
             new.setText(0, text)
             new.itemtype = 'tree2'
@@ -3638,7 +3738,7 @@ class Main(QMainWindow):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         text, ok = MoInputWindow.getText(self, '新增一个小分类', '请输入你想要增加的分类名称:')
         if ok:
-            text=text.lstrip(' ').rstrip('\n')
+            text = text.lstrip(' ').rstrip('\n')
             new = VersionItemEdit(item)
             new.setText(0, text)
             new.itemtype = 'tree3'
@@ -3704,6 +3804,9 @@ class Main(QMainWindow):
         new5 = VersionItemEdit(new3)
         new5.itemtype = 'list'
         new5.setText(0, '目标')
+        new6 = VersionItemEdit(new3)
+        new6.itemtype = 'list'
+        new6.setText(0, '标签')
         new3.setExpanded(True)
         item.setExpanded(True)
 
@@ -3725,6 +3828,26 @@ class Main(QMainWindow):
                     new = VersionItemEdit(item)
                     new.itemtype = 'list_text'
                     new.set_value(text2)
+
+    def version_button_list_add_list_label(self):
+        item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
+        choose = []
+        for i in edit_json.version_label:
+            choose.append(i)
+        for i in edit_json.version_label2:
+            choose.append(i)
+        choose.append('自行填入')
+        text1, ok1 = MoInputWindow.getItem(self, "增加新标签", '标签名称', choose)
+        if ok1:
+            if text1 == '自行填入':
+                text2, ok2 = MoInputWindow.getText(self, "增加新标签", '标签名称')
+                new = VersionItemEdit(item)
+                new.itemtype = 'list_text'
+                new.set_value(text2)
+            else:
+                new = VersionItemEdit(item)
+                new.itemtype = 'list_text'
+                new.set_value(text1)
 
     def version_tree_expand_toplevelitem(self):
         for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):
@@ -4089,12 +4212,17 @@ class Main(QMainWindow):
             self.entry_edit_change_name()
 
     def test_inputwindow(self):
-        for i in self.json_base['非英雄单位']:
-            v = self.json_base['非英雄单位'][i]
-            for j in ['英雄攻击伤害', '非英雄攻击伤害']:
-                w = v[j]
-                if '1' in w and str(w['1']['1']) == '0' and '2' not in w and '2' not in w['1']:
-                    w.pop('1')
+        for i in self.version_base:
+            v = self.version_base[i]
+            v['简易展示'] = ''
+            for j in v:
+                if isinstance(v[j], dict):
+                    for k in v[j]:
+                        for l in v[j][k]:
+                            for m in range(2, len(v[j][k][l])):
+                                if '标签' not in v[j][k][l][m]:
+                                    v[j][k][l][m]['标签'] = []
+        self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
 
     def test_inputwindow_loop_check(self, json):
         for i in self.json_base['非英雄单位']:
