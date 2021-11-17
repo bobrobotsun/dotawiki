@@ -803,9 +803,10 @@ def mech_repeat(json, mech):
         for j in json[i]:
             if isinstance(json[i][j], dict) and "叠加" in json[i][j]:
                 for k in json[i][j]["叠加"]:
-                    if str(json[i][j]["叠加"][k]["代码1"]) in mech["来源"] and str(json[i][j]["叠加"][k]["代码2"]) in mech["方式"]:
+                    if str(json[i][j]["叠加"][k]["代码1"]) in mech["来源"] and str(json[i][j]["叠加"][k]["代码2"]) in mech["方式"] and str(json[i][j]["叠加"][k]["代码3"]) in mech["归属"]:
                         json[i][j]["叠加"][k]["来源"] = mech["来源"][str(json[i][j]["叠加"][k]["代码1"])]
                         json[i][j]["叠加"][k]["方式"] = mech["方式"][str(json[i][j]["叠加"][k]["代码2"])]
+                        json[i][j]["叠加"][k]["归属"] = mech["归属"][str(json[i][j]["叠加"][k]["代码3"])]
 
 
 def mech_others(json, mech):
@@ -2818,7 +2819,7 @@ def create_upgrade_buff(json_dict):
             for j in json_dict[str(i)]['叠加']:
                 if json_dict[str(i)]['叠加'][j]['代码1'] != 0:
                     retxt += '{{额外信息框|<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['叠加'][j]['方式'] + '</span>' \
-                             + '|' + json_dict[str(i)]['叠加'][j]['来源'] + '来源{{E|' + json_dict[str(i)]['叠加'][j]['方式'] + '}}：{{ET|' + json_dict[str(i)]['叠加'][j]['方式'] + '|注释}}}} '
+                             + '|' + json_dict[str(i)]['叠加'][j]['来源'] + '来源{{E|' + json_dict[str(i)]['叠加'][j]['方式'] + '}}'+json_dict[str(i)]['叠加'][j]['归属']+'：{{ET|' + json_dict[str(i)]['叠加'][j]['方式'] + '|注释}}}} '
             for j in json_dict[str(i)]['标记']:
                 if json_dict[str(i)]['标记'][j]['代码'] != 0:
                     retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'

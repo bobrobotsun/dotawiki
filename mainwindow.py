@@ -4212,17 +4212,8 @@ class Main(QMainWindow):
             self.entry_edit_change_name()
 
     def test_inputwindow(self):
-        for i in self.version_base:
-            v = self.version_base[i]
-            v['简易展示'] = ''
-            for j in v:
-                if isinstance(v[j], dict):
-                    for k in v[j]:
-                        for l in v[j][k]:
-                            for m in range(2, len(v[j][k][l])):
-                                if '标签' not in v[j][k][l][m]:
-                                    v[j][k][l][m]['标签'] = []
-        self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+        i=1
+
 
     def test_inputwindow_loop_check(self, json):
         for i in self.json_base['非英雄单位']:
