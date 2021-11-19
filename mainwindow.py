@@ -3235,6 +3235,14 @@ class Main(QMainWindow):
                     for j in v:
                         for k in v[j]:
                             bool = {'加强': False, '削弱': False, '平衡': False}
+                            target_name = v[j][k][0]
+                            if v[j][k][0] == '':
+                                if j == '无标题':
+                                    target_name = i
+                                else:
+                                    target_name = j
+                            else:
+                                title_num.append(target_name)
                             for l in range(2, len(v[j][k])):
                                 for m in v[j][k][l]['标签']:
                                     if m in label:
@@ -3243,15 +3251,8 @@ class Main(QMainWindow):
                                         elif m in bool:
                                             bool[m] = True
                                         else:
-                                            label[m].append(k)
-                            target_name = v[j][k][0]
-                            if v[j][k][0] == '':
-                                if j == '无标题':
-                                    target_name = i
-                                else:
-                                    target_name = j
-                            else:
-                                title_num.append(v[j][k][0])
+                                            if target_name not in label[m]:
+                                                label[m].append(target_name)
                             if bool['加强'] and not bool['削弱'] and not bool['平衡']:
                                 label['加强'].append(target_name)
                             elif not bool['加强'] and bool['削弱'] and not bool['平衡']:

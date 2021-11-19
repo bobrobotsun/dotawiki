@@ -566,8 +566,8 @@ version_label = {
     '平衡':'<i class="fa fa-exchange" style="color:#3333aa"></i>',
     '英雄重做':'',
     '技能重做':'',
-    '神杖重做':'',
-    '魔晶重做':'',
+    '重要神杖更新':'{{图片|Agha.png}}',
+    '重要魔晶更新':'{{图片|Shard.png}}',
     '物品重做':''
 }
 version_label2={
