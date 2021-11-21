@@ -57,7 +57,7 @@ def number_to_string(number, rr=4):
 
 
 def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '', image_size=''):
-    if image_size!='' and '|' not in image_size:
+    if image_size != '' and '|' not in image_size:
         print('报错')
     if k in numjsons:
         numjson = numjsons[k]
@@ -69,7 +69,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
             if i in numjson:
                 if ii > 1:
                     for j in numjson[i]['升级来源']:
-                        retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] +image_size+'|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
+                        retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] + image_size + '|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
                 jj = 0
                 while True:
                     jj += 1
@@ -91,7 +91,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
 
 
 def nocheck_create_upgrade_text(numjson, post_each=lambda x: x['后缀'] if '后缀' in x else '', post_group=lambda x, y: '', image_size=''):
-    if image_size!='' and '|' not in image_size:
+    if image_size != '' and '|' not in image_size:
         print('报错')
     retext = ''
     ii = 0
@@ -101,7 +101,7 @@ def nocheck_create_upgrade_text(numjson, post_each=lambda x: x['后缀'] if '后
         if i in numjson:
             if ii > 1:
                 for j in numjson[i]['升级来源']:
-                    retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] +image_size+'|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
+                    retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] + image_size + '|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
             jj = 0
             while True:
                 jj += 1
@@ -256,7 +256,7 @@ def create_page_logs(title, log_base, log_list):
     junior = False
     bools = False
     index_of_upgrade = -1
-    index_of_index=-1
+    index_of_index = -1
     for i in range(len(log_list)):
         v = log_list[i]
         for j in range(len(v)):
@@ -277,11 +277,11 @@ def create_page_logs(title, log_base, log_list):
         return '请前往<span class="dota_create_link_to_wiki_page">data:版本更新.json</span>添加当前版本号，以方便确认其前后版本。'
     else:
         if junior:
-            retxt+='\n<tr><td>大版本</td><td>[[' + log_list[index_of_upgrade][0] + ']]</td></tr>'
+            retxt += '\n<tr><td>大版本</td><td>[[' + log_list[index_of_upgrade][0] + ']]</td></tr>'
             if index_of_index > 1:
-                retxt += '\n<tr><td>上一小版本</td><td>[[' + log_list[index_of_upgrade][0] + '/' + log_list[index_of_upgrade][index_of_index-1] + ']]</td></tr>'
+                retxt += '\n<tr><td>上一小版本</td><td>[[' + log_list[index_of_upgrade][0] + '/' + log_list[index_of_upgrade][index_of_index - 1] + ']]</td></tr>'
             if index_of_index < len(log_list[index_of_upgrade]) - 1:
-                retxt += '\n<tr><td>下一小版本</td><td>[[' + log_list[index_of_upgrade][0] + '/' + log_list[index_of_upgrade][index_of_index+1] + ']]</td></tr>'
+                retxt += '\n<tr><td>下一小版本</td><td>[[' + log_list[index_of_upgrade][0] + '/' + log_list[index_of_upgrade][index_of_index + 1] + ']]</td></tr>'
         else:
             if index_of_upgrade == 0:
                 retxt += '\n<tr><td colspan=2>当前版本为可考的最古老版本</td></tr>'
@@ -336,13 +336,13 @@ def create_page_logs(title, log_base, log_list):
                                         for tnumber in range(current_ul):
                                             retxt += '\t'
                                         retxt += '</ul>'
-                                show_text=''
+                                show_text = ''
                                 for y in x['标签']:
                                     if y in edit_json.version_label:
-                                        show_text+=edit_json.version_label[y]
+                                        show_text += '{{额外信息框|' + edit_json.version_label[y] + '|' + y + '}}'
                                     if y in edit_json.version_label2:
-                                        show_text += edit_json.version_label2[y]
-                                show_text+=x['文字']
+                                        show_text += '{{额外信息框|' + edit_json.version_label2[y] + '|' + y + '}}'
+                                show_text += x['文字']
                                 if current_ul == 0:
                                     retxt += '\n' + show_text + '\n'
                                 else:
@@ -406,9 +406,9 @@ def create_2nd_logs(json_base, log_base, log_list, name, limit=10):
                                         show_text = ''
                                         for y in x[l]['标签']:
                                             if y in edit_json.version_label:
-                                                show_text += edit_json.version_label[y]
+                                                show_text += '{{额外信息框|' + edit_json.version_label[y] + '|' + y + '}}'
                                             if y in edit_json.version_label2:
-                                                show_text += edit_json.version_label2[y]
+                                                show_text += '{{额外信息框|' + edit_json.version_label2[y] + '|' + y + '}}'
                                         show_text += x[l]['文字']
                                         retxt += '<li>' + show_text + '</li>'
                 for m in range(current_ul):
@@ -467,14 +467,14 @@ def create_switch_log(log_base, log_list, name, limit=10):
                                         show_text = ''
                                         for y in x[l]['标签']:
                                             if y in edit_json.version_label:
-                                                show_text += edit_json.version_label[y]
+                                                show_text += '{{额外信息框|' + edit_json.version_label[y] + '|' + y + '}}'
                                             if y in edit_json.version_label2:
-                                                show_text += edit_json.version_label2[y]
+                                                show_text += '{{额外信息框|' + edit_json.version_label2[y] + '|' + y + '}}'
                                         show_text += x[l]['文字']
-                                        if current_ul>0:
+                                        if current_ul > 0:
                                             content += '<li>' + show_text + '</li>'
                                         else:
-                                            content += '<br>'+show_text
+                                            content += '<br>' + show_text
                 if current_ul > 0:
                     for m in range(current_ul):
                         content += '</ul>'
@@ -543,26 +543,26 @@ def create_page_hero(json_base, log_base, log_list, hero):
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
     retxt += '\n==历史更新==\n' \
-             + create_switch_log(log_base, log_list, all_the_names(db, json_base))\
-             +'<ul><li>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
-    for i in range(len(db['技能'])-8):
-        retxt+='{{H|'+db['技能'][i]+'|link='+db['技能'][i]+'/版本改动}}'
-    for i in ['10','15','20','25']:
-        retxt+='{{H|'+hero+i+'级天赋|link='+hero+i+'级天赋/版本改动}}'
-    retxt+='{{图片|talent.png}}[['+hero+'/天赋/版本改动|'+hero+'全部天赋]]</li>'
-    if len(db['删除技能'])>0:
-        retxt+='<li>或者您可以在此查询一些已经被删除的技能：'
+             + create_switch_log(log_base, log_list, all_the_names(db, json_base)) \
+             + '<ul><li>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
+    for i in range(len(db['技能']) - 8):
+        retxt += '{{H|' + db['技能'][i] + '|link=' + db['技能'][i] + '/版本改动}}'
+    for i in ['10', '15', '20', '25']:
+        retxt += '{{H|' + hero + i + '级天赋|link=' + hero + i + '级天赋/版本改动}}'
+    retxt += '{{图片|talent.png}}[[' + hero + '/天赋/版本改动|' + hero + '全部天赋]]</li>'
+    if len(db['删除技能']) > 0:
+        retxt += '<li>或者您可以在此查询一些已经被删除的技能：'
         for i in db['删除技能']:
             retxt += '{{H|' + i + '}}'
-        retxt+='</li>'
+        retxt += '</li>'
     retxt += '</ul>\n==饰品==\n' \
              + '<span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + db["中文名"] + '/equipment">点击进入查看饰品信息</span>' \
              + '\n==代码查询==\n' \
-             + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>npc_dota_hero_'+db['代码名']+'</code>|npc_dota_hero_'+db['代码名']+'|td=0}}</li>'
+             + '<ul><li>' + db['页面名'] + '：{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}、{{点击复制|<code>npc_dota_hero_' + db['代码名'] + '</code>|npc_dota_hero_' + db['代码名'] + '|td=0}}</li>'
     for i in db['技能']:
-        retxt+='<li>'+i+'（'+json_base['技能'][i]['中文名']+'）：{{点击复制|<code>'+json_base['技能'][i]['代码']+'</code>|'+json_base['技能'][i]['代码']+'|td=0}}</li>'
-    retxt += '<li>[[常用测试指令#'+db['页面名']+'|点击此处可以查看全部测试指令]]</li>'
-    retxt+='</ul>\n'
+        retxt += '<li>' + i + '（' + json_base['技能'][i]['中文名'] + '）：{{点击复制|<code>' + json_base['技能'][i]['代码'] + '</code>|' + json_base['技能'][i]['代码'] + '|td=0}}</li>'
+    retxt += '<li>[[常用测试指令#' + db['页面名'] + '|点击此处可以查看全部测试指令]]</li>'
+    retxt += '</ul>\n'
     retxt += json_base['机制']['通用']['简单条目']['英雄导航']
     retxt += thanks_for_the_audience()
     rere = ''
@@ -582,13 +582,13 @@ def create_page_hero(json_base, log_base, log_list, hero):
         rere += retxt[i]
     rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#历史更新|更新日志]]<br>[[#代码查询|代码查询]]</div>'
     for i in db['标签']:
-        rere+='[[分类:'+i+']]'
+        rere += '[[分类:' + i + ']]'
     return rere
 
 
 def create_page_unit(json_base, log_base, log_list, unit):
     db = json_base['非英雄单位'][unit]
-    retxt = '__NOTOC__<div>' + db['具体展示']+ db["页面名"] + '是DOTA2中的一种'
+    retxt = '__NOTOC__<div>' + db['具体展示'] + db["页面名"] + '是DOTA2中的一种'
     if db["远古单位"]["1"]["1"] == 1:
         retxt += '远古'
     if db["英雄级单位"]["1"]["1"] == 1:
@@ -608,8 +608,8 @@ def create_page_unit(json_base, log_base, log_list, unit):
     if '1' in db['源技能']:
         retxt += '\n==召唤源技能==\n'
         for i, v in db['源技能'].items():
-            if v in json_base['技能'] and json_base['技能'][v]['应用']==db['应用']:
-                retxt +='<span style="padding:0.5em;">' + json_base['技能'][v]['简易展示'] + '</span>'
+            if v in json_base['技能'] and json_base['技能'][v]['应用'] == db['应用']:
+                retxt += '<span style="padding:0.5em;">' + json_base['技能'][v]['简易展示'] + '</span>'
     unitgroup = []
     for i, v in json_base['单位组'].items():
         if unit in v['全部单位']:
@@ -624,24 +624,24 @@ def create_page_unit(json_base, log_base, log_list, unit):
     retxt += '</div>'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
-    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))+'<ul>'
-    if len(db['技能'])>0:
-        retxt +='<li>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
+    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base)) + '<ul>'
+    if len(db['技能']) > 0:
+        retxt += '<li>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
         for i in range(len(db['技能'])):
-            retxt+='{{H|'+db['技能'][i]+'|link='+db['技能'][i]+'/版本改动}}'
-        retxt+='</li>'
-    if len(db['删除技能'])>0:
-        retxt+='<li>或者您可以在此查询一些已经被删除的技能：'
+            retxt += '{{H|' + db['技能'][i] + '|link=' + db['技能'][i] + '/版本改动}}'
+        retxt += '</li>'
+    if len(db['删除技能']) > 0:
+        retxt += '<li>或者您可以在此查询一些已经被删除的技能：'
         for i in db['删除技能']:
             retxt += '{{H|' + i + '}}'
-        retxt+='</li>'
-    retxt +='</ul>\n==代码查询==\n' \
-            + '<ul><li>'+db['页面名']+'：</li><ul>'
+        retxt += '</li>'
+    retxt += '</ul>\n==代码查询==\n' \
+             + '<ul><li>' + db['页面名'] + '：</li><ul>'
     for i in db['代码名']:
-        retxt+='<li>'+i+'：{{点击复制|<code>'+db['代码名'][i]+'</code>|'+db['代码名'][i]+'|td=0}}、{{点击复制|<code>npc_dota_'+db['代码名'][i]+'</code>|npc_dota_'+db['代码名'][i]+'|td=0}}</li>'
+        retxt += '<li>' + i + '：{{点击复制|<code>' + db['代码名'][i] + '</code>|' + db['代码名'][i] + '|td=0}}、{{点击复制|<code>npc_dota_' + db['代码名'][i] + '</code>|npc_dota_' + db['代码名'][i] + '|td=0}}</li>'
     retxt += '</ul>'
     for i in db['技能']:
-        retxt+='<li>'+i+'（'+json_base['技能'][i]['中文名']+'）：{{点击复制|<code>'+json_base['技能'][i]['代码']+'</code>|'+json_base['技能'][i]['代码']+'|td=0}}</li>'
+        retxt += '<li>' + i + '（' + json_base['技能'][i]['中文名'] + '）：{{点击复制|<code>' + json_base['技能'][i]['代码'] + '</code>|' + json_base['技能'][i]['代码'] + '|td=0}}</li>'
     retxt += '</ul>'
     retxt += '<div>' + json_base['机制']['通用']['简单条目']['非英雄单位导航'] + '</div>'
     retxt += thanks_for_the_audience()
@@ -662,7 +662,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
         rere += retxt[i]
     rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + unit + '.json">' + unit + '</span></div>'
     for i in db['标签']:
-        rere+='[[分类:'+i+']]'
+        rere += '[[分类:' + i + ']]'
     return rere
 
 
@@ -699,21 +699,21 @@ def create_page_item(json_base, log_base, log_list, item):
             retxt += '。'
     for i in db['技能']:
         retxt += json_base['技能'][i]['具体展示']
-    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))+'<ul>'
-    if len(db['技能'])>0:
-        retxt +='<li>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
+    retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base)) + '<ul>'
+    if len(db['技能']) > 0:
+        retxt += '<li>或者你可以点击下列技能名字，来跳转到对应技能的日志页面：'
         for i in range(len(db['技能'])):
-            retxt+='{{H|'+db['技能'][i]+'|link='+db['技能'][i]+'/版本改动}}'
-        retxt+='</li>'
-    if len(db['删除技能'])>0:
-        retxt+='<li>或者您可以在此查询一些已经被删除的技能：'
+            retxt += '{{H|' + db['技能'][i] + '|link=' + db['技能'][i] + '/版本改动}}'
+        retxt += '</li>'
+    if len(db['删除技能']) > 0:
+        retxt += '<li>或者您可以在此查询一些已经被删除的技能：'
         for i in db['删除技能']:
             retxt += '{{H|' + i + '}}'
-        retxt+='</li>'
-    retxt +='</ul>\n==代码查询==\n' \
-            + '<ul><li>'+db['页面名']+'：{{点击复制|<code>'+db['代码名']+'</code>|'+db['代码名']+'|td=0}}、{{点击复制|<code>item_'+db['代码名']+'</code>|item_'+db['代码名']+'|td=0}}</li>'
+        retxt += '</li>'
+    retxt += '</ul>\n==代码查询==\n' \
+             + '<ul><li>' + db['页面名'] + '：{{点击复制|<code>' + db['代码名'] + '</code>|' + db['代码名'] + '|td=0}}、{{点击复制|<code>item_' + db['代码名'] + '</code>|item_' + db['代码名'] + '|td=0}}</li>'
     for i in db['技能']:
-        retxt+='<li>'+i+'（'+json_base['技能'][i]['中文名']+'）：{{点击复制|<code>'+json_base['技能'][i]['代码']+'</code>|'+json_base['技能'][i]['代码']+'|td=0}}</li>'
+        retxt += '<li>' + i + '（' + json_base['技能'][i]['中文名'] + '）：{{点击复制|<code>' + json_base['技能'][i]['代码'] + '</code>|' + json_base['技能'][i]['代码'] + '|td=0}}</li>'
     retxt += '<li>[[常用测试指令#' + db['页面名'] + '|点击此处可以查看全部测试指令]]</li>'
     retxt += thanks_for_the_audience()
     rere = ''
@@ -733,7 +733,7 @@ def create_page_item(json_base, log_base, log_list, item):
         rere += retxt[i]
     rere += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' + item + '.json">' + item + '</span></div>'
     for i in db['标签']:
-        rere+='[[分类:'+i+']]'
+        rere += '[[分类:' + i + ']]'
     return rere
 
 
@@ -756,36 +756,40 @@ def create_all_chapter_page_mechnism(db):
 def create_one_chapter_content_page_mechnism(db):
     retxt = ''
     for j in db['内容']:
-        retxt += db['内容'][j]['内容']+'\n'
+        retxt += db['内容'][j]['内容'] + '\n'
     return retxt
+
 
 def create_page_normal_ability(json_base, log_base, log_list, ability):
     db = json_base['技能'][ability]
-    retxt=''
-    retxt+='您当前进入的页面是{{H|'+db['技能归属']+'}}的技能{{H|'+ability+'}}的更新日志页面。<br>\n'\
-           + create_switch_log(log_base, log_list, all_the_names(db, json_base,False),0)+thanks_for_the_audience()
-    retxt+='[[分类:更新日志]]'
+    retxt = ''
+    retxt += '您当前进入的页面是{{H|' + db['技能归属'] + '}}的技能{{H|' + ability + '}}的更新日志页面。<br>\n' \
+             + create_switch_log(log_base, log_list, all_the_names(db, json_base, False), 0) + thanks_for_the_audience()
+    retxt += '[[分类:更新日志]]'
     return retxt
 
-def create_page_talent_ability(log_base, log_list,hero,talent_type, talent_names):
-    retxt='您当前进入的页面是{{H|'+hero+'}}的'
-    if talent_type=='':
-        retxt+='全部{{图片|talent.png}}天赋'
+
+def create_page_talent_ability(log_base, log_list, hero, talent_type, talent_names):
+    retxt = '您当前进入的页面是{{H|' + hero + '}}的'
+    if talent_type == '':
+        retxt += '全部{{图片|talent.png}}天赋'
     else:
-        retxt+='{{H|'+hero+talent_type+'级左天赋}}{{H|'+hero+talent_type+'级右天赋}}'
-    retxt+='的更新日志页面。<br>\n'\
-           + create_switch_log(log_base, log_list, talent_names,0)+thanks_for_the_audience()
-    retxt+='[[分类:更新日志]]'
+        retxt += '{{H|' + hero + talent_type + '级左天赋}}{{H|' + hero + talent_type + '级右天赋}}'
+    retxt += '的更新日志页面。<br>\n' \
+             + create_switch_log(log_base, log_list, talent_names, 0) + thanks_for_the_audience()
+    retxt += '[[分类:更新日志]]'
     return retxt
+
 
 def create_page_old_ability(json_base, log_base, log_list, ability):
     db = json_base['技能'][ability]
-    retxt=''
-    retxt+='您当前进入的页面是一个陈旧的、被删除的技能。考虑到它可能无法呈现在{{H|'+db['技能归属']+'}}的页面上，因此我们将其所有的信息保存在它们自己的页面上。您将在此看到这个技能在删除前的最后一个版本的数据，和它的更新日志。\n\n'+db['具体展示']\
-           +'\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base,False),0)+thanks_for_the_audience()
+    retxt = ''
+    retxt += '您当前进入的页面是一个陈旧的、被删除的技能。考虑到它可能无法呈现在{{H|' + db['技能归属'] + '}}的页面上，因此我们将其所有的信息保存在它们自己的页面上。您将在此看到这个技能在删除前的最后一个版本的数据，和它的更新日志。\n\n' + db['具体展示'] \
+             + '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base, False), 0) + thanks_for_the_audience()
     for i in db['标签']:
-        retxt+='[[分类:'+i+']]'
+        retxt += '[[分类:' + i + ']]'
     return retxt
+
 
 def create_page_mechnism(json_base, log_base, log_list, mech):
     db = json_base['机制'][mech]
@@ -815,7 +819,7 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
                 nums += 1
         rere += retxt[i]
     for i in db['标签']:
-        rere+='[[分类:'+i+']]'
+        rere += '[[分类:' + i + ']]'
     return rere
 
 
@@ -844,7 +848,7 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' \
              + unitgroup + '.json">' + unitgroup + '</span></div>'
     for i in db['标签']:
-        retxt+='[[分类:'+i+']]'
+        retxt += '[[分类:' + i + ']]'
     return retxt
 
 
@@ -880,11 +884,11 @@ def create_item_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
     p = Pinyin()
-    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="简易拼音=1；">'\
-             +'<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>'\
-             +'<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="简易拼音=1；">' \
+             + '<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
+             + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
              + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
-             +'<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">价格</span>'\
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">价格</span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
     for i in edit_json.item_shop:
@@ -893,11 +897,11 @@ def create_item_choose_element(json_base, args, dict, post):
     for i in edit_json.edit_adition['物品属性']:
         retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
                  + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
-    retxt+='</span><div>'
+    retxt += '</span><div>'
     for i in json_base['物品']:
         if json_base['物品'][i]['应用'] == 1:
             retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
-                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音='+p.get_pinyin(i).replace('-', '')[:3]+'；完整代码='+json_base['物品'][i]['代码名']+'；'
+                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + p.get_pinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
             for j in json_base['物品'][i]['商店']:
                 retxt += json_base['物品'][i]['商店'][j] + '=1；'
             for j in edit_json.edit_adition['物品属性']:
@@ -907,6 +911,7 @@ def create_item_choose_element(json_base, args, dict, post):
             retxt += '" style="border:1px black solid;margin:2px;text-align:center;">{{' + '|'.join(args) + '}}' + post + '</span>'
     retxt += '</div></div>'
     return retxt
+
 
 def create_delete_item_choose_element(json_base, args, post):
     args.insert(1, '')
@@ -918,6 +923,7 @@ def create_delete_item_choose_element(json_base, args, post):
     retxt += ''
     return retxt
 
+
 def create_neutral_item_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
@@ -926,7 +932,7 @@ def create_neutral_item_choose_element(json_base, args, dict, post):
     retxt += '"><div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
              + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
              + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
-             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">中立等级</span>'\
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="价格" data-display-len="3">中立等级</span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
     for i in edit_json.item_shop:
@@ -937,9 +943,9 @@ def create_neutral_item_choose_element(json_base, args, dict, post):
                  + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
     retxt += '</span><div>'
     for i in json_base['物品']:
-        if json_base['物品'][i]['应用'] == 1 and json_base['物品'][i]['商店']['1'][:3]=='中立第':
+        if json_base['物品'][i]['应用'] == 1 and json_base['物品'][i]['商店']['1'][:3] == '中立第':
             retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
-                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音='+p.get_pinyin(i).replace('-', '')[:3]+'；完整代码='+json_base['物品'][i]['代码名']+'；'
+                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + p.get_pinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
             for j in json_base['物品'][i]['商店']:
                 retxt += json_base['物品'][i]['商店'][j] + '=1；'
             for j in edit_json.edit_adition['物品属性']:
@@ -950,34 +956,36 @@ def create_neutral_item_choose_element(json_base, args, dict, post):
     retxt += '</div></div>'
     return retxt
 
+
 def create_delete_neutral_item_choose_element(json_base, args, post):
     args.insert(1, '')
     retxt = ''
     for i in json_base['物品']:
-        if json_base['物品'][i]['应用'] != 1 and json_base['物品'][i]['商店']['1'][:3]=='中立第':
+        if json_base['物品'][i]['应用'] != 1 and json_base['物品'][i]['商店']['1'][:3] == '中立第':
             args[1] = i
             retxt += '<span style="border:1px black solid;margin:2px;text-align:center;display: inline-block;">{{' + '|'.join(args) + '}}' + post + '</span>'
     retxt += ''
     return retxt
 
-def create_version_choose_element(list,base,dict):
+
+def create_version_choose_element(list, base, dict):
     retxt = ''
     retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="版本号=2；">' \
              + '<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
              + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
              + '<span class="dota_stretch_out_and_draw_back_input dota_compound_number_input"></span>' \
-             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="版本号" data-display-len="3">版本号</span>'\
+             + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="版本号" data-display-len="3">版本号</span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="时间" data-display-len="3">时间</span>'
     retxt += '</span><div>'
     for i in list:
         for j in range(len(i)):
-            version_name=i[0]
-            if j>0:
-                version_name+='/'+i[j]
+            version_name = i[0]
+            if j > 0:
+                version_name += '/' + i[j]
             if version_name in base:
-                db=base[version_name]
+                db = base[version_name]
                 retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content"' \
-                         + ' data-select-input-text="' + version_name + '" data-check-key="版本号=' +version_name+'.；时间=' +db['更新日期']+'；"' \
+                         + ' data-select-input-text="' + version_name + '" data-check-key="版本号=' + version_name + '.；时间=' + db['更新日期'] + '；"' \
                          + ' style="border:1px black solid;margin:2px;text-align:center;">' \
                          + version_name + '</span>'
     retxt += '</div></div>'

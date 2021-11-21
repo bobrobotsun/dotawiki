@@ -2013,13 +2013,13 @@ class Main(QMainWindow):
     def upload_text_link(self, x):
         retxt = ''
         link = x.group(1).split('|')
-        if len(link)>1:
-            retxt=self.uploat_text_link_by_args(link[0],link[1])
+        if len(link) > 1:
+            retxt = self.uploat_text_link_by_args(link[0], link[1])
         else:
             retxt = self.uploat_text_link_by_args(link[0])
         return retxt
 
-    def uploat_text_link_by_args(self,link,text=''):
+    def uploat_text_link_by_args(self, link, text=''):
         if '#' in link:
             link_index = link.index('#') + 1
             link_target = ''
@@ -2033,8 +2033,8 @@ class Main(QMainWindow):
             real_link = link[:link_index] + link_target
         else:
             real_link = link
-        if text=='':
-            text=link
+        if text == '':
+            text = link
         retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + real_link + '">' + text + '</span>'
         return retxt
 
@@ -2148,8 +2148,8 @@ class Main(QMainWindow):
             else:
                 retxt = '<span class="dota_click_copy_text_html" data-click-copy-text="' + template_args[1] + '"' + td + '>' + template_args[1] + '</span>'
         elif template_args[0] == '链接':
-            if len(template_args)>2:
-                retxt=self.uploat_text_link_by_args(template_args[1],template_args[2])
+            if len(template_args) > 2:
+                retxt = self.uploat_text_link_by_args(template_args[1], template_args[2])
             else:
                 retxt = self.uploat_text_link_by_args(template_args[1])
         elif template_args[0] == '错误文字':
@@ -3270,7 +3270,7 @@ class Main(QMainWindow):
                     retxt += '<li>' + j + '</li>'
                 for j in label:
                     if j != '重要' and len(label[j]) > 0:
-                        retxt += '<li>{{额外信息框|本版本对' + str(len(label[j])) + '个' + i + '内容进行了【' +edit_json.version_label[j]+ j + '】|'
+                        retxt += '<li>{{额外信息框|本版本对' + str(len(label[j])) + '个' + i + '内容进行了【' + edit_json.version_label[j] + j + '】|'
                         for k in range(len(label[j])):
                             if k > 0:
                                 retxt += '、'
@@ -3561,7 +3561,7 @@ class Main(QMainWindow):
         ori_text = re.sub(r'[\[\]【】]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
-            text = re.sub(r'(?<!\\)([+-]{2,})', lambda x: self.version_edit_change_value_create_lablel1(item, x.group(1)), text)
+            text = re.sub(r'(?<!\\)([+-]{2,3})', lambda x: self.version_edit_change_value_create_lablel1(item, x.group(1)), text)
             text = re.sub(r'(?<!\\)([\[【]{2})', lambda x: '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)([\]】]{2})', lambda x: '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)[\[【](.+?)(?<!\\)[\]】]', lambda x: '{{H|' + x.group(1) + '}}', text)
@@ -3616,6 +3616,7 @@ class Main(QMainWindow):
             label = parent.child(3)
             count = label.childCount()
             bool = True
+            add=''
             if type == '++' or type == '+++':
                 add = '加强'
             elif type == '--' or type == '---':
@@ -3624,6 +3625,8 @@ class Main(QMainWindow):
                 add = '补偿性加强'
             elif type == '--+':
                 add = '补偿性削弱'
+            elif type == '+-+' or type == '-+-':
+                add = '补偿性平衡'
             elif type == '+-' or type == '-+':
                 add = '平衡'
             for i in range(count):
@@ -4213,8 +4216,17 @@ class Main(QMainWindow):
             self.entry_edit_change_name()
 
     def test_inputwindow(self):
-        i=1
-
+        for i in self.version_base:
+            v=self.version_base[i]
+            for j in v:
+                if isinstance(v[j],dict):
+                    for k in v[j]:
+                        for l in v[j][k]:
+                            for m in range(2,len(v[j][k][l])):
+                                for n in range(len(v[j][k][l][m]['标签'])):
+                                    if v[j][k][l][m]['标签'][n]=='重要天赋更新':
+                                        v[j][k][l][m]['标签'][n]='新天赋'
+        self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
 
     def test_inputwindow_loop_check(self, json):
         for i in self.json_base['非英雄单位']:

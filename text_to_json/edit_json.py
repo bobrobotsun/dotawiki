@@ -568,6 +568,7 @@ version_label = {
     '技能重做':'',
     '重要神杖更新':'{{图片|Agha.png}}',
     '重要魔晶更新':'{{图片|Shard.png}}',
+    '新天赋':'{{图片|Talent.png}}',
     '物品重做':''
 }
 version_label2={
