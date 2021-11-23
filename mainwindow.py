@@ -653,6 +653,7 @@ class Main(QMainWindow):
         info_txt += page.common_code_hero_page(self.json_base, self.seesion, self.csrf_token, self.change_all_template_link_to_html)
         info_txt += page.common_code_item_page(self.json_base, self.seesion, self.csrf_token, self.change_all_template_link_to_html)
         info_txt += page.translate_page_dota_hud_error(self.text_base['翻译'], self.seesion, self.csrf_token, self.change_all_template_link_to_html)
+        info_txt += page.all_version_simple_show(self.version_base, self.version_list['版本'], self.seesion, self.csrf_token, self.change_all_template_link_to_html)
         QMessageBox.information(self, '更改完毕', info_txt, QMessageBox.Yes, QMessageBox.Yes)
 
     def download_json_base(self):
@@ -1118,13 +1119,13 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].clicked.connect(self.version_button_delete_tree_item)
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'] = QPushButton('增加新目标', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].clicked.connect(self.version_button_list_add_list_text)
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].clicked.connect(lambda:self.version_button_list_add_list_text())
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'] = QPushButton('删除该目标', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'])
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].clicked.connect(self.version_button_delete_tree_item)
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'] = QPushButton('增加新标签', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'].clicked.connect(self.version_button_list_add_list_label)
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'].clicked.connect(lambda:self.version_button_list_add_list_label())
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(5)
 
         self.check_version()
@@ -3550,6 +3551,12 @@ class Main(QMainWindow):
         elif item.itemtype == 'tree2':
             self.version_button_tree2_add_tree3()
             item.setExpanded(False)
+        elif item.itemtype == 'list' and item.text(0) == '目标':
+            self.version_button_list_add_list_text(False)
+        elif item.itemtype == 'list' and item.text(0) == '标签':
+            self.version_button_list_add_list_label(False)
+        elif item.itemtype == 'list_text':
+            self.version_button_delete_tree_item()
         elif item.hasvalue:
             self.version_edit_change_value()
 
@@ -3814,7 +3821,7 @@ class Main(QMainWindow):
         new3.setExpanded(True)
         item.setExpanded(True)
 
-    def version_button_list_add_list_text(self):
+    def version_button_list_add_list_text(self,expand=True):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         choose = ['自行填入']
         for i in self.version_default:
@@ -3832,8 +3839,9 @@ class Main(QMainWindow):
                     new = VersionItemEdit(item)
                     new.itemtype = 'list_text'
                     new.set_value(text2)
+            item.setExpanded(expand)
 
-    def version_button_list_add_list_label(self):
+    def version_button_list_add_list_label(self,expand=True):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         choose = []
         for i in edit_json.version_label:
@@ -3852,6 +3860,7 @@ class Main(QMainWindow):
                 new = VersionItemEdit(item)
                 new.itemtype = 'list_text'
                 new.set_value(text1)
+            item.setExpanded(expand)
 
     def version_tree_expand_toplevelitem(self):
         for i in range(self.versionlayout['版本内容']['横排版']['树'][0].topLevelItemCount()):

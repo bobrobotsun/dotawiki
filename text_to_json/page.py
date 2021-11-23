@@ -244,3 +244,26 @@ def translate_page_dota_hud_error(json,seesion, csrf_token,html_function):
     upload_data = {'action': 'edit', 'title': '翻译对照/游戏报错', 'text': retxt, 'format': 'json', 'token': csrf_token}
     upload_info = seesion.post(target_url, headers=headers, data=upload_data)
     return analyse_upload_json('翻译对照/游戏报错', upload_info)
+
+def all_version_simple_show(log_base,log_list,seesion, csrf_token,html_function):
+    retxt = ''
+    button = ''
+    content = ''
+    key=''
+    log_show_list = []
+    for i in range(len(log_list) - 1, -1, -1):
+        for j in range(len(log_list[i])):
+            log_name = log_list[i][0]
+            if j > 0:
+                log_name = log_list[i][0] + '/' + log_list[i][j]
+            if log_name in log_base:
+                v = log_base[log_name]
+                button += '<div class="dota_dict_label_switch_content_by_click_button" data-display-len="2" data-check-key="' + log_name + '">' + log_name + '</div>'
+                content += '<div class="dota_dict_label_switch_content_by_click_content" data-check-key="' + log_name + '=1；" data-display-type="inline-block">' + v['简易展示'] + '</div>'
+                if j==0:
+                    key=log_name+'=1；'+key
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="'+key+'" data-need-new-tip="1">' + button + '<div>' + content + '</div></div>\n{{全部格式}}'
+    retxt=html_function(retxt)
+    upload_data = {'action': 'edit', 'title': '更新日志', 'text': retxt, 'format': 'json', 'token': csrf_token}
+    upload_info = seesion.post(target_url, headers=headers, data=upload_data)
+    return analyse_upload_json('更新日志', upload_info)
