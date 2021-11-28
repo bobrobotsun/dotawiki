@@ -434,6 +434,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
                 v = log_base[log_name]
                 current_ul = 0
                 new_log = True
+                all_labels=[]
                 for j, w in v.items():
                     if isinstance(w, dict):
                         for j2, w2 in w.items():
@@ -449,7 +450,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
                                     if showit:
                                         if new_log:
                                             button += '<div class="dota_dict_label_switch_content_by_click_button" data-display-len="2" data-check-key="' + log_name + '">' \
-                                                      + log_name + '</div>'
+                                                      + log_name
                                             content += '<div class="dota_dict_label_switch_content_by_click_content" data-check-key="' + log_name + '=1；" data-display-type="block">' \
                                                        + '<h3><span class="dota_create_link_to_wiki_page">' + log_name + '</span>\t<small>' + v['更新日期'] + '</small></h3>'
                                             if log_len < limit or limit <= 0:
@@ -465,11 +466,8 @@ def create_switch_log(log_base, log_list, name, limit=10):
                                                 content += '</ul>'
                                             current_ul = x[l]['序列级数']
                                         show_text = ''
-                                        for y in x[l]['标签']:
-                                            if y in edit_json.version_label:
-                                                show_text += '{{额外信息框|' + edit_json.version_label[y] + '|' + y + '}}'
-                                            if y in edit_json.version_label2:
-                                                show_text += '{{额外信息框|' + edit_json.version_label2[y] + '|' + y + '}}'
+                                        all_labels.extend(x[l]['标签'])
+                                        show_text += edit_json.change_label_list_to_text(x[l]['标签'],'list')
                                         show_text += x[l]['文字']
                                         if current_ul > 0:
                                             content += '<li>' + show_text + '</li>'
@@ -479,6 +477,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
                     for m in range(current_ul):
                         content += '</ul>'
                 if not new_log:
+                    button+=edit_json.change_label_list_to_text(all_labels)+ '</div>'
                     content += '</div>'
     if log_len > 0:
         retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="'

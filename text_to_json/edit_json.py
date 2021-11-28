@@ -560,22 +560,43 @@ version = {
 version_default = {
 }
 version_label = {
-    '重要':'',
+    '重要':'<i class="fa fa-warning" style="color:#aa3333"></i>',
     '加强':'<i class="fa fa-arrow-up" style="color:#33aa33"></i>',
     '削弱':'<i class="fa fa-arrow-down" style="color:#aa3333"></i>',
     '平衡':'<i class="fa fa-exchange" style="color:#3333aa"></i>',
-    '英雄重做':'',
-    '技能重做':'',
+    '英雄重做':'<i class="fa fa-user" style="color:#33aa33"></i>',
+    '技能重做':'<i class="fa fa-anchor" style="color:#33aa33"></i>',
     '重要神杖更新':'{{图片|Agha.png}}',
     '重要魔晶更新':'{{图片|Shard.png}}',
     '新天赋':'{{图片|Talent.png}}',
-    '物品重做':''
+    '单位重做':'<i class="fa fa-paw" style="color:#33aa33"></i>',
+    '物品重做':'<i class="fa fa-gavel" style="color:#33aa33"></i>'
 }
 version_label2={
     '补偿性加强':'<i class="fa fa-arrow-circle-up" style="color:#33aa33"></i>',
     '补偿性削弱':'<i class="fa fa-arrow-circle-down" style="color:#aa3333"></i>',
-    '补偿性平衡':'<i class="fa fa-retweet" style="color:#3333aa"></i>'
+    '补偿性平衡':'<i class="fa fa-retweet" style="color:#3333aa"></i>',
+    '错误修复':'<i class="fa fa-bug" style="color:#33aa33"></i>',
+    '疑似漏洞':'<i class="fa fa-bug" style="color:#aa3333"></i>'
 }
+def change_label_list_to_text(labels,index='label'):
+    retxt=''
+    if index=='label':
+        for i in version_label:
+            if i in labels:
+                retxt += '{{额外信息框|' + version_label[i] + '|' + i + '}}'
+        for i in version_label2:
+            if i in labels:
+                retxt += '{{额外信息框|' + version_label2[i] + '|' + i + '}}'
+    elif index=='list':
+        for i in labels:
+            if i in version_label:
+                retxt += '{{额外信息框|' + version_label[i] + '|' + i + '}}'
+            if i in version_label2:
+                retxt += '{{额外信息框|' + version_label2[i] + '|' + i + '}}'
+    return retxt
+
+
 item_shop=['消耗品','属性','装备','其他','配件','辅助','法器','防具','兵刃','宝物','神秘商店','肉山','共享','中立第1级','中立第2级','中立第3级','中立第4级','中立第5级']
 
 def set_version_default(base):

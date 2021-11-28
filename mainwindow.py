@@ -102,7 +102,7 @@ class Main(QMainWindow):
         self.move(qr.topLeft())
 
     # 这是用来控制间隔时间的函数
-    def time_point_for_iterable_sleep_by_time(self, staytime=0.08, pasttime=0.0):
+    def time_point_for_iterable_sleep_by_time(self, staytime=0.02, pasttime=0.0):
         if pasttime == 0:
             pasttime = self.time_point_for_iterable_sleep
         temptime = time.time()
@@ -664,6 +664,7 @@ class Main(QMainWindow):
             total_num = 0
             for i in self.json_name:
                 total_num += len(self.json_name[i])
+            self.temp_time_show=time.time()
             self.progress = upload_text('开始下载json')
             self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
             self.progress.setWindowIcon(self.icon)
@@ -681,7 +682,7 @@ class Main(QMainWindow):
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
             self.startactiveCount = threading.activeCount()
-            for i in range(20):
+            for i in range(80):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
         except FileNotFoundError:
@@ -727,9 +728,8 @@ class Main(QMainWindow):
                         self.lock.release()
                 else:
                     self.local.k += 1
-                    self.time_point_for_iterable_sleep_by_time(0.5)
-                    self.progress.addtext(
-                        ['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：' + str(self.local.download_info.status_code) + '，尝试次数：' + str(self.local.k), 2],
+                    self.time_point_for_iterable_sleep_by_time(0.2)
+                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：' + str(self.local.download_info.status_code) + '，尝试次数：' + str(self.local.k), 2],
                         self.current_num[0], threading.current_thread().name)
                     if self.local.k >= 20:
                         self.lock.release()
@@ -739,7 +739,7 @@ class Main(QMainWindow):
         if (self.progress.success[1] == self.progress.maxmax):
             self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
             self.fix_window_with_json_data()
-            self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口', 0])
+            self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口。\n总耗时：' + self.system_cal_time(self.temp_time_show), 0])
         self.lock.release()
 
     def create_icon_by_local_image(self, image_name):
@@ -1404,7 +1404,7 @@ class Main(QMainWindow):
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
             return True
         else:
-            QMessageBox.information(self, "已完成", info + '\n总耗时：' + str(round(time.time() - time_show, 2)) + '秒')
+            QMessageBox.information(self, "已完成", info + '\n总耗时：' + self.system_cal_time(time_show))
             return False
 
     def loop_check_to_html(self, json, function):
@@ -1451,7 +1451,7 @@ class Main(QMainWindow):
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
             return True
         else:
-            QMessageBox.information(self, "已完成", '目标【机制】都已经更新完毕\n总耗时：' + str(round(time.time() - time_show, 2)) + '秒')
+            QMessageBox.information(self.w, "已完成", '目标【机制】都已经更新完毕\n总耗时：' + self.system_cal_time(time_show))
             return False
 
     def upload_basic_json(self):
@@ -1461,6 +1461,7 @@ class Main(QMainWindow):
         QMessageBox.information(self, "上传完成", '已经上传完毕基础文件')
 
     def upload_all(self, chosen=''):
+        time_show=time.time()
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
@@ -1487,9 +1488,10 @@ class Main(QMainWindow):
         for i in range(total_num):
             self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1]), i)
             QApplication.processEvents()
-        QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+        QMessageBox.information(self.w, '上传完毕', '您已上传完毕，可以关闭窗口\n总耗时：' + self.system_cal_time(time_show), QMessageBox.Yes, QMessageBox.Yes)
 
     def upload_common_page(self, chosen=''):
+        time_show=time.time()
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
@@ -1569,9 +1571,10 @@ class Main(QMainWindow):
         for i in range(len(all_redirect)):
             self.w.addtext(self.upload_page(all_redirect[i][0], all_redirect[i][1], 0), i + len(all_upload) + len(all_copy_upload))
             QApplication.processEvents()
-        QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+        QMessageBox.information(self.w, '上传完毕', '您已上传完毕，可以关闭窗口\n总耗时：' + self.system_cal_time(time_show), QMessageBox.Yes, QMessageBox.Yes)
 
     def upload_html_data_page(self, chosen=''):
+        time_show=time.time()
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
@@ -1590,7 +1593,7 @@ class Main(QMainWindow):
         for i in range(len(all_upload)):
             self.w.addtext(self.upload_html(all_upload[i][0], all_upload[i][1]), i)
             QApplication.processEvents()
-        QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+        QMessageBox.information(self.w, '上传完毕', '您已上传完毕，可以关闭窗口\n总耗时：' + self.system_cal_time(time_show), QMessageBox.Yes, QMessageBox.Yes)
 
     def create_all_json_data(self):
         retxt = '<script>\ndota_json_json_data={'
@@ -1607,6 +1610,7 @@ class Main(QMainWindow):
         return retxt
 
     def upload_all_json_and_page(self):
+        time_show=time.time()
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
@@ -1690,7 +1694,7 @@ class Main(QMainWindow):
         for i in range(len(all_redirect)):
             self.w.addtext(self.upload_page(all_redirect[i][0], all_redirect[i][1], 0), i + len(all_json_upload) + len(all_page_upload) + len(all_copy_upload))
             QApplication.processEvents()
-        QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+        QMessageBox.information(self.w, '上传完毕', '您已上传完毕，可以关闭窗口\n总耗时：' + self.system_cal_time(time_show), QMessageBox.Yes, QMessageBox.Yes)
 
     def get_the_wiki_image_with_hashmd5(self, image_name):
         hashmd5 = hashlib.md5(image_name.encode("utf-8")).hexdigest()
@@ -1763,6 +1767,7 @@ class Main(QMainWindow):
         QMessageBox.information(self.w, '下载完毕', "您已下载完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
     def upload_same_kind(self):
+        time_show=time.time()
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
         if not self.update_the_jsons_alreadey:
@@ -1866,7 +1871,7 @@ class Main(QMainWindow):
         for i in range(len(all_redirect)):
             self.w.addtext(self.upload_page(all_redirect[i][0], all_redirect[i][1], 0), i + len(all_upload) + len(all_page) + len(all_copy_page))
             QApplication.processEvents()
-        QMessageBox.information(self.w, '上传完毕', "您已上传完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+        QMessageBox.information(self.w, '上传完毕', '您已上传完毕，可以关闭窗口\n总耗时：' + self.system_cal_time(time_show), QMessageBox.Yes, QMessageBox.Yes)
 
     def upload_json_1(self, pagename, content):
         return ['暂时不予以上传', 1]
@@ -4277,6 +4282,20 @@ class Main(QMainWindow):
                                 break
             else:
                 break
+
+    def system_cal_time(self,start):
+        all=time.time()-start
+        minute=all // 60
+        hour=int(minute // 60)
+        minute=int(minute % 60)
+        secend=int(all % 60)
+        retxt=''
+        if hour>0:
+            retxt+=str(hour)+'小时'
+        if minute>0:
+            retxt+=str(minute).zfill(2)+'分'
+        retxt+=str(secend).zfill(2)+'秒'
+        return retxt
 
 
 class upload_text(QWidget):
