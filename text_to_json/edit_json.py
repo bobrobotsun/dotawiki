@@ -564,13 +564,13 @@ version_label = {
     '加强':'<i class="fa fa-arrow-up" style="color:#33aa33"></i>',
     '削弱':'<i class="fa fa-arrow-down" style="color:#aa3333"></i>',
     '平衡':'<i class="fa fa-exchange" style="color:#3333aa"></i>',
-    '英雄重做':'<i class="fa fa-user" style="color:#33aa33"></i>',
-    '技能重做':'<i class="fa fa-anchor" style="color:#33aa33"></i>',
+    '英雄重做':'<i class="fa fa-user" style="color:#aa00aa"></i>',
+    '技能重做':'<i class="fa fa-anchor" style="color:#aa00aa"></i>',
     '重要神杖更新':'{{图片|Agha.png}}',
     '重要魔晶更新':'{{图片|Shard.png}}',
-    '新天赋':'{{图片|Talent.png}}',
-    '单位重做':'<i class="fa fa-paw" style="color:#33aa33"></i>',
-    '物品重做':'<i class="fa fa-gavel" style="color:#33aa33"></i>'
+    '新天赋':'{{图片|Talentb.png}}',
+    '单位重做':'<i class="fa fa-paw" style="color:#aa00aa"></i>',
+    '物品重做':'<i class="fa fa-gavel" style="color:#aa00aa"></i>'
 }
 version_label2={
     '补偿性加强':'<i class="fa fa-arrow-circle-up" style="color:#33aa33"></i>',

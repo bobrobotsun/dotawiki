@@ -102,7 +102,7 @@ class Main(QMainWindow):
         self.move(qr.topLeft())
 
     # 这是用来控制间隔时间的函数
-    def time_point_for_iterable_sleep_by_time(self, staytime=0.02, pasttime=0.0):
+    def time_point_for_iterable_sleep_by_time(self, staytime=0.03, pasttime=0.0):
         if pasttime == 0:
             pasttime = self.time_point_for_iterable_sleep
         temptime = time.time()
@@ -682,7 +682,7 @@ class Main(QMainWindow):
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
             self.startactiveCount = threading.activeCount()
-            for i in range(80):
+            for i in range(40):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
         except FileNotFoundError:
@@ -3348,7 +3348,7 @@ class Main(QMainWindow):
         for i in self.version_base:
             self.version_base[i]['简易展示'] = self.change_all_template_link_to_html(self.version_create_simple_show(self.version_base[i]))
             all_upload.append([i + '.json', self.version_base[i]])
-            # all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'])])
+            all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'])])
         num1 = len(all_upload)
         num2 = len(all_upload_page)
         self.w.confirm_numbers(num1 + num2)
