@@ -1451,7 +1451,7 @@ class Main(QMainWindow):
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
             return True
         else:
-            QMessageBox.information(self.w, "已完成", '目标【机制】都已经更新完毕\n总耗时：' + self.system_cal_time(time_show))
+            QMessageBox.information(self, "已完成", '目标【机制】都已经更新完毕\n总耗时：' + self.system_cal_time(time_show))
             return False
 
     def upload_basic_json(self):
