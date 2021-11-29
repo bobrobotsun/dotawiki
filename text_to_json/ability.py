@@ -755,7 +755,7 @@ def mech_mech(json, mech):
         else:
             for j in json[i]:
                 for k in json[i][j]:
-                    if str(json[i][j][k]["代码"]) in mech[i]:
+                    if "代码" in json[i][j][k] and str(json[i][j][k]["代码"]) in mech[i]:
                         json[i][j][k]["值"] = mech[i][str(json[i][j][k]["代码"])]["名称"]
                         json[i][j][k]["图片"] = mech[i][str(json[i][j][k]["代码"])]["图片"]
                         if json[i][j][k]["简述"] == "":
