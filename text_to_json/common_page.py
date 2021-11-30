@@ -249,7 +249,7 @@ def create_navboxunit(json_base):
 
 def create_page_logs(title, log_base, log_list):
     retxt = ''
-    retxt += '<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;">\n<tr><th colspan=2>' + title + '</th></tr>' + '\n<tr><td>游戏本体</td><td>' + \
+    retxt += right_menu()+'<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;">\n<tr><th colspan=2>' + title + '</th></tr>' + '\n<tr><td>游戏本体</td><td>' + \
              log_base['游戏本体'] + '</td></tr>' + '\n<tr><td>更新日期</td><td>' + log_base['更新日期'] + '</td></tr>'
     if log_base['地图作者'] != '':
         retxt += '\n<tr><td>作者</td><td>' + log_base['地图作者'] + '</td></tr>'
@@ -299,7 +299,8 @@ def create_page_logs(title, log_base, log_list):
             retxt += '[[' + log_base['次级版本'][i] + ']]'
     if '官网链接' in log_base and log_base['官网链接'] != '' and log_base['官网链接'] != '-':
         retxt += '\n<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
-    retxt += '\n<tr><td colspan=2 style="text-align:right;font-size:85%"><span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + title + '.json"><i class="fa fa-database" aria-hidden="true"></i></span></td></tr></table>'
+    retxt += '\n<tr><td colspan=2 style="text-align:right;font-size:85%"><span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + title + '.json">'\
+             +'<i class="fa fa-database" aria-hidden="true"></i></span></td></tr></table>'
     table_name = ["开头", '英雄', "物品", "中立生物", "建筑", "兵线", "通用", "结尾"]
     for i in range(len(table_name)):
         if table_name[i] in log_base:
@@ -309,10 +310,10 @@ def create_page_logs(title, log_base, log_list):
                     titles = '=='
                 else:
                     titles = '==='
-                    retxt += '\n==' + table_name[i] + '=='
+                    retxt += '\n==' + table_name[i] + '==\n<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + table_name[i] + '|' + table_name[i] + ']]</div>'
                 for j0, w0 in v.items():
                     if j0 != '无标题':
-                        retxt += '\n' + titles + j0 + titles
+                        retxt += '\n' + titles + j0 + titles+'\n<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + j0 + '|--' + j0 + ']]</div>'
                     for j, w in w0.items():
                         if w[0] != '':
                             retxt += '\n===={{大图片|' + w[0] + '|h36}}[[' + w[0] + ']]===='
@@ -485,7 +486,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
             retxt += i + '=1；'
         retxt += '" data-need-new-tip="1">' + button + '<div>' + content + '</div></div>'
         if limit == 0:
-            retxt += '您可以点击上面的版本号按钮来快速查看对应的更新日志。'
+            retxt = right_menu()+retxt+'您可以点击上面的版本号按钮来快速查看对应的更新日志。'
         else:
             retxt += '<br><ul><li>您可以点击上面的版本号按钮来快速查看对应的更新日志，或者您可以<b>[[' + name[0] + '/版本改动|点此处查看完整的日志页面……]]</b></li></ul>'
     elif limit == 0:
@@ -498,7 +499,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
 
 def create_page_hero(json_base, log_base, log_list, hero):
     db = json_base['英雄'][hero]
-    retxt = '__NOTOC__<div style="float:left;">' \
+    retxt = '__NOTOC__'+right_menu()+'<div style="float:left;">' \
             + '<div class="bg-primary" style="margin-left:0px;margin-top:1em;display:block;height:48px;">' \
             + '<div class="heronavi" style="margin-bottom:0px">{{小图片|' + db["页面名"] + '}}</div>' \
             + '<div class="heronavi" style="margin-bottom:0px">[[' + db["中文名"] + '/英雄语音|英雄语音]]</div>' \
@@ -587,7 +588,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
 
 def create_page_unit(json_base, log_base, log_list, unit):
     db = json_base['非英雄单位'][unit]
-    retxt = '__NOTOC__<div>' + db['具体展示'] + db["页面名"] + '是DOTA2中的一种'
+    retxt = '__NOTOC__'+right_menu()+'<div>' + db['具体展示'] + db["页面名"] + '是DOTA2中的一种'
     if db["远古单位"]["1"]["1"] == 1:
         retxt += '远古'
     if db["英雄级单位"]["1"]["1"] == 1:
@@ -667,7 +668,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
 
 def create_page_item(json_base, log_base, log_list, item):
     db = json_base['物品'][item]
-    retxt = '__NOTOC__' + json_base['物品'][item]['具体展示'] + '<b>' + db["页面名"] + '</b>是DOTA2中的一种<span class="dota_create_link_to_wiki_page">物品</span>，可以在<b>"'
+    retxt = '__NOTOC__'+right_menu() + json_base['物品'][item]['具体展示'] + '<b>' + db["页面名"] + '</b>是DOTA2中的一种<span class="dota_create_link_to_wiki_page">物品</span>，可以在<b>"'
     for i, v in db['商店'].items():
         if i != '1':
             retxt += '、'
@@ -792,7 +793,7 @@ def create_page_old_ability(json_base, log_base, log_list, ability):
 
 def create_page_mechnism(json_base, log_base, log_list, mech):
     db = json_base['机制'][mech]
-    retxt = ''
+    retxt = right_menu()
     if db['次级分类'] != '引用机制':
         if db['图片'] != '':
             retxt += '{{图片|' + db['图片'] + '|w' + db['图片大小'] + '|right}}'
@@ -824,7 +825,7 @@ def create_page_mechnism(json_base, log_base, log_list, mech):
 
 def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     db = json_base['单位组'][unitgroup]
-    retxt = ''
+    retxt = right_menu()
     if db['图片'] != '':
         retxt += '{{图片|' + db['图片'] + '|w120|right}}\n'
     retxt += '==组信息==\n<div class="dota_rotatey_transform_switch_content1">'
@@ -1007,6 +1008,8 @@ def create_version_choose_element(list, base, dict):
     retxt += '</div></div>'
     return retxt
 
+def right_menu(a='#',b='↑↑置顶↑↑'):
+    return '<div class="dota_invisible_menu_item_at_right_of_the_screen">[['+a+'|'+b+']]</div>'
 
 def thanks_for_the_audience():
     retxt = '\n==感谢您的阅读==' \

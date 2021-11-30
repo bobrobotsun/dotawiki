@@ -712,7 +712,7 @@ class Main(QMainWindow):
             while True:
                 self.local.download_info = self.local.seesion.post(self.local.target_url, headers=self.header, data=self.local.download_data)
                 self.lock.acquire()
-                if self.local.download_info.status_code < 400:
+                if isinstance(self.local.download_info.status_code,int) and self.local.download_info.status_code < 400:
                     try:
                         self.local.jsons = self.local.download_info.json()
                     except Exception as xx:
