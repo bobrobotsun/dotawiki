@@ -839,11 +839,17 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     for i in db['全部单位']:
         if i in json_base['非英雄单位']:
             retxt += json_base['非英雄单位'][i]['简易展示']
+    temp=''
+    for i,v in db['单位来源'].items():
+        if v in json_base['技能']:
+            temp += json_base['技能'][v]['简易展示']
+    if temp!='':
+        retxt += '\n==单位来源==\n'+temp
     retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
     retxt += thanks_for_the_audience()
     if db['次级分类'] != '':
         retxt += '\n'
-        if len(db['次级分类']) >= 4 and db['次级分类'][-4:] == '中立营地':
+        if len(db['次级分类']) >= 4 and db['次级分类'] == '中立生物营地':
             retxt += json_base['机制']['通用']['简单条目']['中立生物营地导航']
     retxt += '<div class="dota_invisible_menu_item_at_right_of_the_screen"><span class="dota_create_link_to_wiki_page" data-link-page-name="Data:' \
              + unitgroup + '.json">' + unitgroup + '</span></div>'

@@ -1249,7 +1249,7 @@ def calculate_combine_txt_numbers(list1, list2, op):
             if len(expand1[i][0]) < expand2[i][0][0]:
                 expand1[i][0] = [expand1[i][0][-1]]
             else:
-                expand1[i][0] = [expand1[i][0][expand2[i][0][0]]]
+                expand1[i][0] = [expand1[i][0][int(expand2[i][0][0])]]
         elif op == 'matrix+':  # 前后两组矩阵乘，生成m*n组数值。
             matx = copy.deepcopy(expand1[i][0])
             maty = copy.deepcopy(expand2[i][0])

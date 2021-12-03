@@ -2422,7 +2422,7 @@ class Main(QMainWindow):
                     if len(self.json_base['技能'][v]['技能归属']) > 0:
                         target_name.append(self.json_base['技能'][v]['技能归属'])
             for i, v in self.json_base['单位组'].items():
-                if selected_name in v['全部单位']:
+                if '全部单位' in v and selected_name in v['全部单位']:
                     target_name.append(i)
         elif selected == '单位组':
             target_name.append(selected_name)

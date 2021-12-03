@@ -13,13 +13,13 @@ def get_source_to_data(all_json, version, text_base,name_base):
         all_json['单位组'][i]['页面名'] = i
         all_json['单位组'][i]['分类'] = '单位组'
         all_units=[]
-        if '手填标签' not in all_json['单位组'][i]:
+        if '单位来源' not in all_json['单位组'][i]:
+            all_json['单位组'][i]['单位来源'] = {}
+        if '手填标签' not in all_json['单位组'][i] or not isinstance(all_json['单位组'][i]['手填标签'],dict):
             all_json['单位组'][i]['手填标签'] = {}
-        if '标签' not in all_json['单位组'][i]:
-            all_json['单位组'][i]['标签'] = []
         all_json['单位组'][i]['标签'] = []
-        if all_json['单位组'][i]['次级分类'] != '' and all_json['单位组'][i]['次级分类'] not in all_json['单位组'][i]['手填标签'].values():
-            all_json['单位组'][i]['手填标签'][str(len(all_json['单位组'][i]['手填标签'])+1)]=all_json['单位组'][i]['次级分类']
+        if all_json['单位组'][i]['次级分类'] != '':
+            all_json['单位组'][i]['标签'].append(all_json['单位组'][i]['次级分类'])
         for k in all_json['单位组'][i]['手填标签']:
             if all_json['单位组'][i]['手填标签'][k] != '':
                 all_json['单位组'][i]['标签'].append(all_json['单位组'][i]['手填标签'][k])
@@ -202,4 +202,7 @@ def apply_extra_attribute(result,extra,name):
                 result['护甲'] = ability.calculate_combine_txt_numbers(result['护甲'], i['值'], '+')
             elif i['属性']=='加魔抗':
                 result['魔法抗性'] = ability.calculate_combine_txt_numbers(result['魔法抗性'], i['值'], '%*%')
+            elif i['属性']=='等级':
+                for j in result:
+                    result[j]=ability.calculate_combine_txt_numbers(result[j], i['值'], 'catch')
     return result

@@ -370,6 +370,7 @@ edit = {
         "图片": ['text', ''],
         "迷你图片": ['text', ''],
         "次级分类": ['text', ''],
+        "单位来源": ['tree', {"list": ['text', '', 1, 0, True]}],
         "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}],
         "成员": ['tree', {"list": ["tree", {'名称': ['text', ''],
                                           '额外属性': ['tree', {'list': ['tree', {
