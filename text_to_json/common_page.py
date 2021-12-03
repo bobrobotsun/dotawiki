@@ -478,7 +478,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
                     for m in range(current_ul):
                         content += '</ul>'
                 if not new_log:
-                    button+=edit_json.change_label_list_to_text(all_labels)+ '</div>'
+                    button+=edit_json.change_label_list_to_text(all_labels,count=True)+ '</div>'
                     content += '</div>'
     if log_len > 0:
         retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="'

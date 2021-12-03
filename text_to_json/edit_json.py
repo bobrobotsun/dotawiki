@@ -146,7 +146,7 @@ edit = {
         "召唤物": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                            '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "单位关系类型": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
-                                             '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
+                                              '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "等级": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                           '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "生命值": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
@@ -210,9 +210,9 @@ edit = {
         "模型比例": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                             '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "英雄攻击伤害": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
-                                            '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
+                                              '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "非英雄攻击伤害": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
-                                            '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
+                                               '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
         "攻击速度": ['tree', {"list": ['tree', {'代码': ['tree', {'list': ['txt', '', 0, 3, False]}],
                                             '修正': ['tree', {'list': ['txt', '', 1, 1, False]}]}, 1, 1, False]}],
     },
@@ -372,12 +372,12 @@ edit = {
         "次级分类": ['text', ''],
         "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}],
         "成员": ['tree', {"list": ["tree", {'名称': ['text', ''],
-            '额外属性': ['tree', {'list': ['tree', {
-                                            '属性':['text',''],
-                                            '代码': ['tree', {'list': ['text', '', 0, 4, False]}],
-                                            '目标': ['tree', {'list': ['text', '', 1, 0, True]}]}, 1, 0, True]}],
-            'list': ['tree', {'单位名': ['text', ''], '数量': ['tree', {'代码': ['tree', {'list': ['text', '', 0, 4, False]}]}]}, 1, 1, False],
-                }, 1, 1, False]}],
+                                          '额外属性': ['tree', {'list': ['tree', {
+                                              '属性': ['text', ''],
+                                              '代码': ['tree', {'list': ['text', '', 0, 4, False]}],
+                                              '目标': ['tree', {'list': ['text', '', 1, 0, True]}]}, 1, 0, True]}],
+                                          'list': ['tree', {'单位名': ['text', ''], '数量': ['tree', {'代码': ['tree', {'list': ['text', '', 0, 4, False]}]}]}, 1, 1, False],
+                                          }, 1, 1, False]}],
     },
     '机制': {
         "页面名": ['text', ''],
@@ -560,44 +560,47 @@ version = {
 version_default = {
 }
 version_label = {
-    '重要':'<i class="fa fa-warning" style="color:#aa3333"></i>',
-    '加强':'<i class="fa fa-arrow-up" style="color:#33aa33"></i>',
-    '削弱':'<i class="fa fa-arrow-down" style="color:#aa3333"></i>',
-    '平衡':'<i class="fa fa-exchange" style="color:#3333aa"></i>',
-    '英雄重做':'<i class="fa fa-user" style="color:#aa00aa"></i>',
-    '技能重做':'<i class="fa fa-anchor" style="color:#aa00aa"></i>',
-    '重要神杖更新':'{{图片|Agha.png}}',
-    '重要魔晶更新':'{{图片|Shard.png}}',
-    '新天赋':'{{图片|Talentb.png}}',
-    '单位重做':'<i class="fa fa-paw" style="color:#aa00aa"></i>',
-    '物品重做':'<i class="fa fa-gavel" style="color:#aa00aa"></i>'
+    '重要': '<i class="fa fa-warning" style="color:#aa3333"></i>',
+    '加强': '<i class="fa fa-arrow-up" style="color:#33aa33"></i>',
+    '削弱': '<i class="fa fa-arrow-down" style="color:#aa3333"></i>',
+    '平衡': '<i class="fa fa-exchange" style="color:#3333aa"></i>',
+    '英雄重做': '<i class="fa fa-user" style="color:#aa00aa"></i>',
+    '技能重做': '<i class="fa fa-anchor" style="color:#aa00aa"></i>',
+    '重要神杖更新': '{{图片|Agha.png}}',
+    '重要魔晶更新': '{{图片|Shard.png}}',
+    '新天赋': '{{图片|Talentb.png}}',
+    '单位重做': '<i class="fa fa-paw" style="color:#aa00aa"></i>',
+    '物品重做': '<i class="fa fa-gavel" style="color:#aa00aa"></i>'
 }
-version_label2={
-    '补偿性加强':'<i class="fa fa-arrow-circle-up" style="color:#33aa33"></i>',
-    '补偿性削弱':'<i class="fa fa-arrow-circle-down" style="color:#aa3333"></i>',
-    '补偿性平衡':'<i class="fa fa-retweet" style="color:#3333aa"></i>',
-    '错误修复':'<i class="fa fa-bug" style="color:#33aa33"></i>',
-    '疑似漏洞':'<i class="fa fa-bug" style="color:#aa3333"></i>'
+version_label2 = {
+    '补偿性加强': '<i class="fa fa-arrow-circle-up" style="color:#33aa33"></i>',
+    '补偿性削弱': '<i class="fa fa-arrow-circle-down" style="color:#aa3333"></i>',
+    '补偿性平衡': '<i class="fa fa-retweet" style="color:#3333aa"></i>',
+    '错误修复': '<i class="fa fa-bug" style="color:#33aa33"></i>',
+    '疑似漏洞': '<i class="fa fa-bug" style="color:#aa3333"></i>'
 }
-def change_label_list_to_text(labels,index='label'):
-    retxt=''
-    if index=='label':
+
+
+def change_label_list_to_text(labels, index='label', count=False):
+    retxt = ''
+    if index == 'label':
         for i in version_label:
             if i in labels:
-                retxt += '{{额外信息框|' + version_label[i] + '|' + i + '}}'
+                retxt += '{{额外信息框|' + version_label[i] + '|' + ((str(labels.count(i)) + '×') if count else '') + i + '}}'
         for i in version_label2:
             if i in labels:
-                retxt += '{{额外信息框|' + version_label2[i] + '|' + i + '}}'
-    elif index=='list':
+                retxt += '{{额外信息框|' + version_label2[i] + '|' + ((str(labels.count(i)) + '×') if count else '') + i + '}}'
+    elif index == 'list':
         for i in labels:
             if i in version_label:
-                retxt += '{{额外信息框|' + version_label[i] + '|' + i + '}}'
+                retxt += '{{额外信息框|' + version_label[i] + '|' + ((str(labels.count(i)) + '×') if count else '') + i + '}}'
             if i in version_label2:
-                retxt += '{{额外信息框|' + version_label2[i] + '|' + i + '}}'
+                retxt += '{{额外信息框|' + version_label2[i] + '|' + ((str(labels.count(i)) + '×') if count else '') + i + '}}'
     return retxt
 
 
-item_shop=['消耗品','属性','装备','其他','配件','辅助','法器','防具','兵刃','宝物','神秘商店','肉山','共享','中立第1级','中立第2级','中立第3级','中立第4级','中立第5级']
+item_shop = ['消耗品', '属性', '装备', '其他', '配件', '辅助', '法器', '防具', '兵刃', '宝物', '神秘商店', '肉山', '共享', '中立第1级', '中立第2级', '中立第3级', '中立第4级', '中立第5级']
+
 
 def set_version_default(base):
     v = {

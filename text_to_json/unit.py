@@ -529,7 +529,7 @@ def fulfil_complex_and_simple_show(all_json,html_function):
             st+='</div>'
         unitgroup = []
         for j,w in all_json['单位组'].items():
-            if i in w['全部单位']:
+            if '全部单位' in w and i in w['全部单位']:
                 unitgroup.append(j)
         if len(unitgroup) > 0:
             st+='<div class="border_white" style="padding:0.25em;flex-grow:1;"><div>所属单位组：</div>'

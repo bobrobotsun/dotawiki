@@ -760,7 +760,7 @@ class Main(QMainWindow):
             p = Pinyin()
             for i in names:
                 self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
-                self.mainlayout['列表'][i]['布局']['列表'].setIconSize(QSize(36, 28))
+                self.mainlayout['列表'][i]['布局']['列表'].setIconSize(QSize(12, 12))
                 self.mainlayout['列表'][i]['布局']['列表'].clear()
                 for j in self.json_base[i]:
                     temp = QListWidgetItem()

@@ -196,7 +196,7 @@ def confirm_extra_attribute(jsons,all_json,name,index):
 def apply_extra_attribute(result,extra,name):
     for i in extra:
         if len(i['目标'])==0 or name in i['目标']:
-            if i['属性']=='加百分比生命':
+            if i['属性'] == '加百分比生命':
                 result['生命值'] = ability.calculate_combine_txt_numbers(result['生命值'], i['值'], '%+')
             elif i['属性']=='加护甲':
                 result['护甲'] = ability.calculate_combine_txt_numbers(result['护甲'], i['值'], '+')
