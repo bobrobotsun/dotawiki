@@ -249,7 +249,7 @@ def create_navboxunit(json_base):
 
 def create_page_logs(title, log_base, log_list):
     retxt = ''
-    retxt += right_menu()+'<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;">\n<tr><th colspan=2>' + title + '</th></tr>' + '\n<tr><td>游戏本体</td><td>' + \
+    retxt += right_menu() + '<table class="wikitable" style="text-align:center;background:#333;width:300px;color:#fff;float:right;">\n<tr><th colspan=2>' + title + '</th></tr>' + '\n<tr><td>游戏本体</td><td>' + \
              log_base['游戏本体'] + '</td></tr>' + '\n<tr><td>更新日期</td><td>' + log_base['更新日期'] + '</td></tr>'
     if log_base['地图作者'] != '':
         retxt += '\n<tr><td>作者</td><td>' + log_base['地图作者'] + '</td></tr>'
@@ -299,8 +299,8 @@ def create_page_logs(title, log_base, log_list):
             retxt += '[[' + log_base['次级版本'][i] + ']]'
     if '官网链接' in log_base and log_base['官网链接'] != '' and log_base['官网链接'] != '-':
         retxt += '\n<tr><td colspan=2>[' + log_base['官网链接'] + ' ' + log_base['官网链接'] + ']</td></tr>'
-    retxt += '\n<tr><td colspan=2 style="text-align:right;font-size:85%"><span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + title + '.json">'\
-             +'<i class="fa fa-database" aria-hidden="true"></i></span></td></tr></table>'
+    retxt += '\n<tr><td colspan=2 style="text-align:right;font-size:85%"><span class="dota_create_link_to_wiki_page" data-link-page-name="data:' + title + '.json">' \
+             + '<i class="fa fa-database" aria-hidden="true"></i></span></td></tr></table>'
     table_name = ["开头", '英雄', "物品", "中立生物", "建筑", "兵线", "通用", "结尾"]
     for i in range(len(table_name)):
         if table_name[i] in log_base:
@@ -313,7 +313,7 @@ def create_page_logs(title, log_base, log_list):
                     retxt += '\n==' + table_name[i] + '==\n<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + table_name[i] + '|' + table_name[i] + ']]</div>'
                 for j0, w0 in v.items():
                     if j0 != '无标题':
-                        retxt += '\n' + titles + j0 + titles+'\n<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + j0 + '|--' + j0 + ']]</div>'
+                        retxt += '\n' + titles + j0 + titles + '\n<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + j0 + '|--' + j0 + ']]</div>'
                     for j, w in w0.items():
                         if w[0] != '':
                             retxt += '\n===={{大图片|' + w[0] + '|h36}}[[' + w[0] + ']]===='
@@ -425,6 +425,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
     content = ''
     log_len = 0
     log_show_list = []
+    ub = ''
     for i in range(len(log_list) - 1, -1, -1):
         for j in range(len(log_list[i]) - 1, -1, -1):
             if j > 0:
@@ -435,7 +436,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
                 v = log_base[log_name]
                 current_ul = 0
                 new_log = True
-                all_labels=[]
+                all_labels = []
                 for j, w in v.items():
                     if isinstance(w, dict):
                         for j2, w2 in w.items():
@@ -450,8 +451,8 @@ def create_switch_log(log_base, log_list, name, limit=10):
                                     showit = showit and x[l]['文字'] != ''
                                     if showit:
                                         if new_log:
-                                            button += '<div class="dota_dict_label_switch_content_by_click_button" data-display-len="2" data-check-key="' + log_name + '">' \
-                                                      + log_name
+                                            button += '<div class="dota_dict_label_switch_content_by_click_button" data-display-len="2" data-check-key="' + log_name + '">' + log_name
+                                            ub = log_name + '=1；' + ub
                                             content += '<div class="dota_dict_label_switch_content_by_click_content" data-check-key="' + log_name + '=1；" data-display-type="block">' \
                                                        + '<h3><span class="dota_create_link_to_wiki_page">' + log_name + '</span>\t<small>' + v['更新日期'] + '</small></h3>'
                                             if log_len < limit or limit <= 0:
@@ -468,7 +469,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
                                             current_ul = x[l]['序列级数']
                                         show_text = ''
                                         all_labels.extend(x[l]['标签'])
-                                        show_text += edit_json.change_label_list_to_text(x[l]['标签'],'list')
+                                        show_text += edit_json.change_label_list_to_text(x[l]['标签'], 'list')
                                         show_text += x[l]['文字']
                                         if current_ul > 0:
                                             content += '<li>' + show_text + '</li>'
@@ -478,15 +479,16 @@ def create_switch_log(log_base, log_list, name, limit=10):
                     for m in range(current_ul):
                         content += '</ul>'
                 if not new_log:
-                    button+=edit_json.change_label_list_to_text(all_labels,count=True)+ '</div>'
+                    button += edit_json.change_label_list_to_text(all_labels, count=True) + '</div>'
                     content += '</div>'
+    ub = '<div class="dota_dict_label_switch_button_by_click_button" data-check-dict="' + ub + '">全部显示</div>'
     if log_len > 0:
         retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="'
         for i in log_show_list:
             retxt += i + '=1；'
-        retxt += '" data-need-new-tip="1">' + button + '<div>' + content + '</div></div>'
+        retxt += '" data-need-new-tip="1">' + button + ub + '<div>' + content + '</div></div>'
         if limit == 0:
-            retxt = right_menu()+retxt+'您可以点击上面的版本号按钮来快速查看对应的更新日志。'
+            retxt = right_menu() + retxt + '您可以点击上面的版本号按钮来快速查看对应的更新日志。'
         else:
             retxt += '<br><ul><li>您可以点击上面的版本号按钮来快速查看对应的更新日志，或者您可以<b>[[' + name[0] + '/版本改动|点此处查看完整的日志页面……]]</b></li></ul>'
     elif limit == 0:
@@ -499,7 +501,7 @@ def create_switch_log(log_base, log_list, name, limit=10):
 
 def create_page_hero(json_base, log_base, log_list, hero):
     db = json_base['英雄'][hero]
-    retxt = '__NOTOC__'+right_menu()+'<div style="float:left;">' \
+    retxt = '__NOTOC__' + right_menu() + '<div style="float:left;">' \
             + '<div class="bg-primary" style="margin-left:0px;margin-top:1em;display:block;height:48px;">' \
             + '<div class="heronavi" style="margin-bottom:0px">{{小图片|' + db["页面名"] + '}}</div>' \
             + '<div class="heronavi" style="margin-bottom:0px">[[' + db["中文名"] + '/英雄语音|英雄语音]]</div>' \
@@ -588,7 +590,7 @@ def create_page_hero(json_base, log_base, log_list, hero):
 
 def create_page_unit(json_base, log_base, log_list, unit):
     db = json_base['非英雄单位'][unit]
-    retxt = '__NOTOC__'+right_menu()+'<div>' + db['具体展示'] + db["页面名"] + '是DOTA2中的一种'
+    retxt = '__NOTOC__' + right_menu() + '<div>' + db['具体展示'] + db["页面名"] + '是DOTA2中的一种'
     if db["远古单位"]["1"]["1"] == 1:
         retxt += '远古'
     if db["英雄级单位"]["1"]["1"] == 1:
@@ -668,7 +670,7 @@ def create_page_unit(json_base, log_base, log_list, unit):
 
 def create_page_item(json_base, log_base, log_list, item):
     db = json_base['物品'][item]
-    retxt = '__NOTOC__'+right_menu() + json_base['物品'][item]['具体展示'] + '<b>' + db["页面名"] + '</b>是DOTA2中的一种<span class="dota_create_link_to_wiki_page">物品</span>，可以在<b>"'
+    retxt = '__NOTOC__' + right_menu() + json_base['物品'][item]['具体展示'] + '<b>' + db["页面名"] + '</b>是DOTA2中的一种<span class="dota_create_link_to_wiki_page">物品</span>，可以在<b>"'
     for i, v in db['商店'].items():
         if i != '1':
             retxt += '、'
@@ -839,12 +841,12 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
     for i in db['全部单位']:
         if i in json_base['非英雄单位']:
             retxt += json_base['非英雄单位'][i]['简易展示']
-    temp=''
-    for i,v in db['单位来源'].items():
+    temp = ''
+    for i, v in db['单位来源'].items():
         if v in json_base['技能']:
             temp += json_base['技能'][v]['简易展示']
-    if temp!='':
-        retxt += '\n==单位来源==\n'+temp
+    if temp != '':
+        retxt += '\n==单位来源==\n' + temp
     retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base))
     retxt += thanks_for_the_audience()
     if db['次级分类'] != '':
@@ -890,7 +892,7 @@ def create_item_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
     p = Pinyin()
-    all_shop={}
+    all_shop = {}
     retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；">' \
              + '<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
              + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
@@ -899,7 +901,7 @@ def create_item_choose_element(json_base, args, dict, post):
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
     for i in edit_json.item_shop:
-        all_shop[i]=''
+        all_shop[i] = ''
     for i in edit_json.edit_adition['物品属性']:
         retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
                  + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
@@ -907,21 +909,21 @@ def create_item_choose_element(json_base, args, dict, post):
     for i in json_base['物品']:
         if json_base['物品'][i]['应用'] == 1:
             temp = '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
-                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + p.get_pinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
+                   + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + p.get_pinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
             for j in edit_json.edit_adition['物品属性']:
                 if j in json_base['物品'][i]:
                     temp += j + '=' + ability.better_float_to_text(json_base['物品'][i][j]['1']) + '；'
             args[1] = i
             temp += '" style="border:1px black solid;margin:2px;text-align:center;">{{' + '|'.join(args) + '}}' + post + '</span>'
             for j in json_base['物品'][i]['商店']:
-                w=json_base['物品'][i]['商店'][j]
+                w = json_base['物品'][i]['商店'][j]
                 if w in all_shop:
                     all_shop[w] += temp
                 else:
                     all_shop[w] = temp
-    retxt+='<div style="display: grid;grid-template-columns:repeat(auto-fill,minmax(358px,1fr));">'
+    retxt += '<div style="display: grid;grid-template-columns:repeat(auto-fill,minmax(358px,1fr));">'
     for i in all_shop:
-        retxt+='<span class="dota_simple_label_exchange_fieldset" data-fieldset-legend="'+i+'">'+all_shop[i]+'</span>'
+        retxt += '<span class="dota_simple_label_exchange_fieldset" data-fieldset-legend="' + i + '">' + all_shop[i] + '</span>'
     retxt += '</div></div>'
     return retxt
 
@@ -941,7 +943,7 @@ def create_neutral_item_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
     p = Pinyin()
-    all_shop={}
+    all_shop = {}
     retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；'
     retxt += '"><div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
              + '<span class="dota_stretch_out_and_draw_back" data-stretch-attri-dict="' + dict + '">' \
@@ -950,7 +952,7 @@ def create_neutral_item_choose_element(json_base, args, dict, post):
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
     for i in range(5):
-        all_shop['中立第'+str(i+1)+'级']=''
+        all_shop['中立第' + str(i + 1) + '级'] = ''
     for i in edit_json.item_shop:
         retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
                  + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
@@ -961,21 +963,21 @@ def create_neutral_item_choose_element(json_base, args, dict, post):
     for i in json_base['物品']:
         if json_base['物品'][i]['应用'] == 1 and json_base['物品'][i]['商店']['1'][:3] == '中立第':
             temp = '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
-                     + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + p.get_pinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
+                   + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + p.get_pinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
             for j in edit_json.edit_adition['物品属性']:
                 if j in json_base['物品'][i]:
                     temp += j + '=' + ability.better_float_to_text(json_base['物品'][i][j]['1']) + '；'
             args[1] = i
             temp += '" style="border:1px black solid;margin:2px;text-align:center;">{{' + '|'.join(args) + '}}' + post + '</span>'
             for j in json_base['物品'][i]['商店']:
-                w=json_base['物品'][i]['商店'][j]
+                w = json_base['物品'][i]['商店'][j]
                 if w in all_shop:
                     all_shop[w] += temp
                 else:
                     all_shop[w] = temp
-    retxt+='<div style="display: grid;grid-template-columns:repeat(auto-fill,minmax(358px,1fr));">'
+    retxt += '<div style="display: grid;grid-template-columns:repeat(auto-fill,minmax(358px,1fr));">'
     for i in all_shop:
-        retxt+='<span class="dota_simple_label_exchange_fieldset" data-fieldset-legend="'+i+'">'+all_shop[i]+'</span>'
+        retxt += '<span class="dota_simple_label_exchange_fieldset" data-fieldset-legend="' + i + '">' + all_shop[i] + '</span>'
     retxt += '</div></div>'
     return retxt
 
@@ -1014,8 +1016,10 @@ def create_version_choose_element(list, base, dict):
     retxt += '</div></div>'
     return retxt
 
-def right_menu(a='#',b='↑↑置顶↑↑'):
-    return '<div class="dota_invisible_menu_item_at_right_of_the_screen">[['+a+'|'+b+']]</div>'
+
+def right_menu(a='#', b='↑↑置顶↑↑'):
+    return '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[' + a + '|' + b + ']]</div>'
+
 
 def thanks_for_the_audience():
     retxt = '\n==感谢您的阅读==' \
