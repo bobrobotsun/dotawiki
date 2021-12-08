@@ -3247,8 +3247,7 @@ class Main(QMainWindow):
                                     target_name = i
                                 else:
                                     target_name = j
-                            else:
-                                title_num.append(target_name)
+                            title_num.append(target_name)
                             for l in range(2, len(v[j][k])):
                                 for m in v[j][k][l]['标签']:
                                     if m in label:
@@ -3346,6 +3345,9 @@ class Main(QMainWindow):
         all_upload = []
         all_upload_page = []
         for i in self.version_base:
+            v=self.version_base[i]['更新日期']
+            if len(v)==9 and v[4]=='/' and v[6]=='/':
+                self.version_base[i]['更新日期']=v[:5]+'0'+v[5:]
             self.version_base[i]['简易展示'] = self.change_all_template_link_to_html(self.version_create_simple_show(self.version_base[i]))
             all_upload.append([i + '.json', self.version_base[i]])
             all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'])])

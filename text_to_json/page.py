@@ -251,7 +251,7 @@ def all_version_simple_show(log_base,log_list,seesion, csrf_token,html_function)
     content = ''
     key=''
     log_show_list = []
-    ub=['','','']
+    ub=['','']
     for i in range(len(log_list) - 1, -1, -1):
         for j in range(len(log_list[i]) - 1, -1, -1):
             log_name = log_list[i][0]
@@ -268,8 +268,7 @@ def all_version_simple_show(log_base,log_list,seesion, csrf_token,html_function)
                     key=log_name+'=1；'+key
     ub[0]='<div class="dota_dict_label_switch_button_by_click_button" data-check-dict="' + ub[0] + '">全部显示</div>'
     ub[1]='<div class="dota_dict_label_switch_button_by_click_button" data-check-dict="' + ub[1] + '">仅主版本</div>'
-    ub[2]='<div class="dota_dict_label_switch_button_by_click_button" data-check-dict="' + ub[2] + '">全部清除</div>'
-    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="'+key+'" data-need-new-tip="1">' + button+ ub[0]+ ub[1]+ ub[2] + '<div>' + content + '</div></div>\n{{全部格式}}'
+    retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="'+key+'" data-need-new-tip="1">' + button+ ub[0]+ ub[1] + '<div>' + content + '</div></div>\n{{全部格式}}'
     retxt=html_function(retxt)
     upload_data = {'action': 'edit', 'title': '更新日志', 'text': retxt, 'format': 'json', 'token': csrf_token}
     upload_info = seesion.post(target_url, headers=headers, data=upload_data)

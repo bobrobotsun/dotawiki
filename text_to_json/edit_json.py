@@ -571,14 +571,14 @@ version_label = {
     '重要魔晶更新': '{{图片|Shard.png}}',
     '新天赋': '{{图片|Talentb.png}}',
     '单位重做': '<i class="fa fa-paw" style="color:#aa00aa"></i>',
-    '物品重做': '<i class="fa fa-gavel" style="color:#aa00aa"></i>'
+    '物品重做': '<i class="fa fa-gavel" style="color:#aa00aa"></i>',
+    '错误修复': '<i class="fa fa-bug" style="color:#33aa33"></i>',
+    '疑似漏洞': '<i class="fa fa-bug" style="color:#aa3333"></i>'
 }
 version_label2 = {
     '补偿性加强': '<i class="fa fa-arrow-circle-up" style="color:#33aa33"></i>',
     '补偿性削弱': '<i class="fa fa-arrow-circle-down" style="color:#aa3333"></i>',
-    '补偿性平衡': '<i class="fa fa-retweet" style="color:#3333aa"></i>',
-    '错误修复': '<i class="fa fa-bug" style="color:#33aa33"></i>',
-    '疑似漏洞': '<i class="fa fa-bug" style="color:#aa3333"></i>'
+    '补偿性平衡': '<i class="fa fa-retweet" style="color:#3333aa"></i>'
 }
 
 
