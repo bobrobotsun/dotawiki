@@ -3265,22 +3265,22 @@ class Main(QMainWindow):
                             elif bool['加强'] or bool['削弱'] or bool['平衡']:
                                 label['平衡'].append(target_name)
             if len(title_num) > 0:
-                retxt += '<ul><li>{{额外信息框|【' + str(len(title_num)) + '】×' + i + '更新|'
+                retxt += '<ul><li>{{额外信息框|【' + str(len(title_num)) + '】×' + i + '更新|{{H|'
                 for j in range(len(title_num)):
                     if j > 0:
-                        retxt += '、'
-                    retxt += '{{H|' + title_num[j] + '}}'
-                retxt += '}}</li><ul>'
+                        retxt += '，'
+                    retxt += title_num[j]
+                retxt += '}}}}</li><ul>'
                 for j in label['重要']:
                     retxt += '<li>' + j + '</li>'
                 for j in label:
                     if j != '重要' and len(label[j]) > 0:
-                        retxt += '<li>{{额外信息框|【' + str(len(label[j])) + '】×' + i + '【' + edit_json.version_label[j] + j + '】|'
+                        retxt += '<li>{{额外信息框|【' + str(len(label[j])) + '】×' + i + '【' + edit_json.version_label[j] + j + '】|{{H|'
                         for k in range(len(label[j])):
                             if k > 0:
-                                retxt += '、'
-                            retxt += '{{H|' + label[j][k] + '}}'
-                        retxt += '}}</li>'
+                                retxt += '，'
+                            retxt += label[j][k]
+                        retxt += '}}}}</li>'
                 retxt += '</ul></ul>'
         retxt += '</div>'
         return retxt
