@@ -102,7 +102,7 @@ class Main(QMainWindow):
         self.move(qr.topLeft())
 
     # 这是用来控制间隔时间的函数
-    def time_point_for_iterable_sleep_by_time(self, staytime=0.03, pasttime=0.0):
+    def time_point_for_iterable_sleep_by_time(self, staytime=0.05, pasttime=0.0):
         if pasttime == 0:
             pasttime = self.time_point_for_iterable_sleep
         temptime = time.time()
@@ -682,7 +682,7 @@ class Main(QMainWindow):
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
             self.startactiveCount = threading.activeCount()
-            for i in range(40):
+            for i in range(20):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
         except FileNotFoundError:
@@ -728,7 +728,7 @@ class Main(QMainWindow):
                         self.lock.release()
                 else:
                     self.local.k += 1
-                    self.time_point_for_iterable_sleep_by_time(0.2)
+                    self.time_point_for_iterable_sleep_by_time(1)
                     self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：' + str(self.local.download_info.status_code) + '，尝试次数：' + str(self.local.k), 2],
                         self.current_num[0], threading.current_thread().name)
                     if self.local.k >= 20:
@@ -808,6 +808,9 @@ class Main(QMainWindow):
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
+
+    def view_target_web(self,address):
+        ss=1
 
     # 以下是拥有bot权限的用户在开启软件后才能使用的内容
 
@@ -2047,10 +2050,11 @@ class Main(QMainWindow):
     def upload_text_template(self, x):
         retxt = ''
         template_args = x.group(1).split('|')
-        if template_args[0] in ['H', 'A', 'I', 'h', 'a', 'i']:
+        if template_args[0].lower() in ['h', 'a', 'i','hh']:
             size = ''
             pic_style = ''
             text_link = '1'
+            image_class='dota_get_image_by_json_name'
             if template_args[1] == '魔晶升级' or template_args[1] == '魔晶技能':
                 template_args.insert(2, 'w24')
             for i in range(2, len(template_args)):
@@ -2066,7 +2070,9 @@ class Main(QMainWindow):
                 pic_style += ' data-image-class="ability_icon"'
             elif template_args[0] in ['I', 'i']:
                 pic_style += ' data-image-class="item_icon"'
-            retxt += '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="' + text_link + '"' + size + pic_style + '></span>'
+            if template_args[0].lower()=='hh':
+                image_class = 'delay_get_image_by_json_name'
+            retxt += '<span class="'+image_class+'" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="' + text_link + '"' + size + pic_style + '></span>'
         elif template_args[0] in ['E', 'e']:
             if template_args[1] in self.entry_base:
                 retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + self.entry_base[template_args[1]]['链接'] + '">' + template_args[1] + '</span>'
@@ -2080,19 +2086,24 @@ class Main(QMainWindow):
                     db = self.json_base['技能'][template_args[1]]
                     v = self.json_base['技能'][template_args[1]]['效果']
                     w = ''
+                    j=0
                     tip = True
                     for i in range(3, len(template_args)):
                         if template_args[i] == 'tip':
                             tip = False
                     if template_args[2] in v:
                         w = v[template_args[2]]
+                        j=template_args[2]
                     else:
                         for j in v:
                             if template_args[2] == v[j]['名称']:
                                 w = v[j]
+                                break
                     if w != '':
                         if tip:
-                            retxt += '{{额外信息框|<span class="border_3d_out" style="background-color:#fff">' + w['名称'] + '</span>|{{H|' + db['技能归属'] + '}}{{H|' + db['页面名'] + '}}' + ability.create_upgrade_buff(w) + '}}'
+                            retxt += '{{额外信息框|<span class="border_3d_out" style="background-color:#fff">{{小图片|' + db['页面名'] + '}}' + w['名称'] + '</span>|{{H|' + db['技能归属'] + '，' + db['页面名'] + '}}' \
+                                     + '<span class="dota_create_find_text_in_json_and_show" data-find-text-in-json-address="' + db['页面名'] + '，效果，'+str(j)+'" '\
+                                     + 'data-find-text-in-json-change-function="transform_function_ability_buff_from_json"></span>}}'
                         else:
                             retxt += '<span class="" style="border-style:outset;background-color:#fff">' + w['名称'] + '</span>'
                     else:
@@ -2101,6 +2112,7 @@ class Main(QMainWindow):
             size = ''
             center = ''
             link = ''
+            text = ''
             image_class = ''
             if template_args[1].lower() == 'shard.png':
                 template_args.insert(2, 'w24')
@@ -2118,15 +2130,15 @@ class Main(QMainWindow):
                 elif template_args[i][:5] == 'link=':
                     link = ' data-image-link="' + template_args[i][5:] + '"'
                 elif template_args[i][:5] == 'text=':
-                    image_class = ' data-text-link="' + template_args[i][5:] + '"'
+                    text = ' data-text-link="' + template_args[i][5:] + '"'
                 elif template_args[i][:6] == 'class=':
                     image_class = ' data-image-class="' + template_args[i][6:] + '"'
             if template_args[0] == '图片':
-                retxt = '<span class="dota_get_image_by_image_name" data-image-name="' + template_args[1] + '"' + size + center + link + image_class + '></span>'
+                retxt = '<span class="dota_get_image_by_image_name" data-image-name="' + template_args[1] + '"' + size + center + link + text + image_class + '></span>'
             elif template_args[0] == '大图片':
-                retxt = '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '"' + size + center + link + image_class + '></span>'
+                retxt = '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '"' + size + center + link + text + image_class + '></span>'
             elif template_args[0] == '小图片':
-                retxt = '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '"' + size + center + link + image_class + ' data-image-mini="1"></span>'
+                retxt = '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '"' + size + center + link + text + image_class + ' data-image-mini="1"></span>'
         elif template_args[0] in ['et', 'ET', '词汇']:
             if template_args[1] in self.entry_base:
                 if len(template_args) > 2 and template_args[2] in self.entry_base[template_args[1]]:
@@ -3265,22 +3277,22 @@ class Main(QMainWindow):
                             elif bool['加强'] or bool['削弱'] or bool['平衡']:
                                 label['平衡'].append(target_name)
             if len(title_num) > 0:
-                retxt += '<ul><li>{{额外信息框|【' + str(len(title_num)) + '】×' + i + '更新|{{H|'
+                retxt += '<ul><li>{{额外信息框|【' + str(len(title_num)) + '】×' + i + '更新|'
                 for j in range(len(title_num)):
                     if j > 0:
-                        retxt += '，'
-                    retxt += title_num[j]
-                retxt += '}}}}</li><ul>'
+                        retxt += '、'
+                    retxt += '{{H|'+title_num[j]+'}}'
+                retxt += '}}</li><ul>'
                 for j in label['重要']:
                     retxt += '<li>' + j + '</li>'
                 for j in label:
                     if j != '重要' and len(label[j]) > 0:
-                        retxt += '<li>{{额外信息框|【' + str(len(label[j])) + '】×' + i + '【' + edit_json.version_label[j] + j + '】|{{H|'
+                        retxt += '<li>{{额外信息框|【' + str(len(label[j])) + '】×' + i + '【' + edit_json.version_label[j] + j + '】|'
                         for k in range(len(label[j])):
                             if k > 0:
-                                retxt += '，'
-                            retxt += label[j][k]
-                        retxt += '}}}}</li>'
+                                retxt += '、'
+                            retxt += '{{H|'+label[j][k]+'}}'
+                        retxt += '}}</li>'
                 retxt += '</ul></ul>'
         retxt += '</div>'
         return retxt
@@ -3596,7 +3608,7 @@ class Main(QMainWindow):
                 nowindex = igrandpa.indexOfChild(iparent)
                 allcount = igrandpa.childCount()
 
-                ipattern = re.compile(r'{{[ahi]\|.+?}}', re.I)
+                ipattern = re.compile(r'{{[ahib]\|.+?}}', re.I)
                 iresult = ipattern.findall(text)
                 ilevel = int(iparent.child(0).text(1))
 
@@ -3606,16 +3618,20 @@ class Main(QMainWindow):
                     if int(nowparent.child(0).text(1)) > ilevel or nowindex == h:
                         if icount > 2 and nowparent.child(2).text(0) == '目标':
                             for i in iresult:
+                                if i.find('|',4)>0:
+                                    name=i[4:i.find('|',4)]
+                                else:
+                                    name=i[4:-2]
                                 ibool = True
                                 itarget = nowparent.child(2)
                                 for j in range(itarget.childCount()):
-                                    if itarget.child(j).text(1) == i[4:-2]:
+                                    if itarget.child(j).text(1) == name:
                                         ibool = False
                                         break
                                 if ibool:
                                     new = VersionItemEdit(itarget)
                                     new.itemtype = 'list_text'
-                                    new.set_value(i[4:-2])
+                                    new.set_value(name)
                     else:
                         break
                 if igrandpa.itemtype == 'tree3' and igrandpa.child(allcount - 1).child(1).text(1) != '':
@@ -4108,7 +4124,19 @@ class Main(QMainWindow):
         self.entry_refresh_tree()
         self.file_save(os.path.join('database', 'entry_base.json'), json.dumps(self.entry_base))
         self.upload_json('entry_base.json', self.entry_base)
+        self.upload_html('词汇链接', self.entry_create_js_list_name())
         QMessageBox.information(self, "上传完成", '已经整理好，保存并上传entry_base')
+
+    def entry_create_js_list_name(self):
+        retxt = '<script>\ndota_json_entry_list={'
+        for i in self.entry_base:
+            v = self.entry_base[i]
+            retxt += '\n"' + i + '":{'
+            for j in v:
+                retxt += '\n"' + j + '":\'' + self.change_all_template_link_to_html(v[j]) + '\','
+            retxt += '},'
+        retxt += '};\n</script>'
+        return retxt
 
     def entry_save_the_edit(self):
         self.entry_base = {}

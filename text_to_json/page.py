@@ -263,7 +263,8 @@ def all_version_simple_show(log_base,log_list,seesion, csrf_token,html_function)
             if log_name in log_base:
                 v = log_base[log_name]
                 button += '<div class="dota_dict_label_switch_content_by_click_button" data-display-len="2" data-check-key="' + log_name + '">' + log_name + '</div>'
-                content += '<div class="dota_dict_label_switch_content_by_click_content" data-check-key="' + log_name + '=1；" data-display-type="inline-block">' + v['简易展示'] + '</div>'
+                content += '<div class="dota_dict_label_switch_content_by_click_content dota_create_find_text_in_json_and_show" data-check-key="' + log_name + '=1；" data-display-type="inline-block"'\
+                           +' data-find-text-in-json-address="'+log_name+',简易展示" data-find-text-in-json-default-text="正在查询《'+log_name+'》的信息……"></div>'
                 if j==0:
                     key=log_name+'=1；'+key
     ub[0]='<div class="dota_dict_label_switch_button_by_click_button" data-check-dict="' + ub[0] + '">全部显示</div>'
