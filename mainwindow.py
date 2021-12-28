@@ -102,7 +102,7 @@ class Main(QMainWindow):
         self.move(qr.topLeft())
 
     # 这是用来控制间隔时间的函数
-    def time_point_for_iterable_sleep_by_time(self, staytime=0.05, pasttime=0.0):
+    def time_point_for_iterable_sleep_by_time(self, staytime=0.002, pasttime=0.0):
         if pasttime == 0:
             pasttime = self.time_point_for_iterable_sleep
         temptime = time.time()
@@ -682,7 +682,7 @@ class Main(QMainWindow):
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
             self.startactiveCount = threading.activeCount()
-            for i in range(20):
+            for i in range(100):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
         except FileNotFoundError:
@@ -696,6 +696,7 @@ class Main(QMainWindow):
     def download_json_thread(self):
         while True:
             self.lock.acquire()
+            self.time_point_for_iterable_sleep_by_time()
             try:
                 self.local.current_num = self.current_num[1]
                 self.current_num[1] += 1
@@ -704,6 +705,7 @@ class Main(QMainWindow):
             except Exception as xx:
                 print(self.download_json_list[self.local.current_num], '：分配出现错误，原因为：' + str(xx))
             finally:
+                self.time_point_for_iterable_sleep_by_time()
                 self.lock.release()
             self.local.download_data = {'action': 'jsondata', 'title': self.download_json_list[self.local.current_num][2], 'format': 'json'}
             self.local.seesion = self.seesion
@@ -732,8 +734,10 @@ class Main(QMainWindow):
                     self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：' + str(self.local.download_info.status_code) + '，尝试次数：' + str(self.local.k), 2],
                         self.current_num[0], threading.current_thread().name)
                     if self.local.k >= 20:
+                        self.time_point_for_iterable_sleep_by_time()
                         self.lock.release()
                         break
+                    self.time_point_for_iterable_sleep_by_time()
                     self.lock.release()
         self.lock.acquire()
         if (self.progress.success[1] == self.progress.maxmax):

@@ -1800,8 +1800,7 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
             if indexlist[0] < len(result) and indexlist[1] < len(result[indexlist[0]]):
                 the_key = result[indexlist[0]][indexlist[1]]
             else:
-                raise (editerror(target[0], target[1],
-                                 '→'.join(target[2:]) + '：\n在调用第' + str(i + 1) + '条【' + condition_name + '】第' + str(j + 1) + '项' + condition[j] + '时，检查到序数超标了，请检查是否填写错误'))
+                raise (editerror(target[0], target[1],'→'.join(target[2:]) + '：\n在调用第' + str(i + 1) + '条【' + condition_name + '】第' + str(j + 1) + '项' + condition[j] + '时，检查到序数超标了，请检查是否填写错误'))
         elif condition[j] == '@average' or condition[j] == '@平均' or condition[j] == '@min' or condition[j] == '@最小' or condition[j] == '@max' or condition[j] == '@最大':
             _sum, count, _min, _max = 0, 0, float('inf'), float('-inf')
             kk = 0
@@ -1986,7 +1985,8 @@ def check_the_json_meet_one_condition(condition, json, target, index, logic=Fals
                             one_half_result, one_half_bool = check_the_json_meet_one_condition(condition, tempjson[j], target, index)
                             one_bool = one_bool and one_half_bool
                             if one_half_bool:
-                                one_half_result[0] = [i] + one_half_result[0]
+                                one_half_result[0] = [j] + one_half_result[0]
+                                half_result.append(one_half_result[0])
                         else:
                             if jj > 1:
                                 break
