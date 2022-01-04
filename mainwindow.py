@@ -664,7 +664,7 @@ class Main(QMainWindow):
             total_num = 0
             for i in self.json_name:
                 total_num += len(self.json_name[i])
-            self.temp_time_show=time.time()
+            self.temp_time_show = time.time()
             self.progress = upload_text('开始下载json')
             self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
             self.progress.setWindowIcon(self.icon)
@@ -714,7 +714,7 @@ class Main(QMainWindow):
             while True:
                 self.local.download_info = self.local.seesion.post(self.local.target_url, headers=self.header, data=self.local.download_data)
                 self.lock.acquire()
-                if isinstance(self.local.download_info.status_code,int) and self.local.download_info.status_code < 400:
+                if isinstance(self.local.download_info.status_code, int) and self.local.download_info.status_code < 400:
                     try:
                         self.local.jsons = self.local.download_info.json()
                     except Exception as xx:
@@ -732,7 +732,7 @@ class Main(QMainWindow):
                     self.local.k += 1
                     self.time_point_for_iterable_sleep_by_time(1)
                     self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：' + str(self.local.download_info.status_code) + '，尝试次数：' + str(self.local.k), 2],
-                        self.current_num[0], threading.current_thread().name)
+                                          self.current_num[0], threading.current_thread().name)
                     if self.local.k >= 20:
                         self.time_point_for_iterable_sleep_by_time()
                         self.lock.release()
@@ -813,8 +813,8 @@ class Main(QMainWindow):
             self.edit_target_selected_changed()
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
 
-    def view_target_web(self,address):
-        ss=1
+    def view_target_web(self, address):
+        ss = 1
 
     # 以下是拥有bot权限的用户在开启软件后才能使用的内容
 
@@ -1126,13 +1126,13 @@ class Main(QMainWindow):
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该条目'].clicked.connect(self.version_button_delete_tree_item)
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'] = QPushButton('增加新目标', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].clicked.connect(lambda:self.version_button_list_add_list_text())
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新目标'].clicked.connect(lambda: self.version_button_list_add_list_text())
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'] = QPushButton('删除该目标', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'])
         self.versionlayout['版本内容']['横排版']['竖排版']['删除该目标'].clicked.connect(self.version_button_delete_tree_item)
         self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'] = QPushButton('增加新标签', self)
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addWidget(self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'])
-        self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'].clicked.connect(lambda:self.version_button_list_add_list_label())
+        self.versionlayout['版本内容']['横排版']['竖排版']['增加新标签'].clicked.connect(lambda: self.version_button_list_add_list_label())
         self.versionlayout['版本内容']['横排版']['竖排版'][0].addStretch(5)
 
         self.check_version()
@@ -1468,7 +1468,7 @@ class Main(QMainWindow):
         QMessageBox.information(self, "上传完成", '已经上传完毕基础文件')
 
     def upload_all(self, chosen=''):
-        time_show=time.time()
+        time_show = time.time()
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
@@ -1498,7 +1498,7 @@ class Main(QMainWindow):
         QMessageBox.information(self.w, '上传完毕', '您已上传完毕，可以关闭窗口\n总耗时：' + self.system_cal_time(time_show), QMessageBox.Yes, QMessageBox.Yes)
 
     def upload_common_page(self, chosen=''):
-        time_show=time.time()
+        time_show = time.time()
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
@@ -1581,7 +1581,7 @@ class Main(QMainWindow):
         QMessageBox.information(self.w, '上传完毕', '您已上传完毕，可以关闭窗口\n总耗时：' + self.system_cal_time(time_show), QMessageBox.Yes, QMessageBox.Yes)
 
     def upload_html_data_page(self, chosen=''):
-        time_show=time.time()
+        time_show = time.time()
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
@@ -1617,7 +1617,7 @@ class Main(QMainWindow):
         return retxt
 
     def upload_all_json_and_page(self):
-        time_show=time.time()
+        time_show = time.time()
         self.w = upload_text('开始上传数据')
         self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
         self.w.setWindowIcon(self.icon)
@@ -1774,7 +1774,7 @@ class Main(QMainWindow):
         QMessageBox.information(self.w, '下载完毕', "您已下载完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
 
     def upload_same_kind(self):
-        time_show=time.time()
+        time_show = time.time()
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
         if not self.update_the_jsons_alreadey:
@@ -2054,11 +2054,11 @@ class Main(QMainWindow):
     def upload_text_template(self, x):
         retxt = ''
         template_args = x.group(1).split('|')
-        if template_args[0].lower() in ['h', 'a', 'i','hh']:
+        if template_args[0].lower() in ['h', 'a', 'i', 'hh']:
             size = ''
             pic_style = ''
             text_link = '1'
-            image_class='dota_get_image_by_json_name'
+            image_class = 'dota_get_image_by_json_name'
             if template_args[1] == '魔晶升级' or template_args[1] == '魔晶技能':
                 template_args.insert(2, 'w24')
             for i in range(2, len(template_args)):
@@ -2074,9 +2074,9 @@ class Main(QMainWindow):
                 pic_style += ' data-image-class="ability_icon"'
             elif template_args[0] in ['I', 'i']:
                 pic_style += ' data-image-class="item_icon"'
-            if template_args[0].lower()=='hh':
+            if template_args[0].lower() == 'hh':
                 image_class = 'delay_get_image_by_json_name'
-            retxt += '<span class="'+image_class+'" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="' + text_link + '"' + size + pic_style + '></span>'
+            retxt += '<span class="' + image_class + '" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="' + text_link + '"' + size + pic_style + '></span>'
         elif template_args[0] in ['E', 'e']:
             if template_args[1] in self.entry_base:
                 retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + self.entry_base[template_args[1]]['链接'] + '">' + template_args[1] + '</span>'
@@ -2090,14 +2090,21 @@ class Main(QMainWindow):
                     db = self.json_base['技能'][template_args[1]]
                     v = self.json_base['技能'][template_args[1]]['效果']
                     w = ''
-                    j=0
+                    chosen = ''
+                    name = ''
+                    preinfo=''
                     tip = True
                     for i in range(3, len(template_args)):
                         if template_args[i] == 'tip':
                             tip = False
+                        elif template_args[i][:7] == 'chosen=':
+                            chosen = ' data-buff-chosen="' + template_args[i][7:] + '"'
+                        elif template_args[i][:5] == 'name=':
+                            name = ' data-buff-name="' + template_args[i][5:] + '"'
+                        elif template_args[i][:8] == 'preinfo=':
+                            preinfo = template_args[i][8:]
                     if template_args[2] in v:
                         w = v[template_args[2]]
-                        j=template_args[2]
                     else:
                         for j in v:
                             if template_args[2] == v[j]['名称']:
@@ -2105,9 +2112,7 @@ class Main(QMainWindow):
                                 break
                     if w != '':
                         if tip:
-                            retxt += '{{额外信息框|<span class="border_3d_out" style="background-color:#fff">{{小图片|' + db['页面名'] + '}}' + w['名称'] + '</span>|{{H|' + db['技能归属'] + '，' + db['页面名'] + '}}' \
-                                     + '<span class="dota_create_find_text_in_json_and_show" data-find-text-in-json-address="' + db['页面名'] + '，效果，'+str(j)+'" '\
-                                     + 'data-find-text-in-json-change-function="transform_function_ability_buff_from_json"></span>}}'
+                            retxt += '<span class="dota_get_ability_buff_by_json" data-buff-address="' + db['页面名']+ '，' + w['名称'] + '"' + name + chosen + '>'+preinfo+'</span>'
                         else:
                             retxt += '<span class="" style="border-style:outset;background-color:#fff">' + w['名称'] + '</span>'
                     else:
@@ -3285,7 +3290,7 @@ class Main(QMainWindow):
                 for j in range(len(title_num)):
                     if j > 0:
                         retxt += '、'
-                    retxt += '{{H|'+title_num[j]+'}}'
+                    retxt += '{{H|' + title_num[j] + '}}'
                 retxt += '}}</li><ul>'
                 for j in label['重要']:
                     retxt += '<li>' + j + '</li>'
@@ -3295,7 +3300,7 @@ class Main(QMainWindow):
                         for k in range(len(label[j])):
                             if k > 0:
                                 retxt += '、'
-                            retxt += '{{H|'+label[j][k]+'}}'
+                            retxt += '{{H|' + label[j][k] + '}}'
                         retxt += '}}</li>'
                 retxt += '</ul></ul>'
         retxt += '</div>'
@@ -3361,9 +3366,9 @@ class Main(QMainWindow):
         all_upload = []
         all_upload_page = []
         for i in self.version_base:
-            v=self.version_base[i]['更新日期']
-            if len(v)==9 and v[4]=='/' and v[6]=='/':
-                self.version_base[i]['更新日期']=v[:5]+'0'+v[5:]
+            v = self.version_base[i]['更新日期']
+            if len(v) == 9 and v[4] == '/' and v[6] == '/':
+                self.version_base[i]['更新日期'] = v[:5] + '0' + v[5:]
             self.version_base[i]['简易展示'] = self.change_all_template_link_to_html(self.version_create_simple_show(self.version_base[i]))
             all_upload.append([i + '.json', self.version_base[i]])
             all_upload_page.append([i, common_page.create_page_logs(i, self.version_base[i], self.version_list['版本'])])
@@ -3622,10 +3627,10 @@ class Main(QMainWindow):
                     if int(nowparent.child(0).text(1)) > ilevel or nowindex == h:
                         if icount > 2 and nowparent.child(2).text(0) == '目标':
                             for i in iresult:
-                                if i.find('|',4)>0:
-                                    name=i[4:i.find('|',4)]
+                                if i.find('|', 4) > 0:
+                                    name = i[4:i.find('|', 4)]
                                 else:
-                                    name=i[4:-2]
+                                    name = i[4:-2]
                                 ibool = True
                                 itarget = nowparent.child(2)
                                 for j in range(itarget.childCount()):
@@ -3650,7 +3655,7 @@ class Main(QMainWindow):
             label = parent.child(3)
             count = label.childCount()
             bool = True
-            add=''
+            add = ''
             if type == '++' or type == '+++':
                 add = '加强'
             elif type == '--' or type == '---':
@@ -3848,7 +3853,7 @@ class Main(QMainWindow):
         new3.setExpanded(True)
         item.setExpanded(True)
 
-    def version_button_list_add_list_text(self,expand=True):
+    def version_button_list_add_list_text(self, expand=True):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         choose = ['自行填入']
         for i in self.version_default:
@@ -3868,7 +3873,7 @@ class Main(QMainWindow):
                     new.set_value(text2)
             item.setExpanded(expand)
 
-    def version_button_list_add_list_label(self,expand=True):
+    def version_button_list_add_list_label(self, expand=True):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         choose = []
         for i in edit_json.version_label:
@@ -4265,15 +4270,15 @@ class Main(QMainWindow):
 
     def test_inputwindow(self):
         for i in self.version_base:
-            v=self.version_base[i]
+            v = self.version_base[i]
             for j in v:
-                if isinstance(v[j],dict):
+                if isinstance(v[j], dict):
                     for k in v[j]:
                         for l in v[j][k]:
-                            for m in range(2,len(v[j][k][l])):
+                            for m in range(2, len(v[j][k][l])):
                                 for n in range(len(v[j][k][l][m]['标签'])):
-                                    if v[j][k][l][m]['标签'][n]=='重要天赋更新':
-                                        v[j][k][l][m]['标签'][n]='新天赋'
+                                    if v[j][k][l][m]['标签'][n] == '重要天赋更新':
+                                        v[j][k][l][m]['标签'][n] = '新天赋'
         self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
 
     def test_inputwindow_loop_check(self, json):
@@ -4317,18 +4322,18 @@ class Main(QMainWindow):
             else:
                 break
 
-    def system_cal_time(self,start):
-        all=time.time()-start
-        minute=all // 60
-        hour=int(minute // 60)
-        minute=int(minute % 60)
-        secend=int(all % 60)
-        retxt=''
-        if hour>0:
-            retxt+=str(hour)+'小时'
-        if minute>0:
-            retxt+=str(minute).zfill(2)+'分'
-        retxt+=str(secend).zfill(2)+'秒'
+    def system_cal_time(self, start):
+        all = time.time() - start
+        minute = all // 60
+        hour = int(minute // 60)
+        minute = int(minute % 60)
+        secend = int(all % 60)
+        retxt = ''
+        if hour > 0:
+            retxt += str(hour) + '小时'
+        if minute > 0:
+            retxt += str(minute).zfill(2) + '分'
+        retxt += str(secend).zfill(2) + '秒'
         return retxt
 
 

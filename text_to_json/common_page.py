@@ -766,8 +766,10 @@ def create_one_chapter_content_page_mechnism(db):
 def create_page_normal_ability(json_base, log_base, log_list, ability):
     db = json_base['技能'][ability]
     retxt = ''
-    retxt += '您当前进入的页面是{{H|' + db['技能归属'] + '}}的技能{{H|' + ability + '}}的更新日志页面。<br>\n' \
-             + create_switch_log(log_base, log_list, all_the_names(db, json_base, False), 0) + thanks_for_the_audience()
+    retxt += '您当前进入的页面是{{H|' + db['技能归属'] + '}}的技能{{H|' + ability + '}}的更新日志页面。'\
+             +'<span class="dota_click_infomation_hide_and_seek"><span class="dota_click_infomation_hide_and_seek_button" style="border:1px black solid;background-color:#fff">点击显示技能详情</span>'\
+             +'<div class="dota_click_infomation_hide_and_seek_frame" data-display-type="block">'+db['具体展示']+'</div></span>'\
+             +'\n'+ create_switch_log(log_base, log_list, all_the_names(db, json_base, False), 0) + thanks_for_the_audience()
     retxt += '[[分类:更新日志]]'
     return retxt
 
