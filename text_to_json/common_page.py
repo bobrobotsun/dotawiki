@@ -873,20 +873,25 @@ def create_hero_choose_element(json_base, args, dict, post):
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="简易拼音" data-display-len="3">拼音</span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整英文" data-display-len="3">英文</span>' \
              + '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element" data-check-key="完整代码" data-display-len="3">代码</span>'
-    for i in ['力量天辉', '敏捷天辉', '智力天辉', '力量夜魇', '敏捷夜魇', '智力夜魇', '近战', '远程']:
+    for i in ['近战', '远程']:
         retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
                  + ' data-check-key="' + i + '" data-display-len="3">' + i + '</span>'
     for i in ['力量', '敏捷', '智力', '生命值', '魔法值', '生命恢复', '魔法恢复', '攻击力', '攻击速度', '攻击前摇', '护甲', '移动速度', '弹道速度']:
         retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
                  + ' data-check-key="总' + i + '" data-display-len="3">' + i + '</span>'
-    retxt += '</span><div>'
+    retxt += '</span>'
+    all_kind = {'天辉力量':'','天辉敏捷':'','天辉智力':'','夜魇力量':'','夜魇敏捷':'','夜魇智力':''}
     for i in json_base['英雄']:
         if json_base['英雄'][i]['应用'] == 1:
             args[1] = i
-            retxt += '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content dota_hero_comprehensive_attri_dict_hero"' \
+            kind=json_base['英雄'][i]['阵营']['1']+json_base['英雄'][i]['主属性']['1']
+            all_kind[kind]+= '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content dota_hero_comprehensive_attri_dict_hero"' \
                      + ' data-select-input-text="' + i + '"  data-check-key-name="hero-comprehensive-attri-dict" data-hero-name="' + i + '"' \
                      + ' style="border:1px black solid;margin:2px;text-align:center;">' \
                      + '{{' + '|'.join(args) + '}}' + post + '</span>'
+    retxt += '<div style="display: grid;grid-template-columns:repeat(auto-fill,minmax(358px,1fr));">'
+    for i in all_kind:
+        retxt += '<span class="dota_simple_label_exchange_fieldset" data-fieldset-legend="' + i + '">' + all_kind[i] + '</span>'
     retxt += '</div></div>'
     return retxt
 
