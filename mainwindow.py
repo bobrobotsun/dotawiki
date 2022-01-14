@@ -489,7 +489,7 @@ class Main(QMainWindow):
             self.find_dota2_folder()
 
     def find_dota2_folder(self):
-        folders = ['steamapps', 'common', 'dota 2 beta', 'game', 'dota', 'scripts', 'npc']
+        folders = ['steamapps', 'common', 'dota 2 beta', 'game', 'dota']
         nowaddress = QFileDialog.getExistingDirectory(self, '请选择Steam的安装路径（使用完美启动器的用户请选择DOTA2目录下的steam文件夹）', '/home')
         for i in range(len(folders)):
             if folders[i] in os.listdir(nowaddress):
@@ -514,24 +514,13 @@ class Main(QMainWindow):
                     ['npc_heroes.txt', 'npc_abilities.txt', 'npc_units.txt', 'items.txt'],
                     [False, False, False]]
         ttt = ''
-        for i in range(3):
-            if i > 0:
-                ttt += '\n'
-            ttt += has_text[0][i] + '数据：'
-            if has_text[1][i] in os.listdir(address):
-                ttt += '文件存在，成功读取'
-                has_text[2][i] = True
-            else:
-                ttt += has_text[1][i] + '文件不存在，读取失败'
-        ttt += '\n已经从vpk处提取物品、翻译文件'
-        if has_text[2][0] or has_text[2][1] or has_text[2][2]:
-            if has_text[2][0]:
-                hero.get_hero_data_from_txt(self.text_base['英雄'], os.path.join(address, has_text[1][0]))
-            if has_text[2][1]:
-                ability.get_hero_data_from_txt(self.text_base['技能'], os.path.join(address, has_text[1][1]))
-            if has_text[2][2]:
-                unit.get_hero_data_from_txt(self.text_base['非英雄单位'], os.path.join(address, has_text[1][2]))
-            pak1 = vpk.open(address.replace('scripts\\npc', "pak01_dir.vpk"))
+        if 'pak01_dir.vpk' in os.listdir(address):
+            ttt += '已经从vpk处提取【英雄】【单位】【物品】【技能】【翻译】文件'
+            pak1 = vpk.open(address+"\\pak01_dir.vpk")
+
+            hero.get_hero_data_from_txt(self.text_base['英雄'], pak1.get_file("scripts/npc/npc_heroes.txt"))
+            ability.get_hero_data_from_txt(self.text_base['技能'], pak1.get_file("scripts/npc/npc_abilities.txt"))
+            unit.get_hero_data_from_txt(self.text_base['非英雄单位'], pak1.get_file("scripts/npc/npc_units.txt"))
             hero.get_lore_data_from_vpk(self.text_base['英雄'], pak1.get_file("resource/localization/hero_lore_schinese.txt"))
             hero.get_dota_data_from_vpk(self.text_base['英雄'], pak1.get_file("resource/localization/dota_schinese.txt"))
             ability.get_dota_data_from_vpk(self.text_base['技能'], pak1.get_file("resource/localization/abilities_schinese.txt"))
@@ -4269,58 +4258,24 @@ class Main(QMainWindow):
             self.entry_edit_change_name()
 
     def test_inputwindow(self):
-        for i in self.version_base:
-            v = self.version_base[i]
-            for j in v:
-                if isinstance(v[j], dict):
-                    for k in v[j]:
-                        for l in v[j][k]:
-                            for m in range(2, len(v[j][k][l])):
-                                for n in range(len(v[j][k][l][m]['标签'])):
-                                    if v[j][k][l][m]['标签'][n] == '重要天赋更新':
-                                        v[j][k][l][m]['标签'][n] = '新天赋'
-        self.file_save(os.path.join('database', 'version_base.json'), json.dumps(self.version_base))
+        self.test_inputwindow_loop_check(self.json_base,[])
 
-    def test_inputwindow_loop_check(self, json):
-        for i in self.json_base['非英雄单位']:
-            v = self.json_base['非英雄单位'][i]
-            for j in ['英雄攻击伤害', '非英雄攻击伤害']:
-                w = v[j]
-                if '1' in w and w['1']['1'] == '0':
-                    v.pop('1')
+    def test_inputwindow_loop_check(self, json,db):
+        for i in json:
+            v=json[i]
+            if isinstance(v,dict):
+                if '混合文字' in v:
+                    self.test_inputwindow_change_it(v['混合文字'],db)
+                else:
+                    self.test_inputwindow_loop_check(v,db+[i])
 
-    def test_inputwindow_change_it(self, json):
-        ii = 0
-        while True:
-            ii += 1
-            i = str(ii)
-            if i in json:
-                if isinstance(json[i], dict) and '1' in json[i] and '0' in json[i]['1'] and json[i]['1']['0'] == '图片链接':
-                    text = '{{H|' + json[i]['1']['2'] + '}}'
-                    index = ii
-                    pops = 0
-                    if str(ii - 1) in json and isinstance(json[str(ii - 1)], str):
-                        index = ii - 1
-                        text = json[str(ii - 1)] + text
-                        json.pop(str(ii))
-                        pops += 1
-                    if str(ii + 1) in json and isinstance(json[str(ii + 1)], str):
-                        text += json[str(ii + 1)]
-                        json.pop(str(ii + 1))
-                        pops += 1
-                    json[str(index)] = text
-                    if pops > 0:
-                        jj = index + pops
-                        while True:
-                            jj += 1
-                            j = str(jj)
-                            if j in json:
-                                json[str(jj - pops)] = json[j]
-                                json.pop(j)
-                            else:
-                                break
-            else:
-                break
+    def test_inputwindow_change_it(self, json,db):
+        for i in json:
+            v=json[i]
+            if isinstance(v,dict):
+                if v['1']['0']=='图片链接':
+                    print(json,db)
+
 
     def system_cal_time(self, start):
         all = time.time() - start

@@ -67,9 +67,8 @@ def get_dota_data_from_vpk(base_txt, ffile):
             base_txt[name]['lore'] = {'1': i.group(2)}
 
 
-def get_hero_data_from_txt(base_txt, address):
-    this_file = open(address, mode="r")
-    this_string = this_file.read()
+def get_hero_data_from_txt(base_txt, ffile):
+    this_string = ffile.read().decode('utf8')
     alltext = re.finditer('"(.*?)".*?\n\t\{(.|\n)*?\n\t\}', this_string)
     for i in alltext:
         name = i.group(1)
@@ -1077,8 +1076,7 @@ def one_combine_txt_numbers(json, all_json, base_txt, target):
         rere[0][0].append(temptext)
     elif json['0'] == '图片链接':
         temp = all_json[json["1"]][json["2"]]
-        rere[0][0].append(
-            '{{H|' + temp['页面名'] + '|h' + json['3'] + '}}')
+        rere[0][0].append('{{H|' + temp['页面名'] + '|h' + json['3'] + '}}')
     elif json["0"] == "手填":
         j = 0
         while True:

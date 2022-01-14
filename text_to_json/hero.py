@@ -88,9 +88,8 @@ def get_dota_data_from_vpk(base_txt, ffile):
             base_txt[name]['hype'] = {'1': i.group(2)}
 
 
-def get_hero_data_from_txt(base_txt, source_address):
-    this_file = open(source_address, mode="r")
-    this_string = this_file.read()
+def get_hero_data_from_txt(base_txt, ffile):
+    this_string = ffile.read().decode('utf8')
     alltext = re.finditer('"npc_dota_hero_(.*?)"\n\t\{(.|\n)*?\n\t\}', this_string)
     for i in alltext:
         name = i.group(1)
