@@ -60,13 +60,17 @@ def findunitpro(source, data, tb, pro, inherit=True, number=True):
         j = source.find('\"', i + 1, tb[1])
         j = source.find('\"', j + 1, tb[1])
         k = source.find('\"', j + 1, tb[1])
+        if source[j + 1:k]=='value':
+            j = source.find('\"', k + 1, tb[1])
+            k = source.find('\"', j + 1, tb[1])
+        realvalue=source[j + 1:k]
         if number:
             if source[j + 1:k] == '':
                 data[pro[1]] = {"1": 0}
             else:
-                data[pro[1]] = {"1": float(source[j + 1:k])}
+                data[pro[1]] = {"1": float(realvalue)}
         else:
-            data[proname] = {"1": pro[2][source[j + 1:k]]}
+            data[proname] = {"1": pro[2][realvalue]}
     return
 
 
@@ -573,11 +577,9 @@ def change_double_combine_numbers_to_str(slist1, slist2):
 
 
 unitpro_txt = [
-    ["攻击类型", "CombatClassAttack", {"DOTA_COMBAT_CLASS_ATTACK_BASIC": "基础", "DOTA_COMBAT_CLASS_ATTACK_HERO": "英雄",
-                                   "DOTA_COMBAT_CLASS_ATTACK_PIERCE": "穿刺", "DOTA_COMBAT_CLASS_ATTACK_SIEGE": "攻城"}]
-    , ["护甲类型", "CombatClassDefend", {"DOTA_COMBAT_CLASS_DEFEND_BASIC": "基础", "DOTA_COMBAT_CLASS_DEFEND_HERO": "英雄",
-                                     "DOTA_COMBAT_CLASS_DEFEND_STRUCTURE": "建筑"}]
-    , ["近战远程", "AttackCapabilities",
+    ["攻击类型", "CombatClassAttack", {"DOTA_COMBAT_CLASS_ATTACK_BASIC": "基础", "DOTA_COMBAT_CLASS_ATTACK_HERO": "英雄","DOTA_COMBAT_CLASS_ATTACK_PIERCE": "穿刺", "DOTA_COMBAT_CLASS_ATTACK_SIEGE": "攻城"}]
+    , ["护甲类型", "CombatClassDefend", {"DOTA_COMBAT_CLASS_DEFEND_BASIC": "基础", "DOTA_COMBAT_CLASS_DEFEND_HERO": "英雄","DOTA_COMBAT_CLASS_DEFEND_HEROs": "英雄","DOTA_COMBAT_CLASS_DEFEND_STRUCTURE": "建筑"}],
+     ["近战远程", "AttackCapabilities",
        {"DOTA_UNIT_CAP_MELEE_ATTACK": "近战", "DOTA_UNIT_CAP_RANGED_ATTACK": "远程", "DOTA_UNIT_CAP_NO_ATTACK": "不攻击"}]
     , ["移动方式", "MovementCapabilities",
        {"DOTA_UNIT_CAP_MOVE_GROUND": "地面", "DOTA_UNIT_CAP_MOVE_FLY": "飞行", "DOTA_UNIT_CAP_MOVE_NONE": "不移动"}]

@@ -92,9 +92,7 @@ def finditemrequire(source, data, tb):
 
 def finditemspecial(source, data, tb):
     i = source.find("AbilitySpecial", tb[0], tb[1])
-    if i == -1:
-        return
-    else:
+    if i > -1:
         k = source.find("{", i, tb[1])
         while True:
             j = source.find("{", k + 1, tb[1])
@@ -117,7 +115,28 @@ def finditemspecial(source, data, tb):
                     else:
                         data[source[r[0]:r[1]]][str(l + 1)] = float(splitit[l])
             else:
-                return
+                break
+    i = source.find("AbilityValues", tb[0], tb[1])
+    if i > -1:
+        k = source.find("}", i, tb[1])
+        all_pro = re.finditer('\t*?"(.*?)".*?"(.+?)"', source[i:k])
+        for j in all_pro:
+            temp_name = j.group(1)
+            temp_value = j.group(2)
+            temp_dict={}
+            data[temp_name] = {}
+            temp_list = temp_value.split(' ')
+            for k in range(len(temp_list)):
+                temp_valuek = temp_list[k].strip()
+                try:
+                    temp_dict[str(k + 1)] = int(temp_valuek)
+                except ValueError:
+                    try:
+                        temp_dict[str(k + 1)] = float(temp_valuek)
+                    except ValueError:
+                        temp_dict[str(k + 1)] = temp_valuek
+            data[temp_name]=temp_dict
+
 
 
 def get_dota_data_from_vpk(base_txt, ffile):

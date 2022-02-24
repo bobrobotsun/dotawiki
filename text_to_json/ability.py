@@ -70,6 +70,7 @@ def get_dota_data_from_vpk(base_txt, ffile):
 def get_hero_data_from_txt(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
     alltext = re.finditer('"(.*?)".*?\n\t\{(.|\n)*?\n\t\}', this_string)
+    some_talent={}
     for i in alltext:
         name = i.group(1)
         base_txt[name] = {}
@@ -91,7 +92,48 @@ def get_hero_data_from_txt(base_txt, ffile):
                         base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
                     except ValueError:
                         base_txt[name][temp_name][str(k + 1)] = temp_valuek
-
+        all_pro = re.finditer('\t*?"(.*?)".*?\n.*\n?.*"value".*?"(.+?)"((.|\n)*?)}', i.group(0))
+        for j in all_pro:
+            temp_name = j.group(1)
+            temp_value = j.group(2)
+            base_txt[name][temp_name] = {}
+            if temp_value.find('|') == -1:
+                temp_list = temp_value.split(' ')
+            else:
+                temp_list = temp_value.split('|')
+            for k in range(len(temp_list)):
+                temp_valuek = temp_list[k].strip()
+                try:
+                    base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
+                except ValueError:
+                    try:
+                        base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
+                    except ValueError:
+                        base_txt[name][temp_name][str(k + 1)] = temp_valuek
+            other_pro = re.finditer('\t*?"(.*?)"[\s\t"]+([^\s\t"]+)[\s\t"]*', j.group(3))
+            for k in other_pro:
+                temp_name = k.group(1)
+                temp_value = k.group(2)
+                temp_dict={}
+                some_talent[temp_name]={}
+                if temp_value.find('|') == -1:
+                    temp_list = temp_value.split(' ')
+                else:
+                    temp_list = temp_value.split('|')
+                for k in range(len(temp_list)):
+                    temp_valuek = temp_list[k].strip().strip('+').strip('x')
+                    try:
+                        temp_dict[str(k + 1)] = int(temp_valuek)
+                    except ValueError:
+                        try:
+                            temp_dict[str(k + 1)] = float(temp_valuek)
+                        except ValueError:
+                            temp_dict[str(k + 1)] = temp_valuek
+                some_talent[temp_name][name+'-'+j.group(1)] = temp_dict
+    for i in some_talent:
+        if i in base_txt:
+            for j in some_talent[i]:
+                base_txt[i][j]=some_talent[i][j]
 
 def autoget_talent_source(all_json, base):
     retxt = ''
