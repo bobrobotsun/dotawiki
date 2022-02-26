@@ -90,14 +90,14 @@ def get_dota_data_from_vpk(base_txt, ffile):
 
 def get_hero_data_from_txt(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
-    alltext = re.finditer('"npc_dota_hero_(.*?)"\n\t\{(.|\n)*?\n\t\}', this_string)
+    alltext = re.finditer('"npc_dota_hero_(.*?)"\r\n\t{(.|\n)*?\r\n\t}', this_string)
     for i in alltext:
         name = i.group(1)
         if name == 'base':
             base_txt[name] = copy.deepcopy(hero_default)
         else:
             base_txt[name] = copy.deepcopy(base_txt['base'])
-        all_pro = re.finditer('\n\t\t"(.*?)".*?"(.*?)"', i.group(0))
+        all_pro = re.finditer('\t*?"(.*?)".*?"(.*?)"', i.group(0))
         base_txt[name]['ability'] = []
         for j in all_pro:
             temp_name = j.group(1)
