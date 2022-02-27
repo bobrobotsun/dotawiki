@@ -2,6 +2,7 @@ import re
 import math
 from xpinyin import Pinyin
 from text_to_json import hero, ability, edit_json
+import mainwindow
 
 target_url = 'http://dota.huijiwiki.com/w/api.php'
 
@@ -69,7 +70,7 @@ def create_upgrade_text(numjsons, k, post_each=lambda x: x['后缀'] if '后缀'
             if i in numjson:
                 if ii > 1:
                     for j in numjson[i]['升级来源']:
-                        retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] + image_size + '|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
+                        retext += image_with_tip_with_link(numjson[i]['升级来源'][j]["图片"],numjson[i]['升级来源'][j]["名称"],False)
                 jj = 0
                 while True:
                     jj += 1
@@ -101,7 +102,7 @@ def nocheck_create_upgrade_text(numjson, post_each=lambda x: x['后缀'] if '后
         if i in numjson:
             if ii > 1:
                 for j in numjson[i]['升级来源']:
-                    retext += '{{图片|' + numjson[i]['升级来源'][j]["图片"] + image_size + '|link=' + numjson[i]['升级来源'][j]["名称"] + '}}'
+                    retext += image_with_tip_with_link(numjson[i]['升级来源'][j]["图片"],numjson[i]['升级来源'][j]["名称"],False)
             jj = 0
             while True:
                 jj += 1
@@ -142,7 +143,7 @@ def get_unit_upgrade_double(db1, db2, combine='~', post=''):
             if ii > 1:
                 retxt += '<br>'
                 for j, w in db1[i]['升级来源'].items():
-                    retxt += '{{图片|' + w["图片"] + '|h16|link=' + w["名称"] + '}}'
+                    retxt += image_with_tip_with_link(w["图片"],w["名称"],False)
             jj = 0
             while True:
                 jj += 1
@@ -177,27 +178,28 @@ def get_item_value(db):
 
 
 def create_role_set(role, level):
-    retxt = '<div style="margin:auto;display:inline-block" title="' + number_to_string(level) + '级' \
-            + number_to_string(role) + '">{{图片|'
+    retxt = ''
+    image=''
     if role == '核心':
-        retxt += 'carry'
+        image += 'carry'
     elif role == '爆发':
-        retxt += 'nuker'
+        image += 'nuker'
     elif role == '先手':
-        retxt += 'initiator'
+        image += 'initiator'
     elif role == '控制':
-        retxt += 'disabler'
+        image += 'disabler'
     elif role == '耐久':
-        retxt += 'durable'
+        image += 'durable'
     elif role == '逃生':
-        retxt += 'escape'
+        image += 'escape'
     elif role == '辅助':
-        retxt += 'support'
+        image += 'support'
     elif role == '打野':
-        retxt += 'jungler'
+        image += 'jungler'
     elif role == '推进':
-        retxt += 'pusher'
-    retxt += '.png|h32}}</div>'
+        image += 'pusher'
+    image+='.png'
+    retxt+=image_with_tip_with_link(image,number_to_string(level) + '级' + number_to_string(role),False,False,'h32')
     return retxt
 
 
@@ -1034,6 +1036,20 @@ def create_version_choose_element(list, base, dict):
     retxt += '</div></div>'
     return retxt
 
+def image_with_tip_with_link(image, name, black=True,text_link=True,image_size='h18'):
+    retxt = ''
+    retxt += '{{额外信息框|{{图片|'
+    if black:
+        retxt += image.replace('Talent.png', 'Talentb.png')
+    else:
+        retxt += image
+    retxt += '|' + image_size + '}}|'
+    if text_link:
+        retxt += '[['+name+']]'
+    else:
+        retxt += name
+    retxt += '}}'
+    return retxt
 
 def right_menu(a='#', b='↑↑置顶↑↑'):
     return '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[' + a + '|' + b + ']]</div>'

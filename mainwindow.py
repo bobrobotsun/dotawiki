@@ -2244,6 +2244,18 @@ class Main(QMainWindow):
             for i in range(1, len(template_args)):
                 retxt += '|' + template_args[i]
             retxt += '|style=warning}}'
+        elif template_args[0] == '展开中文名':
+            prefix='('
+            suffix=')'
+            for i in range(2, len(template_args)):
+                if template_args[i][:4] == 'pre=':
+                    prefix = template_args[i][4:]
+                elif template_args[i][:4] == 'suf=':
+                    suffix = template_args[i][4:]
+            name=template_args[1]
+            retxt=name
+            if name in self.json_base['技能'] and self.json_base['技能'][name]['中文名']!=name:
+                retxt+=prefix+self.json_base['技能'][name]['中文名']+suffix
         else:
             return x.group(0)
         return retxt

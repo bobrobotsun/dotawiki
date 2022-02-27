@@ -6,6 +6,8 @@ import hashlib
 import re
 import time
 import operator
+
+import mainwindow
 from text_to_json import common_page, edit_json
 from text_to_json.WikiError import editerror
 from xpinyin import Pinyin
@@ -940,12 +942,7 @@ def change_combine_txt(json, ii, data, all_json, name, target, change_all_templa
                         returntxt += "("
                         for j in range(1, len(temp)):
                             for k in temp[j][1]:
-                                returntxt += '{{图片|'
-                                if target[2] == '描述':
-                                    returntxt += temp[j][1][k]
-                                else:
-                                    returntxt += temp[j][1][k].replace('Talent.png', 'Talentb.png')
-                                returntxt += '|h16|link=' + k + '}}'
+                                returntxt+=common_page.image_with_tip_with_link(temp[j][1][k],str(k))
                             returntxt += combine_numbers_post_level(temp[j][0], post, level)
                         returntxt += ")"
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
@@ -1611,7 +1608,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
         if '条件复合属性' in conditions:
             for i in range(len(conditions['条件复合属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件复合属性'][i], i, json, result, target, '条件复合属性')
-                another_info += '(' + common_page.create_upgrade_text(tempjson, image_size='|h16') + ')'
+                another_info += '(' + common_page.nocheck_create_upgrade_text(tempjson, image_size='|h16') + ')'
         if '条件单一属性' in conditions:
             for i in range(len(conditions['条件单一属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件单一属性'][i], i, json, result, target, '条件单一属性')
@@ -1663,7 +1660,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             for i in range(len(traitlist)):
                 if i > 0:
                     another_info += ';'
-                another_info += common_page.create_upgrade_text(json["属性"], traitlist[i], image_size='|h16')
+                another_info += common_page.create_upgrade_text(json["属性"], traitlist[i],  image_size='|h16')
             another_info += ')'
 
         if '条件物品属性' in conditions:
@@ -1709,7 +1706,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     name = tempjson['名称']
                 else:
                     name = conditions['条件复合属性'][i][-1]
-                trait += '<div>' + name + '：' + common_page.nocheck_create_upgrade_text(tempjson, image_size='|h16') + '</div>'
+                trait += '<div>' + name + '：' + common_page.nocheck_create_upgrade_text(tempjson,  image_size='|h16') + '</div>'
         if '条件单一属性' in conditions:
             for i in range(len(conditions['条件单一属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件单一属性'][i][:-1], i, json, result, target, '条件单一属性')
@@ -1742,7 +1739,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                         w = tempjson[j]
                         if jj > 1:
                             temptxt += '+'
-                        temptxt += common_page.create_upgrade_text(tempjson, j, lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '')
+                        temptxt += common_page.create_upgrade_text(tempjson, j,  lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '')
                     else:
                         break
                 trait += '<div>' + tempname + '：' + temptxt + '</div>'
@@ -1765,7 +1762,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 if '简述' in tempjson and tempjson['简述'] != '':
                     note += '<div>' + tempjson['简述'] + '</div>'
         for i in traitlist:
-            trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i, image_size='|h16') + '</div>'
+            trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i,  image_size='|h16') + '</div>'
 
         if '条件物品属性' in conditions:
             for i in range(len(conditions['条件物品属性'])):
@@ -2752,7 +2749,7 @@ def create_upgrade_cast_target(db):
     return retxt
 
 
-def create_upgrade_cast_point_backswing(arr1, arr2):
+def create_upgrade_cast_point_backswing(arr1, arr2, all_json):
     retxt = ''
     ii = 0
     while True:
@@ -2813,7 +2810,7 @@ def create_upgrade_cooldown(arr, outtip='div'):
             retxt += '<' + outtip + ' style="padding:0.5em 0.5em 0em 1em;">'
             if v['名称'] != '':
                 retxt += v['名称']
-            retxt += '{{额外信息框|{{图片|' + v['1']['类型']['图片'] + '|h16}}|' + v['1']['类型']['值'] + '}} '
+            retxt += common_page.image_with_tip_with_link(v['1']['类型']['图片'],v['1']['类型']['值'],False)+' '
             jj = 0
             while True:
                 jj += 1
@@ -2837,10 +2834,10 @@ def create_upgrade_cooldown(arr, outtip='div'):
                             k = str(kk)
                             if k in v[j]['升级来源']:
                                 x = v[j]['升级来源'][k]
-                                retxt += '{{图片|' + x['图片'] + '|h16|link=' + x['名称'] + '}}'
+                                retxt += common_page.image_with_tip_with_link(x['图片'],x['名称'],False)
                             else:
                                 break
-                        retxt += '{{额外信息框|{{图片|' + v[j]['类型']['图片'] + '|h16}}|' + v[j]['类型']['值'] + '}}'
+                        retxt += common_page.image_with_tip_with_link(v[j]['类型']['图片'],v[j]['类型']['值'],False)
                         kk = 0
                         while True:
                             kk += 1
@@ -2872,7 +2869,7 @@ def create_upgrade_buff(json_dict):
             retxt += '<tr><td>'
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
-                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[str(i)]['升级来源'][j]['图片']) + '|link=' + json_dict[str(i)]['升级来源'][j]['名称'] + '}} '
+                    retxt += common_page.image_with_tip_with_link(json_dict[str(i)]['升级来源'][j]['图片'],json_dict[str(i)]['升级来源'][j]['名称'],image_size='h22') + ' '
             retxt += '</td><td style="padding:0.25em;">'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
                 retxt += '{{额外信息框|{{图片|' + json_dict[str(i)]['图片'] + '}}|' + json_dict[str(i)]['值'] + '}} '
@@ -2978,7 +2975,7 @@ def create_upgrade_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|link=' + json_dict[i]['升级来源'][j]["名称"] + '}} '
+                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"],json_dict[i]['升级来源'][j]["名称"],image_size='h22')+' '
             retxt += '</td><td style="padding:0.25em;"><span style="cursor:help;">{{图片|' + json_dict[i]['图片'] + '}}</span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
             kk = 0
@@ -3008,7 +3005,7 @@ def create_independent_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += '{{图片|' + re.sub(r'alent.png', lambda x: 'alentb.png', json_dict[i]['升级来源'][j]["图片"]) + '|link=' + json_dict[i]['升级来源'][j]["名称"] + '}} '
+                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"],json_dict[i]['升级来源'][j]["名称"],image_size='h22') + ' '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
             if json_dict[i]['机制名'][0] == '#':
                 return ''
@@ -3095,8 +3092,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                         bt += '<div style="padding:0.25em;">{{图片|' + v['图片'] + '|h16|link=' + v['技能名'] + '}}[[' + v['技能名'] + ']]（' + v['中文名'] + ')</div>'
                     else:
                         break
-            bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
-            st += '<tr><td style="width:140px;max-width:140px;text-align:left;vertical-align:top;">' + create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"])
+            bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"],all_json)
+            st += '<tr><td style="width:140px;max-width:140px;text-align:left;vertical-align:top;">' + create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"],all_json)
             ii = 0
             while True:
                 ii += 1

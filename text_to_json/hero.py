@@ -382,7 +382,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
              +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(48px,1fr));gap:2px;place-content:center center;">'
         for ii in range(len(db['技能']) - 8):
             v = db['技能'][ii]
-            bt += '[[#'+v+'|{{额外信息框|{{大图片|'+v+'|w36}}|'+v+'|noclick}}]]'
+            bt += '[[#'+v+'|{{大图片|'+v+'|w36|text=0|center}}]]'
             st += '<div class="dota_click_absolute_additional_infomation_frame dota_click_find_text_in_json_and_show">' \
                   '<div class="dota_get_image_by_json_name dota_click_absolute_additional_infomation_frame_button" data-json-name="' + v \
                   + '" data-image-height="36" data-image-center="1"></div>' \
