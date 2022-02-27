@@ -450,7 +450,7 @@ edit_adition = {
         '定值移速': {'代码': 'bonus_movement_speed', '后缀': '', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page">移动速度</span>'},
         '百分比移速': {'代码': 'bonus_movement_speed', '后缀': '%', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page">移动速度</span>'},
         '百分比转身速率': {'代码': 'turn_rate', '后缀': '%', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page">转身速率</span>'},
-        '魔法损耗': {'代码': 'manacost_reduction', '后缀': '%', '展示前缀': '+', '展示后缀': '魔法消耗/损失降低'},
+        '魔法损耗': {'代码': 'manacost_reduction', '后缀': '%', '展示前缀': '+', '展示后缀': '[[魔法损耗降低]]'},
         '状态抗性': {'代码': 'status_resistance', '后缀': '%', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page">状态抗性</span>'},
         '状态抗性降低': {'代码': 'status_resistance', '后缀': '%', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page">状态抗性</span>降低'},
         '吸血增强': {'代码': 'lifesteal_amp', '后缀': '%', '展示前缀': '+', '展示后缀': '<span class="dota_create_link_to_wiki_page">吸血增强</span>'},

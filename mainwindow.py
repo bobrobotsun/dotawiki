@@ -2147,8 +2147,12 @@ class Main(QMainWindow):
                 retxt += '|w24'
             retxt += '}}'
         elif template_args[0] == '额外信息框':
+            noclick=''
+            for i in range(3, len(template_args)):
+                if template_args[i] == 'noclick':
+                    noclick = ' data-additional-infomation-frame-no-click="1"'
             retxt += '<span class="dota_click_absolute_additional_infomation_frame">' \
-                     + '<span class="dota_click_absolute_additional_infomation_frame_button">' + template_args[1] + '</span>' \
+                     + '<span class="dota_click_absolute_additional_infomation_frame_button"'+noclick+'>' + template_args[1] + '</span>' \
                      + '<span class="dota_click_absolute_additional_infomation_frame_frame">' + template_args[2] + '</span></span> '
         elif template_args[0] == '点击复制':
             td = ''

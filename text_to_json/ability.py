@@ -69,7 +69,7 @@ def get_dota_data_from_vpk(base_txt, ffile):
 
 def get_hero_data_from_txt(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
-    alltext = re.finditer('"(.*?)".*?\n\t\{(.|\n)*?\n\t\}', this_string)
+    alltext = re.finditer('"(.*?)".*?\n(\t|\s\s\s\s)\{(.|\n)*?\n\t\}', this_string)
     some_talent={}
     for i in alltext:
         name = i.group(1)
@@ -121,7 +121,7 @@ def get_hero_data_from_txt(base_txt, ffile):
                 else:
                     temp_list = temp_value.split('|')
                 for k in range(len(temp_list)):
-                    temp_valuek = temp_list[k].strip().strip('+').strip('x')
+                    temp_valuek = temp_list[k].strip().strip('+').strip('x').rstrip('%')
                     try:
                         temp_dict[str(k + 1)] = int(temp_valuek)
                     except ValueError:

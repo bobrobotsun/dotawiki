@@ -90,7 +90,7 @@ def get_dota_data_from_vpk(base_txt, ffile):
 
 def get_hero_data_from_txt(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
-    alltext = re.finditer('"npc_dota_hero_(.*?)"\r\n\t{(.|\n)*?\r\n\t}', this_string)
+    alltext = re.finditer('"npc_dota_hero_(.*?)".*?\n\t{(.|\n)*?\n\t}', this_string)
     for i in alltext:
         name = i.group(1)
         if name == 'base':
@@ -261,6 +261,39 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         for ii in all_attri:
             if not isinstance(all_attri[ii], str):
                 all_attri[ii] = round(all_attri[ii], 2)
+        agha=['']
+        shard=['']
+        for ii in db['技能']:
+            if all_json['技能'][ii]['次级分类']=='魔晶技能':
+                shard.append(ii)
+            if all_json['技能'][ii]['次级分类']=='神杖技能':
+                agha.append(ii)
+            if all_json['技能'][ii]['神杖信息']!='':
+                if agha[0]!='':
+                    agha[0]+='\n'
+                agha[0]+=all_json['技能'][ii]['神杖信息']
+            if all_json['技能'][ii]['魔晶信息']!='':
+                if shard[0]!='':
+                    shard[0]+='\n'
+                shard[0]+=all_json['技能'][ii]['魔晶信息']
+        aghashard ='<div style="text-align:left;border:1px solid;">{{图片|agha.png|h18}}：'
+        if len(agha)>1:
+            aghashard+='提供技能'
+            for ii in range(1,len(agha)):
+                if ii>1:
+                    aghashard +='、'
+                aghashard+='{{H|'+agha[ii]+'}}'
+            aghashard+='\n'
+        aghashard +=agha[0]+'</div>'
+        aghashard +='<div style="text-align:left;border:1px solid;">{{图片|shard.png|w18}}：'
+        if len(shard)>1:
+            aghashard+='提供技能'
+            for ii in range(1,len(shard)):
+                if ii>1:
+                    aghashard +='、'
+                aghashard+='{{H|'+shard[ii]+'}}'
+            aghashard+='\n'
+        aghashard +=shard[0]+'</div>'
         bt = '<span class="dota_compound_list_select_input dota_hero_comprehensive_attri_dict">' \
              +'<div class="dota_hero_comprehensive_attri_dict_hero bgc_black" style="width:360px;float:right;color:white;text-align:center;" data-hero-name="' + i + '">' \
              + '<div style="text-align:center;"><div id="'+db['页面名']+'" style="font-size:200%;font-weight:normal;padding:2px;margin:0px;text-align:center;' + main_color + '">' + db['中文名'] + '</div>' \
@@ -305,7 +338,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
              + fulfil_complex_and_simple_show_attri_0('碰撞体积', fulfil_complex_and_simple_show_attri_2('总碰撞体积',str(db['碰撞体积']['1']))) \
              + fulfil_complex_and_simple_show_attri_0('边界体积', fulfil_complex_and_simple_show_attri_2('总边界体积',str(db['边界体积']['1']))) \
              + fulfil_complex_and_simple_show_attri_0('腿数量', fulfil_complex_and_simple_show_attri_2('总腿数量',str(db['腿数量']['1']))) \
-             + '</div>'  # 完整显示
+             + '</div>'\
+             +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(48px,1fr));gap:2px;place-content:center center;">'# 完整显示
         st = '<div class="dota_simple_infobox bgc_white dota_hero_comprehensive_attri_dict_hero" data-hero-name="' + i + '">' \
              + '<div style="text-align:center;"><div class="bg-primary" style="float:left;padding:0.5em">' \
              + '<span class="dota_get_image_by_json_name" data-json-name="' + i + '" data-image-height="72" data-image-link="1" data-image-center="1"></span></div>' \
@@ -345,15 +379,16 @@ def fulfil_complex_and_simple_show(all_json, html_function):
              + fulfil_complex_and_simple_show_attri_1('白天视野', fulfil_complex_and_simple_show_attri_2('总白天视野', str(db['白天视野']['1']))) \
              + fulfil_complex_and_simple_show_attri_1('夜晚视野', fulfil_complex_and_simple_show_attri_2('总夜晚视野', str(db['夜晚视野']['1']))) \
              + '</div>' \
-               '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(48px,1fr));gap:2px;place-content:center center;">'
+             +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(48px,1fr));gap:2px;place-content:center center;">'
         for ii in range(len(db['技能']) - 8):
             v = db['技能'][ii]
+            bt += '[[#'+v+'|{{额外信息框|{{大图片|'+v+'|w36}}|'+v+'|noclick}}]]'
             st += '<div class="dota_click_absolute_additional_infomation_frame dota_click_find_text_in_json_and_show">' \
                   '<div class="dota_get_image_by_json_name dota_click_absolute_additional_infomation_frame_button" data-json-name="' + v \
                   + '" data-image-height="36" data-image-center="1"></div>' \
                     '<div class="dota_click_absolute_additional_infomation_frame_frame dota_click_find_text_in_json_and_show_textarea">' \
                     '<div class="dota_click_find_text_in_json_and_show_button" data-find-text-in-json-address="' + v + '，简易展示">点击显示《' + v + '》详细信息</div></div></div>'
-        bt += '<div class="bgc_white" style="display:grid;grid-template-columns:1fr 30px 1fr;">' \
+        bt += '</div><div class="bgc_white" style="display:grid;grid-template-columns:1fr 30px 1fr;">' \
               + '<div class="border_black">' + all_json['技能'][i + '25级左天赋']['中文名'] \
               + '</div><div class="bgc_black">25</div><div class="border_black">' + all_json['技能'][i + '25级右天赋']['中文名'] + '</div>' \
               + '<div class="border_black">' + all_json['技能'][i + '20级左天赋']['中文名'] \
@@ -373,6 +408,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
               +'<div class="border_black">' + all_json['技能'][i + '10级左天赋']['中文名'] \
               + '</div><div class="bgc_black">10</div><div class="border_black">' + all_json['技能'][i + '10级右天赋']['中文名'] + '</div>' \
               + '</div>'
+        bt+=aghashard
+        st+=aghashard
         if db['全属性黄点'] > 0:
             bt += '<div class="dota_ability_level_point_change_show" data-ability-level-point-level-max=' + str(db['全属性黄点']) \
                   + ' data-ability-level-point-level-now=' + str(db['全属性黄点']) + ' style="padding:0.25em;">+ 2 全 属 性</div>'
