@@ -358,6 +358,12 @@ def input_upgrade(all_json, upgrade_json):
                     temp[upstr] = copy.deepcopy(temp["1"])
                     for k in upgrade_json[i][upname][j]["值"]:
                         temp[upstr][k] = copy.deepcopy(upgrade_json[i][upname][j]["值"][k])
+                elif "0" in upgrade_json[i][upname][j]["目标"] and upgrade_json[i][upname][j]["目标"]["0"] == "追加":
+                    if '1' not in temp:
+                        upstr='1'
+                    temp[upstr] = {'2':upgrade_json[i][upname][j]["值"]}
+                    temp=temp[upstr]
+                    upstr='2'
                 else:
                     temp[upstr] = upgrade_json[i][upname][j]["值"]
                 tarname = upgrade_json[i][upname][j]["目标"]["2"]
@@ -415,19 +421,20 @@ def complete_upgrade(all_json, mech, base_txt):
         if all_json[i]['应用'] >= 0:
             for j in all_json[i]["属性"]:
                 if fulfil(all_json[i]["属性"][j], all_json[i]):
+                    if '后缀' not in all_json[i]["属性"][j]:
+                        all_json[i]["属性"][j]['后缀']=''
+                        kk=2
+                        while True:
+                            k=str(kk)
+                            kk+=1
+                            if k in all_json[i]["属性"][j]:
+                                if '后缀' in all_json[i]["属性"][j][k]:
+                                    all_json[i]["属性"][j]['后缀']=all_json[i]["属性"][j][k]['后缀']
+                                    all_json[i]["属性"][j][k].pop('后缀')
+                            else:
+                                break
                     one_upgrade(all_json[i]["属性"][j], mech, base_txt, i, '第' + str(j) + '个【属性】')
             for j in all_json[i]["冷却时间"]:
-                if '名称' not in all_json[i]["冷却时间"][j]:
-                    all_json[i]["冷却时间"][j]['名称'] = ''
-                kk = 2
-                while True:
-                    k = str(kk)
-                    kk += 1
-                    if k in all_json[i]["冷却时间"][j] and '名称' in all_json[i]["冷却时间"][j][k]:
-                        all_json[i]["冷却时间"][j]['名称'] = all_json[i]["冷却时间"][j][k]['名称']
-                        all_json[i]["冷却时间"][j][k].pop('名称')
-                    else:
-                        break
                 if fulfil(all_json[i]["冷却时间"][j], all_json[i]):
                     one_upgrade(all_json[i]["冷却时间"][j], mech, base_txt, i, '第' + str(j) + '个【冷却时间】')
             for j in all_json[i]["魔法消耗"]:
@@ -556,8 +563,13 @@ def one_upgrade(json, mech, base_txt, name, target):
         json["1"] = {}
         tempi = '2'
         for tempj in json[tempi]:
-            if not tempj.isnumeric() and tempj != '代码':
+            if not tempj.isnumeric() and tempj != '代码' and tempj != '升级来源' and tempj != '名称':
                 json["1"][tempj] = copy.deepcopy(json[tempi][tempj])
+        if '名称' not in json:
+            json['名称']=''
+        if '名称' in json[tempi]:
+            json['名称']=json[tempi]['名称']
+            json[tempi].pop('名称')
     for ii in range(2, extra + 2):
         i = str(ii)
         if "0" in json[i]["代码"] and json[i]["代码"]["0"] == "手填":
@@ -2869,7 +2881,7 @@ def create_upgrade_buff(json_dict):
             retxt += '<tr><td>'
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
-                    retxt += common_page.image_with_tip_with_link(json_dict[str(i)]['升级来源'][j]['图片'],json_dict[str(i)]['升级来源'][j]['名称'],image_size='h22') + ' '
+                    retxt += common_page.image_with_tip_with_link(json_dict[str(i)]['升级来源'][j]['图片'],json_dict[str(i)]['升级来源'][j]['名称'],image_size='w22') + ' '
             retxt += '</td><td style="padding:0.25em;">'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
                 retxt += '{{额外信息框|{{图片|' + json_dict[str(i)]['图片'] + '}}|' + json_dict[str(i)]['值'] + '}} '
@@ -2975,7 +2987,7 @@ def create_upgrade_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"],json_dict[i]['升级来源'][j]["名称"],image_size='h22')+' '
+                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"],json_dict[i]['升级来源'][j]["名称"],image_size='w22')+' '
             retxt += '</td><td style="padding:0.25em;"><span style="cursor:help;">{{图片|' + json_dict[i]['图片'] + '}}</span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
             kk = 0
@@ -3005,7 +3017,7 @@ def create_independent_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"],json_dict[i]['升级来源'][j]["名称"],image_size='h22') + ' '
+                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"],json_dict[i]['升级来源'][j]["名称"],image_size='w22') + ' '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
             if json_dict[i]['机制名'][0] == '#':
                 return ''

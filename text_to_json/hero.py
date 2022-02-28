@@ -264,18 +264,19 @@ def fulfil_complex_and_simple_show(all_json, html_function):
         agha=['']
         shard=['']
         for ii in db['技能']:
-            if all_json['技能'][ii]['次级分类']=='魔晶技能':
-                shard.append(ii)
-            if all_json['技能'][ii]['次级分类']=='神杖技能':
-                agha.append(ii)
-            if all_json['技能'][ii]['神杖信息']!='':
-                if agha[0]!='':
-                    agha[0]+='\n'
-                agha[0]+=all_json['技能'][ii]['神杖信息']
-            if all_json['技能'][ii]['魔晶信息']!='':
-                if shard[0]!='':
-                    shard[0]+='\n'
-                shard[0]+=all_json['技能'][ii]['魔晶信息']
+            if int(all_json['技能'][ii]['应用'])==1:
+                if all_json['技能'][ii]['次级分类'] == '魔晶技能':
+                    shard.append(ii)
+                if all_json['技能'][ii]['次级分类'] == '神杖技能':
+                    agha.append(ii)
+                if all_json['技能'][ii]['神杖信息'] != '':
+                    if agha[0] != '':
+                        agha[0] += '<br>'
+                    agha[0] += all_json['技能'][ii]['神杖信息']
+                if all_json['技能'][ii]['魔晶信息'] != '':
+                    if shard[0] != '':
+                        shard[0] += '<br>'
+                    shard[0] += all_json['技能'][ii]['魔晶信息']
         aghashard ='<div style="text-align:left;border:1px solid;">{{图片|agha.png|h18}}：'
         if len(agha)>1:
             aghashard+='提供技能'
@@ -283,7 +284,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 if ii>1:
                     aghashard +='、'
                 aghashard+='{{H|'+agha[ii]+'}}'
-            aghashard+='\n'
+            aghashard+='<br>'
         aghashard +=agha[0]+'</div>'
         aghashard +='<div style="text-align:left;border:1px solid;">{{图片|shard.png|w18}}：'
         if len(shard)>1:

@@ -1036,7 +1036,7 @@ def create_version_choose_element(list, base, dict):
     retxt += '</div></div>'
     return retxt
 
-def image_with_tip_with_link(image, name, black=True,text_link=True,image_size='h18'):
+def image_with_tip_with_link(image, name, black=True,text_link=True,image_size='w18'):
     retxt = ''
     retxt += '{{额外信息框|{{图片|'
     if black:

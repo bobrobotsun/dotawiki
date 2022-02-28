@@ -2958,9 +2958,13 @@ class Main(QMainWindow):
     def json_edit_combine_to_text(self):
         warning = QMessageBox.warning(self, '转换', '您正试图将一串已有的混合文字转换为普通文字。\n内部所有的内容将会消失，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if warning == QMessageBox.Yes:
+            temptxt=''
             item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+            tempitem=item.child(0)
+            for i in range(tempitem.childCount()):
+                temptxt+=tempitem.child(i).itemvalue
             item.removeChild(item.child(0))
-            item.set_value('')
+            item.set_value(temptxt)
             self.tree_item_clicked()
 
     def json_edit_add_new_item(self):
