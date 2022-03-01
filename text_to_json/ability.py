@@ -330,6 +330,8 @@ def input_upgrade(all_json, upgrade_json):
                     upgrade_json[i][upname][j]["目标"]["1"] = "技能"
                 if upgrade_json[i][upname][j]["目标"]["2"] == "":
                     upgrade_json[i][upname][j]["目标"]["2"] = i
+                if '0' in upgrade_json[i][upname][j]["目标"] and upgrade_json[i][upname][j]["目标"]["0"] == "追加注释":
+                    upgrade_json[i][upname][j]["目标"]["3"] = '注释'
                 if "代码" in upgrade_json[i][upname][j]["值"] and isinstance(upgrade_json[i][upname][j]["值"]["代码"], dict):
                     if "1" in upgrade_json[i][upname][j]["值"]["代码"] and upgrade_json[i][upname][j]["值"]["代码"]["1"] == "":
                         upgrade_json[i][upname][j]["值"]["代码"]["1"] = "技能"
@@ -354,16 +356,23 @@ def input_upgrade(all_json, upgrade_json):
                     else:
                         break
                 upstr = str(upcount)
-                if "0" in upgrade_json[i][upname][j]["目标"] and upgrade_json[i][upname][j]["目标"]["0"] == "替换":
-                    temp[upstr] = copy.deepcopy(temp["1"])
-                    for k in upgrade_json[i][upname][j]["值"]:
-                        temp[upstr][k] = copy.deepcopy(upgrade_json[i][upname][j]["值"][k])
-                elif "0" in upgrade_json[i][upname][j]["目标"] and upgrade_json[i][upname][j]["目标"]["0"] == "追加":
-                    if '1' not in temp:
-                        upstr='1'
-                    temp[upstr] = {'2':upgrade_json[i][upname][j]["值"]}
-                    temp=temp[upstr]
-                    upstr='2'
+                if "0" in upgrade_json[i][upname][j]["目标"]:
+                    if upgrade_json[i][upname][j]["目标"]["0"] == "替换":
+                        temp[upstr] = copy.deepcopy(temp["1"])
+                        for k in upgrade_json[i][upname][j]["值"]:
+                            temp[upstr][k] = copy.deepcopy(upgrade_json[i][upname][j]["值"][k])
+                    elif upgrade_json[i][upname][j]["目标"]["0"] == "追加":
+                        if '1' not in temp:
+                            upstr='1'
+                        temp[upstr] = {'2':upgrade_json[i][upname][j]["值"]}
+                        temp=temp[upstr]
+                        upstr='2'
+                    elif upgrade_json[i][upname][j]["目标"]["0"] == "追加注释":
+                        temp[upstr]=upgrade_json[i][upname][j]["值"]
+                        if '序列级数' not in temp[upstr]:
+                            temp[upstr]['序列级数']=1
+                    else:
+                        temp[upstr] = upgrade_json[i][upname][j]["值"]
                 else:
                     temp[upstr] = upgrade_json[i][upname][j]["值"]
                 tarname = upgrade_json[i][upname][j]["目标"]["2"]
@@ -3202,7 +3211,12 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                             for j in range(1, uls - v['序列级数'] + 1):
                                 bt += '</ul>'
                             uls = v['序列级数']
-                        bt += '<li>' + v['文字'] + '</li>'
+                        bt += '<li>'
+                        if '升级来源' in v:
+                            for jj in v['升级来源']:
+                                w=v['升级来源'][jj]
+                                bt+='{{图片|'+w['图片']+'|w20}}'+w['名称']+"升级："
+                        bt += v['文字'] + '</li>'
                     else:
                         break
             for k in range(1, uls + 1):

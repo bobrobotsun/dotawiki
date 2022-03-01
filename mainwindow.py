@@ -527,6 +527,7 @@ class Main(QMainWindow):
             item.get_hero_data_from_txt(self.text_base['物品'], pak1.get_file("scripts/npc/items.txt"))
             item.get_dota_data_from_vpk(self.text_base['物品'], pak1.get_file("resource/localization/abilities_schinese.txt"))
             translate.get_dota_data_from_vpk(self.text_base['翻译'], pak1.get_file("resource/localization/dota_schinese.txt"), pak1.get_file("resource/localization/dota_english.txt"))
+            translate.get_dota_data_from_vpk(self.text_base['翻译'], pak1.get_file("resource/localization/abilities_schinese.txt"), pak1.get_file("resource/localization/abilities_english.txt"))
             self.file_save(os.path.join('database', 'dota2_address.json'), address)
             self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
             messagebox = QMessageBox(QMessageBox.Information, '文件抓取', ttt, QMessageBox.NoButton, self)
@@ -981,7 +982,8 @@ class Main(QMainWindow):
         self.editlayout['额外机制']['竖布局']['关联技能'] = {0: QTreeWidget(self)}
         self.editlayout['额外机制']['竖布局'][0].addWidget(self.editlayout['额外机制']['竖布局']['关联技能'][0])
         self.editlayout['额外机制']['竖布局']['关联技能'][0].setHeaderLabels(['大分类', '名称'])
-        self.editlayout['额外机制']['竖布局']['关联技能'][0].setColumnWidth(0, 150)
+        self.editlayout['额外机制']['竖布局']['关联技能'][0].setColumnWidth(0, 100)
+        self.editlayout['额外机制']['竖布局']['关联技能'][0].setColumnWidth(1, 600)
         self.editlayout['额外机制']['竖布局']['关联技能'][0].expandAll()
         self.editlayout['额外机制']['竖布局']['关联技能'][0].doubleClicked.connect(self.edit_target_selected_quick_changed)
         self.editlayout['额外机制']['竖布局']['树'] = {0: QTreeWidget(self)}
@@ -989,6 +991,7 @@ class Main(QMainWindow):
         self.editlayout['额外机制']['竖布局']['树'][0].setHeaderLabels(['名称', '值'])
         self.dict_to_tree(self.editlayout['额外机制']['竖布局']['树'], self.mech)
         self.editlayout['额外机制']['竖布局']['树'][0].setColumnWidth(0, 150)
+        self.editlayout['额外机制']['竖布局']['树'][0].setColumnWidth(1, 2000)
         for i in range(self.editlayout['额外机制']['竖布局']['树'][0].topLevelItemCount()):
             self.editlayout['额外机制']['竖布局']['树'][0].topLevelItem(i).setExpanded(True)
 
