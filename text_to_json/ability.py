@@ -358,7 +358,10 @@ def input_upgrade(all_json, upgrade_json):
                 upstr = str(upcount)
                 if "0" in upgrade_json[i][upname][j]["目标"]:
                     if upgrade_json[i][upname][j]["目标"]["0"] == "替换":
-                        temp[upstr] = copy.deepcopy(temp["1"])
+                        if '1' in temp:
+                            temp[upstr] = copy.deepcopy(temp["1"])
+                        else:
+                            temp[upstr] = copy.deepcopy(temp["2"])
                         for k in upgrade_json[i][upname][j]["值"]:
                             temp[upstr][k] = copy.deepcopy(upgrade_json[i][upname][j]["值"][k])
                     elif upgrade_json[i][upname][j]["目标"]["0"] == "追加":
@@ -376,16 +379,21 @@ def input_upgrade(all_json, upgrade_json):
                 else:
                     temp[upstr] = upgrade_json[i][upname][j]["值"]
                 tarname = upgrade_json[i][upname][j]["目标"]["2"]
+                if '升级来源' not in temp[upstr]:
+                    temp[upstr]["升级来源"]={}
+                    uplen=1
+                else:
+                    uplen=len(temp[upstr]["升级来源"])+1
                 if upname == '神杖':
-                    temp[upstr]["升级来源"] = {"1": {"名称": '阿哈利姆神杖', '图片': 'agha.png'}}
+                    temp[upstr]["升级来源"][str(uplen)] = {"名称": '阿哈利姆神杖', '图片': 'agha.png'}
                     if i != tarname and i in all_json['技能']:
-                        temp[upstr]["升级来源"]['2'] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
+                        temp[upstr]["升级来源"][str(uplen+1)] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
                 elif upname == '魔晶':
-                    temp[upstr]["升级来源"] = {"1": {"名称": '阿哈利姆魔晶', '图片': 'shard.png'}}
+                    temp[upstr]["升级来源"][str(uplen)] = {"名称": '阿哈利姆魔晶', '图片': 'shard.png'}
                     if i != tarname and i in all_json['技能']:
-                        temp[upstr]["升级来源"]['2'] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
+                        temp[upstr]["升级来源"][str(uplen+1)] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
                 elif upname == '技能':
-                    temp[upstr]["升级来源"] = {"1": {"名称": i, '图片': all_json['技能'][i]['迷你图片']}}
+                    temp[upstr]["升级来源"][str(uplen)] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
     for i in all_json["技能"]:
         for j in all_json["技能"][i]["效果"]:
             kk = 2
@@ -736,6 +744,14 @@ def array_cal(arr1, arr2, opp):
                 arr1[i] = arr1[i] * (1 - temp)
             elif opp == '+%':
                 arr1[i] = arr1[i] * (1 + temp)
+            elif opp == '%%-':
+                arr1[i] = temp * (100 - arr1[i]) / 100
+            elif opp == '%%+':
+                arr1[i] = temp * (100 + arr1[i]) / 100
+            elif opp == '-%%':
+                arr1[i] = temp * (1 - arr1[i])
+            elif opp == '+%%':
+                arr1[i] = temp * (1 + arr1[i])
             elif opp == 'round':
                 arr1[i] = round(arr1[i], int(temp))
             elif opp == 'ceil':
