@@ -48,14 +48,14 @@ def findunitname(source, tb):
 
 
 # 寻找属性（查询源字符串，数据存储位置，上下限，属性序数，是否继承默认数据）
-def findunitpro(source, data, tb, pro, inherit=True, number=True):
+def findunitpro(source, data,default_data, tb, pro, inherit=True, number=True):
     i = source.find('\"' + pro[1] + '\"', tb[0], tb[1])
     proname=pro[1]
     if len(pro)>3:
         proname=pro[3]
     if i == -1:
-        if inherit and proname in unit_default:
-            data[proname] = unit_default[proname]
+        if inherit and proname in default_data:
+            data[proname] = default_data[proname]
     else:
         j = source.find('\"', i + 1, tb[1])
         j = source.find('\"', j + 1, tb[1])
@@ -66,7 +66,10 @@ def findunitpro(source, data, tb, pro, inherit=True, number=True):
         realvalue=source[j + 1:k]
         if number:
             if source[j + 1:k] == '':
-                data[pro[1]] = {"1": 0}
+                if pro[1] in default_data:
+                    data[pro[1]] = default_data[pro[1]]
+                else:
+                    data[pro[1]]={'1':0}
             else:
                 data[pro[1]] = {"1": float(realvalue)}
         else:
@@ -79,17 +82,22 @@ def get_hero_data_from_txt(base_txt, ffile):
     tb = [0, 0]
     findtb(source_string, 0, len(source_string), tb, -1)
     for i in unitpro_txt:
-        findunitpro(source_string, unit_default, tb, i, False, False)
+        findunitpro(source_string, unit_default, unit_default, tb, i, False, False)
     for i in unitpro_num:
-        findunitpro(source_string, unit_default, tb, i, False, True)
+        findunitpro(source_string, unit_default, unit_default, tb, i, False, True)
     while True:
         if findtb(source_string, tb[1] + 2, len(source_string), tb, 0):
             name = findunitname(source_string, tb)
+            default=unit_default
+            if name[:-1]+'1' in base_txt:
+                default =base_txt[name[:-1]+'1']
+            elif name[:-1] in base_txt:
+                default =base_txt[name[:-1]]
             base_txt[name] = {}
             for i in unitpro_txt:
-                findunitpro(source_string, base_txt[name], tb, i, True, False)
+                findunitpro(source_string, base_txt[name],default, tb, i, True, False)
             for i in unitpro_num:
-                findunitpro(source_string, base_txt[name], tb, i, True, True)
+                findunitpro(source_string, base_txt[name],default, tb, i, True, True)
         else:
             break
 

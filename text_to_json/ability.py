@@ -112,25 +112,26 @@ def get_hero_data_from_txt(base_txt, ffile):
                         base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
                     except ValueError:
                         base_txt[name][temp_name][str(k + 1)] = temp_valuek
-            other_pro = re.finditer('\t*?"(.*?)"[\s\t"]+([^\s\t"]+)[\s\t"]*', j.group(3))
+            other_pro = re.finditer('[\s\t]*?"(.*?)"([^\S\r\n]|")+([^\s\t"]+)([^\S\r\n]|")+', j.group(3))
             for k in other_pro:
                 temp_name = k.group(1)
-                temp_value = k.group(2)
+                temp_value = k.group(3)
                 temp_dict={}
-                some_talent[temp_name]={}
+                if temp_name not in some_talent:
+                    some_talent[temp_name]={}
                 if temp_value.find('|') == -1:
                     temp_list = temp_value.split(' ')
                 else:
                     temp_list = temp_value.split('|')
-                for k in range(len(temp_list)):
-                    temp_valuek = temp_list[k].strip().strip('+').strip('x').rstrip('%')
+                for l in range(len(temp_list)):
+                    temp_valuek = temp_list[l].strip().strip('+').strip('x').rstrip('%')
                     try:
-                        temp_dict[str(k + 1)] = int(temp_valuek)
+                        temp_dict[str(l + 1)] = int(temp_valuek)
                     except ValueError:
                         try:
-                            temp_dict[str(k + 1)] = float(temp_valuek)
+                            temp_dict[str(l + 1)] = float(temp_valuek)
                         except ValueError:
-                            temp_dict[str(k + 1)] = temp_valuek
+                            temp_dict[str(l + 1)] = temp_valuek
                 some_talent[temp_name][name+'-'+j.group(1)] = temp_dict
     for i in some_talent:
         if i in base_txt:
@@ -374,6 +375,8 @@ def input_upgrade(all_json, upgrade_json):
                         temp[upstr]=upgrade_json[i][upname][j]["值"]
                         if '序列级数' not in temp[upstr]:
                             temp[upstr]['序列级数']=1
+                        else:
+                            temp[upstr]['序列级数'] = int(temp[upstr]['序列级数'])
                     else:
                         temp[upstr] = upgrade_json[i][upname][j]["值"]
                 else:
@@ -3228,7 +3231,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                                 bt += '</ul>'
                             uls = v['序列级数']
                         bt += '<li>'
-                        if '升级来源' in v:
+                        if '升级来源' in v and v['序列级数']==1:
                             for jj in v['升级来源']:
                                 w=v['升级来源'][jj]
                                 bt+='{{图片|'+w['图片']+'|w20}}'+w['名称']+"升级："
