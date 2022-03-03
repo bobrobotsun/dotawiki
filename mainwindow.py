@@ -3742,7 +3742,7 @@ class Main(QMainWindow):
             rere += '{{H|' + name + '}}：' + self.json_base['技能'][name]['描述']
             for i in self.json_base['技能'][name]['属性']:
                 rere += self.json_base['技能'][name]['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(self.json_base['技能'][name]['属性'], i) + '，'
-            rere += common_page.create_upgrade_manacost(self.json_base['技能'][name]['魔法消耗'], 'span') + common_page.create_upgrade_cooldown(self.json_base['技能'][name]['冷却时间'], 'span')
+            rere += ability.create_upgrade_manacost(self.json_base['技能'][name]['魔法消耗'], 'span') + ability.create_upgrade_cooldown(self.json_base['技能'][name]['冷却时间'], 'span')
         return rere
 
     def version_button_tree1(self):
