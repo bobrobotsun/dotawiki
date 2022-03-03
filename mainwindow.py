@@ -516,7 +516,7 @@ class Main(QMainWindow):
         ttt = ''
         if 'pak01_dir.vpk' in os.listdir(address):
             ttt += '已经从vpk处提取【英雄】【单位】【物品】【技能】【翻译】文件'
-            pak1 = vpk.open(address+"\\pak01_dir.vpk")
+            pak1 = vpk.open(address + "\\pak01_dir.vpk")
 
             hero.get_hero_data_from_txt(self.text_base['英雄'], pak1.get_file("scripts/npc/npc_heroes.txt"))
             ability.get_hero_data_from_txt(self.text_base['技能'], pak1.get_file("scripts/npc/npc_abilities.txt"))
@@ -1503,30 +1503,30 @@ class Main(QMainWindow):
         if chosen == '' or chosen == '英雄':
             for i in self.json_base['英雄']:
                 all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base),i, 0)])
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base), i, 0)])
                 talent_name = []
                 for j in ['10', '15', '20', '25']:
                     talent_name.append(common_page.all_the_names(self.json_base['技能'][i + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][i + j + '级右天赋'], self.json_base))
-                    all_upload.append([i + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.json_base,self.version_base, self.version_list['版本'], i, j, talent_name[-1])])
-                all_upload.append([i + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base,self.version_base, self.version_list['版本'], i, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
+                    all_upload.append([i + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], i, j, talent_name[-1])])
+                all_upload.append([i + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], i, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
             self.w.add_info_text('【英雄】页面已经分析完毕！')
             QApplication.processEvents()
         if chosen == '' or chosen == '非英雄单位':
             for i in self.json_base['非英雄单位']:
                 all_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][i], self.json_base),i, 0)])
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][i], self.json_base), i, 0)])
             self.w.add_info_text('【非英雄单位】页面已经分析完毕！')
             QApplication.processEvents()
         if chosen == '' or chosen == '物品':
             for i in self.json_base['物品']:
                 all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][i], self.json_base),i, 0)])
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][i], self.json_base), i, 0)])
             self.w.add_info_text('【物品】页面已经分析完毕！')
             QApplication.processEvents()
         if chosen == '' or chosen == '单位组':
             for i in self.json_base['单位组']:
                 all_upload.append([i, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['单位组'][i], self.json_base),i, 0)])
+                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['单位组'][i], self.json_base), i, 0)])
             self.w.add_info_text('【单位组】页面已经分析完毕！')
             QApplication.processEvents()
         if chosen == '技能':
@@ -1551,7 +1551,7 @@ class Main(QMainWindow):
                     all_copy_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
                 else:
                     all_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
-                    all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['机制'][i], self.json_base),i, 0)])
+                    all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['机制'][i], self.json_base), i, 0)])
             self.w.add_info_text('【机制】页面已经分析完毕！')
             QApplication.processEvents()
         self.w.add_info_text('所有页面已经分析完毕！现在开始上传全部内容…………')
@@ -1631,27 +1631,28 @@ class Main(QMainWindow):
         QApplication.processEvents()
         for i in self.json_base['英雄']:
             all_page_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
-            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base),i, 0)])
+            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base), i, 0)])
             talent_name = []
             for j in ['10', '15', '20', '25']:
                 talent_name.append(common_page.all_the_names(self.json_base['技能'][i + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][i + j + '级右天赋'], self.json_base))
-                all_page_upload.append([i + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.json_base,self.version_base, self.version_list['版本'], i, j, talent_name[-1])])
-            all_page_upload.append([i + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base,self.version_base, self.version_list['版本'], i, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
+                all_page_upload.append([i + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], i, j, talent_name[-1])])
+            all_page_upload.append(
+                [i + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], i, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
         self.w.add_info_text('【英雄】页面已经分析完毕！')
         QApplication.processEvents()
         for i in self.json_base['非英雄单位']:
             all_page_upload.append([i, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], i)])
-            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][i], self.json_base),i, 0)])
+            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][i], self.json_base), i, 0)])
         self.w.add_info_text('【非英雄单位】页面已经分析完毕！')
         QApplication.processEvents()
         for i in self.json_base['物品']:
             all_page_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
-            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][i], self.json_base),i, 0)])
+            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][i], self.json_base), i, 0)])
         self.w.add_info_text('【物品】页面已经分析完毕！')
         QApplication.processEvents()
         for i in self.json_base['单位组']:
             all_page_upload.append([i, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], i)])
-            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['单位组'][i], self.json_base),i, 0)])
+            all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['单位组'][i], self.json_base), i, 0)])
         self.w.add_info_text('【单位组】页面已经分析完毕！')
         QApplication.processEvents()
         for i in self.json_base['技能']:
@@ -1669,7 +1670,7 @@ class Main(QMainWindow):
                 all_copy_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
             else:
                 all_page_upload.append([i, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['机制'][i], self.json_base),i, 0)])
+                all_page_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['机制'][i], self.json_base), i, 0)])
         self.w.add_info_text('【机制】页面已经分析完毕！')
         QApplication.processEvents()
         self.w.add_info_text('所有页面已经分析完毕！现在开始上传全部内容…………')
@@ -1825,20 +1826,21 @@ class Main(QMainWindow):
                 if k in self.json_base['英雄']:
                     all_upload.append([k + '.json', self.json_base['英雄'][k]])
                     all_page.append([k, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][k], self.json_base),k, 0)])
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][k], self.json_base), k, 0)])
                     talent_name = []
                     for j in ['10', '15', '20', '25']:
                         talent_name.append(common_page.all_the_names(self.json_base['技能'][k + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][k + j + '级右天赋'], self.json_base))
-                        all_page.append([k + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.json_base,self.version_base, self.version_list['版本'], k, j, talent_name[-1])])
-                    all_page.append([k + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base,self.version_base, self.version_list['版本'], k, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
+                        all_page.append([k + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], k, j, talent_name[-1])])
+                    all_page.append(
+                        [k + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], k, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
                 elif k in self.json_base['物品']:
                     all_upload.append([k + '.json', self.json_base['物品'][k]])
                     all_page.append([k, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],common_page.all_the_names(self.json_base['物品'][k], self.json_base),k, 0)])
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][k], self.json_base), k, 0)])
                 elif k in self.json_base['非英雄单位']:
                     all_upload.append([k + '.json', self.json_base['非英雄单位'][k]])
                     all_page.append([k, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],common_page.all_the_names(self.json_base['非英雄单位'][k], self.json_base),k, 0)])
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][k], self.json_base), k, 0)])
                 if k in self.json_base['机制源']:
                     all_upload.append([k + '/源.json', self.json_base['机制源'][k]])
                 if k in self.json_base['机制']:
@@ -1847,11 +1849,11 @@ class Main(QMainWindow):
                         all_copy_page.append([k, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], k)])
                     else:
                         all_page.append([k, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], k)])
-                        all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],common_page.all_the_names(self.json_base['机制'][k], self.json_base),k, 0)])
+                        all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['机制'][k], self.json_base), k, 0)])
                 if k in self.json_base['单位组']:
                     all_upload.append([k + '.json', self.json_base['单位组'][k]])
                     all_page.append([k, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], k)])
-                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'],common_page.all_the_names(self.json_base['单位组'][k], self.json_base),k, 0)])
+                    all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['单位组'][k], self.json_base), k, 0)])
         total_num = len(all_upload) + len(all_page) + len(all_copy_page) + len(all_redirect)
         self.w.confirm_numbers(total_num)
         for i in range(len(all_upload)):
@@ -2080,7 +2082,7 @@ class Main(QMainWindow):
                     w = ''
                     chosen = ''
                     name = ''
-                    preinfo=''
+                    preinfo = ''
                     tip = True
                     for i in range(3, len(template_args)):
                         if template_args[i] == 'tip':
@@ -2100,7 +2102,7 @@ class Main(QMainWindow):
                                 break
                     if w != '':
                         if tip:
-                            retxt += '<span class="dota_get_ability_buff_by_json" data-buff-address="' + db['页面名']+ '，' + w['名称'] + '"' + name + chosen + '>'+preinfo+'</span>'
+                            retxt += '<span class="dota_get_ability_buff_by_json" data-buff-address="' + db['页面名'] + '，' + w['名称'] + '"' + name + chosen + '>' + preinfo + '</span>'
                         else:
                             retxt += '<span class="" style="border-style:outset;background-color:#fff">' + w['名称'] + '</span>'
                     else:
@@ -2150,12 +2152,12 @@ class Main(QMainWindow):
                 retxt += '|w24'
             retxt += '}}'
         elif template_args[0] == '额外信息框':
-            noclick=''
+            noclick = ''
             for i in range(3, len(template_args)):
                 if template_args[i] == 'noclick':
                     noclick = ' data-additional-infomation-frame-no-click="1"'
             retxt += '<span class="dota_click_absolute_additional_infomation_frame">' \
-                     + '<span class="dota_click_absolute_additional_infomation_frame_button"'+noclick+'>' + template_args[1] + '</span>' \
+                     + '<span class="dota_click_absolute_additional_infomation_frame_button"' + noclick + '>' + template_args[1] + '</span>' \
                      + '<span class="dota_click_absolute_additional_infomation_frame_frame">' + template_args[2] + '</span></span> '
         elif template_args[0] == '点击复制':
             td = ''
@@ -2248,17 +2250,17 @@ class Main(QMainWindow):
                 retxt += '|' + template_args[i]
             retxt += '|style=warning}}'
         elif template_args[0] == '展开中文名':
-            prefix='('
-            suffix=')'
+            prefix = '('
+            suffix = ')'
             for i in range(2, len(template_args)):
                 if template_args[i][:4] == 'pre=':
                     prefix = template_args[i][4:]
                 elif template_args[i][:4] == 'suf=':
                     suffix = template_args[i][4:]
-            name=template_args[1]
-            retxt=name
-            if name in self.json_base['技能'] and self.json_base['技能'][name]['中文名']!=name:
-                retxt+=prefix+self.json_base['技能'][name]['中文名']+suffix
+            name = template_args[1]
+            retxt = name
+            if name in self.json_base['技能'] and self.json_base['技能'][name]['中文名'] != name:
+                retxt += prefix + self.json_base['技能'][name]['中文名'] + suffix
         else:
             return x.group(0)
         return retxt
@@ -2961,11 +2963,11 @@ class Main(QMainWindow):
     def json_edit_combine_to_text(self):
         warning = QMessageBox.warning(self, '转换', '您正试图将一串已有的混合文字转换为普通文字。\n内部所有的内容将会消失，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if warning == QMessageBox.Yes:
-            temptxt=''
+            temptxt = ''
             item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-            tempitem=item.child(0)
+            tempitem = item.child(0)
             for i in range(tempitem.childCount()):
-                temptxt+=tempitem.child(i).itemvalue
+                temptxt += tempitem.child(i).itemvalue
             item.removeChild(item.child(0))
             item.set_value(temptxt)
             self.tree_item_clicked()
@@ -4277,24 +4279,23 @@ class Main(QMainWindow):
             self.entry_edit_change_name()
 
     def test_inputwindow(self):
-        self.test_inputwindow_loop_check(self.json_base,[])
+        self.test_inputwindow_loop_check(self.json_base, [])
 
-    def test_inputwindow_loop_check(self, json,db):
+    def test_inputwindow_loop_check(self, json, db):
         for i in json:
-            v=json[i]
-            if isinstance(v,dict):
+            v = json[i]
+            if isinstance(v, dict):
                 if '混合文字' in v:
-                    self.test_inputwindow_change_it(v['混合文字'],db)
+                    self.test_inputwindow_change_it(v['混合文字'], db)
                 else:
-                    self.test_inputwindow_loop_check(v,db+[i])
+                    self.test_inputwindow_loop_check(v, db + [i])
 
-    def test_inputwindow_change_it(self, json,db):
+    def test_inputwindow_change_it(self, json, db):
         for i in json:
-            v=json[i]
-            if isinstance(v,dict):
-                if v['1']['0']=='图片链接':
-                    print(json,db)
-
+            v = json[i]
+            if isinstance(v, dict):
+                if v['1']['0'] == '图片链接':
+                    print(json, db)
 
     def system_cal_time(self, start):
         all = time.time() - start
