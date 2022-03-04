@@ -3606,6 +3606,7 @@ class Main(QMainWindow):
         ori_text = re.sub(r'[\[\]【】]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
+            text.strip().strip('\n')
             text = re.sub(r'(?<!\\)([+-]{2,3})', lambda x: self.version_edit_change_value_create_lablel1(item, x.group(1)), text)
             text = re.sub(r'(?<!\\)([\[【]{2})', lambda x: '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)([\]】]{2})', lambda x: '\\' + x.group(1)[0], text)
@@ -3791,7 +3792,7 @@ class Main(QMainWindow):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         text, ok = MoInputWindow.getText(self, '新增一个小分类', '请输入你想要增加的分类名称:')
         if ok:
-            text = text.lstrip(' ').rstrip('\n')
+            text = text.strip().strip('\n')
             new = VersionItemEdit(item)
             new.setText(0, text)
             new.itemtype = 'tree3'
