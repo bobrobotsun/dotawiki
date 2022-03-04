@@ -892,11 +892,11 @@ def create_hero_choose_element(json_base, args, dict, post):
         retxt += '<span class="dota_dict_label_switch_content_by_click_button dota_stretch_out_and_draw_back_element"' \
                  + ' data-check-key="总' + i + '" data-display-len="3">' + i + '</span>'
     retxt += '</span>'
-    all_kind = {'天辉力量':'','天辉敏捷':'','天辉智力':'','夜魇力量':'','夜魇敏捷':'','夜魇智力':''}
+    all_kind = {'力量':'','敏捷':'','智力':''}
     for i in json_base['英雄']:
         if json_base['英雄'][i]['应用'] == 1:
             args[1] = i
-            kind=json_base['英雄'][i]['阵营']['1']+json_base['英雄'][i]['主属性']['1']
+            kind=json_base['英雄'][i]['主属性']['1']
             all_kind[kind]+= '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content dota_hero_comprehensive_attri_dict_hero"' \
                      + ' data-select-input-text="' + i + '"  data-check-key-name="hero-comprehensive-attri-dict" data-hero-name="' + i + '"' \
                      + ' style="border:1px black solid;margin:2px;text-align:center;">' \

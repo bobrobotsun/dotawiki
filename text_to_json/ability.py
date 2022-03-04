@@ -1022,6 +1022,10 @@ def change_combine_txt(json, ii, data, all_json, name, target, change_all_templa
                     ttarget = copy.deepcopy(target)
                     ttarget.append(str(i))
                     returntxt += find_the_target_value_jsons_by_conditions_and_show_in_table(json[ii]["混合文字"][str(i)], all_json, ttarget)
+                elif json[ii]["混合文字"][str(i)]['类型'] == '逐一等级对比表格':
+                    ttarget = copy.deepcopy(target)
+                    ttarget.append(str(i))
+                    returntxt += find_each_level_value_by_conditions_and_show_in_table(json[ii]["混合文字"][str(i)], all_json, ttarget)
                 elif json[ii]["混合文字"][str(i)]['类型'] == '缩放点击切换器':
                     diplay_number = json[ii]["混合文字"][str(i)]['1']['0']
                     default_display = json[ii]["混合文字"][str(i)]['1']['1']
@@ -2338,6 +2342,56 @@ def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, 
         retxt = ''
     return retxt
 
+def find_each_level_value_by_conditions_and_show_in_table(json, all_json, target):
+    result=[]
+    index=[]
+    conditions = change_json_to_condition_dict(json, target)
+    if '标题' in conditions:
+        title=conditions['标题'][0]
+    else:
+        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《标题》，请填写'))
+    if '数列序数' in conditions:
+        if len(conditions['数列序数'][0])>=3:
+            v=conditions['数列序数'][0]
+            for i in range(int(v[0]),int(v[1]),int(v[2])):
+                index.append(str(i))
+        else:
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n《数列序数》需要至少3个参数，请补充完毕'))
+    elif '名称序数' in conditions:
+        for i in conditions['名称序数'][0]:
+            index.append(str(i))
+    else:
+        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《序数》内容，请填写“数列序数”或“名称序数”'))
+    if '目标' in conditions:
+        for i in range(len(conditions['目标'])):
+            v=conditions['目标'][i]
+            tempjson=all_json
+            for j in range(len(v)):
+                w=v[j]
+                if w in tempjson:
+                    tempjson=tempjson[w]
+                else:
+                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在检索第'+str(i)+'个目标的第'+str(j)+'项【'+str(w)+'】时，没有找到，请检查是否写错'))
+            one_result=[]
+            for j in index:
+                if j in tempjson:
+                    one_result.append(str(tempjson[j]))
+                else:
+                    one_result.append('')
+            result.append(one_result)
+    else:
+        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《目标》，请填写'))
+    retxt='<table class="wikitable"><tr>'
+    for i in title:
+        retxt+='<th>'+i+'</th>'
+    retxt+='</tr>'
+    for i in range(len(index)):
+        retxt+='<tr><td>'+index[i]+'</td>'
+        for j in range(len(result)):
+            retxt+='<td>'+result[j][i]+'</td>'
+        retxt+='</tr>'
+    retxt+='</table>'
+    return retxt
 
 # change_the_right_result_json_to_text_to_show
 def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions, result, json, all_json, target):

@@ -72,10 +72,13 @@ class Main(QMainWindow):
         self.version_base = {}
         # 曾用名的内容
         self.name_base = {'历史': [], '原生': [], '衍生': []}
+        #一些关于本程序的常数，可以通过修改外部文件来影响软件的运行
+        self.const={}
         # 时间函数
         self.time_point_for_iterable_sleep = time.time()
 
     def initUI(self):
+        self.load_const()
         # 设定软件的图标
         self.setWindowIcon(self.icon)
         # 设定窗口大小、位置至0.8倍屏幕长宽，且边缘为0.1倍长宽
@@ -102,7 +105,9 @@ class Main(QMainWindow):
         self.move(qr.topLeft())
 
     # 这是用来控制间隔时间的函数
-    def time_point_for_iterable_sleep_by_time(self, staytime=0.002, pasttime=0.0):
+    def time_point_for_iterable_sleep_by_time(self, staytime=0, pasttime=0.0):
+        if staytime==0:
+            staytime=self.const['thread_staytime']
         if pasttime == 0:
             pasttime = self.time_point_for_iterable_sleep
         temptime = time.time()
@@ -409,6 +414,15 @@ class Main(QMainWindow):
 
     # 以下是数据相关的内容
     # 自动读取软件数据库中保存的数据
+    def load_const(self):
+        try:
+            basefile = open(os.path.join('database', 'const.json'), mode="r", encoding="utf-8")
+            self.const = json.loads(basefile.read())
+            basefile.close()
+        except FileNotFoundError:
+            self.const={'thread_staytime':0.002,'thread_number':100}
+            self.file_save(os.path.join('database', 'const.json'), json.dumps(self.const))
+
     def load_data(self):
         try:
             basefile = open(os.path.join('database', 'text_base.json'), mode="r", encoding="utf-8")
@@ -672,7 +686,7 @@ class Main(QMainWindow):
                         self.download_json_list.append([i, j, j + '.json'])
             self.progress.confirm_numbers(len(self.download_json_list))
             self.startactiveCount = threading.activeCount()
-            for i in range(100):
+            for i in range(self.const['thread_number']):
                 t = threading.Thread(target=self.download_json_thread, name='线程-' + str(i + 1001))
                 t.start()
         except FileNotFoundError:
@@ -3606,7 +3620,7 @@ class Main(QMainWindow):
         ori_text = re.sub(r'[\[\]【】]', lambda x: '\\' + x.group(0), ori_text)
         text, ok = MoInputWindow.getText(self, '修改值', '您想将其修改为:', ori_text)
         if ok:
-            text.strip().strip('\n')
+            text = text.strip().strip('\n')
             text = re.sub(r'(?<!\\)([+-]{2,3})', lambda x: self.version_edit_change_value_create_lablel1(item, x.group(1)), text)
             text = re.sub(r'(?<!\\)([\[【]{2})', lambda x: '\\' + x.group(1)[0], text)
             text = re.sub(r'(?<!\\)([\]】]{2})', lambda x: '\\' + x.group(1)[0], text)
@@ -3619,6 +3633,7 @@ class Main(QMainWindow):
             text = re.sub(r'^(.+?)：：', lambda x: '{{H|' + x.group(1) + '}}：', text)
             text = re.sub(r'\{\{([AHI])\|([0-9]+?)\}\}', lambda x: '{{' + x.group(1) + '|' + hero_text + x.group(2) + '级天赋}}', text)
             text = re.sub(r'\\[\(\)（）\[\]【】<>《》]', lambda x: x.group(0)[1], text)
+            text = re.sub(r'(?<!>)\n', lambda x: '<br>\n', text)
             text = re.sub(r'{{{(.+?)[:：](.+?)}}}', lambda x: self.version_input_text_template_simple_txt(x.group(1), x.group(2)), text)
             text = re.sub(r'{{{{(.+?)}}}}', lambda x: self.version_input_text_simple_introduce(x.group(1)), text)
             item.set_value(text)
@@ -3773,7 +3788,7 @@ class Main(QMainWindow):
         item = self.versionlayout['版本内容']['横排版']['树'][0].currentItem()
         text, ok = MoInputWindow.getText(self, '新增一个中标题', '请输入你想要增加的标题名称:')
         if ok:
-            text = text.lstrip(' ').rstrip('\n')
+            text = text.strip().strip('\n')
             new = VersionItemEdit(item)
             new.setText(0, text)
             new.itemtype = 'tree2'
