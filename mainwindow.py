@@ -72,8 +72,8 @@ class Main(QMainWindow):
         self.version_base = {}
         # 曾用名的内容
         self.name_base = {'历史': [], '原生': [], '衍生': []}
-        #一些关于本程序的常数，可以通过修改外部文件来影响软件的运行
-        self.const={}
+        # 一些关于本程序的常数，可以通过修改外部文件来影响软件的运行
+        self.const = {}
         # 时间函数
         self.time_point_for_iterable_sleep = time.time()
 
@@ -106,8 +106,8 @@ class Main(QMainWindow):
 
     # 这是用来控制间隔时间的函数
     def time_point_for_iterable_sleep_by_time(self, staytime=0, pasttime=0.0):
-        if staytime==0:
-            staytime=self.const['thread_staytime']
+        if staytime == 0:
+            staytime = self.const['thread_staytime']
         if pasttime == 0:
             pasttime = self.time_point_for_iterable_sleep
         temptime = time.time()
@@ -420,7 +420,7 @@ class Main(QMainWindow):
             self.const = json.loads(basefile.read())
             basefile.close()
         except FileNotFoundError:
-            self.const={'thread_staytime':0.002,'thread_number':100}
+            self.const = {'thread_staytime': 0.002, 'thread_number': 100}
             self.file_save(os.path.join('database', 'const.json'), json.dumps(self.const))
 
     def load_data(self):
@@ -810,6 +810,8 @@ class Main(QMainWindow):
                     if image_name != '':
                         temp.setIcon(self.create_icon_by_local_image(image_name))
                     self.mainlayout['列表'][i]['布局']['列表'].addItem(temp)
+            self.edit_target_selected_changed()
+            self.update_the_jsons_alreadey = False
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
             self.edit_category_selected_changed()
@@ -928,6 +930,9 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['下载更新'] = QPushButton('下载更新', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['下载更新'])
         self.editlayout['竖布局']['下载更新'].clicked.connect(self.json_edit_download)
+        self.editlayout['竖布局']['下载同类库'] = QPushButton('下载同类库', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['下载同类库'])
+        self.editlayout['竖布局']['下载同类库'].clicked.connect(self.download_same_kind)
         self.editlayout['竖布局']['删除'] = QPushButton('删除', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['删除'])
         self.editlayout['竖布局']['删除'].clicked.connect(self.json_edit_delete)
@@ -1779,6 +1784,63 @@ class Main(QMainWindow):
             self.w.addtext(self.download_one_image(all_upload[i]), i)
             QApplication.processEvents()
         QMessageBox.information(self.w, '下载完毕', "您已下载完毕，可以关闭窗口", QMessageBox.Yes, QMessageBox.Yes)
+
+    def download_same_kind(self):
+        time_show = time.time()
+        selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
+        selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
+        target_name = []
+        if self.json_base[selected][selected_name]['应用'] > 0:
+            if selected == '技能':
+                target_name.append(self.json_base[selected][selected_name]['技能归属'])
+            elif selected == '技能源':
+                skill_name = selected_name
+                for i in self.json_base['技能']:
+                    if self.json_base['技能'][i]['数据来源'] == skill_name:
+                        target_name.append(self.json_base['技能'][i]['技能归属'])
+            else:
+                target_name.append(selected_name)
+        self.w = upload_text('开始下载数据')
+        self.w.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+        self.w.setWindowIcon(self.icon)
+        self.w.setWindowTitle('下载json中……')
+        QApplication.processEvents()
+        all_download = []
+        if len(target_name) == 0:
+            if selected[-1] == '源':
+                all_download.append([selected, selected_name, selected_name + '/源.json'])
+            else:
+                all_download.append([selected, selected_name, selected_name + '.json'])
+        else:
+            for k in target_name:
+                for i in self.json_base['技能']:
+                    if self.json_base['技能'][i]['技能归属'] == k:
+                        all_download.append(['技能', i, i + '.json'])
+                        j = self.json_base['技能'][i]['数据来源']
+                        if j in self.json_base['技能源']:
+                            all_download.append(['技能源', j, j + '/源.json'])
+                if k in self.json_base['英雄']:
+                    all_download.append(['英雄', k, k + '.json'])
+                if k in self.json_base['物品']:
+                    all_download.append(['物品', k, k + '.json'])
+                if k in self.json_base['非英雄单位']:
+                    all_download.append(['非英雄单位', k, k + '.json'])
+                if k in self.json_base['机制源']:
+                    all_download.append(['机制源', k, k + '/源.json'])
+                if k in self.json_base['机制']:
+                    all_download.append(['机制', k, k + '.json'])
+                if k in self.json_base['单位组']:
+                    all_download.append(['单位组', k, k + '.json'])
+        total_num = len(all_download)
+        self.w.confirm_numbers(total_num)
+        for i in range(len(all_download)):
+            self.json_base[all_download[i][0]][all_download[i][1]] = self.download_json(all_download[i][2])
+            self.w.addtext(['下载《' + all_download[i][0] + '→' + all_download[i][1] + '》完毕', 1], i)
+            QApplication.processEvents()
+        self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
+        self.edit_target_selected_changed()
+        self.update_the_jsons_alreadey = False
+        self.w.addtext(['下载完毕，已为您下载同类数据，并已保存。您可以关闭本窗口。\n总耗时：' + self.system_cal_time(time_show), 0])
 
     def upload_same_kind(self):
         time_show = time.time()
@@ -2712,6 +2774,7 @@ class Main(QMainWindow):
             self.json_base[ss[0]][ss[1]] = self.download_json(ss[1] + '.json')
         self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
         self.edit_target_selected_changed()
+        self.update_the_jsons_alreadey = False
         QMessageBox.information(self, '更新完毕', '更新成功！您成功从wiki下载到' + ss[1] + '的信息。')
 
     def json_edit_delete(self):

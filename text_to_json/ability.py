@@ -8,7 +8,7 @@ import time
 import operator
 
 import mainwindow
-from text_to_json import common_page, edit_json
+from text_to_json import common_page, edit_json,calculate
 from text_to_json.WikiError import editerror
 from xpinyin import Pinyin
 
@@ -590,6 +590,8 @@ def one_upgrade(json, mech, base_txt, name, target):
         if '名称' in json[tempi]:
             json['名称']=json[tempi]['名称']
             json[tempi].pop('名称')
+        json['1']['1']='无'
+        getvalue[0]=['无']
     for ii in range(2, extra + 2):
         i = str(ii)
         if "0" in json[i]["代码"] and json[i]["代码"]["0"] == "手填":
@@ -2344,6 +2346,7 @@ def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, 
 
 def find_each_level_value_by_conditions_and_show_in_table(json, all_json, target):
     result=[]
+    parameter=[]
     index=[]
     conditions = change_json_to_condition_dict(json, target)
     if '标题' in conditions:
@@ -2362,31 +2365,45 @@ def find_each_level_value_by_conditions_and_show_in_table(json, all_json, target
             index.append(str(i))
     else:
         raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《序数》内容，请填写“数列序数”或“名称序数”'))
-    if '目标' in conditions:
-        for i in range(len(conditions['目标'])):
-            v=conditions['目标'][i]
+    parameter.append(index)
+    if '条件' in conditions:
+        for i in range(len(conditions['条件'])):
+            v=conditions['条件'][i]
             tempjson=all_json
             for j in range(len(v)):
                 w=v[j]
                 if w in tempjson:
                     tempjson=tempjson[w]
                 else:
-                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在检索第'+str(i)+'个目标的第'+str(j)+'项【'+str(w)+'】时，没有找到，请检查是否写错'))
+                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在检索第'+str(i)+'个【条件】的第'+str(j)+'项【'+str(w)+'】时，没有找到，请检查是否写错'))
             one_result=[]
             for j in index:
                 if j in tempjson:
                     one_result.append(str(tempjson[j]))
                 else:
                     one_result.append('')
+            parameter.append(one_result)
+    if '文字目标' in conditions:
+        for i in range(len(conditions['文字目标'])):
+            v=conditions['文字目标'][i]
+            one_result=[]
+            equation='【'+str(i)+'】'
+            if len(v)>=1:
+                equation=v[0]
+            for j in range(len(index)):
+                tempara={}
+                for k in range(len(parameter)):
+                    tempara[str(k)]=parameter[k][j]
+                one_result.append(calculate.analyse_text_with_change_sign_and_calculate(equation,tempara))
             result.append(one_result)
     else:
-        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《目标》，请填写'))
+        raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《文字目标》，请填写'))
     retxt='<table class="wikitable"><tr>'
     for i in title:
         retxt+='<th>'+i+'</th>'
     retxt+='</tr>'
     for i in range(len(index)):
-        retxt+='<tr><td>'+index[i]+'</td>'
+        retxt+='<tr>'
         for j in range(len(result)):
             retxt+='<td>'+result[j][i]+'</td>'
         retxt+='</tr>'
