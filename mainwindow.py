@@ -988,6 +988,9 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['传统目标设定'] = QPushButton('传统目标设定', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['传统目标设定'])
         self.editlayout['竖布局']['传统目标设定'].clicked.connect(self.json_edit_target_default)
+        self.editlayout['竖布局']['升级各类型值'] = QPushButton('升级各类型值', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['升级各类型值'])
+        self.editlayout['竖布局']['升级各类型值'].clicked.connect(self.json_edit_default_update_value)
         self.editlayout['竖布局'][0].addStretch(1)
         self.editlayout['竖布局']['软件内更新'] = QPushButton('软件内更新', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['软件内更新'])
@@ -2572,13 +2575,14 @@ class Main(QMainWindow):
         target_name = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()[ind + 1:]
         self.edit_target_selected_changed(target_name)
 
-    def complex_dict_to_tree(self, tdict, edict, sdict):
+    def complex_dict_to_tree(self, tdict, edict, sdict,random=False):
         for i in edict:
             if i != 'list':
                 if i in sdict:
                     if edict[i][0] == 'tree':
                         tdict[i] = {0: TreeItemEdit(tdict[0], i)}
                         tdict[i][0].set_type(edict[i][0])
+                        tdict[i][0].israndom = random
                         self.complex_dict_to_tree(tdict[i], edict[i][1], sdict[i])
                         if len(edict[i]) > 2 and edict[i][2]:
                             tdict[i][0].setBackground(1, self.green)
@@ -2587,15 +2591,18 @@ class Main(QMainWindow):
                         tdict[i] = TreeItemEdit(tdict[0], i)
                         tdict[i].set_type(edict[i][0])
                         tdict[i].set_value(sdict[i])
+                        tdict[i].israndom = random
                     elif edict[i][0] == 'text':
                         if isinstance(sdict[i], dict) and '混合文字' in sdict[i]:
                             tdict[i] = {0: TreeItemEdit(tdict[0], i)}
                             tdict[i][0].set_type('text')
+                            tdict[i][0].israndom = random
                             self.combine_text_to_tree(tdict[i], sdict[i])
                         else:
                             tdict[i] = TreeItemEdit(tdict[0], i)
                             tdict[i].set_type(edict[i][0])
                             tdict[i].set_value(sdict[i])
+                            tdict[i].israndom = random
                     elif edict[i][0] == 'random_tree':
                         tdict[i] = {0: TreeItemEdit(tdict[0], i)}
                         tdict[i][0].set_type('tree')
@@ -2606,6 +2613,7 @@ class Main(QMainWindow):
                     if edict[i][0] == 'tree':
                         tdict[i] = {0: TreeItemEdit(tdict[0], i)}
                         tdict[i][0].set_type(edict[i][0])
+                        tdict[i][0].israndom = random
                         if len(edict[i]) > 2 and edict[i][2]:
                             tdict[i][0].setBackground(1, self.red)
                         else:
@@ -2616,6 +2624,7 @@ class Main(QMainWindow):
                         tdict[i] = TreeItemEdit(tdict[0], i)
                         tdict[i].set_type(edict[i][0])
                         tdict[i].set_value(edict[i][1])
+                        tdict[i].israndom = random
         if 'list' in edict:
             tdict[0].set_kid_list(edict['list'])
             index = tdict[0].listtype[2]
@@ -2632,12 +2641,14 @@ class Main(QMainWindow):
                     tdict[i] = {0: TreeItemEdit(tdict[0], i)}
                     tdict[i][0].set_type(edict['list'][0])
                     tdict[i][0].islist = True
+                    tdict[i][0].israndom = random
                     self.complex_dict_to_tree(tdict[i], edict['list'][1], sdict[i])
                     tdict[i][0].setExpanded(True)
                 else:
                     tdict[i] = TreeItemEdit(tdict[0], i)
                     tdict[i].set_type(edict['list'][0])
                     tdict[i].set_value(sdict[i])
+                    tdict[i].israndom = random
                     tdict[i].islist = True
                 index += 1
 
@@ -2895,13 +2906,11 @@ class Main(QMainWindow):
 
         self.editlayout['竖布局']['增加新次级条目'].setEnabled(sender.israndom and sender.itemtype == 'tree')
         self.editlayout['竖布局']['删除该次级条目'].setEnabled(sender.israndom and parent.israndom)
-        self.editlayout['竖布局']['转换为混合文字'].setEnabled(
-            sender.itemtype == 'text' and sender.childCount() == 0 and not sender.israndom)
-        self.editlayout['竖布局']['转换为普通文字'].setEnabled(
-            sender.itemtype == 'text' and sender.childCount() > 0 and not sender.israndom)
+        self.editlayout['竖布局']['转换为混合文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() == 0 and not sender.israndom)
+        self.editlayout['竖布局']['转换为普通文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() > 0 and not sender.israndom)
 
-        self.editlayout['竖布局']['传统目标设定'].setEnabled(
-            sender.text(0) == '不分类' or sender.text(0) == '英雄' or sender.text(0) == '非英雄')
+        self.editlayout['竖布局']['传统目标设定'].setEnabled(sender.text(0) == '不分类' or sender.text(0) == '英雄' or sender.text(0) == '非英雄')
+        self.editlayout['竖布局']['升级各类型值'].setEnabled(sender.text(0) == '值' and sender.israndom and sender.itemtype == 'tree')
 
     def tree_item_double_clicked(self):
         sender = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -3010,6 +3019,7 @@ class Main(QMainWindow):
             parent.child(i).setText(0, str(i - counts + parent.listtype[2]))
         if parent.itemtype == 'combine_tree':
             parent.tree_or_text = not parent.tree_or_text
+        self.tree_item_clicked()
 
     def json_edit_tree_use_true(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -3069,11 +3079,13 @@ class Main(QMainWindow):
             elif choose[3] == text1:
                 temp.set_type('tree')
         item.setExpanded(True)
+        self.tree_item_clicked()
 
     def json_edit_delete_item(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
         parent = item.parent()
         parent.removeChild(item)
+        self.tree_item_clicked()
 
     def edit_json_expand_2nd(self):
         self.editlayout['修改核心']['竖布局']['树'][0].expandAll()
@@ -3097,9 +3109,21 @@ class Main(QMainWindow):
         text, ok = MoInputWindow.getItem(self, "增加新条目", '条目的类型', choose)
         if ok:
             for i in range(item.childCount()):
-                item.removeChild(item.child(i))
+                item.removeChild(item.child(0))
             tdict = {0: item}
             self.complex_dict_to_tree(tdict, edit_json.edit_default_target, edit_json.edit_default_category[text])
+
+    def json_edit_default_update_value(self):
+        item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        choose = []
+        for i in edit_json.edit_default_update_value:
+            choose.append(i)
+        text, ok = MoInputWindow.getItem(self, "增加新条目", '条目的类型', choose)
+        if ok:
+            for i in range(item.childCount()):
+                item.removeChild(item.child(0))
+            tdict = {0: item}
+            self.complex_dict_to_tree(tdict, edit_json.edit_default_update_type[text], edit_json.edit_default_update_value[text],True)
 
     def read_tree_to_json(self, tree, sdict):
         category = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()

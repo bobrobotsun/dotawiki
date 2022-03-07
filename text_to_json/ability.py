@@ -332,7 +332,12 @@ def input_upgrade(all_json, upgrade_json):
                 if upgrade_json[i][upname][j]["目标"]["2"] == "":
                     upgrade_json[i][upname][j]["目标"]["2"] = i
                 if '0' in upgrade_json[i][upname][j]["目标"] and upgrade_json[i][upname][j]["目标"]["0"] == "追加注释":
+                    upgrade_json[i][upname][j]["目标"]["1"] = '技能'
+                    if '2' not in upgrade_json[i][upname][j]["目标"]:
+                        upgrade_json[i][upname][j]["目标"]["2"] = i
                     upgrade_json[i][upname][j]["目标"]["3"] = '注释'
+                    if '4' in upgrade_json[i][upname][j]["目标"]:
+                        upgrade_json[i][upname][j]["目标"].pop('4')
                 if "代码" in upgrade_json[i][upname][j]["值"] and isinstance(upgrade_json[i][upname][j]["值"]["代码"], dict):
                     if "1" in upgrade_json[i][upname][j]["值"]["代码"] and upgrade_json[i][upname][j]["值"]["代码"]["1"] == "":
                         upgrade_json[i][upname][j]["值"]["代码"]["1"] = "技能"
@@ -725,7 +730,9 @@ def array_cal(arr1, arr2, opp):
             if opp == '=':
                 arr1[i] = temp
         else:
-            if isinstance(temp, str):
+            if len(opp)>2 and opp[0] == '《' and opp[-1] == '》':
+                arr1[i] = calculate.analyse_text_with_change_sign_and_calculate(opp, [arr1[i],temp])
+            elif isinstance(temp, str):
                 arr1[i] = temp
             elif opp == '=':
                 arr1[i] = temp
@@ -979,14 +986,17 @@ def change_combine_txt(json, ii, data, all_json, name, target, change_all_templa
                             bool = bool and temp[j][0][0] == temp[j][0][k]
                         if bool:
                             temp[j][0] = [temp[j][0][0]]
-                    returntxt += combine_numbers_post_level(temp[0][0], post, level)
-                    if len(temp) > 1:
-                        returntxt += "("
-                        for j in range(1, len(temp)):
-                            for k in temp[j][1]:
-                                returntxt+=common_page.image_with_tip_with_link(temp[j][1][k],str(k))
-                            returntxt += combine_numbers_post_level(temp[j][0], post, level)
-                        returntxt += ")"
+                    if len(temp)==2 and temp[0][0][0]=='无':
+                        returntxt += combine_numbers_post_level(temp[1][0], post, level)
+                    else:
+                        returntxt += combine_numbers_post_level(temp[0][0], post, level)
+                        if len(temp) > 1:
+                            returntxt += "("
+                            for j in range(1, len(temp)):
+                                for k in temp[j][1]:
+                                    returntxt += common_page.image_with_tip_with_link(temp[j][1][k], str(k))
+                                returntxt += combine_numbers_post_level(temp[j][0], post, level)
+                            returntxt += ")"
                     if json[ii]["混合文字"][str(i)]['类型'][:2] == '切换':
                         returntxt += '</div>'
                     if json[ii]["混合文字"][str(i)]['类型'][:8] == '缩放点击切换内容':
@@ -1370,6 +1380,8 @@ def calculate_combine_txt_numbers(list1, list2, op):
             for j in range(len(expand1[i][0])):
                 if expand1[i][0][j] == '无穷大':
                     expand1[i][0][j] = '无穷大'
+                elif len(op)>2 and op[0]=='《' and op[-1]=='》':
+                    expand1[i][0][j] = calculate.analyse_text_with_change_sign_and_calculate(op, [expand1[i][0][j],expand2[i][0][j]])
                 elif op == '..':
                     expand1[i][0][j] = number_to_string(expand1[i][0][j]) + number_to_string(expand2[i][0][j])
                 elif op == '+':
