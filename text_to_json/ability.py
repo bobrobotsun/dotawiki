@@ -8,7 +8,7 @@ import time
 import operator
 
 import mainwindow
-from text_to_json import common_page, edit_json,calculate
+from text_to_json import common_page, edit_json, calculate
 from text_to_json.WikiError import editerror
 from xpinyin import Pinyin
 
@@ -72,7 +72,7 @@ def get_dota_data_from_vpk(base_txt, ffile):
 def get_hero_data_from_txt(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
     alltext = re.finditer('"(.*?)".*?\n(\t|\s\s\s\s)\{(.|\n)*?\n\t\}', this_string)
-    some_talent={}
+    some_talent = {}
     for i in alltext:
         name = i.group(1)
         base_txt[name] = {}
@@ -116,9 +116,9 @@ def get_hero_data_from_txt(base_txt, ffile):
             for k in other_pro:
                 temp_name = k.group(1)
                 temp_value = k.group(3)
-                temp_dict={}
+                temp_dict = {}
                 if temp_name not in some_talent:
-                    some_talent[temp_name]={}
+                    some_talent[temp_name] = {}
                 if temp_value.find('|') == -1:
                     temp_list = temp_value.split(' ')
                 else:
@@ -132,11 +132,12 @@ def get_hero_data_from_txt(base_txt, ffile):
                             temp_dict[str(l + 1)] = float(temp_valuek)
                         except ValueError:
                             temp_dict[str(l + 1)] = temp_valuek
-                some_talent[temp_name][name+'-'+j.group(1)] = temp_dict
+                some_talent[temp_name][name + '-' + j.group(1)] = temp_dict
     for i in some_talent:
         if i in base_txt:
             for j in some_talent[i]:
-                base_txt[i][j]=some_talent[i][j]
+                base_txt[i][j] = some_talent[i][j]
+
 
 def autoget_talent_source(all_json, base):
     retxt = ''
@@ -249,7 +250,13 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
             if unit_dic['图片类型'] != '手填':
                 if unit_dic["次级分类"] == "天赋技能":
                     unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
-                    unit_dic["迷你图片"] = 'Talent.png'
+                    pic_name='Talent_'+unit_dic['页面名'][-6:-4]+'_'
+                    if unit_dic['页面名'][-3]=='左':
+                        pic_name+='left'
+                    elif unit_dic['页面名'][-3]=='右':
+                        pic_name+='right'
+                    pic_name+='.png'
+                    unit_dic["迷你图片"] = pic_name
                 elif unit_dic["次级分类"] == "物品技能":
                     if unit_dic["技能归属"] in all_json["物品"]:
                         unit_dic["图片"] = all_json["物品"][unit_dic["技能归属"]]["图片"]
@@ -372,14 +379,14 @@ def input_upgrade(all_json, upgrade_json):
                             temp[upstr][k] = copy.deepcopy(upgrade_json[i][upname][j]["值"][k])
                     elif upgrade_json[i][upname][j]["目标"]["0"] == "追加":
                         if '1' not in temp:
-                            upstr='1'
-                        temp[upstr] = {'2':upgrade_json[i][upname][j]["值"]}
-                        temp=temp[upstr]
-                        upstr='2'
+                            upstr = '1'
+                        temp[upstr] = {'2': upgrade_json[i][upname][j]["值"]}
+                        temp = temp[upstr]
+                        upstr = '2'
                     elif upgrade_json[i][upname][j]["目标"]["0"] == "追加注释":
-                        temp[upstr]=upgrade_json[i][upname][j]["值"]
+                        temp[upstr] = upgrade_json[i][upname][j]["值"]
                         if '序列级数' not in temp[upstr]:
-                            temp[upstr]['序列级数']=1
+                            temp[upstr]['序列级数'] = 1
                         else:
                             temp[upstr]['序列级数'] = int(temp[upstr]['序列级数'])
                     else:
@@ -388,18 +395,18 @@ def input_upgrade(all_json, upgrade_json):
                     temp[upstr] = upgrade_json[i][upname][j]["值"]
                 tarname = upgrade_json[i][upname][j]["目标"]["2"]
                 if '升级来源' not in temp[upstr]:
-                    temp[upstr]["升级来源"]={}
-                    uplen=1
+                    temp[upstr]["升级来源"] = {}
+                    uplen = 1
                 else:
-                    uplen=len(temp[upstr]["升级来源"])+1
+                    uplen = len(temp[upstr]["升级来源"]) + 1
                 if upname == '神杖':
                     temp[upstr]["升级来源"][str(uplen)] = {"名称": '阿哈利姆神杖', '图片': 'agha.png'}
                     if i != tarname and i in all_json['技能']:
-                        temp[upstr]["升级来源"][str(uplen+1)] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
+                        temp[upstr]["升级来源"][str(uplen + 1)] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
                 elif upname == '魔晶':
                     temp[upstr]["升级来源"][str(uplen)] = {"名称": '阿哈利姆魔晶', '图片': 'shard.png'}
                     if i != tarname and i in all_json['技能']:
-                        temp[upstr]["升级来源"][str(uplen+1)] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
+                        temp[upstr]["升级来源"][str(uplen + 1)] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
                 elif upname == '技能':
                     temp[upstr]["升级来源"][str(uplen)] = {"名称": i, '图片': all_json['技能'][i]['迷你图片']}
     for i in all_json["技能"]:
@@ -447,14 +454,14 @@ def complete_upgrade(all_json, mech, base_txt):
             for j in all_json[i]["属性"]:
                 if fulfil(all_json[i]["属性"][j], all_json[i]):
                     if '后缀' not in all_json[i]["属性"][j]:
-                        all_json[i]["属性"][j]['后缀']=''
-                        kk=2
+                        all_json[i]["属性"][j]['后缀'] = ''
+                        kk = 2
                         while True:
-                            k=str(kk)
-                            kk+=1
+                            k = str(kk)
+                            kk += 1
                             if k in all_json[i]["属性"][j]:
                                 if '后缀' in all_json[i]["属性"][j][k]:
-                                    all_json[i]["属性"][j]['后缀']=all_json[i]["属性"][j][k]['后缀']
+                                    all_json[i]["属性"][j]['后缀'] = all_json[i]["属性"][j][k]['后缀']
                                     all_json[i]["属性"][j][k].pop('后缀')
                             else:
                                 break
@@ -591,12 +598,12 @@ def one_upgrade(json, mech, base_txt, name, target):
             if not tempj.isnumeric() and tempj != '代码' and tempj != '升级来源' and tempj != '名称':
                 json["1"][tempj] = copy.deepcopy(json[tempi][tempj])
         if '名称' not in json:
-            json['名称']=''
+            json['名称'] = ''
         if '名称' in json[tempi]:
-            json['名称']=json[tempi]['名称']
+            json['名称'] = json[tempi]['名称']
             json[tempi].pop('名称')
-        json['1']['1']='无'
-        getvalue[0]=['无']
+        json['1']['1'] = '无'
+        getvalue[0] = ['无']
     for ii in range(2, extra + 2):
         i = str(ii)
         if "0" in json[i]["代码"] and json[i]["代码"]["0"] == "手填":
@@ -730,8 +737,8 @@ def array_cal(arr1, arr2, opp):
             if opp == '=':
                 arr1[i] = temp
         else:
-            if len(opp)>2 and opp[0] == '《' and opp[-1] == '》':
-                arr1[i] = calculate.analyse_text_with_change_sign_and_calculate(opp, [arr1[i],temp])
+            if len(opp) > 2 and opp[0] == '《' and opp[-1] == '》':
+                arr1[i] = calculate.analyse_text_with_change_sign_and_calculate(opp, [arr1[i], temp])
             elif isinstance(temp, str):
                 arr1[i] = temp
             elif opp == '=':
@@ -986,8 +993,10 @@ def change_combine_txt(json, ii, data, all_json, name, target, change_all_templa
                             bool = bool and temp[j][0][0] == temp[j][0][k]
                         if bool:
                             temp[j][0] = [temp[j][0][0]]
-                    if len(temp)==2 and temp[0][0][0]=='无':
+                    if len(temp) == 2 and temp[0][0][0] == '无':
                         returntxt += combine_numbers_post_level(temp[1][0], post, level)
+                    elif len(temp) == 2 and temp[1][0][0] == '无':
+                        returntxt += combine_numbers_post_level(temp[0][0], post, level)
                     else:
                         returntxt += combine_numbers_post_level(temp[0][0], post, level)
                         if len(temp) > 1:
@@ -1380,8 +1389,8 @@ def calculate_combine_txt_numbers(list1, list2, op):
             for j in range(len(expand1[i][0])):
                 if expand1[i][0][j] == '无穷大':
                     expand1[i][0][j] = '无穷大'
-                elif len(op)>2 and op[0]=='《' and op[-1]=='》':
-                    expand1[i][0][j] = calculate.analyse_text_with_change_sign_and_calculate(op, [expand1[i][0][j],expand2[i][0][j]])
+                elif len(op) > 2 and op[0] == '《' and op[-1] == '》':
+                    expand1[i][0][j] = calculate.analyse_text_with_change_sign_and_calculate(op, [expand1[i][0][j], expand2[i][0][j]])
                 elif op == '..':
                     expand1[i][0][j] = number_to_string(expand1[i][0][j]) + number_to_string(expand2[i][0][j])
                 elif op == '+':
@@ -1718,7 +1727,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
             for i in range(len(traitlist)):
                 if i > 0:
                     another_info += ';'
-                another_info += common_page.create_upgrade_text(json["属性"], traitlist[i],  image_size='|h16')
+                another_info += common_page.create_upgrade_text(json["属性"], traitlist[i], image_size='|h16')
             another_info += ')'
 
         if '条件物品属性' in conditions:
@@ -1764,7 +1773,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                     name = tempjson['名称']
                 else:
                     name = conditions['条件复合属性'][i][-1]
-                trait += '<div>' + name + '：' + common_page.nocheck_create_upgrade_text(tempjson,  image_size='|h16') + '</div>'
+                trait += '<div>' + name + '：' + common_page.nocheck_create_upgrade_text(tempjson, image_size='|h16') + '</div>'
         if '条件单一属性' in conditions:
             for i in range(len(conditions['条件单一属性'])):
                 tempjson = find_json_by_condition_with_result(conditions['条件单一属性'][i][:-1], i, json, result, target, '条件单一属性')
@@ -1797,7 +1806,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                         w = tempjson[j]
                         if jj > 1:
                             temptxt += '+'
-                        temptxt += common_page.create_upgrade_text(tempjson, j,  lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '')
+                        temptxt += common_page.create_upgrade_text(tempjson, j, lambda x: x['1']['类型']['后缀'] if '后缀' in x['1']['类型'] else '')
                     else:
                         break
                 trait += '<div>' + tempname + '：' + temptxt + '</div>'
@@ -1820,7 +1829,7 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 if '简述' in tempjson and tempjson['简述'] != '':
                     note += '<div>' + tempjson['简述'] + '</div>'
         for i in traitlist:
-            trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i,  image_size='|h16') + '</div>'
+            trait += '<div>' + json['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(json["属性"], i, image_size='|h16') + '</div>'
 
         if '条件物品属性' in conditions:
             for i in range(len(conditions['条件物品属性'])):
@@ -2356,19 +2365,20 @@ def find_the_target_value_jsons_by_conditions_and_show_in_table(json, all_json, 
         retxt = ''
     return retxt
 
+
 def find_each_level_value_by_conditions_and_show_in_table(json, all_json, target):
-    result=[]
-    parameter=[]
-    index=[]
+    result = []
+    parameter = []
+    index = []
     conditions = change_json_to_condition_dict(json, target)
     if '标题' in conditions:
-        title=conditions['标题'][0]
+        title = conditions['标题'][0]
     else:
         raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《标题》，请填写'))
     if '数列序数' in conditions:
-        if len(conditions['数列序数'][0])>=3:
-            v=conditions['数列序数'][0]
-            for i in range(int(v[0]),int(v[1]),int(v[2])):
+        if len(conditions['数列序数'][0]) >= 3:
+            v = conditions['数列序数'][0]
+            for i in range(int(v[0]), int(v[1]), int(v[2])):
                 index.append(str(i))
         else:
             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n《数列序数》需要至少3个参数，请补充完毕'))
@@ -2380,15 +2390,15 @@ def find_each_level_value_by_conditions_and_show_in_table(json, all_json, target
     parameter.append(index)
     if '条件' in conditions:
         for i in range(len(conditions['条件'])):
-            v=conditions['条件'][i]
-            tempjson=all_json
+            v = conditions['条件'][i]
+            tempjson = all_json
             for j in range(len(v)):
-                w=v[j]
+                w = v[j]
                 if w in tempjson:
-                    tempjson=tempjson[w]
+                    tempjson = tempjson[w]
                 else:
-                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在检索第'+str(i)+'个【条件】的第'+str(j)+'项【'+str(w)+'】时，没有找到，请检查是否写错'))
-            one_result=[]
+                    raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在检索第' + str(i) + '个【条件】的第' + str(j) + '项【' + str(w) + '】时，没有找到，请检查是否写错'))
+            one_result = []
             for j in index:
                 if j in tempjson:
                     one_result.append(str(tempjson[j]))
@@ -2397,30 +2407,31 @@ def find_each_level_value_by_conditions_and_show_in_table(json, all_json, target
             parameter.append(one_result)
     if '文字目标' in conditions:
         for i in range(len(conditions['文字目标'])):
-            v=conditions['文字目标'][i]
-            one_result=[]
-            equation='【'+str(i)+'】'
-            if len(v)>=1:
-                equation=v[0]
+            v = conditions['文字目标'][i]
+            one_result = []
+            equation = '【' + str(i) + '】'
+            if len(v) >= 1:
+                equation = v[0]
             for j in range(len(index)):
-                tempara={}
+                tempara = {}
                 for k in range(len(parameter)):
-                    tempara[str(k)]=parameter[k][j]
-                one_result.append(calculate.analyse_text_with_change_sign_and_calculate(equation,tempara))
+                    tempara[str(k)] = parameter[k][j]
+                one_result.append(calculate.analyse_text_with_change_sign_and_calculate(equation, tempara))
             result.append(one_result)
     else:
         raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n没有找到《文字目标》，请填写'))
-    retxt='<table class="wikitable"><tr>'
+    retxt = '<table class="wikitable"><tr>'
     for i in title:
-        retxt+='<th>'+i+'</th>'
-    retxt+='</tr>'
+        retxt += '<th>' + i + '</th>'
+    retxt += '</tr>'
     for i in range(len(index)):
-        retxt+='<tr>'
+        retxt += '<tr>'
         for j in range(len(result)):
-            retxt+='<td>'+result[j][i]+'</td>'
-        retxt+='</tr>'
-    retxt+='</table>'
+            retxt += '<td>' + result[j][i] + '</td>'
+        retxt += '</tr>'
+    retxt += '</table>'
     return retxt
+
 
 # change_the_right_result_json_to_text_to_show
 def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions, result, json, all_json, target):
@@ -2933,7 +2944,7 @@ def create_upgrade_cooldown(arr, outtip='div'):
             retxt += '<' + outtip + ' style="padding:0.5em 0.5em 0em 1em;">'
             if v['名称'] != '':
                 retxt += v['名称']
-            retxt += common_page.image_with_tip_with_link(v['1']['类型']['图片'],v['1']['类型']['值'],False)+' '
+            retxt += common_page.image_with_tip_with_link(v['1']['类型']['图片'], v['1']['类型']['值'], False) + ' '
             jj = 0
             while True:
                 jj += 1
@@ -2957,10 +2968,10 @@ def create_upgrade_cooldown(arr, outtip='div'):
                             k = str(kk)
                             if k in v[j]['升级来源']:
                                 x = v[j]['升级来源'][k]
-                                retxt += common_page.image_with_tip_with_link(x['图片'],x['名称'],False)
+                                retxt += common_page.image_with_tip_with_link(x['图片'], x['名称'], False)
                             else:
                                 break
-                        retxt += common_page.image_with_tip_with_link(v[j]['类型']['图片'],v[j]['类型']['值'],False)
+                        retxt += common_page.image_with_tip_with_link(v[j]['类型']['图片'], v[j]['类型']['值'], False)
                         kk = 0
                         while True:
                             kk += 1
@@ -2992,7 +3003,7 @@ def create_upgrade_buff(json_dict):
             retxt += '<tr><td>'
             if i > 1:
                 for j in json_dict[str(i)]['升级来源']:
-                    retxt += common_page.image_with_tip_with_link(json_dict[str(i)]['升级来源'][j]['图片'],json_dict[str(i)]['升级来源'][j]['名称'],image_size='w22') + ' '
+                    retxt += common_page.image_with_tip_with_link(json_dict[str(i)]['升级来源'][j]['图片'], json_dict[str(i)]['升级来源'][j]['名称'], image_size='w22') + ' '
             retxt += '</td><td style="padding:0.25em;">'
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
                 retxt += '{{额外信息框|{{图片|' + json_dict[str(i)]['图片'] + '}}|' + json_dict[str(i)]['值'] + '}} '
@@ -3098,7 +3109,7 @@ def create_upgrade_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"],json_dict[i]['升级来源'][j]["名称"],image_size='w22')+' '
+                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"], json_dict[i]['升级来源'][j]["名称"], image_size='w22') + ' '
             retxt += '</td><td style="padding:0.25em;"><span style="cursor:help;">{{图片|' + json_dict[i]['图片'] + '}}</span> (' + json_dict[i]['值'] + ') '
             retxt += '：' + json_dict[i]['简述'] + '</td></tr>'
             kk = 0
@@ -3128,7 +3139,7 @@ def create_independent_mech(json_dict):
             retxt += '<tr><td>'
             if ii > 1:
                 for j in json_dict[i]['升级来源']:
-                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"],json_dict[i]['升级来源'][j]["名称"],image_size='w22') + ' '
+                    retxt += common_page.image_with_tip_with_link(json_dict[i]['升级来源'][j]["图片"], json_dict[i]['升级来源'][j]["名称"], image_size='w22') + ' '
             retxt += '</td><td><span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[i]['机制名'] + '</span>：' + json_dict[i]['简述'] + '</td></tr>'
             if json_dict[i]['机制名'][0] == '#':
                 return ''
@@ -3215,8 +3226,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                         bt += '<div style="padding:0.25em;">{{图片|' + v['图片'] + '|h16|link=' + v['技能名'] + '}}[[' + v['技能名'] + ']]（' + v['中文名'] + ')</div>'
                     else:
                         break
-            bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"],all_json)
-            st += '<tr><td style="width:140px;max-width:140px;text-align:left;vertical-align:top;">' + create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"],all_json)
+            bt += create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"], all_json)
+            st += '<tr><td style="width:140px;max-width:140px;text-align:left;vertical-align:top;">' + create_upgrade_cast_point_backswing(db["施法前摇"], db["施法后摇"], all_json)
             ii = 0
             while True:
                 ii += 1
@@ -3314,10 +3325,10 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                                 bt += '</ul>'
                             uls = v['序列级数']
                         bt += '<li>'
-                        if '升级来源' in v and v['序列级数']==1:
+                        if '升级来源' in v and v['序列级数'] == 1:
                             for jj in v['升级来源']:
-                                w=v['升级来源'][jj]
-                                bt+='{{图片|'+w['图片']+'|w20}}'+w['名称']+"升级："
+                                w = v['升级来源'][jj]
+                                bt += '{{图片|' + w['图片'] + '|w20}}' + w['名称'] + "升级："
                         bt += v['文字'] + '</li>'
                     else:
                         break

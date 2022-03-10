@@ -40,12 +40,12 @@ class Main(QMainWindow):
         self.version = '7.31'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
-        self.target_url = 'http://dota.huijiwiki.com/w/api.php'
-        self.image_url = 'http://huiji-public.huijistatic.com/dota/uploads'
+        self.target_url = 'https://dota.huijiwiki.com/api.php'
+        self.image_url = 'https://huiji-public.huijistatic.com/dota/uploads'
         self.seesion = requests.session()
-        self.header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36'}
+        self.header = {}
         self.get_login_token_data = {'action': 'query', 'meta': 'tokens', 'type': 'login', 'format': 'json'}
-        self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'http://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
+        self.login_data = {'action': 'clientlogin', 'loginreturnurl': 'https://www.huijiwiki.com/', 'rememberMe': 1, 'format': 'json'}
         self.get_csrf_token_data = {'action': 'query', 'meta': 'tokens', 'format': 'json'}
         self.logout_data = {'action': 'logout', 'format': 'json'}
         # 菜单栏
@@ -3035,16 +3035,18 @@ class Main(QMainWindow):
 
     def json_edit_text_to_combine(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
-        itemtxt = item.itemvalue
+        itemtxt = item.itemvalue.split('\n')
         item.delete_value()
         temp = TreeItemEdit(item, '混合文字')
         temp.set_type('combine_tree')
         temp.set_kid_list(edit_json.edit_adition['混合文字'])
         tree = self.editlayout['修改核心']['竖布局']['树'][0].setCurrentItem(temp)
         self.tree_item_clicked()
-        self.json_edit_add_list()
-        temp2 = temp.child(0)
-        temp2.set_value(itemtxt)
+        for i in range(2*len(itemtxt)-1):
+            self.json_edit_add_list()
+        for i in range(len(itemtxt)):
+            temp2 = temp.child(2*i)
+            temp2.set_value(itemtxt[i])
         item.setExpanded(True)
 
     def json_edit_combine_to_text(self):
@@ -3054,7 +3056,10 @@ class Main(QMainWindow):
             item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
             tempitem = item.child(0)
             for i in range(tempitem.childCount()):
-                temptxt += tempitem.child(i).itemvalue
+                if tempitem.child(i).itemtype=='text':
+                    if i>0:
+                        temptxt+='\n'
+                    temptxt += tempitem.child(i).itemvalue
             item.removeChild(item.child(0))
             item.set_value(temptxt)
             self.tree_item_clicked()
@@ -3576,9 +3581,9 @@ class Main(QMainWindow):
                 new1.setText(0, i)
                 if i == '官网链接' and self.version_base[title][i] == '':
                     if item.parent() == None:
-                        new1.set_value('http://www.dota2.com/patches/' + title)
+                        new1.set_value('https://www.dota2.com/patches/' + title)
                     else:
-                        new1.set_value('http://www.dota2.com/news/updates/')
+                        new1.set_value('https://www.dota2.com/news/updates/')
                 else:
                     new1.set_value(self.version_base[title][i])
             elif edit_json.version[i][0] == 'tree':
@@ -4053,7 +4058,8 @@ class Main(QMainWindow):
                             oname = self.name_base['历史'][k]['名称'] + l + '级天赋'
                             tname = j + l + '级左天赋'
                             if tname in self.json_base['技能'] and '图片' in self.json_base['技能'][tname] and '迷你图片' in self.json_base['技能'][tname]:
-                                self.name_base['衍生'].append({'名称': oname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']})
+                                picname=self.json_base['技能'][tname]['迷你图片']
+                                self.name_base['衍生'].append({'名称': oname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': picname[:9]+picname[-4:]})
         for i in ['物品', '非英雄单位', '机制', '单位组']:
             for j in self.json_base[i]:
                 if '图片' in self.json_base[i][j] and '迷你图片' in self.json_base[i][j]:
@@ -4080,7 +4086,8 @@ class Main(QMainWindow):
                 tname = j + k + '级左天赋'
                 zyname = j + k + '级天赋'
                 if tname in self.json_base['技能'] and '图片' in self.json_base['技能'][tname] and '迷你图片' in self.json_base['技能'][tname]:
-                    self.name_base['衍生'].append({'名称': zyname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': self.json_base['技能'][tname]['迷你图片']})
+                    picname = self.json_base['技能'][tname]['迷你图片']
+                    self.name_base['衍生'].append({'名称': zyname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': picname[:9]+picname[-4:]})
         self.show_name_base_in_widget()
 
     def show_name_base_in_widget(self):
