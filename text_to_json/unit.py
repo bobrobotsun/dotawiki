@@ -89,7 +89,9 @@ def get_hero_data_from_txt(base_txt, ffile):
         if findtb(source_string, tb[1] + 2, len(source_string), tb, 0):
             name = findunitname(source_string, tb)
             default=unit_default
-            if name[:-1]+'1' in base_txt:
+            if 'eidolon' in name and 'lesser_eidolon' in base_txt:
+                default = base_txt['lesser_eidolon']
+            elif name[:-1]+'1' in base_txt:
                 default =base_txt[name[:-1]+'1']
             elif name[:-1] in base_txt:
                 default =base_txt[name[:-1]]

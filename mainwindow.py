@@ -2127,6 +2127,7 @@ class Main(QMainWindow):
             size = ''
             pic_style = ''
             text_link = '1'
+            image_link = '1'
             image_class = 'dota_get_image_by_json_name'
             if template_args[1] == '魔晶升级' or template_args[1] == '魔晶技能':
                 template_args.insert(2, 'w24')
@@ -2137,6 +2138,8 @@ class Main(QMainWindow):
                     size = ' data-image-height="' + template_args[i][1:] + '"'
                 elif template_args[i][:5] == 'link=':
                     text_link = template_args[i][5:]
+                elif template_args[i][:6] == 'image=':
+                    image_link = template_args[i][6:]
             if len(template_args[1]) > 2 and template_args[1][-2:] == '天赋':
                 pic_style = ''
             elif template_args[0] in ['A', 'a']:
@@ -2145,7 +2148,8 @@ class Main(QMainWindow):
                 pic_style += ' data-image-class="item_icon"'
             if template_args[0].lower() == 'hh':
                 image_class = 'delay_get_image_by_json_name'
-            retxt += '<span class="' + image_class + '" data-json-name="' + template_args[1] + '" data-image-mini="1" ' + ' data-image-link="1" data-text-link="' + text_link + '"' + size + pic_style + '></span>'
+            retxt += '<span class="' + image_class + '" data-json-name="' + template_args[
+                1] + '" data-image-mini="1" ' + ' data-image-link="' + image_link + '" data-text-link="' + text_link + '"' + size + pic_style + '></span>'
         elif template_args[0] in ['E', 'e']:
             if template_args[1] in self.entry_base:
                 retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + self.entry_base[template_args[1]]['链接'] + '">' + template_args[1] + '</span>'
@@ -2575,7 +2579,7 @@ class Main(QMainWindow):
         target_name = self.mainlayout['列表'][target_base]['布局']['列表'].currentItem().text()[ind + 1:]
         self.edit_target_selected_changed(target_name)
 
-    def complex_dict_to_tree(self, tdict, edict, sdict,random=False):
+    def complex_dict_to_tree(self, tdict, edict, sdict, random=False):
         for i in edict:
             if i != 'list':
                 if i in sdict:
@@ -3042,10 +3046,10 @@ class Main(QMainWindow):
         temp.set_kid_list(edit_json.edit_adition['混合文字'])
         tree = self.editlayout['修改核心']['竖布局']['树'][0].setCurrentItem(temp)
         self.tree_item_clicked()
-        for i in range(2*len(itemtxt)-1):
+        for i in range(2 * len(itemtxt) - 1):
             self.json_edit_add_list()
         for i in range(len(itemtxt)):
-            temp2 = temp.child(2*i)
+            temp2 = temp.child(2 * i)
             temp2.set_value(itemtxt[i])
         item.setExpanded(True)
 
@@ -3056,9 +3060,9 @@ class Main(QMainWindow):
             item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
             tempitem = item.child(0)
             for i in range(tempitem.childCount()):
-                if tempitem.child(i).itemtype=='text':
-                    if i>0:
-                        temptxt+='\n'
+                if tempitem.child(i).itemtype == 'text':
+                    if i > 0:
+                        temptxt += '\n'
                     temptxt += tempitem.child(i).itemvalue
             item.removeChild(item.child(0))
             item.set_value(temptxt)
@@ -3128,7 +3132,7 @@ class Main(QMainWindow):
             for i in range(item.childCount()):
                 item.removeChild(item.child(0))
             tdict = {0: item}
-            self.complex_dict_to_tree(tdict, edit_json.edit_default_update_type[text], edit_json.edit_default_update_value[text],True)
+            self.complex_dict_to_tree(tdict, edit_json.edit_default_update_type[text], edit_json.edit_default_update_value[text], True)
 
     def read_tree_to_json(self, tree, sdict):
         category = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
@@ -4058,8 +4062,8 @@ class Main(QMainWindow):
                             oname = self.name_base['历史'][k]['名称'] + l + '级天赋'
                             tname = j + l + '级左天赋'
                             if tname in self.json_base['技能'] and '图片' in self.json_base['技能'][tname] and '迷你图片' in self.json_base['技能'][tname]:
-                                picname=self.json_base['技能'][tname]['迷你图片']
-                                self.name_base['衍生'].append({'名称': oname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': picname[:9]+picname[-4:]})
+                                picname = self.json_base['技能'][tname]['迷你图片']
+                                self.name_base['衍生'].append({'名称': oname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': picname[:9] + picname[-4:]})
         for i in ['物品', '非英雄单位', '机制', '单位组']:
             for j in self.json_base[i]:
                 if '图片' in self.json_base[i][j] and '迷你图片' in self.json_base[i][j]:
@@ -4087,7 +4091,7 @@ class Main(QMainWindow):
                 zyname = j + k + '级天赋'
                 if tname in self.json_base['技能'] and '图片' in self.json_base['技能'][tname] and '迷你图片' in self.json_base['技能'][tname]:
                     picname = self.json_base['技能'][tname]['迷你图片']
-                    self.name_base['衍生'].append({'名称': zyname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': picname[:9]+picname[-4:]})
+                    self.name_base['衍生'].append({'名称': zyname, '页面名': tname, '图片': self.json_base['技能'][tname]['图片'], '迷你图片': picname[:9] + picname[-4:]})
         self.show_name_base_in_widget()
 
     def show_name_base_in_widget(self):
