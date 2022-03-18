@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import *
 from text_to_json import common_page, ability
 from text_to_json.WikiError import editerror
 
-def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_template_link_to_html,loop_time=1,w=''):
+def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech,change_all_template_link_to_html,loop_time=1,selfw=''):
     # 一定报错的内容
     for i in tlist:
         if i not in all_json['机制']:
@@ -36,6 +36,16 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
             todict["版本"] = version
             for i in ["图片", "迷你图片", "图片大小", "简述"]:
                 todict[i] = fromdict[i]
+            todict['自定义机制'] = {}
+            for i in fromdict['自定义机制']:
+                v=fromdict['自定义机制'][i]
+                if v['名称']=='':
+                    dictkey='自定义机制'+i
+                else:
+                    dictkey=v['名称']
+                todict['自定义机制'][dictkey]={}
+                todict['自定义机制'][dictkey]['分隔符']=fromdict['自定义机制'][i]['分隔符']
+                todict['自定义机制'][dictkey]['目标']=fromdict['自定义机制'][i]['目标']
             todict['属性'] = {}
             for i in fromdict['属性']:
                 dictkey = i
@@ -74,7 +84,7 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
                         ability.change_combine_txt(todict, i, text_base, all_json, target, ttarget + ['混合文字'],change_all_template_link_to_html)
                     else:
                         ability.loop_check(todict[i], text_base, all_json, target, ttarget)
-            for i in ["属性", "简单条目", "具体条目"]:
+            for i in ["属性", "简单条目", "具体条目",'自定义机制']:
                 for j in todict[i]:
                     ttarget = ['机制源', target, i, j]
                     if isinstance(todict[i][j], dict):
@@ -85,6 +95,31 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
             # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
             ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, target, ['机制源', target, '内容'],change_all_template_link_to_html)
             # 上面将文字全部转化掉
+            for i in todict['自定义机制']:
+                v=todict['自定义机制'][i]
+                splitop='、'
+                if v['分隔符']!='':
+                    splitop=v['分隔符']
+                all_mech=v['目标'].split(splitop)
+                v.clear()
+                j=0
+                while j<len(all_mech):
+                    if all_mech[j]=='':
+                        all_mech.pop(j)
+                    else:
+                        j+=1
+                for j in all_mech:
+                    v[j]={}
+                    mechname=(target,i)
+                    if mechname in costom_mech and j in costom_mech[mechname]:
+                        for k in costom_mech[mechname][j]:
+                            w=costom_mech[mechname][j][k]
+                            buffname='{{buff|'+k[0]+'|'+k[1]+'}}'
+                            if '升级来源' in w:
+                                for m in w['升级来源']:
+                                    buffname+='{{额外信息框|{{图片|' + w['升级来源'][m]['图片'] + '}}|' + w['升级来源'][m]['名称'] + '}}'
+                            v[j][buffname]=w['值']
+            #上面将自定义机制完全生成完毕
             all_json['机制'][target]['曾用名'] = []
             if target in name_base:
                 for namej in name_base[target]:
@@ -112,8 +147,8 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,change_all_
                     for k in range(uls):
                         comtext += '</ul>'
                     all_json['机制'][target]['内容'][i]['内容'][j]['内容'] = comtext
-            if w!='':
-                w.addtext(['《'+target+'》已经更新了'+str(loop+1)+'次',1], targeti+loop*len(tlist))
+            if selfw!='':
+                selfw.addtext(['《'+target+'》已经更新了'+str(loop+1)+'次',1], targeti+loop*len(tlist))
                 QApplication.processEvents()
 
 def fulfil_labels(all_json):

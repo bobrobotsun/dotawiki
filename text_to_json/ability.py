@@ -183,12 +183,26 @@ def loop_check_source_to_change_content(json):
 # 应用：0、因改版而被删除；1、正在使用；2、因为拥有者删除而被删除
 def get_source_to_data(all_json, upgrade_json, version, name_base):
     for i in all_json['技能源']:
+        v=all_json['技能源'][i]
         all_json['技能源'][i]['页面名'] = i
         all_json['技能源'][i]['分类'] = '技能源'
         if '链接指向' not in all_json['技能源'][i]:
             all_json['技能源'][i]['链接指向'] = {}
         if '手填标签' not in all_json['技能源'][i]:
             all_json['技能源'][i]['手填标签'] = {}
+        for j in v['效果']:
+            w=v['效果'][j]
+            for k in w['自定义机制']:
+                x=w['自定义机制'][k]
+                if x['机制'] in all_json['机制'] and x['名称'] in all_json['机制'][x['机制']]['自定义机制']:
+                    mechs=all_json['机制'][x['机制']]['自定义机制'][x['名称']]
+                    tempdict={}
+                    for l in mechs:
+                        if l in x['目标']:
+                            tempdict[l]=x['目标'][l]
+                        else:
+                            tempdict[l] = ''
+                    x['目标']=tempdict
         # if 'A杖信息' in all_json['技能源'][i]:
         #     all_json['技能源'][i].pop('A杖信息')
         # if '升级' in all_json['技能源'][i]:
@@ -1063,6 +1077,10 @@ def change_combine_txt(json, ii, data, all_json, name, target, change_all_templa
                         if kk not in json[ii]["混合文字"]:
                             json[ii]["混合文字"][kk] = '</span></div>'
                             break
+                elif json[ii]["混合文字"][str(i)]['类型'] == '自定义机制表格':
+                    ttarget = copy.deepcopy(target)
+                    ttarget.append(str(i))
+                    returntxt += change_custom_mechnism_into_wikitable(json[ii]["混合文字"][str(i)], all_json, ttarget)
             else:
                 returntxt += json[ii]["混合文字"][str(i)]
         else:
@@ -1633,6 +1651,8 @@ def change_the_right_result_json_to_text_to_show(conditions, result, json, all_j
                 tempjson = find_json_by_condition_with_result(conditions['条件效果名'][i], i, json, result, target, '条件效果名')
                 if '名称' in tempjson and isinstance(tempjson['名称'], str):
                     address = json['页面名'] + '|' + tempjson['名称']
+        if another_image == '|preinfo=':
+            another_image = ''
         retxt += '{{buff|' + address + chosen + name + another_image + '}}'
     elif conditions['函数'][0][0] == '短':
         another_image = ''
@@ -2494,6 +2514,44 @@ def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions,
                 relist.append(re.sub(r'alent.png', lambda x: 'alentb.png', common_page.nocheck_create_upgrade_text(tempjson)))
     return relist + sort_mark
 
+def change_custom_mechnism_into_wikitable(json, all_json, target):
+    t1=[]
+    t2=[]
+    all_text=[]
+    tar_mech={}
+    retxt=''
+    conditions = change_json_to_condition_dict(json, target)
+    if '满足' in conditions:
+        if conditions['满足'][0][0] in all_json['机制']:
+            if conditions['满足'][0][1] in all_json['机制'][conditions['满足'][0][0]]['自定义机制']:
+                tar_mech=all_json['机制'][conditions['满足'][0][0]]['自定义机制'][conditions['满足'][0][1]]
+                for j in tar_mech:
+                    t1.append(j)
+                    for k in tar_mech[j]:
+                        if k not in t2:
+                            t2.append(k)
+            else:
+                raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n自定义机制表格中《' + conditions['满足'][0][0] + '》没有找到名为《' + conditions['满足'][0][1] + '》的自定义机制，请检查后重新填写'))
+        else:
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n自定义机制表格没有查找到名字为《'+conditions['满足'][0][0]+'》的机制，请检查后重新填写'))
+    all_text=[['' for __ in range(len(t2))] for _ in range(len(t1))]
+    for i in range(len(t1)):
+        v1=t1[i]
+        for j in range(len(t2)):
+            v2=t2[j]
+            if v2 in tar_mech[v1]:
+                all_text[i][j]=tar_mech[v1][v2]
+    retxt = '<table class="wikitable"><tr><th>' + conditions['满足'][0][1] + '</th>'
+    for i in t1:
+        retxt+='<td>' + i + '</td>'
+    retxt += '</tr>'
+    for j in range(len(t2)):
+        retxt+='<tr><td>' + t2[j] + '</td>'
+        for i in range(len(t1)):
+            retxt+='<td>' + all_text[i][j] + '</td>'
+        retxt+='</tr>'
+    retxt += '</table>'
+    return retxt
 
 def change_json_to_condition_dict(json, target):
     redict = {}
@@ -3021,6 +3079,11 @@ def create_upgrade_buff(json_dict):
             for j in json_dict[str(i)]['标记']:
                 if json_dict[str(i)]['标记'][j]['代码'] != 0:
                     retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'
+            for j in json_dict[str(i)]['自定义机制']:
+                retxt+='<span class="ability_indicator" style="background:#882288;color:white;">{{额外信息框|' + json_dict[str(i)]['自定义机制'][j]['名称'] + '|'
+                for k in json_dict[str(i)]['自定义机制'][j]['目标']:
+                    retxt+=k+'：'+json_dict[str(i)]['自定义机制'][j]['目标'][k]+'<br>'
+                retxt=retxt.rstrip('<br>')+'}}</span>'
             if json_dict[str(i)]['生效从属']['代码'] > 1:
                 retxt += '{{额外信息框|<span class="ability_indicator" style="background:#009688;color:white;">' + json_dict[str(i)]['生效从属']['值'] + '</span>' \
                          + '|' + json_dict[str(i)]['生效从属']['简述'] + '}} '
@@ -3151,6 +3214,34 @@ def create_independent_mech(json_dict):
     retxt += '</table></div>'
     return retxt
 
+def get_buff_costom_mechnism(json_dict):
+    redict={}
+    for i in json_dict:
+        v=json_dict[i]
+        for j in v['效果']:
+            w=v['效果'][j]
+            buffname=(i,w['名称'])
+            kk=0
+            while True:
+                kk+=1
+                k=str(kk)
+                if k in w:
+                    x=w[k]
+                    for l in x['自定义机制']:
+                        y=x['自定义机制'][l]
+                        dictname=(y['机制'],y['名称'])
+                        if dictname not in redict:
+                            redict[dictname]={}
+                        for m in y['目标']:
+                            if m not in redict[dictname]:
+                                redict[dictname][m]={}
+                            if buffname not in redict[dictname][m]:
+                                redict[dictname][m][buffname]={'值':y['目标'][m]}
+                                if '升级来源' in x:
+                                    redict[dictname][m][buffname]['升级来源']=x['升级来源']
+                elif kk>=2:
+                    break
+    return redict
 
 def fulfil_complex_and_simple_show(all_json, html_function):
     for i in all_json['技能']:

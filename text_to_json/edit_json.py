@@ -314,6 +314,7 @@ edit = {
                                                              }, 1, 0, True]
                                                }]
                               }],
+            '自定义机制':['tree',{'list':['tree',{'机制': ['text', ''],'名称': ['text', ''],'目标': ['tree_all_text', {}]},1,0,True]}]
         }, 1, 1, False]}],
         "技能免疫": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "无敌": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
@@ -394,6 +395,7 @@ edit = {
         "简述": ['text', ''],
         "日志标识": ['tree', {"list": ['text', '', 1, 0, True]}],
         "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}],
+        "自定义机制": ['tree', {"list": ['tree', {'名称': ['text', ''],'分隔符': ['text', '、'],'目标': ['text', '']}, 1, 0, True]}],
         "属性": ['tree', {"list": ['tree', {'标识': ['text', ''], 'list': ['text', '', 1, 1, False]}, 1, 0, True]}],
         "简单条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],
         "具体条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],
@@ -555,7 +557,8 @@ edit_default_update_type={
             '标记': ['tree', {'list': ['tree', {'类型': ['text', ''], '代码': ['int', 0]}, 1, 1, False]}],
             '叠加': ['tree', {'list': ['tree', {'代码1': ['int', 0], '代码2': ['int', 0], '代码3': ['int', 0]}, 1, 1, False]}],
             '生效从属': ['tree', {'代码': ['int', 1], '简述': ['text', '']}],
-            '生效目标': ['tree', {'不分类': ['random_tree',{}],'英雄': ['random_tree',{}],'非英雄': ['random_tree',{}]}]
+            '生效目标': ['tree', {'不分类': ['random_tree',{}],'英雄': ['random_tree',{}],'非英雄': ['random_tree',{}]}],
+            '自定义机制':['tree',{'list':['tree',{'机制': ['text', ''],'名称': ['text', ''],'目标': ['tree_all_text', {}]},1,0,True]}]
            },
     '蓝耗冷却': {'代码': ['tree', {'list': ['text', '', 0, 3, False]}],
              '类型': ['tree', {'代码': ['int', 1]}],
@@ -624,7 +627,8 @@ edit_default_update_value={
             "不分类": {},
             "英雄": {},
             "非英雄": {}
-        }
+        },
+        '自定义机制': {}
     },
     '蓝耗冷却': {
         '代码': {

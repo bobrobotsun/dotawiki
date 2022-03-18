@@ -1440,6 +1440,7 @@ class Main(QMainWindow):
             time_show = time.time()
             allupdate = []
             loop_time = 1
+            costom_mech=ability.get_buff_costom_mechnism(self.json_base['技能'])
             if target == '':
                 loop_time = 2
                 for i in self.json_base['机制']:
@@ -1456,12 +1457,12 @@ class Main(QMainWindow):
                 self.w.confirm_numbers(total_num)
                 self.w.setWindowTitle('机制一共有' + str(total_num) + '个，1~' + str(len(allupdate)) + '，' + str(len(allupdate) + 1) + '~' + str(total_num) + '。')
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
-                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time, self.w)
+                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list,costom_mech, self.change_all_template_link_to_html, loop_time, self.w)
                 self.loop_check_to_html(self.json_base['机制'], self.change_all_template_link_to_html)
             else:
                 allupdate.append(target)
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
-                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, self.change_all_template_link_to_html, loop_time)
+                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list,costom_mech, self.change_all_template_link_to_html, loop_time)
                 self.loop_check_to_html(self.json_base['机制'][target], self.change_all_template_link_to_html)
             self.file_save_all()
         except editerror as err:
@@ -2612,6 +2613,17 @@ class Main(QMainWindow):
                         tdict[i][0].set_type('tree')
                         tdict[i][0].israndom = True
                         self.random_dict_to_tree(tdict[i], sdict[i])
+                        tdict[i][0].setExpanded(True)
+                    elif edict[i][0] == 'tree_all_text':
+                        tdict[i] = {0: TreeItemEdit(tdict[0], i)}
+                        tdict[i][0].set_type('tree')
+                        tdict[i][0].israndom = random
+                        self.complex_dict_to_tree(tdict[i], edict[i][1], sdict[i])
+                        for j in sdict[i]:
+                            tdict[i][j]=TreeItemEdit(tdict[i][0], j)
+                            tdict[i][j].set_type('text')
+                            tdict[i][j].set_value(sdict[i][j])
+                            tdict[i][j].israndom = random
                         tdict[i][0].setExpanded(True)
                 else:
                     if edict[i][0] == 'tree':
@@ -4393,14 +4405,17 @@ class Main(QMainWindow):
             self.entry_edit_change_name()
 
     def test_inputwindow(self):
-        self.test_inputwindow_loop_check(self.json_base, [])
+        self.test_inputwindow_loop_check(self.json_base['技能源'], [])
+        for i in self.json_base['机制源']:
+            self.json_base['机制源'][i]['自定义机制']={}
+        self.file_save_all()
 
     def test_inputwindow_loop_check(self, json, db):
         for i in json:
             v = json[i]
             if isinstance(v, dict):
-                if '混合文字' in v:
-                    self.test_inputwindow_change_it(v['混合文字'], db)
+                if '生效目标' in v and '生效从属' in v:
+                    v['自定义机制']={}
                 else:
                     self.test_inputwindow_loop_check(v, db + [i])
 
