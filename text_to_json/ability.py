@@ -3254,13 +3254,16 @@ def get_buff_costom_mechnism(json_dict):
             y=v['应用自定义机制'][j]
             bufftar=i
             dictname = (y['机制'], y['名称'])
+            buffname='{{H|'+i+'}}'
+            if y['自称']!='':
+                buffname+='-'+y['自称']
             if dictname not in redict:
                 redict[dictname] = {}
             for m in y['目标']:
                 if m not in redict[dictname]:
                     redict[dictname][m]={}
                 if bufftar not in redict[dictname][m]:
-                    redict[dictname][m][bufftar]={'名称':y['自称'],'值':y['目标'][m],'排序':y['排序']}
+                    redict[dictname][m][bufftar]={'名称':buffname,'值':y['目标'][m],'排序':y['排序']}
     for i in redict:
         for j in redict[i]:
             temp=[]

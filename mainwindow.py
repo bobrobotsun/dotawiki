@@ -984,6 +984,9 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['转换为普通文字'] = QPushButton('转换为普通文字', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['转换为普通文字'])
         self.editlayout['竖布局']['转换为普通文字'].clicked.connect(self.json_edit_combine_to_text)
+        self.editlayout['竖布局']['自定义机制目标'] = QPushButton('自定义机制目标', self)
+        self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['自定义机制目标'])
+        self.editlayout['竖布局']['自定义机制目标'].clicked.connect(self.json_edit_custom_mechnism_target)
         self.editlayout['竖布局'][0].addStretch(1)
         self.editlayout['竖布局']['传统目标设定'] = QPushButton('传统目标设定', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['传统目标设定'])
@@ -2909,6 +2912,7 @@ class Main(QMainWindow):
         self.edit_target_selected_changed()
 
     def tree_item_clicked(self):
+        selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         sender = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
         parent = sender.parent()
         self.editlayout['竖布局']['修改数据'].setEnabled(sender.hasvalue)
@@ -2924,6 +2928,7 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['删除该次级条目'].setEnabled(sender.israndom and parent.israndom)
         self.editlayout['竖布局']['转换为混合文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() == 0 and not sender.israndom)
         self.editlayout['竖布局']['转换为普通文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() > 0 and not sender.israndom)
+        self.editlayout['竖布局']['自定义机制目标'].setEnabled(sender.text(0)=='自定义机制' and selected=='技能源' or sender.text(0)=='应用自定义机制' and selected=='机制源')
 
         self.editlayout['竖布局']['传统目标设定'].setEnabled(sender.text(0) == '不分类' or sender.text(0) == '英雄' or sender.text(0) == '非英雄')
         self.editlayout['竖布局']['升级各类型值'].setEnabled(sender.text(0) == '值' and sender.israndom and sender.itemtype == 'tree')
@@ -2951,7 +2956,9 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['删除该次级条目'].setEnabled(bool)
         self.editlayout['竖布局']['转换为混合文字'].setEnabled(bool)
         self.editlayout['竖布局']['转换为普通文字'].setEnabled(bool)
+        self.editlayout['竖布局']['自定义机制目标'].setEnabled(bool)
         self.editlayout['竖布局']['传统目标设定'].setEnabled(bool)
+        self.editlayout['竖布局']['升级各类型值'].setEnabled(bool)
 
     def json_edit_change_value(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -3079,6 +3086,38 @@ class Main(QMainWindow):
             item.removeChild(item.child(0))
             item.set_value(temptxt)
             self.tree_item_clicked()
+
+    def json_edit_custom_mechnism_target(self):
+        item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
+        for i in range(item.childCount()):
+            child1=item.child(i)
+            mech=child1.child(0).text(1)
+            name=child1.child(1).text(1)
+            if mech in self.json_base['机制']:
+                if name in self.json_base['机制'][mech]['自定义机制']:
+                    child2=child1.child(child1.childCount()-1)
+                    custom=self.json_base['机制'][mech]['自定义机制'][name]
+                    exist={}
+                    while child2.childCount()>0:
+                        child3=child2.child(0)
+                        exist[child3.text(0)]=child3.text(1)
+                        child2.removeChild(child3)
+                    new={}
+                    for j in custom:
+                        if j in exist:
+                            new[j]=exist[j]
+                        else:
+                            new[j]=''
+                    for j in new:
+                        newtree=TreeItemEdit(child2, j)
+                        newtree.set_type('text')
+                        newtree.set_value(new[j])
+                else:
+                    QMessageBox.critical(self, '错误的机制名', '您的【自定义机制】中的第【' + child1.text(0) + '】项的【' + mech + '】中的自定义机制名【'+name+'】不存在，请重新填写！')
+                    break
+            else:
+                QMessageBox.critical(self, '错误的机制名', '您的【自定义机制】中的第【' + child1.text(0) + '】项的机制名【' + mech + '】不存在，请重新填写！')
+                break
 
     def json_edit_add_new_item(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()

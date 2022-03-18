@@ -104,10 +104,6 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
                             ability.change_combine_txt(todict[i], j, text_base, all_json, target, ttarget + ['混合文字'],change_all_template_link_to_html)
                         else:
                             ability.loop_check(todict[i][j], text_base, all_json, target, ttarget,change_all_template_link_to_html)
-
-            # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
-            ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, target, ['机制源', target, '内容'],change_all_template_link_to_html)
-            # 上面将文字全部转化掉
             for i in todict['自定义机制']:
                 v=todict['自定义机制'][i]
                 splitop='、'
@@ -130,6 +126,9 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
                             buffname=w['名称']
                             v[j][buffname]={'值':w['值'],'序数':w['排序']}
             #上面将自定义机制完全生成完毕
+            # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
+            ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, target, ['机制源', target, '内容'],change_all_template_link_to_html)
+            # 上面将文字全部转化掉
             all_json['机制'][target]['曾用名'] = []
             if target in name_base:
                 for namej in name_base[target]:
