@@ -20,6 +20,17 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
             target=tlist[targeti]
             if "图片大小" not in all_json['机制源'][target]:
                 all_json['机制源'][target]["图片大小"]='120'
+            for j in all_json['机制源'][target]['应用自定义机制']:
+                x = all_json['机制源'][target]['应用自定义机制'][j]
+                if x['机制'] in all_json['机制'] and x['名称'] in all_json['机制'][x['机制']]['自定义机制']:
+                    mechs = all_json['机制'][x['机制']]['自定义机制'][x['名称']]
+                    tempdict = {}
+                    for l in mechs:
+                        if l in x['目标']:
+                            tempdict[l] = x['目标'][l]
+                        else:
+                            tempdict[l] = ''
+                    x['目标'] = tempdict
             fromdict = copy.deepcopy(all_json['机制源'][target])
             all_json['机制源'][target]['分类'] = '机制源'
             all_json['机制源'][target]['页面名'] = target
@@ -46,6 +57,7 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
                 todict['自定义机制'][dictkey]={}
                 todict['自定义机制'][dictkey]['分隔符']=fromdict['自定义机制'][i]['分隔符']
                 todict['自定义机制'][dictkey]['目标']=fromdict['自定义机制'][i]['目标']
+            todict['应用自定义机制'] = fromdict['应用自定义机制']
             todict['属性'] = {}
             for i in fromdict['属性']:
                 dictkey = i
@@ -92,6 +104,7 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
                             ability.change_combine_txt(todict[i], j, text_base, all_json, target, ttarget + ['混合文字'],change_all_template_link_to_html)
                         else:
                             ability.loop_check(todict[i][j], text_base, all_json, target, ttarget,change_all_template_link_to_html)
+
             # 这里要是拆开来分析，主要是为了让机制能调用其他机制的内容
             ability.loop_check(all_json['机制'][target]['内容'], text_base, all_json, target, ['机制源', target, '内容'],change_all_template_link_to_html)
             # 上面将文字全部转化掉
@@ -103,7 +116,6 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
                 all_mech=v['目标'].split(splitop)
                 v.clear()
                 j=0
-                ll=0
                 while j<len(all_mech):
                     if all_mech[j]=='':
                         all_mech.pop(j)
@@ -115,12 +127,7 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
                     if mechname in costom_mech and j in costom_mech[mechname]:
                         for k in costom_mech[mechname][j]:
                             w=costom_mech[mechname][j][k]
-                            ll+=1
-                            l=str(ll)
-                            buffname='{{buff|'+k[0]+'|'+k[1]+'}}'
-                            if '升级来源' in w:
-                                for m in w['升级来源']:
-                                    buffname+='{{额外信息框|{{图片|' + w['升级来源'][m]['图片'] + '}}|' + w['升级来源'][m]['名称'] + '}}'
+                            buffname=w['名称']
                             v[j][buffname]={'值':w['值'],'序数':w['排序']}
             #上面将自定义机制完全生成完毕
             all_json['机制'][target]['曾用名'] = []

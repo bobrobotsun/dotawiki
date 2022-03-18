@@ -3221,17 +3221,21 @@ def create_independent_mech(json_dict):
 
 def get_buff_costom_mechnism(json_dict):
     redict={}
-    for i in json_dict:
-        v=json_dict[i]
+    for i in json_dict['技能']:
+        v=json_dict['技能'][i]
         for j in v['效果']:
             w=v['效果'][j]
-            buffname=(i,w['名称'])
+            bufftar=(i,w['名称'])
             kk=0
             while True:
                 kk+=1
                 k=str(kk)
                 if k in w:
                     x=w[k]
+                    buffname = '{{buff|' + bufftar[0] + '|' + bufftar[1]
+                    if kk >= 2 and '1' not in w:
+                        buffname += '|chosen=' + k
+                    buffname += '}}'
                     for l in x['自定义机制']:
                         y=x['自定义机制'][l]
                         dictname=(y['机制'],y['名称'])
@@ -3240,12 +3244,23 @@ def get_buff_costom_mechnism(json_dict):
                         for m in y['目标']:
                             if m not in redict[dictname]:
                                 redict[dictname][m]={}
-                            if buffname not in redict[dictname][m]:
-                                redict[dictname][m][buffname]={'值':y['目标'][m],'排序':y['排序']}
-                                if '升级来源' in x:
-                                    redict[dictname][m][buffname]['升级来源']=x['升级来源']
+                            if bufftar not in redict[dictname][m]:
+                                redict[dictname][m][bufftar]={'名称':buffname,'值':y['目标'][m],'排序':y['排序']}
                 elif kk>=2:
                     break
+    for i in json_dict['机制']:
+        v=json_dict['机制'][i]
+        for j in v['应用自定义机制']:
+            y=v['应用自定义机制'][j]
+            bufftar=i
+            dictname = (y['机制'], y['名称'])
+            if dictname not in redict:
+                redict[dictname] = {}
+            for m in y['目标']:
+                if m not in redict[dictname]:
+                    redict[dictname][m]={}
+                if bufftar not in redict[dictname][m]:
+                    redict[dictname][m][bufftar]={'名称':y['自称'],'值':y['目标'][m],'排序':y['排序']}
     for i in redict:
         for j in redict[i]:
             temp=[]

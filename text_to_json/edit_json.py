@@ -396,6 +396,7 @@ edit = {
         "日志标识": ['tree', {"list": ['text', '', 1, 0, True]}],
         "手填标签": ['tree', {"list": ['text', '', 1, 0, True]}],
         "自定义机制": ['tree', {"list": ['tree', {'名称': ['text', ''],'分隔符': ['text', '、'],'目标': ['text', '']}, 1, 0, True]}],
+        "应用自定义机制": ['tree', {"list": ['tree', {'机制': ['text', ''],'名称': ['text', ''],'自称': ['text', ''],'排序': ['int', 0],'目标': ['tree_all_text', {}]}, 1, 0, True]}],
         "属性": ['tree', {"list": ['tree', {'标识': ['text', ''], 'list': ['text', '', 1, 1, False]}, 1, 0, True]}],
         "简单条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],
         "具体条目": ['tree', {"list": ['tree', {'标识': ['text', ''], '文字': ['text', '']}, 1, 0, True]}],

@@ -1440,7 +1440,7 @@ class Main(QMainWindow):
             time_show = time.time()
             allupdate = []
             loop_time = 1
-            costom_mech=ability.get_buff_costom_mechnism(self.json_base['技能'])
+            costom_mech=ability.get_buff_costom_mechnism(self.json_base)
             if target == '':
                 loop_time = 2
                 for i in self.json_base['机制']:
@@ -4405,9 +4405,10 @@ class Main(QMainWindow):
             self.entry_edit_change_name()
 
     def test_inputwindow(self):
-        self.test_inputwindow_loop_check(self.json_base['技能源'], [])
+        #self.test_inputwindow_loop_check(self.json_base['技能源'], [])
         for i in self.json_base['机制源']:
-            self.json_base['机制源'][i]['自定义机制']={}
+            self.json_base['机制源'][i]['应用自定义机制']={}
+            self.json_base['机制'][i]['应用自定义机制']={}
         self.file_save_all()
 
     def test_inputwindow_loop_check(self, json, db):
