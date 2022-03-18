@@ -103,6 +103,7 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
                 all_mech=v['目标'].split(splitop)
                 v.clear()
                 j=0
+                ll=0
                 while j<len(all_mech):
                     if all_mech[j]=='':
                         all_mech.pop(j)
@@ -114,11 +115,13 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
                     if mechname in costom_mech and j in costom_mech[mechname]:
                         for k in costom_mech[mechname][j]:
                             w=costom_mech[mechname][j][k]
+                            ll+=1
+                            l=str(ll)
                             buffname='{{buff|'+k[0]+'|'+k[1]+'}}'
                             if '升级来源' in w:
                                 for m in w['升级来源']:
                                     buffname+='{{额外信息框|{{图片|' + w['升级来源'][m]['图片'] + '}}|' + w['升级来源'][m]['名称'] + '}}'
-                            v[j][buffname]=w['值']
+                            v[j][buffname]={'值':w['值'],'序数':w['排序']}
             #上面将自定义机制完全生成完毕
             all_json['机制'][target]['曾用名'] = []
             if target in name_base:

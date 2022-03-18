@@ -2528,25 +2528,30 @@ def change_custom_mechnism_into_wikitable(json, all_json, target):
                 for j in tar_mech:
                     t1.append(j)
                     for k in tar_mech[j]:
-                        if k not in t2:
-                            t2.append(k)
+                        if [k,tar_mech[j][k]['序数']] not in t2:
+                            t2.append([k,tar_mech[j][k]['序数']])
             else:
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n自定义机制表格中《' + conditions['满足'][0][0] + '》没有找到名为《' + conditions['满足'][0][1] + '》的自定义机制，请检查后重新填写'))
         else:
             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n自定义机制表格没有查找到名字为《'+conditions['满足'][0][0]+'》的机制，请检查后重新填写'))
+    t2=sorted(t2,key=lambda x:x[1])
     all_text=[['' for __ in range(len(t2))] for _ in range(len(t1))]
     for i in range(len(t1)):
         v1=t1[i]
         for j in range(len(t2)):
-            v2=t2[j]
+            v2=t2[j][0]
             if v2 in tar_mech[v1]:
-                all_text[i][j]=tar_mech[v1][v2]
+                all_text[i][j]=tar_mech[v1][v2]['值']
+    index=t2[0][1]
     retxt = '<table class="wikitable"><tr><th>' + conditions['满足'][0][1] + '</th>'
     for i in t1:
         retxt+='<td>' + i + '</td>'
     retxt += '</tr>'
     for j in range(len(t2)):
-        retxt+='<tr><td>' + t2[j] + '</td>'
+        if index!=t2[j][1]:
+            retxt+='<tr><td></td></tr>'
+            index=t2[j][1]
+        retxt+='<tr><td>' + t2[j][0] + '</td>'
         for i in range(len(t1)):
             retxt+='<td>' + all_text[i][j] + '</td>'
         retxt+='</tr>'
@@ -3236,11 +3241,21 @@ def get_buff_costom_mechnism(json_dict):
                             if m not in redict[dictname]:
                                 redict[dictname][m]={}
                             if buffname not in redict[dictname][m]:
-                                redict[dictname][m][buffname]={'值':y['目标'][m]}
+                                redict[dictname][m][buffname]={'值':y['目标'][m],'排序':y['排序']}
                                 if '升级来源' in x:
                                     redict[dictname][m][buffname]['升级来源']=x['升级来源']
                 elif kk>=2:
                     break
+    for i in redict:
+        for j in redict[i]:
+            temp=[]
+            for k in redict[i][j]:
+                temp.append([k,redict[i][j][k]['排序']])
+            temp=sorted(temp, key=lambda x: x[1])
+            tempdict={}
+            for k in temp:
+                tempdict[k[0]]=redict[i][j][k[0]]
+            redict[i][j]=tempdict
     return redict
 
 def fulfil_complex_and_simple_show(all_json, html_function):
