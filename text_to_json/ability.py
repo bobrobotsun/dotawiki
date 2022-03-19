@@ -3102,7 +3102,9 @@ def create_upgrade_buff(json_dict):
                     retxt +=json_dict[str(i)]['自定义机制'][j]['自称']+'<br>'
                 for k in json_dict[str(i)]['自定义机制'][j]['目标']:
                     retxt+=k+'：'+json_dict[str(i)]['自定义机制'][j]['目标'][k]+'<br>'
-                retxt=retxt.rstrip('<br>')+'}}</span>'
+                if retxt[-4:]=='<br>':
+                    retxt=retxt[:-4]
+                retxt+='}}</span>'
             if json_dict[str(i)]['生效从属']['代码'] > 1:
                 retxt += '{{额外信息框|<span class="ability_indicator" style="background:#009688;color:white;">' + json_dict[str(i)]['生效从属']['值'] + '</span>' \
                          + '|' + json_dict[str(i)]['生效从属']['简述'] + '}} '

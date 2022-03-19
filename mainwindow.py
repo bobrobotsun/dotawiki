@@ -2240,7 +2240,6 @@ class Main(QMainWindow):
             retxt += '}}'
         elif template_args[0] == '额外信息框':
             noclick = ''
-            style = ''
             for i in range(3, len(template_args)):
                 if template_args[i] == 'noclick':
                     noclick = ' data-additional-infomation-frame-no-click="1"'
