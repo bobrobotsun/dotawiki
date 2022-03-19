@@ -195,6 +195,8 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
             for k in w['自定义机制']:
                 x=w['自定义机制'][k]
                 if x['机制'] in all_json['机制'] and x['名称'] in all_json['机制'][x['机制']]['自定义机制']:
+                    if '自称' not in x:
+                        x['自称']=''
                     mechs=all_json['机制'][x['机制']]['自定义机制'][x['名称']]
                     tempdict={}
                     for l in mechs:
@@ -2525,23 +2527,33 @@ def change_custom_mechnism_into_wikitable(json, all_json, target):
         if conditions['满足'][0][0] in all_json['机制']:
             if conditions['满足'][0][1] in all_json['机制'][conditions['满足'][0][0]]['自定义机制']:
                 tar_mech=all_json['机制'][conditions['满足'][0][0]]['自定义机制'][conditions['满足'][0][1]]
-                for j in tar_mech:
-                    t1.append(j)
-                    for k in tar_mech[j]:
-                        if [k,tar_mech[j][k]['序数']] not in t2:
-                            t2.append([k,tar_mech[j][k]['序数']])
+                if '目标' in conditions:
+                    tars=conditions['目标'][0]
+                    for i in tars:
+                        for j in tar_mech:
+                            if i in j and j not in t1:
+                                t1.append(j)
+                                for k in tar_mech[j]:
+                                    if [k, tar_mech[j][k]['序数']] not in t2:
+                                        t2.append([k, tar_mech[j][k]['序数']])
+                else:
+                    for j in tar_mech:
+                        t1.append(j)
+                        for k in tar_mech[j]:
+                            if [k, tar_mech[j][k]['序数']] not in t2:
+                                t2.append([k, tar_mech[j][k]['序数']])
             else:
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n自定义机制表格中《' + conditions['满足'][0][0] + '》没有找到名为《' + conditions['满足'][0][1] + '》的自定义机制，请检查后重新填写'))
         else:
             raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n自定义机制表格没有查找到名字为《'+conditions['满足'][0][0]+'》的机制，请检查后重新填写'))
     t2=sorted(t2,key=lambda x:x[1])
-    all_text=[['' for __ in range(len(t2))] for _ in range(len(t1))]
+    all_text = [['' for __ in range(len(t2))] for _ in range(len(t1))]
     for i in range(len(t1)):
-        v1=t1[i]
+        v1 = t1[i]
         for j in range(len(t2)):
-            v2=t2[j][0]
+            v2 = t2[j][0]
             if v2 in tar_mech[v1]:
-                all_text[i][j]=tar_mech[v1][v2]['值']
+                all_text[i][j] = tar_mech[v1][v2]['值']
     index=t2[0][1]
     retxt = '<table class="wikitable"><tr><th>' + conditions['满足'][0][1] + '</th>'
     for i in t1:
@@ -3086,6 +3098,8 @@ def create_upgrade_buff(json_dict):
                     retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'
             for j in json_dict[str(i)]['自定义机制']:
                 retxt+='<span class="ability_indicator" style="background:#882288;color:white;">{{额外信息框|' + json_dict[str(i)]['自定义机制'][j]['名称'] + '|'
+                if json_dict[str(i)]['自定义机制'][j]['自称']!='':
+                    retxt +=json_dict[str(i)]['自定义机制'][j]['自称']+'<br>'
                 for k in json_dict[str(i)]['自定义机制'][j]['目标']:
                     retxt+=k+'：'+json_dict[str(i)]['自定义机制'][j]['目标'][k]+'<br>'
                 retxt=retxt.rstrip('<br>')+'}}</span>'
@@ -3232,13 +3246,15 @@ def get_buff_costom_mechnism(json_dict):
                 k=str(kk)
                 if k in w:
                     x=w[k]
-                    buffname = '{{buff|' + bufftar[0] + '|' + bufftar[1]
-                    if kk >= 2 and '1' not in w:
-                        buffname += '|chosen=' + k
-                    buffname += '}}'
                     for l in x['自定义机制']:
                         y=x['自定义机制'][l]
                         dictname=(y['机制'],y['名称'])
+                        buffname = '{{buff|' + bufftar[0] + '|' + bufftar[1]
+                        if kk >= 2 and '1' not in w:
+                            buffname += '|chosen=' + k
+                        buffname += '}}'
+                        if y['自称'] != '':
+                            buffname += '-' + y['自称']
                         if dictname not in redict:
                             redict[dictname]={}
                         for m in y['目标']:

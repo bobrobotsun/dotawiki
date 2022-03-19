@@ -314,7 +314,7 @@ edit = {
                                                              }, 1, 0, True]
                                                }]
                               }],
-            '自定义机制':['tree',{'list':['tree',{'机制': ['text', ''],'名称': ['text', ''],'排序': ['int', 0],'目标': ['tree_all_text', {}]},1,0,True]}]
+            '自定义机制':['tree',{'list':['tree',{'机制': ['text', ''],'名称': ['text', ''],'自称': ['text', ''],'排序': ['int', 0],'目标': ['tree_all_text', {}]},1,0,True]}]
         }, 1, 1, False]}],
         "技能免疫": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
         "无敌": ['tree', {"list": ['tree', {'代码': ['int', 0], '简述': ['text', '']}, 1, 0, True]}],
@@ -559,7 +559,7 @@ edit_default_update_type={
             '叠加': ['tree', {'list': ['tree', {'代码1': ['int', 0], '代码2': ['int', 0], '代码3': ['int', 0]}, 1, 1, False]}],
             '生效从属': ['tree', {'代码': ['int', 1], '简述': ['text', '']}],
             '生效目标': ['tree', {'不分类': ['random_tree',{}],'英雄': ['random_tree',{}],'非英雄': ['random_tree',{}]}],
-            '自定义机制':['tree',{'list':['tree',{'机制': ['text', ''],'名称': ['text', ''],'排序': ['int', 0],'目标': ['tree_all_text', {}]},1,0,True]}]
+            '自定义机制':['tree',{'list':['tree',{'机制': ['text', ''],'名称': ['text', ''],'自称': ['text', ''],'排序': ['int', 0],'目标': ['tree_all_text', {}]},1,0,True]}]
            },
     '蓝耗冷却': {'代码': ['tree', {'list': ['text', '', 0, 3, False]}],
              '类型': ['tree', {'代码': ['int', 1]}],
