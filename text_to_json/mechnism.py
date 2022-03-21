@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import *
 from text_to_json import common_page, ability
 from text_to_json.WikiError import editerror
 
-def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech,change_all_template_link_to_html,loop_time=1,selfw=''):
+def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech,update_the_jsons_alreadey,change_all_template_link_to_html,loop_time=1,selfw=''):
     # 一定报错的内容
     for i in tlist:
         if i not in all_json['机制']:
@@ -156,6 +156,7 @@ def get_source_to_data(all_json, tlist, version, text_base,name_base,costom_mech
                     for k in range(uls):
                         comtext += '</ul>'
                     all_json['机制'][target]['内容'][i]['内容'][j]['内容'] = comtext
+            update_the_jsons_alreadey[target]=True
             if selfw!='':
                 selfw.addtext(['《'+target+'》已经更新了'+str(loop+1)+'次',1], targeti+loop*len(tlist))
                 QApplication.processEvents()

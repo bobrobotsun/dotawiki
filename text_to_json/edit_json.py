@@ -352,7 +352,9 @@ edit = {
             '名称': ['text', ''],
             '后缀': ['text', ''],
             '代码': ['tree', {'list': ['text', '', 0, 3, False]}],
-            '修正': ['tree', {'list': ['text', '', 1, 1, False]}]}, 1, 1, False]}],
+            '修正': ['tree', {'list': ['text', '', 1, 1, False]}],
+            '标识': ['tree', {'list': ['tree', {'代码': ['text', ''], '描述': ['text', '']}, 1, 0, True]}]
+        }, 1, 1, False]}],
         "升级": ['tree', {
             '神杖': ['tree', {
                 'list': ['tree', {'目标': ['tree', {'list': ['text', '', 0, 4, False]}], '值': ['random_tree', {}], }, 1,
@@ -549,6 +551,12 @@ edit_default_category = {
 edit_default_update_type={
     '属性': {'代码': ['tree', {'list': ['text', '', 0, 3, False]}],
             '修正': ['tree', {'list': ['text', '', 1, 1, False]}]},
+    '追加属性': {'名称': ['text', ''],
+             '后缀': ['text', ''],
+             '代码': ['tree', {'list': ['text', '', 0, 3, False]}],
+             '修正': ['tree', {'list': ['text', '', 1, 1, False]}],
+             '标识': ['tree', {'list': ['tree', {'类型': ['text', ''], '描述': ['text', '']}, 1, 0, True]}]
+             },
     '效果': {'名称': ['text', ''],
             '代码': ['int', 1],
             '驱散': ['tree', {'代码': ['int', 0], '简述': ['text', '']}],
@@ -587,6 +595,20 @@ edit_default_update_value={
         '修正':{
             '1':''
         }
+    },
+    '追加属性':{
+        '名称':'',
+        '后缀':'',
+        '代码':{
+            '0':'',
+            '1':'',
+            '2':'',
+            '3':''
+        },
+        '修正':{
+            '1':''
+        },
+        '标识':{}
     },
     '效果':{
         "名称": "",

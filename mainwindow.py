@@ -811,13 +811,16 @@ class Main(QMainWindow):
                         temp.setIcon(self.create_icon_by_local_image(image_name))
                     self.mainlayout['列表'][i]['布局']['列表'].addItem(temp)
             self.edit_target_selected_changed()
-            self.update_the_jsons_alreadey = False
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
             self.edit_category_selected_changed()
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
+        finally:
+            self.update_the_jsons_alreadey = {'':False}
+            for i in self.json_base['机制']:
+                self.update_the_jsons_alreadey[i]=False
 
     def view_target_web(self, address):
         ss = 1
@@ -939,7 +942,6 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['改名'] = QPushButton('改名', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['改名'])
         self.editlayout['竖布局']['改名'].clicked.connect(self.json_edit_change_name)
-        self.update_the_jsons_alreadey = False  # 确认是否经过更新数据，以减少所需耗费的时间
         self.editlayout['竖布局']['简单保存'] = QPushButton('简单保存', self)
         self.editlayout['竖布局'][0].addWidget(self.editlayout['竖布局']['简单保存'])
         self.editlayout['竖布局']['简单保存'].clicked.connect(self.json_edit_save)
@@ -1425,9 +1427,11 @@ class Main(QMainWindow):
             self.edit_category_selected_changed()
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
+            self.update_the_jsons_alreadey['']=False
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
             return True
         else:
+            self.update_the_jsons_alreadey['']=True
             QMessageBox.information(self, "已完成", info + '\n总耗时：' + self.system_cal_time(time_show))
             return False
 
@@ -1460,12 +1464,12 @@ class Main(QMainWindow):
                 self.w.confirm_numbers(total_num)
                 self.w.setWindowTitle('机制一共有' + str(total_num) + '个，1~' + str(len(allupdate)) + '，' + str(len(allupdate) + 1) + '~' + str(total_num) + '。')
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
-                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list,costom_mech, self.change_all_template_link_to_html, loop_time, self.w)
+                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list,costom_mech,self.update_the_jsons_alreadey, self.change_all_template_link_to_html, loop_time, self.w)
                 self.loop_check_to_html(self.json_base['机制'], self.change_all_template_link_to_html)
             else:
                 allupdate.append(target)
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
-                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list,costom_mech, self.change_all_template_link_to_html, loop_time)
+                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list,costom_mech,self.update_the_jsons_alreadey, self.change_all_template_link_to_html, loop_time)
                 self.loop_check_to_html(self.json_base['机制'][target], self.change_all_template_link_to_html)
             self.file_save_all()
         except editerror as err:
@@ -1473,10 +1477,14 @@ class Main(QMainWindow):
             self.edit_category_selected_changed()
             self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
+            self.update_the_jsons_alreadey[err.args[1]]=False
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
             return True
         else:
-            QMessageBox.information(self, "已完成", '目标【机制】都已经更新完毕\n总耗时：' + self.system_cal_time(time_show))
+            if target == '':
+                QMessageBox.information(self.w, "已完成", '目标【机制】都已经更新完毕\n总耗时：' + self.system_cal_time(time_show))
+            else:
+                QMessageBox.information(self, "已完成", '目标【机制】都已经更新完毕\n总耗时：' + self.system_cal_time(time_show))
             return False
 
     def upload_basic_json(self):
@@ -1794,6 +1802,7 @@ class Main(QMainWindow):
 
     def download_same_kind(self):
         time_show = time.time()
+        target=''
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
         target_name = []
@@ -1836,6 +1845,7 @@ class Main(QMainWindow):
                     all_download.append(['机制源', k, k + '/源.json'])
                 if k in self.json_base['机制']:
                     all_download.append(['机制', k, k + '.json'])
+                    target=k
                 if k in self.json_base['单位组']:
                     all_download.append(['单位组', k, k + '.json'])
         total_num = len(all_download)
@@ -1846,14 +1856,17 @@ class Main(QMainWindow):
             QApplication.processEvents()
         self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
         self.edit_target_selected_changed()
-        self.update_the_jsons_alreadey = False
+        self.update_the_jsons_alreadey[target] = False
         self.w.addtext(['下载完毕，已为您下载同类数据，并已保存。您可以关闭本窗口。\n总耗时：' + self.system_cal_time(time_show), 0])
 
     def upload_same_kind(self):
         time_show = time.time()
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
-        if not self.update_the_jsons_alreadey:
+        json_ready=''
+        if selected[:2]=='机制':
+            json_ready=selected_name
+        if not self.update_the_jsons_alreadey[json_ready]:
             error_stop = True
             self.json_base[selected][selected_name] = {}
             self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[selected][selected_name])
@@ -1864,8 +1877,6 @@ class Main(QMainWindow):
                 error_stop = self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
             if error_stop:
                 return None
-            else:
-                self.update_the_jsons_alreadey = True
         target_name = []
         if self.json_base[selected][selected_name]['应用'] > 0:
             if selected == '技能':
@@ -2804,7 +2815,10 @@ class Main(QMainWindow):
             self.json_base[ss[0]][ss[1]] = self.download_json(ss[1] + '.json')
         self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
         self.edit_target_selected_changed()
-        self.update_the_jsons_alreadey = False
+        json_ready=''
+        if ss[0][:2]=='机制':
+            json_ready=ss[1]
+        self.update_the_jsons_alreadey[json_ready] = False
         QMessageBox.information(self, '更新完毕', '更新成功！您成功从wiki下载到' + ss[1] + '的信息。')
 
     def json_edit_delete(self):
@@ -2878,7 +2892,10 @@ class Main(QMainWindow):
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
-        self.update_the_jsons_alreadey = False
+        json_ready=''
+        if ss[0][:2]=='机制':
+            json_ready=ss[1]
+        self.update_the_jsons_alreadey[json_ready] = False
         QMessageBox.information(self, "已完成", '已经保存更改，但没有进行数据更新\n请记得更新数据。')
         self.edit_target_selected_changed()
 
@@ -2893,7 +2910,6 @@ class Main(QMainWindow):
             error_stop = self.update_json_base_mechanism(ss[1])
         else:
             error_stop = self.update_json_base(info='已经保存并更新完毕\n请记得上传。')
-        self.update_the_jsons_alreadey = not error_stop
         self.edit_target_selected_changed()
 
     def json_edit_loop_update(self):
@@ -4445,9 +4461,13 @@ class Main(QMainWindow):
 
     def test_inputwindow(self):
         #self.test_inputwindow_loop_check(self.json_base['技能源'], [])
-        for i in self.json_base['机制源']:
-            self.json_base['机制源'][i]['应用自定义机制']={}
-            self.json_base['机制'][i]['应用自定义机制']={}
+        # for i in self.json_base['技能源']:
+        #     for j in self.json_base['技能源'][i]['属性']:
+        #         v=self.json_base['技能源'][i]['属性'][j]
+        #         if v['名称']=='施法距离':
+        #             self.json_base['技能源'][i]['属性'][j]['标识']={'1':{'代码':'施法距离1','描述':''}}
+        #         if v['名称']=='释放距离':
+        #             self.json_base['技能源'][i]['属性'][j]['标识']={'1':{'代码':'攻击距离1','描述':''}}
         self.file_save_all()
 
     def test_inputwindow_loop_check(self, json, db):

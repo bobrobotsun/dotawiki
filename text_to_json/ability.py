@@ -156,8 +156,7 @@ def autoget_talent_source(all_json, base):
 
 
 def cal_ability_source_index(json, base, i):
-    arr = {'10级左天赋': -7, '10级右天赋': -8, '15级左天赋': -5, '15级右天赋': -6, '20级左天赋': -3, '20级右天赋': -4, '25级左天赋': -1,
-           '25级右天赋': -2}
+    arr = {'10级左天赋': -7, '10级右天赋': -8, '15级左天赋': -5, '15级右天赋': -6, '20级左天赋': -3, '20级右天赋': -4, '25级左天赋': -1,'25级右天赋': -2}
     return base[json['英雄'][i[:-6]]['代码名']]['ability'][arr[i[-6:]]]
 
 
@@ -339,7 +338,7 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
 def group_source(a):
     temp = {"1": {}}
     for i in a:
-        if i == "名称" or i == "后缀":
+        if i == "名称" or i == "后缀" or i == "标识":
             temp[i] = a[i]
         else:
             temp["1"][i] = a[i]
@@ -471,16 +470,21 @@ def complete_upgrade(all_json, mech, base_txt):
                 if fulfil(all_json[i]["属性"][j], all_json[i]):
                     if '后缀' not in all_json[i]["属性"][j]:
                         all_json[i]["属性"][j]['后缀'] = ''
-                        kk = 2
-                        while True:
-                            k = str(kk)
-                            kk += 1
-                            if k in all_json[i]["属性"][j]:
-                                if '后缀' in all_json[i]["属性"][j][k]:
-                                    all_json[i]["属性"][j]['后缀'] = all_json[i]["属性"][j][k]['后缀']
-                                    all_json[i]["属性"][j][k].pop('后缀')
-                            else:
-                                break
+                    if '标识' not in all_json[i]["属性"][j]:
+                        all_json[i]["属性"][j]['标识'] = {}
+                    kk = 2
+                    while True:
+                        k = str(kk)
+                        kk += 1
+                        if k in all_json[i]["属性"][j]:
+                            if '后缀' in all_json[i]["属性"][j][k]:
+                                all_json[i]["属性"][j]['后缀'] = all_json[i]["属性"][j][k]['后缀']
+                                all_json[i]["属性"][j][k].pop('后缀')
+                            if '标识' in all_json[i]["属性"][j][k]:
+                                all_json[i]["属性"][j]['标识'] = all_json[i]["属性"][j][k]['标识']
+                                all_json[i]["属性"][j][k].pop('标识')
+                        else:
+                            break
                     one_upgrade(all_json[i]["属性"][j], mech, base_txt, i, '第' + str(j) + '个【属性】')
             for j in all_json[i]["冷却时间"]:
                 if fulfil(all_json[i]["冷却时间"][j], all_json[i]):
@@ -825,6 +829,7 @@ def complete_mech(all_json, mech_json):
         mech_sign(all_json[i]["效果"], mech_json["标记"])
         mech_repeat(all_json[i]["效果"], mech_json["叠加"])
         mech_others(all_json[i], mech_json)
+        mech_trait_sign(all_json[i]["属性"], mech_json["属性标识"],i)
 
 
 def mech_target(json, mech):
@@ -944,6 +949,19 @@ def mech_others(json, mech):
                 if str(json["施法前摇"][i][j]["即时生效"]["代码"]) in mech["即时生效"]:
                     json["施法前摇"][i][j]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i][j]["即时生效"]["代码"])]
 
+def mech_trait_sign(json,mech,target):
+    for i in json:
+        if '标识' in json[i]:
+            for j in json[i]['标识']:
+                v = json[i]['标识'][j]
+                if v['代码'] in mech:
+                    v['图片'] = mech[v['代码']]['图片']
+                    if v['描述'] == '':
+                        v['描述'] = mech[v['代码']]['描述']
+                else:
+                    raise (editerror('技能源', target, '第' + i + '个【效果】的第' + j + '个【属性标识】的代码《' + v['代码'] + '》是错误的，请检查后重新填写'))
+        else:
+            raise (editerror('技能源', target, '没有找到第' + i + '个【效果】的【属性标识】，请检查是否在某个升级处没有填写'))
 
 def loop_check(json, data, all_json, name, target, change_all_template_link_to_html):
     for i in json:
@@ -3241,7 +3259,6 @@ def get_buff_costom_mechnism(json_dict):
         v=json_dict['技能'][i]
         for j in v['效果']:
             w=v['效果'][j]
-            bufftar=(i,w['名称'])
             kk=0
             while True:
                 kk+=1
@@ -3250,6 +3267,7 @@ def get_buff_costom_mechnism(json_dict):
                     x=w[k]
                     for l in x['自定义机制']:
                         y=x['自定义机制'][l]
+                        bufftar=(i,w['名称'],y['自称'])
                         dictname=(y['机制'],y['名称'])
                         buffname = '{{buff|' + bufftar[0] + '|' + bufftar[1]
                         if kk >= 2 and '1' not in w:
@@ -3270,7 +3288,7 @@ def get_buff_costom_mechnism(json_dict):
         v=json_dict['机制'][i]
         for j in v['应用自定义机制']:
             y=v['应用自定义机制'][j]
-            bufftar=i
+            bufftar=(i,y['自称'])
             dictname = (y['机制'], y['名称'])
             buffname='{{H|'+i+'}}'
             if y['自称']!='':
@@ -3380,8 +3398,13 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                         v1 = v['名称']
                     else:
                         v1 = '名字没了'
-                    bt += '<div style="padding:0.5em 0.5em 0em 1em">' + v1 + '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
-                    st += '<div style="padding:0.5em 0.5em 0em 1em">' + v1 + '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
+                    bt += '<div style="padding:0.5em 0.5em 0em 1em">' + v1
+                    st += '<div style="padding:0.5em 0.5em 0em 1em">' + v1
+                    for j in v['标识']:
+                        bt+='{{额外信息框|{{图片|'+v['标识'][j]['图片']+'}}|'+v['标识'][j]['描述']+'}}'
+                        st+='{{额外信息框|{{图片|'+v['标识'][j]['图片']+'}}|'+v['标识'][j]['描述']+'}}'
+                    bt += '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
+                    st += '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
                 else:
                     break
             bt += create_upgrade_manacost(db['魔法消耗']) + create_upgrade_cooldown(db['冷却时间'])
