@@ -605,9 +605,15 @@ def one_upgrade(json, mech, base_txt, name, target):
                     else:
                         break
             except ValueError:
-                if json["1"]["修正"]["2"] in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]]:
-                    for k in base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]]:
-                        getvalue[1].append(base_txt[json["1"]["代码"]["1"]][json["1"]["代码"]["2"]][json["1"]["修正"]["2"]][k])
+                if '2' in json["1"]["修正"]:
+                    address=json["1"]["修正"]["2"].split('，')
+                    if len(address)<2:
+                        address.insert(0,json["1"]["代码"]["2"])
+                    if len(address)<3:
+                        address.insert(0,json["1"]["代码"]["1"])
+                if address[0] in base_txt and address[1] in base_txt[address[0]] and address[2] in base_txt[address[0]][address[1]]:
+                    for k in base_txt[address[0]][address[1]][address[2]]:
+                        getvalue[1].append(base_txt[address[0]][address[1]][address[2]][k])
                 else:
                     raise (editerror('技能源', name, target + '没有找到《' + json["1"]["代码"]["1"] + '→' + json["1"]["代码"]["2"] + '》数据库中' + json["1"]["修正"]["2"] + '的内容'))
     else:
@@ -2573,7 +2579,7 @@ def change_custom_mechnism_into_wikitable(json, all_json, target):
             if v2 in tar_mech[v1]:
                 all_text[i][j] = tar_mech[v1][v2]['值']
     index=t2[0][1]
-    retxt = '<table class="wikitable"><tr><th>' + conditions['满足'][0][1] + '</th>'
+    retxt = '<table class="wikitable dota_scroll_table_by_hide_and_show"><tr><th>' + conditions['满足'][0][1] + '</th>'
     for i in t1:
         retxt+='<td>' + i + '</td>'
     retxt += '</tr>'
