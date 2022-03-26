@@ -111,7 +111,7 @@ def nocheck_create_upgrade_text(numjson, post_each=lambda x: x['后缀'] if '后
                     if jj > 1:
                         retext += "/"
                     retext += number_to_string(numjson[i][j])
-                    if retext[-1].isnumeric():
+                    if len(retext)>0 and retext[-1].isnumeric():
                         retext += post_each(numjson)
                 else:
                     break

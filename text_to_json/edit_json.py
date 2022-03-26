@@ -714,7 +714,7 @@ version_label = {
     '平衡': '<i class="fa fa-exchange" style="color:#3333aa"></i>',
     '英雄重做': '<i class="fa fa-user" style="color:#aa00aa"></i>',
     '技能重做': '<i class="fa fa-anchor" style="color:#aa00aa"></i>',
-    '新天赋': '{{图片|Talentb.png}}',
+    '新天赋': '{{图片|Talent_all.png}}',
     '技能改动': '<i class="fa fa-anchor" style="color:#3333aa"></i>',
     '重要神杖更新': '{{图片|Agha.png}}',
     '重要魔晶更新': '{{图片|Shard.png}}',

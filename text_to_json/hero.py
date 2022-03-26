@@ -126,12 +126,12 @@ def get_hero_data_from_txt(base_txt, ffile):
                 while len(base_txt[name]['ability']) <= int(temp_name[7:]):
                     base_txt[name]['ability'].append('')
                 base_txt[name]['ability'][int(temp_name[7:]) - 1] = temp_value
-                i = 0
-                while i < len(base_txt[name]['ability']):
-                    if base_txt[name]['ability'][i] == '':
-                        base_txt[name]['ability'].pop(i)
-                    else:
-                        i += 1
+        i = 0
+        while i < len(base_txt[name]['ability']):
+            if base_txt[name]['ability'][i] == '':
+                base_txt[name]['ability'].pop(i)
+            else:
+                i += 1
 
 
 def fulfill_hero_json(base_txt, all_json, version, name_base):

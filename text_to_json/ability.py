@@ -94,10 +94,10 @@ def get_hero_data_from_txt(base_txt, ffile):
                         base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
                     except ValueError:
                         base_txt[name][temp_name][str(k + 1)] = temp_valuek
-        all_pro = re.finditer('\t*?"(.*?)".*?\n.*\n?.*"value".*?"(.+?)"((.|\n)*?)}', i.group(0))
+        all_pro = re.finditer('\t*?"(.*?)".*?\n\t{3,}{(.|\n)*?"value".*?"(.*?)"((.|\n)*?)}', i.group(0))
         for j in all_pro:
             temp_name = j.group(1)
-            temp_value = j.group(2)
+            temp_value = j.group(3)
             base_txt[name][temp_name] = {}
             if temp_value.find('|') == -1:
                 temp_list = temp_value.split(' ')
@@ -112,7 +112,7 @@ def get_hero_data_from_txt(base_txt, ffile):
                         base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
                     except ValueError:
                         base_txt[name][temp_name][str(k + 1)] = temp_valuek
-            other_pro = re.finditer('[\s\t]*?"(.*?)"([^\S\r\n]|")+([^\s\t"]+)([^\S\r\n]|")+', j.group(3))
+            other_pro = re.finditer('[\s\t]*?"(.*?)"([^\S\r\n]|")+([^\s\t"]+)([^\S\r\n]|")+', j.group(2)+j.group(4))
             for k in other_pro:
                 temp_name = k.group(1)
                 temp_value = k.group(3)
