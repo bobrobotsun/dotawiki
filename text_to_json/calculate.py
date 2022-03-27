@@ -29,9 +29,9 @@ def change_sign_to_value_in_equation_sub_function(x,para):
         retxt= str(para[x])
     else:
         try:
-            if int(x) in para:
+            if int(x) < len(para):
                 retxt= str(para[int(x)])
-        finally:
+        except Exception:
             retxt='0'
     return retxt
 
@@ -118,9 +118,6 @@ def split_far_bracket_in_equation_list(equalist):
                         new_list.append(v)
                         if len(new_list) == 1 and isinstance(new_list, list) or len(temp_list) == 0:
                             temp_list.extend(new_list)
-                        else:
-                            temp_list.append(new_list)
-                        bool = False
                     else:
                         temp_list.append(v)
         else:

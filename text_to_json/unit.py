@@ -1,7 +1,7 @@
 import json
 import copy
 import math
-from text_to_json import common_page, ability
+from text_to_json import common_page, ability,calculate
 from text_to_json.WikiError import editerror
 
 
@@ -374,7 +374,9 @@ def array_cal(arr1, arr2, opp):
                 temp = float(arr2[0])
             except ValueError:
                 temp = arr2[0]
-        if opp == '=':
+        if len(opp) > 2 and opp[0] == '《' and opp[-1] == '》':
+            arr1[i] = calculate.analyse_text_with_change_sign_and_calculate(opp, [arr1[i], temp])
+        elif opp == '=':
             arr1[i] = temp
         elif opp == '+':
             arr1[i] = arr1[i] + temp
