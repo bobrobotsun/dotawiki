@@ -141,12 +141,15 @@ def finditemspecial(source, data, tb):
 
 def get_dota_data_from_vpk(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
-    alltext = re.finditer('"DOTA_Tooltip_ability_item_(.*?)_Lore".*?"(.*?)"', this_string)
+    alltext = re.finditer('"DOTA_Tooltip_ability_item_(.*?)_Lore".*?"(.*?)"', this_string,re.I)
     for i in alltext:
         name = i.group(1)
         texts = re.sub(r'\\n', lambda x: '<br>', i.group(2))
         if name in base_txt:
             base_txt[name]['lore'] = {'1': texts}
+        else:
+            base_txt[name]={'lore':{'1':texts}}
+
 
 
 def get_hero_data_from_txt(base_txt, ffile):

@@ -62,7 +62,7 @@ def better_float_to_text(x, rounds=4):
 
 def get_dota_data_from_vpk(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
-    alltext = re.finditer('"DOTA_Tooltip_ability_(.*?)_Lore".*?"(.*?)"', this_string)
+    alltext = re.finditer('"DOTA_Tooltip_ability_(.*?)_Lore".*?"(.*?)"', this_string,re.I)
     for i in alltext:
         name = i.group(1)
         if name in base_txt:
@@ -80,59 +80,62 @@ def get_hero_data_from_txt(base_txt, ffile):
         for j in all_pro:
             temp_name = j.group(1)
             temp_value = j.group(2)
-            base_txt[name][temp_name] = {}
-            if temp_value.find('|') == -1:
-                temp_list = temp_value.split(' ')
-            else:
-                temp_list = temp_value.split('|')
-            for k in range(len(temp_list)):
-                temp_valuek = temp_list[k].strip()
-                try:
-                    base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
-                except ValueError:
+            if temp_value!='' and temp_value!=' ':
+                base_txt[name][temp_name] = {}
+                if temp_value.find('|') == -1:
+                    temp_list = temp_value.split(' ')
+                else:
+                    temp_list = temp_value.split('|')
+                for k in range(len(temp_list)):
+                    temp_valuek = temp_list[k].strip()
                     try:
-                        base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
+                        base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
                     except ValueError:
-                        base_txt[name][temp_name][str(k + 1)] = temp_valuek
+                        try:
+                            base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
+                        except ValueError:
+                            base_txt[name][temp_name][str(k + 1)] = temp_valuek
         all_pro = re.finditer('\t*?"(.*?)".*?\n\t{3,}{(.|\n)*?"value".*?"(.*?)"((.|\n)*?)}', i.group(0))
         for j in all_pro:
             temp_name = j.group(1)
             temp_value = j.group(3)
-            base_txt[name][temp_name] = {}
-            if temp_value.find('|') == -1:
-                temp_list = temp_value.split(' ')
-            else:
-                temp_list = temp_value.split('|')
-            for k in range(len(temp_list)):
-                temp_valuek = temp_list[k].strip()
-                try:
-                    base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
-                except ValueError:
+            if temp_value!='' and temp_value!=' ':
+                base_txt[name][temp_name] = {}
+                if temp_value.find('|') == -1:
+                    temp_list = temp_value.split(' ')
+                else:
+                    temp_list = temp_value.split('|')
+                for k in range(len(temp_list)):
+                    temp_valuek = temp_list[k].strip()
                     try:
-                        base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
+                        base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
                     except ValueError:
-                        base_txt[name][temp_name][str(k + 1)] = temp_valuek
+                        try:
+                            base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
+                        except ValueError:
+                            base_txt[name][temp_name][str(k + 1)] = temp_valuek
             other_pro = re.finditer('[\s\t]*?"(.*?)"([^\S\r\n]|")+([^\s\t"]+)([^\S\r\n]|")+', j.group(2)+j.group(4))
             for k in other_pro:
                 temp_name = k.group(1)
                 temp_value = k.group(3)
                 temp_dict = {}
-                if temp_name not in some_talent:
-                    some_talent[temp_name] = {}
-                if temp_value.find('|') == -1:
-                    temp_list = temp_value.split(' ')
-                else:
-                    temp_list = temp_value.split('|')
-                for l in range(len(temp_list)):
-                    temp_valuek = temp_list[l].strip().strip('+').strip('x').rstrip('%')
-                    try:
-                        temp_dict[str(l + 1)] = int(temp_valuek)
-                    except ValueError:
+                if temp_value!='' and temp_value!=' ':
+                    if temp_name not in some_talent:
+                        some_talent[temp_name] = {}
+                    if temp_value.find('|') == -1:
+                        temp_list = temp_value.split(' ')
+                    else:
+                        temp_list = temp_value.split('|')
+                    for l in range(len(temp_list)):
+                        temp_valuek = temp_list[l].strip().strip('+').strip('x').rstrip('%')
                         try:
-                            temp_dict[str(l + 1)] = float(temp_valuek)
+                            temp_dict[str(l + 1)] = int(temp_valuek)
                         except ValueError:
-                            temp_dict[str(l + 1)] = temp_valuek
-                some_talent[temp_name][name + '-' + j.group(1)] = temp_dict
+                            try:
+                                temp_dict[str(l + 1)] = float(temp_valuek)
+                            except ValueError:
+                                temp_dict[str(l + 1)] = temp_valuek
+                    some_talent[temp_name][name + '-' + j.group(1)] = temp_dict
     for i in some_talent:
         if i in base_txt:
             for j in some_talent[i]:

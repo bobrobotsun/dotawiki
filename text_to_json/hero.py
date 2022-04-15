@@ -72,7 +72,7 @@ def findheropro(source, data, tb, pro, inherit=True, number=True, splitit=False)
 
 def get_lore_data_from_vpk(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
-    alltext = re.finditer('"npc_dota_hero_(.*?)_bio".*?"((.|\n)*?)"', this_string)
+    alltext = re.finditer('"npc_dota_hero_(.*?)_bio".*?"((.|\n)*?)"', this_string,re.I)
     for i in alltext:
         name = i.group(1)
         if name in base_txt:
@@ -81,7 +81,7 @@ def get_lore_data_from_vpk(base_txt, ffile):
 
 def get_dota_data_from_vpk(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
-    alltext = re.finditer('"npc_dota_hero_(.*?)_hype".*?"(.*?)"', this_string)
+    alltext = re.finditer('"npc_dota_hero_(.*?)_hype".*?"(.*?)"', this_string,re.I)
     for i in alltext:
         name = i.group(1)
         if name in base_txt:
