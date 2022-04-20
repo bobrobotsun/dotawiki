@@ -293,7 +293,7 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 if ii>1:
                     aghashard +='、'
                 aghashard+='{{H|'+shard[ii]+'}}'
-            aghashard+='\n'
+            aghashard+='<br>'
         aghashard +=shard[0]+'</div>'
         bt = '<span class="dota_compound_list_select_input dota_hero_comprehensive_attri_dict">' \
              +'<div class="dota_hero_comprehensive_attri_dict_hero bgc_black" style="width:360px;float:right;color:white;text-align:center;" data-hero-name="' + i + '">' \

@@ -135,7 +135,7 @@ def split_number_operate_in_equation_list(equalist):
         v=equalist[i]
         if isinstance(v, str):
             if v[0]=='-':
-                v[0]='0'+v[0]
+                v='0'+v
             temptxt=v
             while len(temptxt)>0:
                 find = re.match(r'[.\d]+', temptxt)
