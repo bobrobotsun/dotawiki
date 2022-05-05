@@ -814,7 +814,11 @@ class Main(QMainWindow):
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
             self.edit_category_selected_changed()
-            self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
+            if err.args[0]=='技能源' and err.args[1] in self.json_base['技能']:
+                tar=self.json_base['技能'][err.args[1]]['数据来源']
+                self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(tar)
+            else:
+                self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
         finally:
@@ -1425,7 +1429,11 @@ class Main(QMainWindow):
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
             self.edit_category_selected_changed()
-            self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
+            if err.args[0]=='技能源' and err.args[1] in self.json_base['技能']:
+                tar=self.json_base['技能'][err.args[1]]['数据来源']
+                self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(tar)
+            else:
+                self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
             self.update_the_jsons_alreadey['']=False
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
@@ -1475,7 +1483,11 @@ class Main(QMainWindow):
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
             self.edit_category_selected_changed()
-            self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
+            if err.args[0]=='技能源' and err.args[1] in self.json_base['技能']:
+                tar=self.json_base['技能'][err.args[1]]['数据来源']
+                self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(tar)
+            else:
+                self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
             self.update_the_jsons_alreadey[err.args[1]]=False
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())

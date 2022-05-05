@@ -87,7 +87,7 @@ def get_hero_data_from_txt(base_txt, ffile):
                 else:
                     temp_list = temp_value.split('|')
                 for k in range(len(temp_list)):
-                    temp_valuek = temp_list[k].strip()
+                    temp_valuek = temp_list[k].strip().strip('x')
                     try:
                         base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
                     except ValueError:
@@ -95,47 +95,53 @@ def get_hero_data_from_txt(base_txt, ffile):
                             base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
                         except ValueError:
                             base_txt[name][temp_name][str(k + 1)] = temp_valuek
-        all_pro = re.finditer('\t*?"(.*?)".*?\n\t{3,}{(.|\n)*?"value".*?"(.*?)"((.|\n)*?)}', i.group(0))
+        all_pro = re.finditer('\t*?"(.*?)".*?\n\t{3,}{((.|\n)*?)}', i.group(0))
         for j in all_pro:
-            temp_name = j.group(1)
-            temp_value = j.group(3)
-            if temp_value!='' and temp_value!=' ':
-                base_txt[name][temp_name] = {}
-                if temp_value.find('|') == -1:
-                    temp_list = temp_value.split(' ')
-                else:
-                    temp_list = temp_value.split('|')
-                for k in range(len(temp_list)):
-                    temp_valuek = temp_list[k].strip()
-                    try:
-                        base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
-                    except ValueError:
-                        try:
-                            base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
-                        except ValueError:
-                            base_txt[name][temp_name][str(k + 1)] = temp_valuek
-            other_pro = re.finditer('[\s\t]*?"(.*?)"([^\S\r\n]|")+([^\s\t"]+)([^\S\r\n]|")+', j.group(2)+j.group(4))
+            j_name=j.group(1)
+            other_pro = re.finditer('[\s\t]*?"(.*?)"([^\S\r\n]|")+([^"]+)([^\S\r\n]|")+', j.group(2))
             for k in other_pro:
-                temp_name = k.group(1)
-                temp_value = k.group(3)
-                temp_dict = {}
-                if temp_value!='' and temp_value!=' ':
-                    if temp_name not in some_talent:
-                        some_talent[temp_name] = {}
-                    if temp_value.find('|') == -1:
-                        temp_list = temp_value.split(' ')
-                    else:
-                        temp_list = temp_value.split('|')
-                    for l in range(len(temp_list)):
-                        temp_valuek = temp_list[l].strip().strip('+').strip('x').rstrip('%')
-                        try:
-                            temp_dict[str(l + 1)] = int(temp_valuek)
-                        except ValueError:
+                k_name = k.group(1)
+                k_value = k.group(3)
+                if k_name=='value' or k_name=='special_bonus_scepter' or k_name=='special_bonus_shard':
+                    post=''
+                    if k_name=='special_bonus_scepter':
+                        post='_scepter'
+                    if k_name=='special_bonus_shard':
+                        post='_shard'
+                    if k_value != '' and k_value != ' ':
+                        base_txt[name][j_name+post] = {}
+                        if k_value.find('|') == -1:
+                            temp_list = k_value.split(' ')
+                        else:
+                            temp_list = k_value.split('|')
+                        for l in range(len(temp_list)):
+                            temp_valuek = temp_list[l].strip().strip('x')
                             try:
-                                temp_dict[str(l + 1)] = float(temp_valuek)
+                                base_txt[name][j_name+post][str(l + 1)] = int(temp_valuek)
                             except ValueError:
-                                temp_dict[str(l + 1)] = temp_valuek
-                    some_talent[temp_name][name + '-' + j.group(1)] = temp_dict
+                                try:
+                                    base_txt[name][j_name+post][str(l + 1)] = float(temp_valuek)
+                                except ValueError:
+                                    base_txt[name][j_name+post][str(l + 1)] = temp_valuek
+                else:
+                    k_dict = {}
+                    if k_value != '' and k_value != ' ':
+                        if k_name not in some_talent:
+                            some_talent[k_name] = {}
+                        if k_value.find('|') == -1:
+                            k_list = k_value.split(' ')
+                        else:
+                            k_list = k_value.split('|')
+                        for l in range(len(k_list)):
+                            k_valuek = k_list[l].strip().strip('+').strip('x').rstrip('%')
+                            try:
+                                k_dict[str(l + 1)] = int(k_valuek)
+                            except ValueError:
+                                try:
+                                    k_dict[str(l + 1)] = float(k_valuek)
+                                except ValueError:
+                                    k_dict[str(l + 1)] = k_valuek
+                        some_talent[k_name][name + '-' + j.group(1)] = k_dict
     for i in some_talent:
         if i in base_txt:
             for j in some_talent[i]:
@@ -3295,20 +3301,21 @@ def get_buff_costom_mechnism(json_dict):
                     break
     for i in json_dict['机制']:
         v=json_dict['机制'][i]
-        for j in v['应用自定义机制']:
-            y=v['应用自定义机制'][j]
-            bufftar=(i,y['自称'])
-            dictname = (y['机制'], y['名称'])
-            buffname='{{H|'+i+'}}'
-            if y['自称']!='':
-                buffname+='-'+y['自称']
-            if dictname not in redict:
-                redict[dictname] = {}
-            for m in y['目标']:
-                if m not in redict[dictname]:
-                    redict[dictname][m]={}
-                if bufftar not in redict[dictname][m]:
-                    redict[dictname][m][bufftar]={'名称':buffname,'值':y['目标'][m],'排序':y['排序']}
+        if '应用自定义机制' in v:
+            for j in v['应用自定义机制']:
+                y=v['应用自定义机制'][j]
+                bufftar=(i,y['自称'])
+                dictname = (y['机制'], y['名称'])
+                buffname='{{H|'+i+'}}'
+                if y['自称']!='':
+                    buffname+='-'+y['自称']
+                if dictname not in redict:
+                    redict[dictname] = {}
+                for m in y['目标']:
+                    if m not in redict[dictname]:
+                        redict[dictname][m]={}
+                    if bufftar not in redict[dictname][m]:
+                        redict[dictname][m][bufftar]={'名称':buffname,'值':y['目标'][m],'排序':y['排序']}
     for i in redict:
         for j in redict[i]:
             temp=[]
