@@ -1579,6 +1579,8 @@ class Main(QMainWindow):
             for i in self.json_base['技能']:
                 if self.json_base['技能'][i]['应用'] == 0:
                     all_upload.append([i, common_page.create_page_old_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
+                elif self.json_base['技能'][i]['应用'] == 3:
+                    all_upload.append([i, common_page.create_page_plan_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
                 else:
                     page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                     all_redirect.append([i, page_link_content])
@@ -1704,6 +1706,8 @@ class Main(QMainWindow):
         for i in self.json_base['技能']:
             if self.json_base['技能'][i]['应用'] == 0:
                 all_page_upload.append([i, common_page.create_page_old_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
+            elif self.json_base['技能'][i]['应用'] == 3:
+                all_page_upload.append([i, common_page.create_page_plan_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
             else:
                 page_link_content = '#重定向[[' + self.json_base['技能'][i]['技能归属'] + '#' + i + ']]'
                 all_redirect.append([i, page_link_content])
@@ -1922,6 +1926,8 @@ class Main(QMainWindow):
                         all_upload.append([i + '.json', self.json_base['技能'][i]])
                         if self.json_base['技能'][i]['应用'] == 0:
                             all_page.append([i, common_page.create_page_old_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
+                        elif self.json_base['技能'][i]['应用'] == 3:
+                            all_page.append([i, common_page.create_page_plan_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
                         else:
                             all_redirect.append([i, '#重定向[[' + k + '#' + i + ']]'])
                             if self.json_base['技能'][i]['次级分类'] != '天赋技能':

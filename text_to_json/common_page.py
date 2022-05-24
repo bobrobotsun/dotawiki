@@ -807,6 +807,15 @@ def create_page_old_ability(json_base, log_base, log_list, ability):
         retxt += '[[分类:' + i + ']]'
     return retxt
 
+def create_page_plan_ability(json_base, log_base, log_list, ability):
+    db = json_base['技能'][ability]
+    retxt = ''
+    retxt += '您当前进入的页面是一个计划中的、尚未实装的技能。考虑到它可能无法呈现在{{H|' + db['技能归属'] + '}}的页面上，因此我们将其所有的可能信息提前书写在它们的页面上。您将在此看到这个技能目前的可能属性、技能效果、更新日志。\n\n' + db['具体展示'] \
+             + '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base, False),db['技能归属'], 0) + thanks_for_the_audience()
+    for i in db['标签']:
+        retxt += '[[分类:' + i + ']]'
+    return retxt
+
 
 def create_page_mechnism(json_base, log_base, log_list, mech):
     db = json_base['机制'][mech]
