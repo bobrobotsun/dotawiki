@@ -87,7 +87,7 @@ def get_hero_data_from_txt(base_txt, ffile):
                 else:
                     temp_list = temp_value.split('|')
                 for k in range(len(temp_list)):
-                    temp_valuek = temp_list[k].strip().strip('x')
+                    temp_valuek = temp_list[k].strip().strip('x').rstrip('%')
                     try:
                         base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
                     except ValueError:
@@ -115,7 +115,7 @@ def get_hero_data_from_txt(base_txt, ffile):
                         else:
                             temp_list = k_value.split('|')
                         for l in range(len(temp_list)):
-                            temp_valuek = temp_list[l].strip().strip('x')
+                            temp_valuek = temp_list[l].strip().strip('x').rstrip('%')
                             try:
                                 base_txt[name][j_name+post][str(l + 1)] = int(temp_valuek)
                             except ValueError:

@@ -381,10 +381,13 @@ def create_html_data_page(all_json):
         for j in ['价格', '卷轴价格']:
             if j in all_json['物品'][i]:
                 retxt += '"' + j + '":'
-                if isinstance(all_json['物品'][i][j]['1'], str):
-                    retxt += '"' + all_json['物品'][i][j]['1'] + '",'
+                if '1' in all_json['物品'][i][j]:
+                    if isinstance(all_json['物品'][i][j]['1'], str):
+                        retxt += '"' + all_json['物品'][i][j]['1'] + '",'
+                    else:
+                        retxt += ability.better_float_to_text(all_json['物品'][i][j]['1']) + ','
                 else:
-                    retxt += ability.better_float_to_text(all_json['物品'][i][j]['1']) + ','
+                    retxt += '"0",'
         for j in edit_json.edit_adition['物品属性']:
             if j in all_json['物品'][i]:
                 retxt += '"' + j + '":'
