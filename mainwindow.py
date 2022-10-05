@@ -25,8 +25,9 @@ from PyQt5.QtCore import *
 from text_to_json import hero, ability, item, unit, mechnism, unitgroup, edit_json, dota_menus, page, common_page, translate
 from text_to_json.WikiError import editerror
 import win32con
-import win32clipboard as wincld
-from xpinyin import Pinyin
+import pyperclip
+
+from text_to_json.edit_json import getpinyin
 
 
 class Main(QMainWindow):
@@ -37,7 +38,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.31d'
+        self.version = '7.32c'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/api.php'
@@ -765,14 +766,13 @@ class Main(QMainWindow):
         try:
             self.resort()
             names = ['英雄', '非英雄单位', '技能', '技能源', '物品', '单位组', '机制', '机制源']
-            p = Pinyin()
             for i in names:
                 self.mainlayout['加载信息']['信息'][i].setText('【' + i + '】数据已加载' + str(len(self.json_base[i])) + '个')
                 self.mainlayout['列表'][i]['布局']['列表'].setIconSize(QSize(12, 12))
                 self.mainlayout['列表'][i]['布局']['列表'].clear()
                 for j in self.json_base[i]:
                     temp = QListWidgetItem()
-                    pinyin = p.get_pinyin(j)
+                    pinyin = getpinyin(j,'',0)
                     temp.setText('【' + pinyin[:4].lower() + '】' + j)
                     if self.json_base[i][j]['应用'] == 2:
                         temp.setBackground(self.green)
@@ -2973,10 +2973,7 @@ class Main(QMainWindow):
             self.json_edit_change_value()
 
     def copy_text_from_tree(self, index=0):
-        wincld.OpenClipboard()
-        wincld.EmptyClipboard()
-        wincld.SetClipboardData(win32con.CF_UNICODETEXT, self.sender().currentItem().text(index))
-        wincld.CloseClipboard()
+        pyperclip.copy(self.sender().currentItem().text(index))
 
     def self_edit_button_default(self, bool=False):
         self.editlayout['竖布局']['修改数据'].setEnabled(bool)
@@ -3468,7 +3465,7 @@ class Main(QMainWindow):
                         for k in v[j]:
                             bool = {'加强': False, '削弱': False, '平衡': False}
                             target_name = v[j][k][0]
-                            if v[j][k][0] == '':
+                            if v[j][k][0] == '' or v[j][k][0] is None:
                                 if j == '无标题':
                                     target_name = i
                                 else:
@@ -4370,9 +4367,8 @@ class Main(QMainWindow):
 
     def entry_resort(self):
         temp = []
-        p = Pinyin()
         for i in self.entry_base:
-            temp.append([p.get_pinyin(i), i])
+            temp.append([getpinyin(i), i])
         temp = sorted(temp, key=lambda x: x[0])
         new_base = {}
         for i in temp:
@@ -4381,11 +4377,10 @@ class Main(QMainWindow):
 
     def entry_refresh_tree(self):
         self.entrylayout['编辑区']['树'][0].clear()
-        p = Pinyin()
         for i in self.entry_base:
             tree1 = TreeItemEdit(self.entrylayout['编辑区']['树'][0], i)
             tree1.set_type('tree')
-            tree1.setText(1, p.get_pinyin(i))
+            tree1.setText(1, getpinyin(i))
             tree2 = TreeItemEdit(tree1, '链接')
             tree2.set_type('text')
             tree2.set_value(self.entry_base[i]['链接'])
@@ -4409,10 +4404,9 @@ class Main(QMainWindow):
                         self.entrylayout['编辑区']['树'][0].setCurrentIndex(i)
                         self.entrylayout['编辑区']['树'][0].topLevelItem(i).setExpanded(True)
             else:
-                p = Pinyin()
                 tree1 = TreeItemEdit(self.entrylayout['编辑区']['树'][0], text)
                 tree1.set_type('tree')
-                tree1.setText(1, p.get_pinyin(text))
+                tree1.setText(1, getpinyin(text))
                 tree2 = TreeItemEdit(tree1, '链接')
                 tree2.set_type('text')
                 tree3 = TreeItemEdit(tree1, '文字')

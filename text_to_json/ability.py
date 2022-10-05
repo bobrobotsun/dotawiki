@@ -10,7 +10,7 @@ import operator
 import mainwindow
 from text_to_json import common_page, edit_json, calculate
 from text_to_json.WikiError import editerror
-from xpinyin import Pinyin
+from text_to_json.edit_json import getpinyin
 
 
 def change_str_to_int(s):
@@ -87,7 +87,7 @@ def get_hero_data_from_txt(base_txt, ffile):
                 else:
                     temp_list = temp_value.split('|')
                 for k in range(len(temp_list)):
-                    temp_valuek = temp_list[k].strip().strip('x').rstrip('%')
+                    temp_valuek = temp_list[k].strip().strip('x').strip('=').rstrip('%')
                     try:
                         base_txt[name][temp_name][str(k + 1)] = int(temp_valuek)
                     except ValueError:
@@ -95,10 +95,10 @@ def get_hero_data_from_txt(base_txt, ffile):
                             base_txt[name][temp_name][str(k + 1)] = float(temp_valuek)
                         except ValueError:
                             base_txt[name][temp_name][str(k + 1)] = temp_valuek
-        all_pro = re.finditer('\t*?"(.*?)".*?\n\t{3,}{((.|\n)*?)}', i.group(0))
+        all_pro = re.finditer('[\s\t]*?"(.*?)".*?\n(\t{3,}|\s{12,}){((.|\n)*?)}', i.group(0))
         for j in all_pro:
             j_name=j.group(1)
-            other_pro = re.finditer('[\s\t]*?"(.*?)"([^\S\r\n]|")+([^"]+)([^\S\r\n]|")+', j.group(2))
+            other_pro = re.finditer('[\s\t]*?"(.*?)"([^\S\r\n]|")+([^"]+)([^\S\r\n]|")+', j.group(3))
             for k in other_pro:
                 k_name = k.group(1)
                 k_value = k.group(3)
@@ -115,7 +115,7 @@ def get_hero_data_from_txt(base_txt, ffile):
                         else:
                             temp_list = k_value.split('|')
                         for l in range(len(temp_list)):
-                            temp_valuek = temp_list[l].strip().strip('x').rstrip('%')
+                            temp_valuek = temp_list[l].strip().strip('x').strip('=').rstrip('%')
                             try:
                                 base_txt[name][j_name+post][str(l + 1)] = int(temp_valuek)
                             except ValueError:
@@ -133,7 +133,7 @@ def get_hero_data_from_txt(base_txt, ffile):
                         else:
                             k_list = k_value.split('|')
                         for l in range(len(k_list)):
-                            k_valuek = k_list[l].strip().strip('+').strip('x').rstrip('%')
+                            k_valuek = k_list[l].strip().strip('+').strip('x').strip('=').rstrip('%')
                             try:
                                 k_dict[str(l + 1)] = int(k_valuek)
                             except ValueError:
@@ -2010,9 +2010,8 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项时，您的排序没有声明升降序，或声明发生了错误'))
         elif condition[j] == '@技能':
             if tempjson['分类'] == '技能':
-                p = Pinyin()
                 list1 = [tempjson['技能排序'], '+']
-                list2 = [p.get_pinyin(tempjson['技能归属']), '+']
+                list2 = [getpinyin(tempjson['技能归属']), '+']
                 indexdict = {'英雄技能': 1, '神杖技能': 1, '魔晶技能': 1, '非英雄单位技能': 2, '物品技能': 3, '天赋技能': 4}
                 indexkey = tempjson['次级分类']
                 list3 = []
@@ -2025,8 +2024,7 @@ def find_json_by_condition_with_result(condition, i, tempjson, result, target, c
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项时，查询到的不是技能，请重新确定自己【满足】条件'))
         elif condition[j] == '@pinyin' or condition[j] == '@拼音':
             if isinstance(tempjson, str) and len(condition) >= j + 2 and (condition[j + 1] == '+' or condition[j] == '-'):
-                p = Pinyin()
-                return [[p.get_pinyin(tempjson), condition[j + 1]]]
+                return [[getpinyin(tempjson), condition[j + 1]]]
             else:
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n在调用第' + str(i) + '条【' + condition_name + '】第' + str(j) + '项时，您的排序没有声明升降序，或声明发生了错误，或目标不是文字'))
         elif condition[j] == '@+' or condition[j] == '@升序':

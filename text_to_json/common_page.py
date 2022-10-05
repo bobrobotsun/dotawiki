@@ -1,8 +1,9 @@
 import re
 import math
-from xpinyin import Pinyin
+import pypinyin
 from text_to_json import hero, ability, edit_json
 import mainwindow
+from text_to_json.edit_json import getpinyin
 
 target_url = 'http://dota.huijiwiki.com/w/api.php'
 
@@ -318,7 +319,7 @@ def create_page_logs(title, log_base, log_list):
                     if j0 != '无标题':
                         retxt += '\n' + titles + j0 + titles + '\n<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + j0 + '|--' + j0 + ']]</div>'
                     for j, w in w0.items():
-                        if w[0] != '':
+                        if w[0] != '' and w[1] is not None:
                             retxt += '\n===={{大图片|' + w[0] + '|h36}}[[' + w[0] + ']]===='
                         current_ul = 0
                         for k in range(2, len(w)):
@@ -866,9 +867,10 @@ def create_page_unitgroup(json_base, log_base, log_list, unitgroup):
         if i in json_base['非英雄单位']:
             retxt += json_base['非英雄单位'][i]['简易展示']
     temp = ''
-    for i, v in db['单位来源'].items():
-        if v in json_base['技能']:
-            temp += json_base['技能'][v]['简易展示']
+    if isinstance(db['单位来源'],dict):
+        for i, v in db['单位来源'].items():
+            if v in json_base['技能']:
+                temp += json_base['技能'][v]['简易展示']
     if temp != '':
         retxt += '\n==单位来源==\n' + temp
     retxt += '\n==历史更新==\n' + create_switch_log(log_base, log_list, all_the_names(db, json_base),unitgroup)
@@ -920,7 +922,6 @@ def create_hero_choose_element(json_base, args, dict, post):
 def create_item_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
-    p = Pinyin()
     all_shop = {}
     retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；">' \
              + '<div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
@@ -938,7 +939,7 @@ def create_item_choose_element(json_base, args, dict, post):
     for i in json_base['物品']:
         if json_base['物品'][i]['应用'] == 1:
             temp = '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
-                   + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + p.get_pinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
+                   + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + getpinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
             for j in edit_json.edit_adition['物品属性']:
                 if j in json_base['物品'][i]:
                     temp += j + '=' + ability.better_float_to_text(json_base['物品'][i][j]['1']) + '；'
@@ -971,7 +972,6 @@ def create_delete_item_choose_element(json_base, args, post):
 def create_neutral_item_choose_element(json_base, args, dict, post):
     args.insert(1, '')
     retxt = ''
-    p = Pinyin()
     all_shop = {}
     retxt += '<div class="dota_dict_label_switch_content_by_click" data-display-dict="价格=1；'
     retxt += '"><div class="dota_compound_list_select_input_button_empty">↑↑删除框内内容↑↑</div>' \
@@ -992,7 +992,7 @@ def create_neutral_item_choose_element(json_base, args, dict, post):
     for i in json_base['物品']:
         if json_base['物品'][i]['应用'] == 1 and json_base['物品'][i]['商店']['1'][:3] == '中立第':
             temp = '<span class="dota_compound_list_select_input_button dota_dict_label_switch_content_by_click_content" data-select-input-text="' + i + '" data-check-key="' \
-                   + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + p.get_pinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
+                   + '价格=' + ability.better_float_to_text(json_base['物品'][i]['价格']['1']) + '；简易拼音=' + getpinyin(i).replace('-', '')[:3] + '；完整代码=' + json_base['物品'][i]['代码名'] + '；'
             for j in edit_json.edit_adition['物品属性']:
                 if j in json_base['物品'][i]:
                     temp += j + '=' + ability.better_float_to_text(json_base['物品'][i][j]['1']) + '；'

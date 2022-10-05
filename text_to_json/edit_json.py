@@ -8,7 +8,10 @@
 作者: 莫无煜
 网站: https://dota.huijiwiki.com
 """
-from xpinyin import Pinyin
+import pypinyin
+
+def getpinyin(word,sep='-',style=8):
+    return sep.join([_[0] for _ in pypinyin.pinyin(word,style=style)])
 
 
 # dict排序方法
@@ -16,9 +19,8 @@ def sortedDictValues(adict, pinyin, _reverse=False):
     keys = []
     new = {}
     if pinyin:
-        p = Pinyin()
         for i in adict:
-            keys.append([p.get_pinyin(i), i])
+            keys.append([getpinyin(i), i])
         keys = sorted(keys, key=lambda x: x[0], reverse=_reverse)
         for i in keys:
             new[i[1]] = adict[i[1]]
@@ -32,9 +34,8 @@ def sortedDictValues(adict, pinyin, _reverse=False):
 def sortedList(alist, function=lambda x: x[0], _reverse=False):
     keys = []
     new = []
-    p = Pinyin()
     for i in alist:
-        keys.append([p.get_pinyin(i), i])
+        keys.append([getpinyin(i), i])
     keys = sorted(keys, key=function, reverse=_reverse)
     for i in keys:
         new.append(i[1])
@@ -57,10 +58,9 @@ def version_sort(version_json, version_list):
 def one_version_name_sort(version_json):
     keys = []
     new = {}
-    p = Pinyin()
     for i in version_json:
         if i != '0':
-            keys.append([p.get_pinyin(version_json[i][0]), i])
+            keys.append([getpinyin(version_json[i][0]), i])
     keys = sorted(keys, key=lambda x: x[0])
     new['0'] = version_json['0']
     for i in range(len(keys)):
@@ -71,9 +71,8 @@ def one_version_name_sort(version_json):
 def special_sort_dict_by_pinyin(version_json, sortfun=lambda x, y: x[y]):
     keys = []
     new = {}
-    p = Pinyin()
     for i in version_json:
-        keys.append([p.get_pinyin(sortfun(version_json, i)), i])
+        keys.append([getpinyin(sortfun(version_json, i)), i])
     keys = sorted(keys, key=lambda x: x[0])
     for i in keys:
         new[i[1]] = version_json[i[1]]
@@ -83,9 +82,8 @@ def special_sort_dict_by_pinyin(version_json, sortfun=lambda x, y: x[y]):
 def special_sort_list_by_pinyin(version_json, sortfun=lambda x, y: x[y]):
     keys = []
     new = []
-    p = Pinyin()
     for i in range(len(version_json)):
-        keys.append([p.get_pinyin(sortfun(version_json, i)), i])
+        keys.append([getpinyin(sortfun(version_json, i)), i])
     keys = sorted(keys, key=lambda x: x[0])
     for i in keys:
         new.append(version_json[i[1]])
@@ -776,3 +774,6 @@ def set_version_default(base):
             elif base['英雄'][i]['近战远程']['1'] == '远程':
                 v['远程英雄'].append(i)
     return v
+
+if __name__=='__main__':
+    print(getpinyin('我是人'))
