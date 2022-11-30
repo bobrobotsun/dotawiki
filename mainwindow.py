@@ -83,7 +83,7 @@ class Main(QMainWindow):
         # 设定软件的图标
         self.setWindowIcon(self.icon)
         # 设定窗口大小、位置至0.8倍屏幕长宽，且边缘为0.1倍长宽
-        self.setGeometry(self.screen_size[0] * 0.02, self.screen_size[1] * 0.1, self.screen_size[0] * 0.96, self.screen_size[1] * 0.8)
+        self.setGeometry(int(self.screen_size[0] * 0.02), int(self.screen_size[1] * 0.1), int(self.screen_size[0] * 0.96), int(self.screen_size[1] * 0.8))
         # 创建一个菜单栏
         self.create_menubar()
         self.main_layout()
