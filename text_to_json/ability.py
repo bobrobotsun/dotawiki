@@ -3518,7 +3518,6 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                 if k in all_json['非英雄单位']:
                     bt += all_json['非英雄单位'][k]['简易展示']
             bt += '</div>'
-            bt += '<div class="dota_invisible_menu_item_at_right_of_the_screen">[[#' + db['页面名'] + '|{{H|' + db['页面名'] + '|image=0|link=0}}]]</div>'
             db['简易展示'] = html_function(st)
             db['具体展示'] = html_function(bt)
 

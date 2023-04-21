@@ -10,6 +10,8 @@
 """
 
 import json
+import traceback
+
 import requests
 import os
 import time
@@ -38,7 +40,7 @@ class Main(QMainWindow):
         self.initUI()
 
     def initParam(self):
-        self.version = '7.32c'
+        self.version = '7.33'
         self.title = 'dotawiki'
         # 登录用的一些东西，包括网址、request（包含cookie）、api指令
         self.target_url = 'https://dota.huijiwiki.com/api.php'
@@ -171,6 +173,16 @@ class Main(QMainWindow):
         except FileNotFoundError:
             self.login_success(False)
 
+    def seesion_post(self, *args, **kwargs):
+        while True:
+            try:
+                temp = self.seesion.post(*args, **kwargs)
+            except:
+                print('post链接错误，正在重试')
+                continue
+            else:
+                return temp
+
     # 自动登录，通过读取文件夹内的文件储存的用户名和密码进行登录
     def login(self, password, **kwargs):
         # 判断此时是否打开了登录窗口
@@ -182,7 +194,7 @@ class Main(QMainWindow):
         tryi = 0
         while True:
             # 获取登录令牌
-            login_token = self.seesion.post(self.target_url, data=self.get_login_token_data, headers=self.header)
+            login_token = self.seesion_post(self.target_url, data=self.get_login_token_data, headers=self.header)
             # 使用登录令牌登录
             if login_token.status_code < 400:
                 login_token_json = login_token.json()
@@ -196,7 +208,7 @@ class Main(QMainWindow):
         self.login_data['password'] = password['密码']
         tryi = 0
         while True:
-            login_info = self.seesion.post(self.target_url, data=self.login_data, headers=self.header)
+            login_info = self.seesion_post(self.target_url, data=self.login_data, headers=self.header)
             # 判断登录效果
             if login_info.status_code != 200 or login_info.json()["clientlogin"]["status"] == "FAIL":
                 tryi += 1
@@ -215,7 +227,8 @@ class Main(QMainWindow):
                             kwargs['window'].close()
                     break
             else:
-                self.csrf_token = self.seesion.post(self.target_url, data=self.get_csrf_token_data, headers=self.header).json()['query']['tokens']['csrftoken']
+                self.csrf_token = self.seesion_post(self.target_url, data=self.get_csrf_token_data, headers=self.header).json()['query']['tokens']['csrftoken']
+                print(login_info.json()["clientlogin"])
                 self.login_success(True, username=login_info.json()["clientlogin"]["username"], password=password['密码'])
                 if window:
                     kwargs['window'].close()
@@ -259,7 +272,7 @@ class Main(QMainWindow):
 
     # 登出
     def logout(self):
-        logout_info = self.seesion.post(self.target_url, data=self.logout_data, headers=self.header)
+        logout_info = self.seesion_post(self.target_url, data=self.logout_data, headers=self.header)
         self.login_success(False)
 
     # 登出
@@ -421,7 +434,7 @@ class Main(QMainWindow):
             self.const = json.loads(basefile.read())
             basefile.close()
         except FileNotFoundError:
-            self.const = {'thread_staytime': 0.002, 'thread_number': 100}
+            self.const = {'thread_staytime': 0.01, 'thread_number': 5}
             self.file_save(os.path.join('database', 'const.json'), json.dumps(self.const))
 
     def load_data(self):
@@ -439,17 +452,6 @@ class Main(QMainWindow):
             elif messageBox.clickedButton() == buttonFile:
                 self.get_data_from_text()
         try:
-            basefile = open(os.path.join('database', 'json_base.json'), mode="r", encoding="utf-8")
-            self.json_base = json.loads(basefile.read())
-            basefile.close()
-        except FileNotFoundError:
-            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载合成数据？", QMessageBox.NoButton, self)
-            button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
-            button2 = messageBox.addButton('没有网络，没法下载', QMessageBox.NoRole)
-            messageBox.exec_()
-            if messageBox.clickedButton() == button1:
-                self.download_json_base()
-        try:
             basefile = open(os.path.join('database', 'json_name.json'), mode="r", encoding="utf-8")
             self.json_name = json.loads(basefile.read())
             basefile.close()
@@ -460,6 +462,17 @@ class Main(QMainWindow):
             messageBox.exec_()
             if messageBox.clickedButton() == button1:
                 self.download_json_name()
+        try:
+            basefile = open(os.path.join('database', 'json_base.json'), mode="r", encoding="utf-8")
+            self.json_base = json.loads(basefile.read())
+            basefile.close()
+        except FileNotFoundError:
+            messageBox = QMessageBox(QMessageBox.Critical, "获取数据失败", "请问您是否准备从wiki下载合成数据？", QMessageBox.NoButton, self)
+            button1 = messageBox.addButton('从网络下载', QMessageBox.YesRole)
+            button2 = messageBox.addButton('没有网络，没法下载', QMessageBox.NoRole)
+            messageBox.exec_()
+            if messageBox.clickedButton() == button1:
+                self.download_json_base()
         try:
             basefile = open(os.path.join('database', 'mech.json'), mode="r", encoding="utf-8")
             self.mech = json.loads(basefile.read())
@@ -541,8 +554,10 @@ class Main(QMainWindow):
             ability.get_dota_data_from_vpk(self.text_base['技能'], pak1.get_file("resource/localization/abilities_schinese.txt"))
             item.get_hero_data_from_txt(self.text_base['物品'], pak1.get_file("scripts/npc/items.txt"))
             item.get_dota_data_from_vpk(self.text_base['物品'], pak1.get_file("resource/localization/abilities_schinese.txt"))
-            translate.get_dota_data_from_vpk(self.text_base['翻译'], pak1.get_file("resource/localization/dota_schinese.txt"), pak1.get_file("resource/localization/dota_english.txt"))
-            translate.get_dota_data_from_vpk(self.text_base['翻译'], pak1.get_file("resource/localization/abilities_schinese.txt"), pak1.get_file("resource/localization/abilities_english.txt"))
+            translate.get_dota_data_from_vpk(self.text_base['翻译'], pak1.get_file("resource/localization/dota_schinese.txt"),
+                                             pak1.get_file("resource/localization/dota_english.txt"))
+            translate.get_dota_data_from_vpk(self.text_base['翻译'], pak1.get_file("resource/localization/abilities_schinese.txt"),
+                                             pak1.get_file("resource/localization/abilities_english.txt"))
             self.file_save(os.path.join('database', 'dota2_address.json'), address)
             self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
             messagebox = QMessageBox(QMessageBox.Information, '文件抓取', ttt, QMessageBox.NoButton, self)
@@ -559,7 +574,7 @@ class Main(QMainWindow):
 
     # 将文件保存在目标文件夹内
     def file_save(self, file, content):
-        with open(file, mode="w") as f:
+        with open(file, mode="w", encoding='utf8') as f:
             f.write(content)
 
     # 从wiki网站上下载对应的信息
@@ -570,7 +585,7 @@ class Main(QMainWindow):
         warn = 0
         while True:
             self.time_point_for_iterable_sleep_by_time()
-            download_info = self.seesion.post(self.target_url, data=download_data, headers=self.header)
+            download_info = self.seesion_post(self.target_url, data=download_data, headers=self.header)
             if download_info.status_code == 200:
                 return download_info.json()['jsondata']
             else:
@@ -582,7 +597,7 @@ class Main(QMainWindow):
 
     def download_json_name(self):
         for i in self.json_name:
-            temp = self.seesion.post(self.target_url, headers=self.header,
+            temp = self.seesion_post(self.target_url, headers=self.header,
                                      data={'action': 'parse', 'text': '{{#invoke:json|api_all_page_names|' + i + '}}', 'contentmodel': 'wikitext', 'prop': 'text',
                                            'disablelimitreport': 'false', 'format': 'json'}).json()['parse']['text']['*']
             texttemp = re.sub('<.*?>', '', temp)[:-1]
@@ -616,8 +631,7 @@ class Main(QMainWindow):
         QMessageBox.information(self, '下载机制定义完成', '下载机制定义完成，请继续操作')
 
     def download_and_upload_wiki_menu(self):
-        wiki_result = self.seesion.post(self.target_url, headers=self.header,
-                                        data={'action': 'jsondata', 'title': '机制.json', 'format': 'json'}).json()
+        wiki_result = self.seesion_post(self.target_url, headers=self.header, data={'action': 'jsondata', 'title': '机制.json', 'format': 'json'}).json()
         wiki_menu = dota_menus.menu_init(wiki_result['jsondata'])
         for i in self.json_base['英雄']:
             wiki_menu['单位']['英雄'].append(i)
@@ -671,7 +685,7 @@ class Main(QMainWindow):
                 total_num += len(self.json_name[i])
             self.temp_time_show = time.time()
             self.progress = upload_text('开始下载json')
-            self.progress.setGeometry(self.screen_size[0] * 0.2, self.screen_size[1] * 0.15, self.screen_size[0] * 0.6, self.screen_size[1] * 0.7)
+            self.progress.setGeometry(int(self.screen_size[0] * 0.2), int(self.screen_size[1] * 0.15), int(self.screen_size[0] * 0.6), int(self.screen_size[1] * 0.7))
             self.progress.setWindowIcon(self.icon)
             self.progress.setWindowTitle('下载json中……')
             self.current_num = [0, 0]
@@ -717,7 +731,14 @@ class Main(QMainWindow):
             self.local.target_url = self.target_url
             self.local.k = 0
             while True:
-                self.local.download_info = self.local.seesion.post(self.local.target_url, headers=self.header, data=self.local.download_data)
+                try:
+                    self.local.download_info = self.local.seesion.post(self.local.target_url, headers=self.header, data=self.local.download_data)
+                except Exception as xx:
+                    self.lock.acquire()
+                    print(self.download_json_list[self.local.current_num], '：访问错误，原因为：' + str(xx))
+                    self.time_point_for_iterable_sleep_by_time()
+                    self.lock.release()
+                    continue
                 self.lock.acquire()
                 if isinstance(self.local.download_info.status_code, int) and self.local.download_info.status_code < 400:
                     try:
@@ -736,7 +757,8 @@ class Main(QMainWindow):
                 else:
                     self.local.k += 1
                     self.time_point_for_iterable_sleep_by_time(1)
-                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：' + str(self.local.download_info.status_code) + '，尝试次数：' + str(self.local.k), 2],
+                    self.progress.addtext(['下载《' + self.download_json_list[self.local.current_num][2] + '》内容失败，代码：' + str(
+                        self.local.download_info.status_code) + '，尝试次数：' + str(self.local.k), 2],
                                           self.current_num[0], threading.current_thread().name)
                     if self.local.k >= 20:
                         self.time_point_for_iterable_sleep_by_time()
@@ -746,7 +768,7 @@ class Main(QMainWindow):
                     self.lock.release()
         self.lock.acquire()
         if (self.progress.success[1] == self.progress.maxmax):
-            self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
+            self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base, ensure_ascii=False))
             self.fix_window_with_json_data()
             self.progress.addtext(['下载完毕，已为您下载合成数据，并已保存。您可以关闭本窗口。\n总耗时：' + self.system_cal_time(self.temp_time_show), 0])
         self.lock.release()
@@ -772,7 +794,7 @@ class Main(QMainWindow):
                 self.mainlayout['列表'][i]['布局']['列表'].clear()
                 for j in self.json_base[i]:
                     temp = QListWidgetItem()
-                    pinyin = getpinyin(j,'',0)
+                    pinyin = getpinyin(j, '', 0)
                     temp.setText('【' + pinyin[:4].lower() + '】' + j)
                     if self.json_base[i][j]['应用'] == 2:
                         temp.setBackground(self.green)
@@ -814,17 +836,17 @@ class Main(QMainWindow):
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
             self.edit_category_selected_changed()
-            if err.args[0]=='技能源' and err.args[1] in self.json_base['技能']:
-                tar=self.json_base['技能'][err.args[1]]['数据来源']
+            if err.args[0] == '技能源' and err.args[1] in self.json_base['技能']:
+                tar = self.json_base['技能'][err.args[1]]['数据来源']
                 self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(tar)
             else:
                 self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
         finally:
-            self.update_the_jsons_alreadey = {'':False}
+            self.update_the_jsons_alreadey = {'': False}
             for i in self.json_base['机制']:
-                self.update_the_jsons_alreadey[i]=False
+                self.update_the_jsons_alreadey[i] = False
 
     def view_target_web(self, address):
         ss = 1
@@ -1329,7 +1351,7 @@ class Main(QMainWindow):
 
     def file_save_all(self):
         self.file_save(os.path.join('database', 'text_base.json'), json.dumps(self.text_base))
-        self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
+        self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base, ensure_ascii=False))
         self.file_save(os.path.join('database', 'json_name.json'), json.dumps(self.json_name))
         self.file_save(os.path.join('database', 'name_base.json'), json.dumps(self.name_base))
 
@@ -1429,17 +1451,17 @@ class Main(QMainWindow):
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
             self.edit_category_selected_changed()
-            if err.args[0]=='技能源' and err.args[1] in self.json_base['技能']:
-                tar=self.json_base['技能'][err.args[1]]['数据来源']
+            if err.args[0] == '技能源' and err.args[1] in self.json_base['技能']:
+                tar = self.json_base['技能'][err.args[1]]['数据来源']
                 self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(tar)
             else:
                 self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
-            self.update_the_jsons_alreadey['']=False
+            self.update_the_jsons_alreadey[''] = False
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
             return True
         else:
-            self.update_the_jsons_alreadey['']=True
+            self.update_the_jsons_alreadey[''] = True
             QMessageBox.information(self, "已完成", info + '\n总耗时：' + self.system_cal_time(time_show))
             return False
 
@@ -1455,7 +1477,7 @@ class Main(QMainWindow):
             time_show = time.time()
             allupdate = []
             loop_time = 1
-            costom_mech=ability.get_buff_costom_mechnism(self.json_base)
+            costom_mech = ability.get_buff_costom_mechnism(self.json_base)
             if target == '':
                 loop_time = 2
                 for i in self.json_base['机制']:
@@ -1472,24 +1494,26 @@ class Main(QMainWindow):
                 self.w.confirm_numbers(total_num)
                 self.w.setWindowTitle('机制一共有' + str(total_num) + '个，1~' + str(len(allupdate)) + '，' + str(len(allupdate) + 1) + '~' + str(total_num) + '。')
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
-                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list,costom_mech,self.update_the_jsons_alreadey, self.change_all_template_link_to_html, loop_time, self.w)
+                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, costom_mech, self.update_the_jsons_alreadey,
+                                            self.change_all_template_link_to_html, loop_time, self.w)
                 self.loop_check_to_html(self.json_base['机制'], self.change_all_template_link_to_html)
             else:
                 allupdate.append(target)
                 reversed_name_dict_list = self.reversed_name_create_tree_list_name()
-                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list,costom_mech,self.update_the_jsons_alreadey, self.change_all_template_link_to_html, loop_time)
+                mechnism.get_source_to_data(self.json_base, allupdate, self.version, self.text_base, reversed_name_dict_list, costom_mech, self.update_the_jsons_alreadey,
+                                            self.change_all_template_link_to_html, loop_time)
                 self.loop_check_to_html(self.json_base['机制'][target], self.change_all_template_link_to_html)
             self.file_save_all()
         except editerror as err:
             self.editlayout['修改核心']['竖布局']['大分类'][0].setCurrentText(err.args[0])
             self.edit_category_selected_changed()
-            if err.args[0]=='技能源' and err.args[1] in self.json_base['技能']:
-                tar=self.json_base['技能'][err.args[1]]['数据来源']
+            if err.args[0] == '技能源' and err.args[1] in self.json_base['技能']:
+                tar = self.json_base['技能'][err.args[1]]['数据来源']
                 self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(tar)
             else:
                 self.editlayout['修改核心']['竖布局']['具体库'][0].setCurrentText(err.args[1])
             self.edit_target_selected_changed()
-            self.update_the_jsons_alreadey[err.args[1]]=False
+            self.update_the_jsons_alreadey[err.args[1]] = False
             QMessageBox.critical(self.parent(), '发现错误', err.get_error_info())
             return True
         else:
@@ -1513,6 +1537,7 @@ class Main(QMainWindow):
         self.w.setWindowTitle('上传json中……')
         QApplication.processEvents()
         all_upload = []
+        all_page_upload = []
         all_upload.append(['版本.json', {'版本': self.version}])
         if chosen == '':
             for i in self.json_base:
@@ -1521,6 +1546,7 @@ class Main(QMainWindow):
                         all_upload.append([j + '/源.json', self.json_base[i][j]])
                     else:
                         all_upload.append([j + '.json', self.json_base[i][j]])
+                        all_page_upload.append([f'Data:{j}', common_page.create_page_common_data(self.json_base[i][j], j)])
         else:
             i = chosen
             for j in self.json_base[i]:
@@ -1528,10 +1554,14 @@ class Main(QMainWindow):
                     all_upload.append([j + '/源.json', self.json_base[i][j]])
                 else:
                     all_upload.append([j + '.json', self.json_base[i][j]])
-        total_num = len(all_upload)
+                    all_page_upload.append([f'Data:{j}', common_page.create_page_common_data(self.json_base[i][j], j)])
+        total_num = len(all_upload) + len(all_page_upload)
         self.w.confirm_numbers(total_num)
         for i in range(total_num):
             self.w.addtext(self.upload_json(all_upload[i][0], all_upload[i][1]), i)
+            QApplication.processEvents()
+        for i in range(len(all_page_upload)):
+            self.w.addtext(self.upload_page(all_page_upload[i][0], all_page_upload[i][1], 2), i + len(all_upload))
             QApplication.processEvents()
         QMessageBox.information(self.w, '上传完毕', '您已上传完毕，可以关闭窗口\n总耗时：' + self.system_cal_time(time_show), QMessageBox.Yes, QMessageBox.Yes)
 
@@ -1550,9 +1580,11 @@ class Main(QMainWindow):
             for i in self.json_base['英雄']:
                 all_upload.append([i, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], i)])
                 all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][i], self.json_base), i, 0)])
+                all_upload.append([f'Data:{i}', common_page.create_page_common_data(self.json_base['英雄'][i], i)])
                 talent_name = []
                 for j in ['10', '15', '20', '25']:
                     talent_name.append(common_page.all_the_names(self.json_base['技能'][i + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][i + j + '级右天赋'], self.json_base))
+                    all_upload.append([f'Data:{i}{j}级天赋', common_page.create_page_hero_common_talent_data(self.json_base['英雄'][i], j)])
                     all_upload.append([i + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], i, j, talent_name[-1])])
                 all_upload.append([i + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], i, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
             self.w.add_info_text('【英雄】页面已经分析完毕！')
@@ -1566,7 +1598,8 @@ class Main(QMainWindow):
         if chosen == '' or chosen == '物品':
             for i in self.json_base['物品']:
                 all_upload.append([i, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], i)])
-                all_upload.append([i + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][i], self.json_base), i, 0)])
+                all_upload.append([i + '/版本改动',
+                                   common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][i], self.json_base), i, 0)])
             self.w.add_info_text('【物品】页面已经分析完毕！')
             QApplication.processEvents()
         if chosen == '' or chosen == '单位组':
@@ -1675,6 +1708,7 @@ class Main(QMainWindow):
                     all_json_upload.append([j + '/源.json', self.json_base[i][j]])
                 else:
                     all_json_upload.append([j + '.json', self.json_base[i][j]])
+                    all_page_upload.append([f'Data:{j}', common_page.create_page_common_data(self.json_base[i][j], j)])
         self.w.add_info_text('【json】部分已经生成完毕！')
         QApplication.processEvents()
         for i in self.json_base['英雄']:
@@ -1683,9 +1717,9 @@ class Main(QMainWindow):
             talent_name = []
             for j in ['10', '15', '20', '25']:
                 talent_name.append(common_page.all_the_names(self.json_base['技能'][i + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][i + j + '级右天赋'], self.json_base))
+                all_page_upload.append([f'Data:{i}{j}级天赋', common_page.create_page_hero_common_talent_data(self.json_base['英雄'][i], j)])
                 all_page_upload.append([i + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], i, j, talent_name[-1])])
-            all_page_upload.append(
-                [i + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], i, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
+            all_page_upload.append([i + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], i, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
         self.w.add_info_text('【英雄】页面已经分析完毕！')
         QApplication.processEvents()
         for i in self.json_base['非英雄单位']:
@@ -1729,8 +1763,10 @@ class Main(QMainWindow):
         self.w.confirm_numbers(total_num)
         self.w.setWindowTitle('一共需要上传共计' + str(total_num) + '个页面，其中：json页面' + str(len(all_json_upload)) + '个（1~' + str(len(all_json_upload)) + '），'
                               + '普通页面' + str(len(all_page_upload)) + '个（' + str(1 + len(all_json_upload)) + '~' + str(len(all_json_upload) + len(all_page_upload)) + '），'
-                              + '引用机制页面' + str(len(all_copy_upload)) + '个（' + str(1 + len(all_json_upload) + len(all_page_upload)) + '~' + str(len(all_json_upload) + len(all_page_upload) + len(all_copy_upload)) + '），'
-                              + '重定向页面' + str(len(all_redirect)) + '个（' + str(1 + len(all_json_upload) + len(all_page_upload) + len(all_copy_upload)) + '~' + str(total_num) + '）')
+                              + '引用机制页面' + str(len(all_copy_upload)) + '个（' + str(1 + len(all_json_upload) + len(all_page_upload)) + '~' + str(
+            len(all_json_upload) + len(all_page_upload) + len(all_copy_upload)) + '），'
+                              + '重定向页面' + str(len(all_redirect)) + '个（' + str(1 + len(all_json_upload) + len(all_page_upload) + len(all_copy_upload)) + '~' + str(
+            total_num) + '）')
         QApplication.processEvents()
         for i in range(len(all_json_upload)):
             self.w.addtext(self.upload_json(all_json_upload[i][0], all_json_upload[i][1]), i)
@@ -1818,7 +1854,7 @@ class Main(QMainWindow):
 
     def download_same_kind(self):
         time_show = time.time()
-        target=''
+        target = ''
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
         target_name = []
@@ -1861,7 +1897,7 @@ class Main(QMainWindow):
                     all_download.append(['机制源', k, k + '/源.json'])
                 if k in self.json_base['机制']:
                     all_download.append(['机制', k, k + '.json'])
-                    target=k
+                    target = k
                 if k in self.json_base['单位组']:
                     all_download.append(['单位组', k, k + '.json'])
         total_num = len(all_download)
@@ -1870,7 +1906,7 @@ class Main(QMainWindow):
             self.json_base[all_download[i][0]][all_download[i][1]] = self.download_json(all_download[i][2])
             self.w.addtext(['下载《' + all_download[i][0] + '→' + all_download[i][1] + '》完毕', 1], i)
             QApplication.processEvents()
-        self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
+        self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base, ensure_ascii=False))
         self.edit_target_selected_changed()
         self.update_the_jsons_alreadey[target] = False
         self.w.addtext(['下载完毕，已为您下载同类数据，并已保存。您可以关闭本窗口。\n总耗时：' + self.system_cal_time(time_show), 0])
@@ -1879,9 +1915,9 @@ class Main(QMainWindow):
         time_show = time.time()
         selected = self.editlayout['修改核心']['竖布局']['大分类'][0].currentText()
         selected_name = self.editlayout['修改核心']['竖布局']['具体库'][0].currentText()
-        json_ready=''
-        if selected[:2]=='机制':
-            json_ready=selected_name
+        json_ready = ''
+        if selected[:2] == '机制':
+            json_ready = selected_name
         if not self.update_the_jsons_alreadey[json_ready]:
             error_stop = True
             self.json_base[selected][selected_name] = {}
@@ -1919,11 +1955,13 @@ class Main(QMainWindow):
                 all_upload.append([selected_name + '/源.json', self.json_base[selected][selected_name]])
             else:
                 all_upload.append([selected_name + '.json', self.json_base[selected][selected_name]])
+                all_page.append([f'Data:{selected_name}', common_page.create_page_common_data(self.json_base[selected][selected_name], selected_name)])
         else:
             for k in target_name:
                 for i in self.json_base['技能']:
                     if self.json_base['技能'][i]['技能归属'] == k:
                         all_upload.append([i + '.json', self.json_base['技能'][i]])
+                        all_page.append([f'Data:{i}', common_page.create_page_common_data(self.json_base['技能'][i], i)])
                         if self.json_base['技能'][i]['应用'] == 0:
                             all_page.append([i, common_page.create_page_old_ability(self.json_base, self.version_base, self.version_list['版本'], i)])
                         elif self.json_base['技能'][i]['应用'] == 3:
@@ -1937,26 +1975,30 @@ class Main(QMainWindow):
                             all_upload.append([j + '/源.json', self.json_base['技能源'][j]])
                 if k in self.json_base['英雄']:
                     all_upload.append([k + '.json', self.json_base['英雄'][k]])
+                    all_page.append([f'Data:{k}', common_page.create_page_common_data(self.json_base['英雄'][k], k)])
                     all_page.append([k, common_page.create_page_hero(self.json_base, self.version_base, self.version_list['版本'], k)])
                     all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['英雄'][k], self.json_base), k, 0)])
                     talent_name = []
                     for j in ['10', '15', '20', '25']:
                         talent_name.append(common_page.all_the_names(self.json_base['技能'][k + j + '级左天赋'], self.json_base) + common_page.all_the_names(self.json_base['技能'][k + j + '级右天赋'], self.json_base))
+                        all_page.append([f'Data:{k}{j}级天赋', common_page.create_page_hero_common_talent_data(self.json_base['英雄'][k], j)])
                         all_page.append([k + j + '级天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], k, j, talent_name[-1])])
-                    all_page.append(
-                        [k + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], k, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
+                    all_page.append([k + '/天赋/版本改动', common_page.create_page_talent_ability(self.json_base, self.version_base, self.version_list['版本'], k, '', talent_name[0] + talent_name[1] + talent_name[2] + talent_name[3])])
                 elif k in self.json_base['物品']:
                     all_upload.append([k + '.json', self.json_base['物品'][k]])
+                    all_page.append([f'Data:{k}', common_page.create_page_common_data(self.json_base['物品'][k], k)])
                     all_page.append([k, common_page.create_page_item(self.json_base, self.version_base, self.version_list['版本'], k)])
                     all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['物品'][k], self.json_base), k, 0)])
                 elif k in self.json_base['非英雄单位']:
                     all_upload.append([k + '.json', self.json_base['非英雄单位'][k]])
+                    all_page.append([f'Data:{k}', common_page.create_page_common_data(self.json_base['非英雄单位'][k], k)])
                     all_page.append([k, common_page.create_page_unit(self.json_base, self.version_base, self.version_list['版本'], k)])
                     all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['非英雄单位'][k], self.json_base), k, 0)])
                 if k in self.json_base['机制源']:
                     all_upload.append([k + '/源.json', self.json_base['机制源'][k]])
                 if k in self.json_base['机制']:
                     all_upload.append([k + '.json', self.json_base['机制'][k]])
+                    all_page.append([f'Data:{k}', common_page.create_page_common_data(self.json_base['机制'][k], k)])
                     if self.json_base['机制'][k]['次级分类'] == '引用机制':
                         all_copy_page.append([k, common_page.create_page_mechnism(self.json_base, self.version_base, self.version_list['版本'], k)])
                     else:
@@ -1964,6 +2006,7 @@ class Main(QMainWindow):
                         all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['机制'][k], self.json_base), k, 0)])
                 if k in self.json_base['单位组']:
                     all_upload.append([k + '.json', self.json_base['单位组'][k]])
+                    all_page.append([f'Data:{k}', common_page.create_page_common_data(self.json_base['单位组'][k], k)])
                     all_page.append([k, common_page.create_page_unitgroup(self.json_base, self.version_base, self.version_list['版本'], k)])
                     all_page.append([k + '/版本改动', common_page.create_switch_log(self.version_base, self.version_list['版本'], common_page.all_the_names(self.json_base['单位组'][k], self.json_base), k, 0)])
         total_num = len(all_upload) + len(all_page) + len(all_copy_page) + len(all_redirect)
@@ -1991,24 +2034,30 @@ class Main(QMainWindow):
         k = 0
         while True:
             self.time_point_for_iterable_sleep_by_time()
-            download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
-            if download_info.status_code < 400:
-                download_content = download_info.json()
-                if 'jsondata' in download_content and download_content['jsondata'] == content:
-                    return ['《' + pagename + '》通过校验，不需要修改！', 0]
-                break
+            try:
+                download_info = self.seesion_post(self.target_url, headers=self.header, data=download_data)
+            except Exception as err:
+                print('上传错误，原因为：')
+                traceback.print_exc()
+                continue
             else:
-                k += 1
-                self.time_point_for_iterable_sleep_by_time()
-                if k >= 5:
+                if download_info.status_code < 400:
+                    download_content = download_info.json()
+                    if 'jsondata' in download_content and download_content['jsondata'] == content:
+                        return ['《' + pagename + '》通过校验，不需要修改！', 0]
                     break
+                else:
+                    k += 1
+                    self.time_point_for_iterable_sleep_by_time()
+                    if k >= 5:
+                        break
         pagename = 'Data:' + pagename
         content = json.dumps(content)
         upload_data = {'action': 'edit', 'title': pagename, 'text': content, 'format': 'json', 'token': self.csrf_token}
         k = 0
         while True:
             self.time_point_for_iterable_sleep_by_time()
-            upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
+            upload_info = self.seesion_post(self.target_url, headers=self.header, data=upload_data)
             if upload_info.status_code < 400:
                 upload_info_json = upload_info.json()
                 break
@@ -2040,7 +2089,7 @@ class Main(QMainWindow):
         k = 0
         while True:
             self.time_point_for_iterable_sleep_by_time()
-            download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
+            download_info = self.seesion_post(self.target_url, headers=self.header, data=download_data)
             if download_info.status_code < 400:
                 download_content = download_info.json()
                 if 'error' in download_content:
@@ -2050,7 +2099,7 @@ class Main(QMainWindow):
                     l = 0
                     while True:
                         self.time_point_for_iterable_sleep_by_time()
-                        upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
+                        upload_info = self.seesion_post(self.target_url, headers=self.header, data=upload_data)
                         if upload_info.status_code < 400:
                             return ['《' + pagename + '》没有进行任何操作，并且刷新缓存完毕！', 0]
                         else:
@@ -2065,7 +2114,7 @@ class Main(QMainWindow):
         upload_data = {'action': 'edit', 'title': pagename, 'text': upcontent, 'format': 'json', 'token': self.csrf_token}
         while True:
             self.time_point_for_iterable_sleep_by_time()
-            upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
+            upload_info = self.seesion_post(self.target_url, headers=self.header, data=upload_data)
             if upload_info.status_code < 400:
                 upload_info_json = upload_info.json()
                 break
@@ -2092,7 +2141,7 @@ class Main(QMainWindow):
         k = 0
         while True:
             self.time_point_for_iterable_sleep_by_time()
-            upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
+            upload_info = self.seesion_post(self.target_url, headers=self.header, data=upload_data)
             if upload_info.status_code < 400:
                 upload_info_json = upload_info.json()
                 break
@@ -2115,45 +2164,206 @@ class Main(QMainWindow):
         retxt = gettxt
         findlen = 0
         findnow = 0
-        while True:
-            findnow = '+'.join(re.findall(r'\{\{([^\{\}]*?)\}\}', retxt))
-            if findnow == findlen:
-                break
-            else:
-                findlen = findnow
-            retxt = re.sub(r'\{\{([^\{\}]*?)\}\}', lambda x: self.upload_text_template(x), retxt)
-        retxt = re.sub(r'\[\[([^:]*?)\]\]', lambda x: self.upload_text_link(x), retxt)
+        try:
+            while True:
+                findnow = '+'.join(re.findall(r'\{\{([^\{\}]*?)\}\}', retxt))
+                if findnow == findlen:
+                    break
+                else:
+                    findlen = findnow
+                retxt = re.sub(r'\{\{([^\{\}]*?)\}\}', lambda x: self.upload_text_template(x), retxt)
+            # retxt = re.sub(r'\[\[([^:]*?)\]\]', lambda x: self.upload_text_link(x), retxt)
+        except:
+            traceback.print_exc()
         return retxt
 
     def upload_text_link(self, x):
         retxt = ''
         link = x.group(1).split('|')
         if len(link) > 1:
-            retxt = self.uploat_text_link_by_args(link[0], link[1])
+            retxt = self.uploat_text_link_by_args(link[0], '|'.join(link[1:]))
         else:
             retxt = self.uploat_text_link_by_args(link[0])
         return retxt
 
     def uploat_text_link_by_args(self, link, text=''):
-        if '#' in link:
-            link_index = link.index('#') + 1
-            link_target = ''
-            for i in range(link_index, len(link)):
-                link_hex = link[i].encode('utf-8')
-                if len(link_hex) > 1:
-                    for j in link_hex:
-                        link_target += '.' + self.change_256hex_to_str(j)
-                else:
-                    link_target += link[i]
-            real_link = link[:link_index] + link_target
-        else:
-            real_link = link
+        # if '#' in link:
+        #     link_index = link.index('#') + 1
+        #     link_target = ''
+        #     for i in range(link_index, len(link)):
+        #         link_hex = link[i].encode('utf-8')
+        #         if len(link_hex) > 1:
+        #             for j in link_hex:
+        #                 # link_target += '.' + self.change_256hex_to_str(j)
+        #                 link_target += j
+        #         else:
+        #             link_target += link[i]
+        #     real_link = link[:link_index] + link_target
+        # else:
+        real_link = link
         if text == '':
             text = link
-        retxt = '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + real_link + '">' + text + '</span>'
+        # retxt = '{{link|' + real_link + '|' + text + '}}'
+        retxt = '[[' + real_link + '|' + text + ']]'
         return retxt
 
     def upload_text_template(self, x):
+        retxt = ''
+        template_args = x.group(1).split('|')
+        if template_args[0].lower() in ['h', 'a', 'i', 'hh']:
+            size = ''
+            pic_style = ''
+            text_link = '|link=1'
+            image_link = '|image=1'
+            image_class = 'dota_get_image_by_json_name'
+            if template_args[1] == '魔晶升级' or template_args[1] == '魔晶技能':
+                template_args.insert(2, 'w24')
+            for i in range(2, len(template_args)):
+                if template_args[i][0] == 'w':
+                    size = '|w=' + template_args[i][1:]
+                elif template_args[i][0] == 'h':
+                    size = '|h=' + template_args[i][1:]
+                elif template_args[i][:5] == 'link=':
+                    text_link = '|' + template_args[i]
+                elif template_args[i][:6] == 'image=':
+                    image_link = '|' + template_args[i]
+            if len(template_args[1]) > 2 and template_args[1][-2:] == '天赋':
+                pic_style = ''
+            elif template_args[0] in ['A', 'a']:
+                pic_style += ' data-image-class="ability_icon"'
+            elif template_args[0] in ['I', 'i']:
+                pic_style += ' data-image-class="item_icon"'
+            if template_args[0].lower() == 'hh':
+                image_class = 'delay_get_image_by_json_name'
+            retxt += '{{hai|' + template_args[1] + size + text_link + image_link + '}}'
+            # retxt += '<span class="' + image_class + '" data-json-name="' + template_args[
+            #     1] + '" data-image-mini="1" ' + ' data-image-link="' + image_link + '" data-text-link="' + text_link + '"' + size + pic_style + '></span>'
+        elif template_args[0] in ['E', 'e']:
+            if template_args[1] in self.entry_base:
+                retxt += '{{link|' + self.entry_base[template_args[1]]['链接'] + '|' + template_args[1] + '}}'
+            else:
+                retxt += '{{link|' + template_args[1] + '|' + template_args[1] + '}}'
+        elif template_args[0] in ['et', 'ET', '词汇']:
+            if template_args[1] in self.entry_base:
+                if len(template_args) > 2 and template_args[2] in self.entry_base[template_args[1]]:
+                    retxt += self.entry_base[template_args[1]][template_args[2]]
+                else:
+                    retxt += self.entry_base[template_args[1]]['文字']
+            else:
+                retxt += '{{错误文字|错误的词汇名称：' + template_args[1] + '}}'
+        elif '图片' in template_args[0]:
+            size = ''
+            center = ''
+            link = ''
+            text = ''
+            image_class = ''
+            if template_args[1].lower() == 'shard.png':
+                template_args.insert(2, 'w24')
+            for i in range(2, len(template_args)):
+                if template_args[i] == 'left':
+                    # center = ' data-image-center="left"'
+                    center = '|left=1'
+                elif template_args[i] == 'right':
+                    # center = ' data-image-center="right"'
+                    center = '|right=1'
+                elif template_args[i] == 'center':
+                    # center = ' data-image-center="center"'
+                    center = '|center=1'
+                elif template_args[i][0] == 'w' and '=' not in template_args[i]:
+                    # size = ' data-image-width="' + template_args[i][1:] + '"'
+                    size = '|w=' + template_args[i][1:]
+                elif template_args[i][0] == 'h' and '=' not in template_args[i]:
+                    # size = ' data-image-height="' + template_args[i][1:] + '"'
+                    size = '|h=' + template_args[i][1:]
+                elif template_args[i][:5] == 'link=':
+                    # link = ' data-image-link="' + template_args[i][5:] + '"'
+                    link = '|link=' + template_args[i][5:]
+                elif template_args[i][:5] == 'text=':
+                    # text = ' data-text-link="' + template_args[i][5:] + '"'
+                    link = '|text=' + template_args[i][5:]
+                elif template_args[i][:6] == 'class=':
+                    # image_class = ' data-image-class="' + template_args[i][6:] + '"'
+                    link = '|class=' + template_args[i][6:]
+            if template_args[0] == '图片':
+                retxt = '{{image|' + template_args[1] + size + center + link + text + image_class + '}}'
+            elif template_args[0] == '大图片':
+                retxt = '{{image_big|' + template_args[1] + size + center + link + text + image_class + '}}'
+            elif template_args[0] == '小图片':
+                # retxt = '{{小图片|' + template_args[1] + size + center + link + text + image_class + ' data-image-mini="1">}}'
+                retxt = '{{image_small|' + template_args[1] + size + center + link + text + image_class + '}}'
+        elif template_args[0] == '链接':
+            if len(template_args) > 2:
+                retxt = self.uploat_text_link_by_args(template_args[1], '|'.join(template_args[2:]))
+            else:
+                retxt = self.uploat_text_link_by_args(template_args[1])
+        elif template_args[0] == '点击复制':
+            td = ''
+            if template_args[-1][:3] == 'td=':
+                # td = ' data-text-decoration="' + template_args[-1][3:] + '"'
+                td = '|' + template_args[-1]
+                template_args.pop()
+            if len(template_args) > 2:
+                # retxt = '<span class="dota_click_copy_text_html" data-click-copy-text="' + template_args[2] + '"' + td + '>' + template_args[1] + '</span>'
+                retxt = '{{click_to_copy|' + template_args[1] + '|' + template_args[2] + td + '}}'
+            else:
+                # retxt = '<span class="dota_click_copy_text_html" data-click-copy-text="' + template_args[1] + '"' + td + '>' + template_args[1] + '</span>'
+                retxt = '{{click_to_copy|' + template_args[1] + '|' + template_args[1] + td + '}}'
+        elif template_args[0] == '分类查询':
+            post = ''
+            dict = ''
+            delete = True
+            should_be_delete = []
+            for i in range(2, len(template_args)):
+                if template_args[i][:5] == 'post=':
+                    post = template_args[i][5:]
+                    should_be_delete.insert(0, i)
+                if template_args[i][:5] == 'dict=':
+                    dict = template_args[i][5:]
+                    should_be_delete.insert(0, i)
+                if template_args[i] == 'delete':
+                    delete = False
+                    should_be_delete.insert(0, i)
+            for i in should_be_delete:
+                template_args.pop(i)
+            if template_args[1] == '英雄':
+                retxt = common_page.create_hero_choose_element(self.json_base, template_args[2:], dict, post)
+            elif template_args[1] == '物品':
+                if delete:
+                    retxt = common_page.create_item_choose_element(self.json_base, template_args[2:], dict, post)
+                else:
+                    retxt = common_page.create_delete_item_choose_element(self.json_base, template_args[2:], post)
+            elif template_args[1] == '中立物品':
+                if delete:
+                    retxt = common_page.create_neutral_item_choose_element(self.json_base, template_args[2:], dict, post)
+                else:
+                    retxt = common_page.create_delete_neutral_item_choose_element(self.json_base, template_args[2:], post)
+            elif template_args[1] == '更新日志':
+                retxt = common_page.create_version_choose_element(self.version_list['版本'], self.version_base, dict)
+        elif template_args[0] == '机制内容':
+            if len(template_args) < 4:
+                if template_args[1] in self.json_base['机制']:
+                    if template_args[2] in self.json_base['机制'][template_args[1]]['内容']:
+                        if template_args[3] in self.json_base['机制'][template_args[1]]['内容'][template_args[2]]['内容']:
+                            retxt += self.json_base['机制'][template_args[1]]['内容'][template_args[2]]['内容'][template_args[3]]['内容']
+                        else:
+                            retxt += '{{错误文字|《{{H|' + template_args[1] + '}}》标题下《' + template_args[2] + '》错误标识：' + template_args[3] + '}}'
+                    else:
+                        retxt += '{{错误文字|《{{H|' + template_args[1] + '}}》错误标题：' + template_args[2] + '}}'
+                else:
+                    retxt += '{{错误文字|错误机制名：' + template_args[1] + '}}'
+            else:
+                retxt += '{{错误文字|《机制内容》需要输入3个参数，而您只输入了' + str(len(template_args) - 1) + '个参数}}'
+        elif template_args[0].lower() in ['b', 'buff']:
+            if len(template_args) < 3:
+                retxt = '{{错误文字|调用buff应使用2个参数，而您只输入了' + str(len(template_args) - 1) + '个参数}}'
+            else:
+                if template_args[1] in self.json_base['技能']:
+                    retxt += '{{hai|' + template_args[1] + '}}-' + template_args[2]
+        else:
+            return x.group(0)
+        return retxt
+
+    def upload_text_template_old(self, x):
         retxt = ''
         template_args = x.group(1).split('|')
         if template_args[0].lower() in ['h', 'a', 'i', 'hh']:
@@ -2186,8 +2396,9 @@ class Main(QMainWindow):
         elif template_args[0] in ['E', 'e']:
             if template_args[1] in self.entry_base:
                 retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + self.entry_base[template_args[1]]['链接'] + '">' + template_args[1] + '</span>'
+                retxt += '{{link|' + self.entry_base[template_args[1]]['链接'] + '|' + template_args[1] + '}}'
             else:
-                retxt += '<span class="dota_create_link_to_wiki_page" data-link-page-name="' + template_args[1] + '">' + template_args[1] + '</span>'
+                retxt += '{{link|' + template_args[1] + '|' + template_args[1] + '}}'
         elif template_args[0].lower() in ['b', 'buff']:
             if len(template_args) < 3:
                 retxt = '{{错误文字|调用buff应使用2个参数，而您只输入了' + str(len(template_args) - 1) + '个参数}}'
@@ -2218,7 +2429,8 @@ class Main(QMainWindow):
                                 break
                     if w != '':
                         if tip:
-                            retxt += '<span class="dota_get_ability_buff_by_json" data-buff-address="' + db['页面名'] + '，' + w['名称'] + '"' + name + chosen + '>' + preinfo + '</span>'
+                            retxt += '<span class="dota_get_ability_buff_by_json" data-buff-address="' + db['页面名'] + '，' + w[
+                                '名称'] + '"' + name + chosen + '>' + preinfo + '</span>'
                         else:
                             retxt += '<span class="" style="border-style:outset;background-color:#fff">' + w['名称'] + '</span>'
                     else:
@@ -2233,27 +2445,36 @@ class Main(QMainWindow):
                 template_args.insert(2, 'w24')
             for i in range(2, len(template_args)):
                 if template_args[i] == 'left':
-                    center = ' data-image-center="left"'
+                    # center = ' data-image-center="left"'
+                    center = '|left=1'
                 elif template_args[i] == 'right':
-                    center = ' data-image-center="right"'
+                    # center = ' data-image-center="right"'
+                    center = '|right=1'
                 elif template_args[i] == 'center':
-                    center = ' data-image-center="center"'
-                elif template_args[i][0] == 'w':
-                    size = ' data-image-width="' + template_args[i][1:] + '"'
-                elif template_args[i][0] == 'h':
-                    size = ' data-image-height="' + template_args[i][1:] + '"'
+                    # center = ' data-image-center="center"'
+                    center = '|center=1'
+                elif template_args[i][0] == 'w' and '=' not in template_args[i]:
+                    # size = ' data-image-width="' + template_args[i][1:] + '"'
+                    size = '|w=' + template_args[i][1:]
+                elif template_args[i][0] == 'h' and '=' not in template_args[i]:
+                    # size = ' data-image-height="' + template_args[i][1:] + '"'
+                    size = '|h=' + template_args[i][1:]
                 elif template_args[i][:5] == 'link=':
-                    link = ' data-image-link="' + template_args[i][5:] + '"'
+                    # link = ' data-image-link="' + template_args[i][5:] + '"'
+                    link = '|link=' + template_args[i][5:]
                 elif template_args[i][:5] == 'text=':
-                    text = ' data-text-link="' + template_args[i][5:] + '"'
+                    # text = ' data-text-link="' + template_args[i][5:] + '"'
+                    link = '|text=' + template_args[i][5:]
                 elif template_args[i][:6] == 'class=':
-                    image_class = ' data-image-class="' + template_args[i][6:] + '"'
+                    # image_class = ' data-image-class="' + template_args[i][6:] + '"'
+                    link = '|class=' + template_args[i][6:]
             if template_args[0] == '图片':
-                retxt = '<span class="dota_get_image_by_image_name" data-image-name="' + template_args[1] + '"' + size + center + link + text + image_class + '></span>'
+                retxt = '{{image|' + template_args[1] + size + center + link + text + image_class + '}}'
             elif template_args[0] == '大图片':
-                retxt = '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '"' + size + center + link + text + image_class + '></span>'
+                retxt = '{{image_big|' + template_args[1] + size + center + link + text + image_class + '}}'
             elif template_args[0] == '小图片':
-                retxt = '<span class="dota_get_image_by_json_name" data-json-name="' + template_args[1] + '"' + size + center + link + text + image_class + ' data-image-mini="1"></span>'
+                # retxt = '{{小图片|' + template_args[1] + size + center + link + text + image_class + ' data-image-mini="1">}}'
+                retxt = '{{image_small|' + template_args[1] + size + center + link + text + image_class + '}}'
         elif template_args[0] in ['et', 'ET', '词汇']:
             if template_args[1] in self.entry_base:
                 if len(template_args) > 2 and template_args[2] in self.entry_base[template_args[1]]:
@@ -2652,7 +2873,7 @@ class Main(QMainWindow):
                         tdict[i][0].israndom = random
                         self.complex_dict_to_tree(tdict[i], edict[i][1], sdict[i])
                         for j in sdict[i]:
-                            tdict[i][j]=TreeItemEdit(tdict[i][0], j)
+                            tdict[i][j] = TreeItemEdit(tdict[i][0], j)
                             tdict[i][j].set_type('text')
                             tdict[i][j].set_value(sdict[i][j])
                             tdict[i][j].israndom = random
@@ -2703,7 +2924,8 @@ class Main(QMainWindow):
     def item_dict_to_extra_tree(self, tdict, sdict):
         tempmenu = TreeItemEdit(tdict[0], '物品属性')
         tempmenu.set_type('list')
-        tempmenu.set_kid_list(['tree', {'名称': ['text', ''], '代码': ['text', ''], '后缀': ['text', ''], '展示前缀': ['text', ''], '展示后缀': ['text', ''], '叠加': ['text', '']}, 1, 0, False])
+        tempmenu.set_kid_list(
+            ['tree', {'名称': ['text', ''], '代码': ['text', ''], '后缀': ['text', ''], '展示前缀': ['text', ''], '展示后缀': ['text', ''], '叠加': ['text', '']}, 1, 0, False])
         for ii in sdict:
             if isinstance(sdict[ii], dict) and '代码' in sdict[ii] and '后缀' in sdict[ii] and '展示前缀' in sdict[ii] and '展示后缀' in sdict[ii] and '叠加' in sdict[ii]:
                 i = str(tempmenu.listtype[2])
@@ -2831,11 +3053,11 @@ class Main(QMainWindow):
             self.json_base[ss[0]][ss[1]] = self.download_json(ss[1] + '/源.json')
         else:
             self.json_base[ss[0]][ss[1]] = self.download_json(ss[1] + '.json')
-        self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base))
+        self.file_save(os.path.join('database', 'json_base.json'), json.dumps(self.json_base, ensure_ascii=False))
         self.edit_target_selected_changed()
-        json_ready=''
-        if ss[0][:2]=='机制':
-            json_ready=ss[1]
+        json_ready = ''
+        if ss[0][:2] == '机制':
+            json_ready = ss[1]
         self.update_the_jsons_alreadey[json_ready] = False
         QMessageBox.information(self, '更新完毕', '更新成功！您成功从wiki下载到' + ss[1] + '的信息。')
 
@@ -2853,7 +3075,7 @@ class Main(QMainWindow):
             k = 0
             while True:
                 self.time_point_for_iterable_sleep_by_time()
-                upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
+                upload_info = self.seesion_post(self.target_url, headers=self.header, data=upload_data)
                 if upload_info.status_code < 400:
                     self.json_base[ss[0]].pop(ss[1])
                     self.json_name[ss[0]].pop(self.json_name[ss[0]].index(ss[1]))
@@ -2884,7 +3106,7 @@ class Main(QMainWindow):
                 k = 0
                 while True:
                     self.time_point_for_iterable_sleep_by_time()
-                    upload_info = self.seesion.post(self.target_url, headers=self.header, data=upload_data)
+                    upload_info = self.seesion_post(self.target_url, headers=self.header, data=upload_data)
                     if upload_info.status_code < 400:
                         self.json_base[ss[0]][text] = copy.deepcopy(self.json_base[ss[0]][ss[1]])
                         self.json_name[ss[0]].append(text)
@@ -2910,9 +3132,9 @@ class Main(QMainWindow):
         self.json_base[ss[0]][ss[1]] = {}
         self.read_tree_to_json(self.editlayout['修改核心']['竖布局']['树'][0], self.json_base[ss[0]][ss[1]])
         self.file_save_all()
-        json_ready=''
-        if ss[0][:2]=='机制':
-            json_ready=ss[1]
+        json_ready = ''
+        if ss[0][:2] == '机制':
+            json_ready = ss[1]
         self.update_the_jsons_alreadey[json_ready] = False
         QMessageBox.information(self, "已完成", '已经保存更改，但没有进行数据更新\n请记得更新数据。')
         self.edit_target_selected_changed()
@@ -2962,7 +3184,8 @@ class Main(QMainWindow):
         self.editlayout['竖布局']['删除该次级条目'].setEnabled(sender.israndom and parent.israndom)
         self.editlayout['竖布局']['转换为混合文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() == 0 and not sender.israndom)
         self.editlayout['竖布局']['转换为普通文字'].setEnabled(sender.itemtype == 'text' and sender.childCount() > 0 and not sender.israndom)
-        self.editlayout['竖布局']['自定义机制目标'].setEnabled(sender.text(0)=='自定义机制' and selected=='技能源' or sender.text(0)=='应用自定义机制' and selected=='机制源')
+        self.editlayout['竖布局']['自定义机制目标'].setEnabled(
+            sender.text(0) == '自定义机制' and selected == '技能源' or sender.text(0) == '应用自定义机制' and selected == '机制源')
 
         self.editlayout['竖布局']['传统目标设定'].setEnabled(sender.text(0) == '不分类' or sender.text(0) == '英雄' or sender.text(0) == '非英雄')
         self.editlayout['竖布局']['升级各类型值'].setEnabled(sender.text(0) == '值' and sender.israndom and sender.itemtype == 'tree')
@@ -3104,7 +3327,8 @@ class Main(QMainWindow):
         item.setExpanded(True)
 
     def json_edit_combine_to_text(self):
-        warning = QMessageBox.warning(self, '转换', '您正试图将一串已有的混合文字转换为普通文字。\n内部所有的内容将会消失，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        warning = QMessageBox.warning(self, '转换', '您正试图将一串已有的混合文字转换为普通文字。\n内部所有的内容将会消失，这个操作将会难以撤销。', QMessageBox.Yes | QMessageBox.No,
+                                      QMessageBox.No)
         if warning == QMessageBox.Yes:
             temptxt = ''
             item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
@@ -3121,30 +3345,30 @@ class Main(QMainWindow):
     def json_edit_custom_mechnism_target(self):
         item = self.editlayout['修改核心']['竖布局']['树'][0].currentItem()
         for i in range(item.childCount()):
-            child1=item.child(i)
-            mech=child1.child(0).text(1)
-            name=child1.child(1).text(1)
+            child1 = item.child(i)
+            mech = child1.child(0).text(1)
+            name = child1.child(1).text(1)
             if mech in self.json_base['机制']:
                 if name in self.json_base['机制'][mech]['自定义机制']:
-                    child2=child1.child(child1.childCount()-1)
-                    custom=self.json_base['机制'][mech]['自定义机制'][name]
-                    exist={}
-                    while child2.childCount()>0:
-                        child3=child2.child(0)
-                        exist[child3.text(0)]=child3.text(1)
+                    child2 = child1.child(child1.childCount() - 1)
+                    custom = self.json_base['机制'][mech]['自定义机制'][name]
+                    exist = {}
+                    while child2.childCount() > 0:
+                        child3 = child2.child(0)
+                        exist[child3.text(0)] = child3.text(1)
                         child2.removeChild(child3)
-                    new={}
+                    new = {}
                     for j in custom:
                         if j in exist:
-                            new[j]=exist[j]
+                            new[j] = exist[j]
                         else:
-                            new[j]=''
+                            new[j] = ''
                     for j in new:
-                        newtree=TreeItemEdit(child2, j)
+                        newtree = TreeItemEdit(child2, j)
                         newtree.set_type('text')
                         newtree.set_value(new[j])
                 else:
-                    QMessageBox.critical(self, '错误的机制名', '您的【自定义机制】中的第【' + child1.text(0) + '】项的【' + mech + '】中的自定义机制名【'+name+'】不存在，请重新填写！')
+                    QMessageBox.critical(self, '错误的机制名', '您的【自定义机制】中的第【' + child1.text(0) + '】项的【' + mech + '】中的自定义机制名【' + name + '】不存在，请重新填写！')
                     break
             else:
                 QMessageBox.critical(self, '错误的机制名', '您的【自定义机制】中的第【' + child1.text(0) + '】项的机制名【' + mech + '】不存在，请重新填写！')
@@ -3370,7 +3594,7 @@ class Main(QMainWindow):
             text = item.text(0)
             title = item.parent().text(0) + '/' + text
         download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
-        download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
+        download_info = self.seesion_post(self.target_url, headers=self.header, data=download_data)
         if 'error' in download_info.json() and download_info.json()['error']['code'] == 'invalidtitle':
             messageBox = QMessageBox(QMessageBox.Critical, "下载失败", "网络上没有这个版本更新的库，请问是否自行创建？", QMessageBox.NoButton, self)
             button1 = messageBox.addButton('自行新建', QMessageBox.YesRole)
@@ -3402,7 +3626,7 @@ class Main(QMainWindow):
                 while True:
                     self.time_point_for_iterable_sleep_by_time()
                     download_data = {'action': 'jsondata', 'title': title + '.json', 'format': 'json'}
-                    download_info = self.seesion.post(self.target_url, headers=self.header, data=download_data)
+                    download_info = self.seesion_post(self.target_url, headers=self.header, data=download_data)
                     if download_info.status_code < 400:
                         try:
                             download_info_json = download_info.json()
@@ -3448,7 +3672,8 @@ class Main(QMainWindow):
                         QApplication.processEvents()
 
     def version_create_simple_show(self, version):
-        retxt = '<div class="dota_simple_infobox bgc_white" style="text-align:left;"><span style="font-size:36px">[[' + version['版本'] + ']]</span> ' + version['更新日期'] + ' <br>'
+        retxt = '<div class="dota_simple_infobox bgc_white" style="text-align:left;"><span style="font-size:36px">[[' + version['版本'] + ']]</span> ' + version[
+            '更新日期'] + ' <br>'
         label = {}
         titles = {'英雄': ['英雄'], '物品': ['物品'], '其他': []}
         for i in edit_json.version:
@@ -3897,9 +4122,12 @@ class Main(QMainWindow):
                 rere += db[i]['1'] + '，'
             for i in [['力量', 'Strength_Icon'], ['敏捷', 'Agility_Icon'], ['智力', 'Intelligence_Icon']]:
                 rere += '{{图片|' + i[1] + '.png}}' + common_page.number_to_string(db[i[0]]['1']) + '+' + common_page.number_to_string(db[i[0] + '成长']['1'])
-            rere += '，' + common_page.number_to_string(db['生命值']['1'] + db['力量']['1'] * 20) + '血，' + common_page.number_to_string(db['生命恢复']['1'] + db['力量']['1'] * 0.1) + '回血，'
-            rere += common_page.number_to_string(db['魔法值']['1'] + db['智力']['1'] * 12) + '蓝，' + common_page.number_to_string(db['魔法恢复']['1'] + db['智力']['1'] * 0.05) + '回蓝，'
-            rere += common_page.number_to_string(db['攻击下限']['1'] + db[db['主属性']['1']]['1']) + '~' + common_page.number_to_string(db['攻击上限']['1'] + db[db['主属性']['1']]['1']) + '攻击力，'
+            rere += '，' + common_page.number_to_string(db['生命值']['1'] + db['力量']['1'] * 20) + '血，' + common_page.number_to_string(
+                db['生命恢复']['1'] + db['力量']['1'] * 0.1) + '回血，'
+            rere += common_page.number_to_string(db['魔法值']['1'] + db['智力']['1'] * 12) + '蓝，' + common_page.number_to_string(
+                db['魔法恢复']['1'] + db['智力']['1'] * 0.05) + '回蓝，'
+            rere += common_page.number_to_string(db['攻击下限']['1'] + db[db['主属性']['1']]['1']) + '~' + common_page.number_to_string(
+                db['攻击上限']['1'] + db[db['主属性']['1']]['1']) + '攻击力，'
             rere += common_page.number_to_string(db['护甲']['1'] + round(db['敏捷']['1'] / 6, 2)) + '护甲，' + common_page.number_to_string(db['移动速度']['1']) + '移速，'
             rere += common_page.number_to_string(db['攻击间隔']['1']) + '基础攻击间隔，' + common_page.number_to_string(db['攻击距离']['1']) + '攻击距离。'
         elif name in self.json_base['非英雄单位']:
@@ -3938,7 +4166,8 @@ class Main(QMainWindow):
             rere += '{{H|' + name + '}}：' + self.json_base['技能'][name]['描述']
             for i in self.json_base['技能'][name]['属性']:
                 rere += self.json_base['技能'][name]['属性'][i]['名称'] + '：' + common_page.create_upgrade_text(self.json_base['技能'][name]['属性'], i) + '，'
-            rere += ability.create_upgrade_manacost(self.json_base['技能'][name]['魔法消耗'], 'span') + ability.create_upgrade_cooldown(self.json_base['技能'][name]['冷却时间'], 'span')
+            rere += ability.create_upgrade_manacost(self.json_base['技能'][name]['魔法消耗'], 'span') + ability.create_upgrade_cooldown(self.json_base['技能'][name]['冷却时间'],
+                                                                                                                                        'span')
         return rere
 
     def version_button_tree1(self):
@@ -4420,7 +4649,8 @@ class Main(QMainWindow):
             if clickb == QMessageBox.Yes:
                 self.entrylayout['编辑区']['树'][0].takeTopLevelItem(self.entrylayout['编辑区']['树'][0].indexOfTopLevelItem(item))
         elif item.parent().indexOfChild(item) > 1:
-            clickb = QMessageBox.critical(self, '删除一组文字', '您正试图删除【' + item.parent().text(0) + '】这条词汇的【' + item.text(0) + '】！', QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            clickb = QMessageBox.critical(self, '删除一组文字', '您正试图删除【' + item.parent().text(0) + '】这条词汇的【' + item.text(0) + '】！', QMessageBox.Yes | QMessageBox.No,
+                                          QMessageBox.Yes)
             if clickb == QMessageBox.Yes:
                 item.parent().removeChild(item)
 
@@ -4472,7 +4702,7 @@ class Main(QMainWindow):
             self.entry_edit_change_name()
 
     def test_inputwindow(self):
-        #self.test_inputwindow_loop_check(self.json_base['技能源'], [])
+        # self.test_inputwindow_loop_check(self.json_base['技能源'], [])
         # for i in self.json_base['技能源']:
         #     for j in self.json_base['技能源'][i]['属性']:
         #         v=self.json_base['技能源'][i]['属性'][j]
@@ -4487,7 +4717,7 @@ class Main(QMainWindow):
             v = json[i]
             if isinstance(v, dict):
                 if '生效目标' in v and '生效从属' in v:
-                    v['自定义机制']={}
+                    v['自定义机制'] = {}
                 else:
                     self.test_inputwindow_loop_check(v, db + [i])
 
