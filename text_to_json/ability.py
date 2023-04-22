@@ -62,7 +62,7 @@ def better_float_to_text(x, rounds=4):
 
 def get_dota_data_from_vpk(base_txt, ffile):
     this_string = ffile.read().decode('utf8')
-    alltext = re.finditer('"DOTA_Tooltip_ability_(.*?)_Lore".*?"(.*?)"', this_string,re.I)
+    alltext = re.finditer('"DOTA_Tooltip_ability_(.*?)_Lore".*?"(.*?)"', this_string, re.I)
     for i in alltext:
         name = i.group(1)
         if name in base_txt:
@@ -80,7 +80,7 @@ def get_hero_data_from_txt(base_txt, ffile):
         for j in all_pro:
             temp_name = j.group(1)
             temp_value = j.group(2)
-            if temp_value!='' and temp_value!=' ':
+            if temp_value != '' and temp_value != ' ':
                 base_txt[name][temp_name] = {}
                 if temp_value.find('|') == -1:
                     temp_list = temp_value.split(' ')
@@ -97,19 +97,19 @@ def get_hero_data_from_txt(base_txt, ffile):
                             base_txt[name][temp_name][str(k + 1)] = temp_valuek
         all_pro = re.finditer('[\s\t]*?"(.*?)".*?\n(\t{3,}|\s{12,}){((.|\n)*?)}', i.group(0))
         for j in all_pro:
-            j_name=j.group(1)
+            j_name = j.group(1)
             other_pro = re.finditer('[\s\t]*?"(.*?)"([^\S\r\n]|")+([^"]+)([^\S\r\n]|")+', j.group(3))
             for k in other_pro:
                 k_name = k.group(1)
                 k_value = k.group(3)
-                if k_name=='value' or k_name=='special_bonus_scepter' or k_name=='special_bonus_shard':
-                    post=''
-                    if k_name=='special_bonus_scepter':
-                        post='_scepter'
-                    if k_name=='special_bonus_shard':
-                        post='_shard'
+                if k_name == 'value' or k_name == 'special_bonus_scepter' or k_name == 'special_bonus_shard':
+                    post = ''
+                    if k_name == 'special_bonus_scepter':
+                        post = '_scepter'
+                    if k_name == 'special_bonus_shard':
+                        post = '_shard'
                     if k_value != '' and k_value != ' ':
-                        base_txt[name][j_name+post] = {}
+                        base_txt[name][j_name + post] = {}
                         if k_value.find('|') == -1:
                             temp_list = k_value.split(' ')
                         else:
@@ -117,12 +117,12 @@ def get_hero_data_from_txt(base_txt, ffile):
                         for l in range(len(temp_list)):
                             temp_valuek = temp_list[l].strip().strip('x').strip('=').rstrip('%')
                             try:
-                                base_txt[name][j_name+post][str(l + 1)] = int(temp_valuek)
+                                base_txt[name][j_name + post][str(l + 1)] = int(temp_valuek)
                             except ValueError:
                                 try:
-                                    base_txt[name][j_name+post][str(l + 1)] = float(temp_valuek)
+                                    base_txt[name][j_name + post][str(l + 1)] = float(temp_valuek)
                                 except ValueError:
-                                    base_txt[name][j_name+post][str(l + 1)] = temp_valuek
+                                    base_txt[name][j_name + post][str(l + 1)] = temp_valuek
                 else:
                     k_dict = {}
                     if k_value != '' and k_value != ' ':
@@ -165,7 +165,7 @@ def autoget_talent_source(all_json, base):
 
 
 def cal_ability_source_index(json, base, i):
-    arr = {'10级左天赋': -7, '10级右天赋': -8, '15级左天赋': -5, '15级右天赋': -6, '20级左天赋': -3, '20级右天赋': -4, '25级左天赋': -1,'25级右天赋': -2}
+    arr = {'10级左天赋': -7, '10级右天赋': -8, '15级左天赋': -5, '15级右天赋': -6, '20级左天赋': -3, '20级右天赋': -4, '25级左天赋': -1, '25级右天赋': -2}
     return base[json['英雄'][i[:-6]]['代码名']]['ability'][arr[i[-6:]]]
 
 
@@ -191,28 +191,32 @@ def loop_check_source_to_change_content(json):
 # 应用：0、因改版而被删除；1、正在使用；2、因为拥有者删除而被删除
 def get_source_to_data(all_json, upgrade_json, version, name_base):
     for i in all_json['技能源']:
-        v=all_json['技能源'][i]
+        v = all_json['技能源'][i]
         all_json['技能源'][i]['页面名'] = i
         all_json['技能源'][i]['分类'] = '技能源'
         if '链接指向' not in all_json['技能源'][i]:
             all_json['技能源'][i]['链接指向'] = {}
         if '手填标签' not in all_json['技能源'][i]:
             all_json['技能源'][i]['手填标签'] = {}
+        if '减益免疫' not in all_json['技能源'][i]:
+            all_json['技能源'][i]['减益免疫'] = {}
         for j in v['效果']:
-            w=v['效果'][j]
+            w = v['效果'][j]
             for k in w['自定义机制']:
-                x=w['自定义机制'][k]
+                x = w['自定义机制'][k]
+                if '减益免疫' not in x:
+                    x['减益免疫'] = {'代码': 0, '简述': ''}
                 if x['机制'] in all_json['机制'] and x['名称'] in all_json['机制'][x['机制']]['自定义机制']:
                     if '自称' not in x:
-                        x['自称']=''
-                    mechs=all_json['机制'][x['机制']]['自定义机制'][x['名称']]
-                    tempdict={}
+                        x['自称'] = ''
+                    mechs = all_json['机制'][x['机制']]['自定义机制'][x['名称']]
+                    tempdict = {}
                     for l in mechs:
                         if l in x['目标']:
-                            tempdict[l]=x['目标'][l]
+                            tempdict[l] = x['目标'][l]
                         else:
                             tempdict[l] = ''
-                    x['目标']=tempdict
+                    x['目标'] = tempdict
         # if 'A杖信息' in all_json['技能源'][i]:
         #     all_json['技能源'][i].pop('A杖信息')
         # if '升级' in all_json['技能源'][i]:
@@ -274,12 +278,12 @@ def get_source_to_data(all_json, upgrade_json, version, name_base):
             if unit_dic['图片类型'] != '手填':
                 if unit_dic["次级分类"] == "天赋技能":
                     unit_dic["图片"] = all_json["英雄"][unit_dic["技能归属"]]["图片"]
-                    pic_name='Talent_'+unit_dic['页面名'][-6:-4]+'_'
-                    if unit_dic['页面名'][-3]=='左':
-                        pic_name+='left'
-                    elif unit_dic['页面名'][-3]=='右':
-                        pic_name+='right'
-                    pic_name+='.png'
+                    pic_name = 'Talent_' + unit_dic['页面名'][-6:-4] + '_'
+                    if unit_dic['页面名'][-3] == '左':
+                        pic_name += 'left'
+                    elif unit_dic['页面名'][-3] == '右':
+                        pic_name += 'right'
+                    pic_name += '.png'
                     unit_dic["迷你图片"] = pic_name
                 elif unit_dic["次级分类"] == "物品技能":
                     if unit_dic["技能归属"] in all_json["物品"]:
@@ -615,11 +619,11 @@ def one_upgrade(json, mech, base_txt, name, target):
                         break
             except ValueError:
                 if '2' in json["1"]["修正"]:
-                    address=json["1"]["修正"]["2"].split('，')
-                    if len(address)<2:
-                        address.insert(0,json["1"]["代码"]["2"])
-                    if len(address)<3:
-                        address.insert(0,json["1"]["代码"]["1"])
+                    address = json["1"]["修正"]["2"].split('，')
+                    if len(address) < 2:
+                        address.insert(0, json["1"]["代码"]["2"])
+                    if len(address) < 3:
+                        address.insert(0, json["1"]["代码"]["1"])
                 if address[0] in base_txt and address[1] in base_txt[address[0]] and address[2] in base_txt[address[0]][address[1]]:
                     for k in base_txt[address[0]][address[1]][address[2]]:
                         getvalue[1].append(base_txt[address[0]][address[1]][address[2]][k])
@@ -844,7 +848,7 @@ def complete_mech(all_json, mech_json):
         mech_sign(all_json[i]["效果"], mech_json["标记"])
         mech_repeat(all_json[i]["效果"], mech_json["叠加"])
         mech_others(all_json[i], mech_json)
-        mech_trait_sign(all_json[i]["属性"], mech_json["属性标识"],i)
+        mech_trait_sign(all_json[i]["属性"], mech_json["属性标识"], i)
 
 
 def mech_target(json, mech):
@@ -964,7 +968,8 @@ def mech_others(json, mech):
                 if str(json["施法前摇"][i][j]["即时生效"]["代码"]) in mech["即时生效"]:
                     json["施法前摇"][i][j]["即时生效"]["图片"] = mech["即时生效"][str(json["施法前摇"][i][j]["即时生效"]["代码"])]
 
-def mech_trait_sign(json,mech,target):
+
+def mech_trait_sign(json, mech, target):
     for i in json:
         if '标识' in json[i]:
             for j in json[i]['标识']:
@@ -977,6 +982,7 @@ def mech_trait_sign(json,mech,target):
                     raise (editerror('技能源', target, '第' + i + '个【效果】的第' + j + '个【属性标识】的代码《' + v['代码'] + '》是错误的，请检查后重新填写'))
         else:
             raise (editerror('技能源', target, '没有找到第' + i + '个【效果】的【属性标识】，请检查是否在某个升级处没有填写'))
+
 
 def loop_check(json, data, all_json, name, target, change_all_template_link_to_html):
     for i in json:
@@ -2547,19 +2553,20 @@ def change_the_right_result_json_to_name_value_pair_to_show_in_table(conditions,
                 relist.append(re.sub(r'alent.png', lambda x: 'alentb.png', common_page.nocheck_create_upgrade_text(tempjson)))
     return relist + sort_mark
 
+
 def change_custom_mechnism_into_wikitable(json, all_json, target):
-    t1=[]
-    t2=[]
-    all_text=[]
-    tar_mech={}
-    retxt=''
+    t1 = []
+    t2 = []
+    all_text = []
+    tar_mech = {}
+    retxt = ''
     conditions = change_json_to_condition_dict(json, target)
     if '满足' in conditions:
         if conditions['满足'][0][0] in all_json['机制']:
             if conditions['满足'][0][1] in all_json['机制'][conditions['满足'][0][0]]['自定义机制']:
-                tar_mech=all_json['机制'][conditions['满足'][0][0]]['自定义机制'][conditions['满足'][0][1]]
+                tar_mech = all_json['机制'][conditions['满足'][0][0]]['自定义机制'][conditions['满足'][0][1]]
                 if '目标' in conditions:
-                    tars=conditions['目标'][0]
+                    tars = conditions['目标'][0]
                     for i in tars:
                         for j in tar_mech:
                             if i in j and j not in t1:
@@ -2576,8 +2583,8 @@ def change_custom_mechnism_into_wikitable(json, all_json, target):
             else:
                 raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n自定义机制表格中《' + conditions['满足'][0][0] + '》没有找到名为《' + conditions['满足'][0][1] + '》的自定义机制，请检查后重新填写'))
         else:
-            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n自定义机制表格没有查找到名字为《'+conditions['满足'][0][0]+'》的机制，请检查后重新填写'))
-    t2=sorted(t2,key=lambda x:x[1])
+            raise (editerror(target[0], target[1], '→'.join(target[2:]) + '：\n自定义机制表格没有查找到名字为《' + conditions['满足'][0][0] + '》的机制，请检查后重新填写'))
+    t2 = sorted(t2, key=lambda x: x[1])
     all_text = [['' for __ in range(len(t2))] for _ in range(len(t1))]
     for i in range(len(t1)):
         v1 = t1[i]
@@ -2585,21 +2592,22 @@ def change_custom_mechnism_into_wikitable(json, all_json, target):
             v2 = t2[j][0]
             if v2 in tar_mech[v1]:
                 all_text[i][j] = tar_mech[v1][v2]['值']
-    index=t2[0][1]
+    index = t2[0][1]
     retxt = '<table class="wikitable dota_scroll_table_by_hide_and_show"><tr><th>' + conditions['满足'][0][1] + '</th>'
     for i in t1:
-        retxt+='<td>' + i + '</td>'
+        retxt += '<td>' + i + '</td>'
     retxt += '</tr>'
     for j in range(len(t2)):
-        if index!=t2[j][1]:
-            retxt+='<tr><td></td></tr>'
-            index=t2[j][1]
-        retxt+='<tr><td>' + t2[j][0] + '</td>'
+        if index != t2[j][1]:
+            retxt += '<tr><td></td></tr>'
+            index = t2[j][1]
+        retxt += '<tr><td>' + t2[j][0] + '</td>'
         for i in range(len(t1)):
-            retxt+='<td>' + all_text[i][j] + '</td>'
-        retxt+='</tr>'
+            retxt += '<td>' + all_text[i][j] + '</td>'
+        retxt += '</tr>'
     retxt += '</table>'
     return retxt
+
 
 def change_json_to_condition_dict(json, target):
     redict = {}
@@ -3099,7 +3107,7 @@ def create_upgrade_cooldown(arr, outtip='div'):
 
 
 def create_upgrade_buff(json_dict):
-    buff_mech = ['技能免疫', '状态抗性', '无敌']
+    buff_mech = ['技能免疫', '减益免疫', '状态抗性', '无敌']
     retxt = '<div style="paddin:0.5em;"><table>'
     i = 0
     compeat_descripe = []  # 检查简述中是否存在重复文字
@@ -3114,8 +3122,9 @@ def create_upgrade_buff(json_dict):
             if '图片' in json_dict[str(i)] and json_dict[str(i)]['图片'] != '':
                 retxt += '{{额外信息框|{{图片|' + json_dict[str(i)]['图片'] + '}}|' + json_dict[str(i)]['值'] + '}} '
             for j in buff_mech:
-                if json_dict[str(i)][j]['代码'] != 0:
-                    retxt += '{{额外信息框|{{图片|' + json_dict[str(i)][j]['图片'] + '}}|' + json_dict[str(i)][j]['简述'] + '}} '
+                if j in json_dict[str(i)]:
+                    if json_dict[str(i)][j]['代码'] != 0:
+                        retxt += '{{额外信息框|{{图片|' + json_dict[str(i)][j]['图片'] + '}}|' + json_dict[str(i)][j]['简述'] + '}} '
             retxt += json_dict['名称'] + ' '
             if json_dict[str(i)]['驱散']['代码'] != 0:
                 retxt += '{{额外信息框|<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['驱散']['值'] + '</span>|' \
@@ -3128,14 +3137,14 @@ def create_upgrade_buff(json_dict):
                 if json_dict[str(i)]['标记'][j]['代码'] != 0:
                     retxt += '<span class="ability_indicator" style="background:#2266dd;color:white;">' + json_dict[str(i)]['标记'][j]['值'] + '</span>'
             for j in json_dict[str(i)]['自定义机制']:
-                retxt+='<span class="ability_indicator" style="background:#882288;color:white;">{{额外信息框|' + json_dict[str(i)]['自定义机制'][j]['名称'] + '|'
-                if json_dict[str(i)]['自定义机制'][j]['自称']!='':
-                    retxt +=json_dict[str(i)]['自定义机制'][j]['自称']+'<br>'
+                retxt += '<span class="ability_indicator" style="background:#882288;color:white;">{{额外信息框|' + json_dict[str(i)]['自定义机制'][j]['名称'] + '|'
+                if json_dict[str(i)]['自定义机制'][j]['自称'] != '':
+                    retxt += json_dict[str(i)]['自定义机制'][j]['自称'] + '<br>'
                 for k in json_dict[str(i)]['自定义机制'][j]['目标']:
-                    retxt+=k+'：'+json_dict[str(i)]['自定义机制'][j]['目标'][k]+'<br>'
-                if retxt[-4:]=='<br>':
-                    retxt=retxt[:-4]
-                retxt+='}}</span>'
+                    retxt += k + '：' + json_dict[str(i)]['自定义机制'][j]['目标'][k] + '<br>'
+                if retxt[-4:] == '<br>':
+                    retxt = retxt[:-4]
+                retxt += '}}</span>'
             if json_dict[str(i)]['生效从属']['代码'] > 1:
                 retxt += '{{额外信息框|<span class="ability_indicator" style="background:#009688;color:white;">' + json_dict[str(i)]['生效从属']['值'] + '</span>' \
                          + '|' + json_dict[str(i)]['生效从属']['简述'] + '}} '
@@ -3266,22 +3275,23 @@ def create_independent_mech(json_dict):
     retxt += '</table></div>'
     return retxt
 
+
 def get_buff_costom_mechnism(json_dict):
-    redict={}
+    redict = {}
     for i in json_dict['技能']:
-        v=json_dict['技能'][i]
+        v = json_dict['技能'][i]
         for j in v['效果']:
-            w=v['效果'][j]
-            kk=0
+            w = v['效果'][j]
+            kk = 0
             while True:
-                kk+=1
-                k=str(kk)
+                kk += 1
+                k = str(kk)
                 if k in w:
-                    x=w[k]
+                    x = w[k]
                     for l in x['自定义机制']:
-                        y=x['自定义机制'][l]
-                        bufftar=(i,w['名称'],y['自称'])
-                        dictname=(y['机制'],y['名称'])
+                        y = x['自定义机制'][l]
+                        bufftar = (i, w['名称'], y['自称'])
+                        dictname = (y['机制'], y['名称'])
                         buffname = '{{buff|' + bufftar[0] + '|' + bufftar[1]
                         if kk >= 2 and '1' not in w:
                             buffname += '|chosen=' + k
@@ -3289,42 +3299,43 @@ def get_buff_costom_mechnism(json_dict):
                         if y['自称'] != '':
                             buffname += '-' + y['自称']
                         if dictname not in redict:
-                            redict[dictname]={}
+                            redict[dictname] = {}
                         for m in y['目标']:
                             if m not in redict[dictname]:
-                                redict[dictname][m]={}
+                                redict[dictname][m] = {}
                             if bufftar not in redict[dictname][m]:
-                                redict[dictname][m][bufftar]={'名称':buffname,'值':y['目标'][m],'排序':y['排序']}
-                elif kk>=2:
+                                redict[dictname][m][bufftar] = {'名称': buffname, '值': y['目标'][m], '排序': y['排序']}
+                elif kk >= 2:
                     break
     for i in json_dict['机制']:
-        v=json_dict['机制'][i]
+        v = json_dict['机制'][i]
         if '应用自定义机制' in v:
             for j in v['应用自定义机制']:
-                y=v['应用自定义机制'][j]
-                bufftar=(i,y['自称'])
+                y = v['应用自定义机制'][j]
+                bufftar = (i, y['自称'])
                 dictname = (y['机制'], y['名称'])
-                buffname='{{H|'+i+'}}'
-                if y['自称']!='':
-                    buffname+='-'+y['自称']
+                buffname = '{{H|' + i + '}}'
+                if y['自称'] != '':
+                    buffname += '-' + y['自称']
                 if dictname not in redict:
                     redict[dictname] = {}
                 for m in y['目标']:
                     if m not in redict[dictname]:
-                        redict[dictname][m]={}
+                        redict[dictname][m] = {}
                     if bufftar not in redict[dictname][m]:
-                        redict[dictname][m][bufftar]={'名称':buffname,'值':y['目标'][m],'排序':y['排序']}
+                        redict[dictname][m][bufftar] = {'名称': buffname, '值': y['目标'][m], '排序': y['排序']}
     for i in redict:
         for j in redict[i]:
-            temp=[]
+            temp = []
             for k in redict[i][j]:
-                temp.append([k,redict[i][j][k]['排序']])
-            temp=sorted(temp, key=lambda x: x[1])
-            tempdict={}
+                temp.append([k, redict[i][j][k]['排序']])
+            temp = sorted(temp, key=lambda x: x[1])
+            tempdict = {}
             for k in temp:
-                tempdict[k[0]]=redict[i][j][k[0]]
-            redict[i][j]=tempdict
+                tempdict[k[0]] = redict[i][j][k[0]]
+            redict[i][j] = tempdict
     return redict
+
 
 def fulfil_complex_and_simple_show(all_json, html_function):
     for i in all_json['技能']:
@@ -3415,8 +3426,8 @@ def fulfil_complex_and_simple_show(all_json, html_function):
                     bt += '<div style="padding:0.5em 0.5em 0em 1em">' + v1
                     st += '<div style="padding:0.5em 0.5em 0em 1em">' + v1
                     for j in v['标识']:
-                        bt+='{{额外信息框|{{图片|'+v['标识'][j]['图片']+'}}|'+v['标识'][j]['描述']+'}}'
-                        st+='{{额外信息框|{{图片|'+v['标识'][j]['图片']+'}}|'+v['标识'][j]['描述']+'}}'
+                        bt += '{{额外信息框|{{图片|' + v['标识'][j]['图片'] + '}}|' + v['标识'][j]['描述'] + '}}'
+                        st += '{{额外信息框|{{图片|' + v['标识'][j]['图片'] + '}}|' + v['标识'][j]['描述'] + '}}'
                     bt += '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
                     st += '：' + common_page.create_upgrade_text(db["属性"], i) + '</div>'
                 else:
@@ -3535,4 +3546,4 @@ abilitypro_num = [["a_cast_range", "AbilityCastRange"]
 abilitypro_bool = [["immediate", "DOTA_ABILITY_BEHAVIOR_IMMEDIATE"]
     , ["ignore_channel", "DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"]]
 ability_trait_level = [["中文名", "英文名", "代码", "传说", "描述", "天赋代码", "神杖信息", "魔晶信息", "注释"], ["效果", "属性", "施法前摇", "施法后摇", "冷却时间"], ["魔法消耗"]
-    , ['技能免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域', '独立机制']]
+    , ['技能免疫', '减益免疫', '无敌', '技能抵挡', '技能反弹', '技能共享', '技能窃取', '幻象', '破坏', '持续施法', '躲避', '缠绕', '即时攻击', '视野', '真实视域', '独立机制']]

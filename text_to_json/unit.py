@@ -152,7 +152,10 @@ def fulfill_unit_json(base_txt, all_json, version, name_base):
                         bool = True
                         proname=j[3] if len(j)>3 else j[1]
                         for l in all_json[i]["代码名"]:
-                            all_json[i][j[0]][k][l] = base_txt["非英雄单位"][all_json[i]["代码名"][l]][proname]["1"]
+                            if proname in base_txt["非英雄单位"][all_json[i]["代码名"][l]]:
+                                all_json[i][j[0]][k][l] = base_txt["非英雄单位"][all_json[i]["代码名"][l]][proname]["1"]
+                            else:
+                                all_json[i][j[0]][k][l]='?'
                             bool = bool and all_json[i][j[0]][k]["1"] == all_json[i][j[0]][k][l]
                         all_json[i][j[0]][k]['代码']['3'] = proname
                         if bool:
